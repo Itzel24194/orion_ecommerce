@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario - ORION SYSTEM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-pink: #ff007f; --neon-blue: #00d4ff; --bg-deep: #020202; }
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-deep); font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+
+        .ultra-bg { position: fixed; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 50%, #1a001a, #000); z-index: 0; }
+        .ultra-bg::after { content: ""; position: absolute; inset: 0; background: conic-gradient(from 0deg, var(--neon-pink), var(--neon-blue), var(--neon-pink)); filter: blur(150px); opacity: 0.25; animation: rotate 20s linear infinite; }
+        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .top-bar { position: fixed; top: 0; width: 100%; height: 65px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); border-bottom: 2px solid var(--neon-pink); color: white; font-weight: 900; font-size: 1.8rem; letter-spacing: 20px; z-index: 100; text-transform: uppercase; box-shadow: 0 0 30px rgba(255, 0, 127, 0.3); }
+
+        .card-wrapper { position: relative; z-index: 10; margin-top: 80px; transition: 0.5s; }
+        .profile-card { width: 450px; padding: 3rem; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(50px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; color: white; text-align: center; }
+        
+        h3 { font-weight: 900; margin-bottom: 2rem; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+
+        .input-box { width: 100%; padding: 18px; margin-bottom: 1.2rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; color: white; box-sizing: border-box; font-size: 1rem; transition: 0.3s; }
+        .input-box:focus { outline: none; border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 212, 255, 0.2); }
+
+        .date-section { margin-bottom: 1.5rem; text-align: left; }
+        .date-title { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 0.8rem; display: block; letter-spacing: 1.5px; text-transform: uppercase; }
+        .date-container { display: flex; gap: 12px; }
+        .input-date { 
+            width: 100%; padding: 15px 5px; 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 2px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; 
+            color: white; 
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+        .input-date:focus { border-color: var(--neon-pink); background: rgba(255, 255, 255, 0.1); outline: none; }
+
+        .gender-section { margin-bottom: 2rem; text-align: left; }
+        .gender-title { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 0.8rem; display: block; letter-spacing: 1.5px; text-transform: uppercase; }
+        .sex-options { display: flex; justify-content: space-around; color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+
+        .btn-orion { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue)); color: white; border: none; border-radius: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: 0.3s; }
+        .btn-orion:hover { transform: scale(1.02); filter: brightness(1.2); }
+    </style>
+</head>
+<body>
+
+    <div class="ultra-bg"></div>
+    <div class="top-bar">ORION</div>
+
+    <div class="card-wrapper">
+        <div class="profile-card">
+            <h3>DATOS DE PERFIL</h3>
+            
+            <form action="{{ url_for('web.register_profile') }}" method="POST">
+                <input type="text" name="nombre" class="input-box" placeholder="NOMBRE(S)*" required>
+                <input type="text" name="apellido_p" class="input-box" placeholder="APELLIDO PATERNO*" required>
+                <input type="text" name="apellido_m" class="input-box" placeholder="APELLIDO MATERNO">
+                
+                <div class="date-section">
+                    <label class="date-title">Fecha de nacimiento</label>
+                    <div class="date-container">
+                        <input type="number" name="dia" class="input-date" placeholder="DD" min="1" max="31" required>
+                        <input type="number" name="mes" class="input-date" placeholder="MM" min="1" max="12" required>
+                        <input type="number" name="anio" class="input-date" placeholder="AAAA" min="1900" max="2026" required>
+                    </div>
+                </div>
+                
+                <div class="gender-section">
+                    <label class="gender-title">Género</label>
+                    <div class="sex-options">
+                        <label><input type="radio" name="genero" value="mujer" required> MUJER</label>
+                        <label><input type="radio" name="genero" value="hombre" required> HOMBRE</label>
+                        <label><input type="radio" name="genero" value="indefinido" required> INDEFINIDO</label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-orion">FINALIZAR REGISTRO</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

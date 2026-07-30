@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-secondary: #00d4ff;
+            --orion-dark: #1a1a2e;
+            --orion-gray: #f5f6f8;
+            --orion-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            --orion-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-color: var(--orion-gray);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: #1a1a2e;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        /* ===== TOP NAV ===== */
+        .top-nav {
+            font-size: 0.75rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            padding: 6px 0;
+        }
+
+        .top-nav a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .top-nav a:hover {
+            color: var(--orion-primary);
+        }
+
+        /* ===== NAVBAR ===== */
+        .main-navbar {
+            background: #ffffff;
+            border-bottom: 2px solid #f0f0f0;
+            padding: 12px 0 !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .brand-logo {
+            font-weight: 900;
+            font-size: 2.3rem;
+            color: var(--orion-primary) !important;
+            letter-spacing: -1.5px;
+            text-decoration: none;
+        }
+
+        .brand-logo:hover {
+            color: var(--orion-primary-dark) !important;
+        }
+
+        .navbar .dropdown-toggle {
+            font-weight: 700;
+            color: #1a1a2e;
+            background: transparent;
+            border: none;
+            padding: 8px 12px;
+        }
+
+        .navbar .dropdown-toggle:hover {
+            color: var(--orion-primary);
+        }
+
+        .search-container {
+            border: 2px solid #eee !important;
+            border-radius: 50px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .search-container input {
+            border: none;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+        }
+
+        .search-container input:focus {
+            box-shadow: none;
+            background: #fff;
+        }
+
+        .search-container .btn-search {
+            background: #f8f9fa;
+            border: none;
+            padding: 8px 15px;
+        }
+
+        .search-container .btn-search:hover {
+            background: #eee;
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--orion-primary);
+        }
+
+        .brand-border {
+            height: 4px;
+            background: linear-gradient(90deg, var(--orion-primary), #1a1a2e);
+            width: 100%;
+        }
+
+        /* ===== DROPDOWN CATEGORÍAS ===== */
+        .dropdown-submenu {
+            position: relative;
+        }
+        .dropdown-submenu>.dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -6px;
+            display: none;
+        }
+        .dropdown-submenu:hover>.dropdown-menu {
+            display: block;
+        }
+        .dropdown-submenu>a::after {
+            content: " ▶";
+            font-size: 0.6rem;
+            float: right;
+            margin-top: 5px;
+        }
+        .dropdown-menu {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+        }
+        .dropdown-item {
+            padding: 8px 20px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        .dropdown-item:hover {
+            background: rgba(225, 0, 152, 0.05);
+            color: var(--orion-primary);
+        }
+
+        /* ===== BOTÓN CARRITO ===== */
+        .btn-cart {
+            position: relative;
+            color: #1a1a2e;
+            font-size: 1.4rem;
+            text-decoration: none;
+        }
+        .btn-cart:hover {
+            color: var(--orion-primary);
+        }
+        .btn-cart .badge-cart {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: var(--orion-primary);
+            color: #fff;
+            font-size: 0.55rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            font-weight: 700;
+        }
+
+        /* ===== TEXTO USUARIO ===== */
+        .user-link {
+            color: #1a1a2e;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .user-link:hover {
+            color: var(--orion-primary);
+        }
+
+        /* ===== HERO ===== */
+        .hero-pedidos {
+            background: linear-gradient(135deg, #0033A0 0%, #002277 100%);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-pedidos::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -5%;
+            width: 250px;
+            height: 250px;
+            background: rgba(227, 24, 55, 0.06);
+            border-radius: 50%;
+        }
+
+        .hero-pedidos::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -3%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 215, 0, 0.04);
+            border-radius: 50%;
+        }
+
+        .hero-pedidos .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-pedidos .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .hero-pedidos .hero-text {
+            flex: 1;
+        }
+
+        .hero-pedidos .hero-title {
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: #FFFFFF;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hero-pedidos .hero-title .bi {
+            color: #FFD700;
+            font-size: 1.6rem;
+        }
+
+        .hero-pedidos .hero-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            font-weight: 400;
+            max-width: 500px;
+        }
+
+        .hero-pedidos .hero-subtitle .bi {
+            color: #FFD700;
+        }
+
+        .hero-pedidos .hero-stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(8px);
+            padding: 8px 22px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .hero-pedidos .hero-stats .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .hero-pedidos .hero-stats .stat-item .bi {
+            color: #FFD700;
+            font-size: 1rem;
+        }
+
+        .hero-pedidos .hero-stats .stat-divider {
+            width: 1px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ===== FILTROS ===== */
+        .filtros-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .filter-btn {
+            border: 2px solid #e0e0e0;
+            background: #fff;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #666;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--orion-primary);
+            color: var(--orion-primary);
+            background: rgba(225, 0, 152, 0.05);
+        }
+
+        .filter-btn.active {
+            background: var(--orion-primary);
+            color: #fff;
+            border-color: var(--orion-primary);
+            box-shadow: 0 4px 15px rgba(225, 0, 152, 0.3);
+        }
+
+        /* ===== PEDIDO CARD ===== */
+        .pedido-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--orion-shadow);
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+        }
+
+        .pedido-card:hover {
+            box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+            transform: translateY(-2px);
+        }
+
+        /* ===== PEDIDO HEADER ===== */
+        .pedido-header {
+            padding: 18px 24px;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pedido-header .order-id {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1a1a2e;
+        }
+
+        .pedido-header .order-id span {
+            color: var(--orion-primary);
+        }
+
+        .pedido-header .order-id .bi {
+            color: var(--orion-primary);
+            margin-right: 6px;
+        }
+
+        .pedido-header .order-date {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .pedido-header .order-date .bi {
+            margin-right: 4px;
+        }
+
+        .pedido-header .order-total {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--orion-primary);
+        }
+
+        .pedido-header .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== STATUS BADGES ===== */
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 5px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-pendiente { background: #fff3cd; color: #856404; }
+        .status-pendiente::before { content: '⏳'; }
+        .status-confirmado { background: #cce5ff; color: #004085; }
+        .status-confirmado::before { content: '✅'; }
+        .status-preparando { background: #fff3cd; color: #856404; }
+        .status-preparando::before { content: '📦'; }
+        .status-enviado { background: #d1ecf1; color: #0c5460; }
+        .status-enviado::before { content: '🚚'; }
+        .status-entregado { background: #d4edda; color: #155724; }
+        .status-entregado::before { content: '✅'; }
+        .status-cancelado { background: #f8d7da; color: #721c24; }
+        .status-cancelado::before { content: '❌'; }
+
+        .badge-click-collect {
+            background: var(--orion-primary);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .badge-click-collect .bi {
+            margin-right: 4px;
+        }
+
+        /* ===== PEDIDO BODY ===== */
+        .pedido-body {
+            padding: 20px 24px;
+        }
+
+        .productos-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .producto-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .producto-item:hover {
+            background: #f5f5f5;
+            border-color: #eee;
+        }
+
+        .producto-img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+            background: #fff;
+        }
+
+        .producto-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .producto-nombre {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+        }
+
+        .producto-atributos {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .producto-atributos .bi {
+            margin-right: 2px;
+        }
+
+        .producto-cantidad {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .producto-cantidad .bi {
+            margin-right: 2px;
+        }
+
+        .producto-precio {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--orion-primary);
+        }
+
+        .producto-subtotal {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        /* ===== PEDIDO FOOTER ===== */
+        .pedido-footer {
+            padding: 14px 24px;
+            background: #fafafa;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .pedido-footer .info-item {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .pedido-footer .info-item .bi {
+            color: var(--orion-primary);
+            margin-right: 4px;
+        }
+
+        .btn-orion {
+            background: linear-gradient(135deg, var(--orion-primary), var(--orion-primary-dark));
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-orion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
+            color: #fff;
+        }
+
+        .btn-ver-detalles {
+            background: var(--orion-primary);
+            color: #fff;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-ver-detalles:hover {
+            background: var(--orion-primary-dark);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .btn-cancelar {
+            background: transparent;
+            border: 2px solid #dc3545;
+            color: #dc3545;
+            padding: 5px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-cancelar:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--orion-shadow);
+            border: 1px solid #f0f0f0;
+        }
+
+        .empty-state .icon {
+            font-size: 4.5rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h4 {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #888;
+            max-width: 400px;
+            margin: 10px auto 24px;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-confirmacion {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-confirmacion.show {
+            display: flex;
+        }
+
+        .modal-confirmacion .modal-content-custom {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 420px;
+            width: 90%;
+            padding: 35px 30px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-confirmacion .modal-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #fff3cd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 2.2rem;
+            color: #856404;
+        }
+
+        .modal-confirmacion .modal-title-custom {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .modal-confirmacion .modal-message {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .modal-confirmacion .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-confirmacion .btn-modal-cancelar {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        .modal-confirmacion .btn-modal-cancelar:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .modal-confirmacion .btn-modal-cerrar {
+            background: #e9ecef;
+            color: #495057;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        .modal-confirmacion .btn-modal-cerrar:hover {
+            background: #dee2e6;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container-custom {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .toast-custom {
+            background: #28a745;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.5s ease;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .toast-custom.error {
+            background: #dc3545;
+        }
+
+        .toast-custom .bi {
+            font-size: 1.2rem;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 30px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .search-container {
+                width: 100% !important;
+            }
+            .brand-logo {
+                font-size: 1.8rem;
+            }
+            .hero-pedidos .hero-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .hero-pedidos .hero-stats {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-pedidos {
+                padding: 16px 0;
+            }
+            .hero-pedidos .hero-title {
+                font-size: 1.4rem;
+                flex-wrap: wrap;
+            }
+            .hero-pedidos .hero-title .bi {
+                font-size: 1.3rem;
+            }
+            .hero-pedidos .hero-subtitle {
+                font-size: 0.85rem;
+            }
+            .hero-pedidos .hero-stats {
+                flex-wrap: wrap;
+                padding: 8px 16px;
+                gap: 10px;
+            }
+            .hero-pedidos .hero-stats .stat-divider {
+                display: none;
+            }
+            .hero-pedidos .hero-stats .stat-item {
+                font-size: 0.8rem;
+            }
+            .pedido-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pedido-header .header-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .pedido-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .producto-item {
+                flex-wrap: wrap;
+                padding: 10px 12px;
+            }
+            .producto-img {
+                width: 52px;
+                height: 52px;
+            }
+            .top-nav {
+                font-size: 0.65rem;
+            }
+            .modal-confirmacion .modal-content-custom {
+                padding: 28px 20px 24px;
+            }
+            .modal-confirmacion .modal-title-custom {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .filtros-container {
+                gap: 6px;
+            }
+            .filter-btn {
+                font-size: 0.65rem;
+                padding: 6px 14px;
+            }
+            .pedido-body {
+                padding: 14px 16px;
+            }
+            .pedido-header {
+                padding: 14px 16px;
+            }
+            .pedido-footer {
+                padding: 12px 16px;
+            }
+            .user-link span {
+                display: none;
+            }
+            .hero-pedidos .hero-stats .stat-item {
+                font-size: 0.75rem;
+            }
+            .modal-confirmacion .modal-actions {
+                flex-direction: column;
+            }
+            .modal-confirmacion .btn-modal-cancelar,
+            .modal-confirmacion .btn-modal-cerrar {
+                width: 100%;
+                min-width: unset;
+            }
+            .pedido-header .order-total {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- ===== TOP NAV ===== -->
+        <div class="top-nav">
+            <div class="container d-flex justify-content-end gap-4">
+                <a href="#"><i class="bi bi-geo-alt"></i> Encuentra tu tienda</a>
+                <a href="/servicios"><i class="bi bi-truck"></i> Servicios</a>
+                <a href="#"><i class="bi bi-question-circle"></i> Ayuda</a>
+            </div>
+        </div>
+
+        <!-- ===== NAVBAR ===== -->
+        <nav class="navbar navbar-expand-lg navbar-light main-navbar">
+            <div class="container">
+                <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#orionNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="orionNavbar">
+                    <!-- Categorías Dropdown -->
+                    <div class="dropdown mx-lg-3">
+                        <button class="dropdown-toggle" data-bs-toggle="dropdown">
+                            Categorías
+                        </button>
+                        <ul class="dropdown-menu shadow border-0 py-2">
+                            {% if categorias %}
+                                {% for padre in categorias if not padre.padre_id %}
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item" href="/catalogo?categoria={{padre._id}}">{{ padre.nombre }}</a>
+                                    <ul class="dropdown-menu shadow border-0">
+                                        {% for hijo in categorias if hijo.padre_id == padre._id %}
+                                        <li><a class="dropdown-item" href="/catalogo?categoria={{hijo._id}}">{{ hijo.nombre }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% endfor %}
+                            {% else %}
+                                <li><a class="dropdown-item" href="/catalogo?categoria=electronica">Electrónica</a></li>
+                                <li><a class="dropdown-item" href="/catalogo?categoria=moda">Moda</a></li>
+                                <li><a class="dropdown-item" href="/catalogo?categoria=hogar">Hogar</a></li>
+                                <li><a class="dropdown-item" href="/catalogo?categoria=deportes">Deportes</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <!-- Buscador -->
+                    <form class="d-flex flex-grow-1" action="{{ url_for('web.catalogo') }}" method="GET">
+                        <div class="input-group search-container">
+                            <input class="form-control" type="search" name="q" placeholder="Buscar productos...">
+                            <button class="btn-search" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Usuario y Carrito -->
+                    <div class="ms-3 d-flex align-items-center gap-3">
+                        {% if session.get('nombre') %}
+                            <a href="{{ url_for('web.perfil') }}" class="user-link">
+                                {% if session.get('foto') %}
+                                    <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}"
+                                         class="user-avatar" alt="Perfil">
+                                {% else %}
+                                    <i class="bi bi-person-circle fs-3"></i>
+                                {% endif %}
+                                <span>HOLA, {{ session['nombre'] }}</span>
+                            </a>
+                        {% else %}
+                            <a href="/login" class="user-link">
+                                <i class="bi bi-person-circle fs-3"></i>
+                                <span>INICIAR SESIÓN</span>
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('web.ver_carrito') }}" class="btn-cart">
+                            <i class="bi bi-bag"></i>
+                            {% if carrito_items|length > 0 %}
+                                <span class="badge-cart">{{ carrito_items|length }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="brand-border"></div>
+
+        <!-- ===== HERO ===== -->
+        <section class="hero-pedidos">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1 class="hero-title">
+                            <i class="bi bi-box-seam"></i> Mis Pedidos
+                        </h1>
+                        <p class="hero-subtitle">
+                            <i class="bi bi-clock-history me-1"></i> 
+                            Visualiza el estado de tus compras y realiza seguimiento de tus entregas
+                        </p>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <i class="bi bi-receipt"></i>
+                            <span>{{ pedidos|length if pedidos else 0 }} pedidos</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <i class="bi bi-truck"></i>
+                            <span>Seguimiento en tiempo real</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CONTENIDO ===== -->
+        <div class="container content">
+
+            <!-- Mensajes Flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="filtros-container">
+                <button class="filter-btn active" data-filter="todos">Todos</button>
+                <button class="filter-btn" data-filter="pendiente">Pendientes</button>
+                <button class="filter-btn" data-filter="confirmado">Confirmados</button>
+                <button class="filter-btn" data-filter="preparando">Preparando</button>
+                <button class="filter-btn" data-filter="enviado">Enviados</button>
+                <button class="filter-btn" data-filter="entregado">Entregados</button>
+                <button class="filter-btn" data-filter="cancelado">Cancelados</button>
+            </div>
+
+            <!-- Lista de Pedidos -->
+            {% if pedidos and pedidos|length > 0 %}
+                {% for pedido in pedidos %}
+                <div class="pedido-card" data-estado="{{ pedido.estado if pedido.estado else 'pendiente' }}">
+                    
+                    <!-- HEADER -->
+                    <div class="pedido-header">
+                        <div>
+                            <div class="order-id">
+                                <i class="bi bi-receipt"></i> Pedido #<span>{{ pedido.numero_pedido if pedido.numero_pedido else pedido._id|string|truncate(8, True, '') }}</span>
+                            </div>
+                            <div class="order-date">
+                                <i class="bi bi-calendar3"></i> 
+                                {{ pedido.created_at.strftime('%d de %B, %Y - %H:%M') if pedido.created_at else 'Fecha no disponible' }}
+                            </div>
+                        </div>
+                        <div class="header-right">
+                            <span class="status-badge status-{{ pedido.estado if pedido.estado else 'pendiente' }}">
+                                {{ pedido.estado|title if pedido.estado else 'Pendiente' }}
+                            </span>
+                            {% if pedido.tipo_envio == 'click_collect' %}
+                                <span class="badge-click-collect"><i class="bi bi-shop"></i> Click & Collect</span>
+                            {% endif %}
+                            <div class="order-total">
+                                ${{ "%.2f"|format(pedido.total|default(0)) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BODY - Productos -->
+                    <div class="pedido-body">
+                        <div class="productos-lista">
+                            {% set items = pedido.items_list if pedido.items_list is defined else pedido.items if pedido.items is defined else [] %}
+                            
+                            {% if items and items|length > 0 %}
+                                {% for item in items %}
+                                <div class="producto-item">
+                                    {% set imagen = item.imagen or item.foto or 'default.jpg' %}
+                                    <img src="{{ url_for('static', filename='uploads/productos/' + imagen) }}" 
+                                         class="producto-img" alt="{{ item.nombre }}" loading="lazy"
+                                         onerror="this.src='https://via.placeholder.com/64/1a1a2e/666?text=Producto'">
+                                    <div class="producto-info">
+                                        <div class="producto-nombre">{{ item.nombre }}</div>
+                                        <div class="producto-atributos">
+                                            {% if item.atributos %}
+                                                {% set color = item.atributos.color|string|replace('\n', '')|replace('\r', '')|trim if item.atributos.color else '' %}
+                                                {% set tamano = item.atributos.tamano|string|replace('\n', '')|replace('\r', '')|replace('\t', '')|trim if item.atributos.tamano else '' %}
+                                                {% if color and color != '' %}
+                                                    <span><i class="bi bi-palette"></i> {{ color }}</span>
+                                                {% endif %}
+                                                {% if tamano and tamano != '' %}
+                                                    {% if color and color != '' %} | {% endif %}
+                                                    <span><i class="bi bi-rulers"></i> {{ tamano }}</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                        <div class="producto-cantidad">
+                                            <i class="bi bi-x"></i> Cantidad: {{ item.cantidad|default(1) }}
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="producto-precio">${{ "%.2f"|format(item.precio|default(0)) }}</div>
+                                        <div class="producto-subtotal">
+                                            Subtotal: ${{ "%.2f"|format((item.precio|default(0)) * (item.cantidad|default(1))) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-3 text-muted">
+                                    <i class="bi bi-cart-x" style="font-size: 2rem; color: #ddd;"></i>
+                                    <p class="mt-1">No hay productos en este pedido</p>
+                                    <small class="text-muted">El pedido no contiene productos</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="pedido-footer">
+                        <div class="d-flex flex-wrap gap-3">
+                            <span class="info-item">
+                                <i class="bi bi-credit-card"></i> 
+                                Pago: {{ pedido.metodo_pago|title if pedido.metodo_pago else 'No especificado' }}
+                            </span>
+                            <span class="info-item">
+                                <i class="bi bi-truck"></i> 
+                                Envío: 
+                                {% if pedido.tipo_envio == 'click_collect' %}
+                                    Recoger en tienda
+                                {% else %}
+                                    Domicilio
+                                {% endif %}
+                                {% if pedido.envio and pedido.envio > 0 %}
+                                    (${{ "%.2f"|format(pedido.envio) }})
+                                {% endif %}
+                            </span>
+                            <span class="info-item">
+                                <i class="bi bi-box"></i>
+                                {{ pedido.total_unidades|default(0) }} unidades
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('web.ver_pedido', id=pedido._id|string) }}" class="btn-ver-detalles">
+                                <i class="bi bi-eye"></i> Ver Detalles
+                            </a>
+                            {% if pedido.estado in ['pendiente', 'confirmado'] %}
+                                <button class="btn-cancelar" onclick="abrirModalCancelar('{{ pedido._id }}')">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="icon">
+                        <i class="bi bi-inbox"></i>
+                    </div>
+                    <h4>¡Aún no tienes pedidos!</h4>
+                    <p>Explora nuestro catálogo y encuentra los productos que necesitas.</p>
+                    <a href="{{ url_for('web.catalogo') }}" class="btn-orion" style="padding: 12px 40px; font-size: 0.95rem;">
+                        <i class="bi bi-shop"></i> Ir a la tienda
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ===== MODAL DE CONFIRMACIÓN ===== -->
+        <div class="modal-confirmacion" id="modalCancelar">
+            <div class="modal-content-custom">
+                <div class="modal-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h3 class="modal-title-custom">¿Cancelar pedido?</h3>
+                <p class="modal-message">¿Estás seguro de que deseas cancelar este pedido? Esta acción no se puede deshacer.</p>
+                <div class="modal-actions">
+                    <button class="btn-modal-cerrar" onclick="cerrarModalCancelar()">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </button>
+                    <button class="btn-modal-cancelar" id="btnConfirmarCancelar">
+                        <i class="bi bi-check-lg me-1"></i> Sí, cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TOAST CONTAINER ===== -->
+        <div class="toast-container-custom" id="toastContainer"></div>
+
+        <!-- ===== FOOTER ===== -->
+        <footer>
+            <div class="container">
+                <p>© 2026 ORION SYSTEM. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let pedidoIdCancelar = null;
+
+        $(document).ready(function() {
+            // Filtros
+            $('.filter-btn').on('click', function() {
+                const filter = $(this).data('filter');
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
+
+                $('.pedido-card').each(function() {
+                    const estado = $(this).data('estado');
+                    if (filter === 'todos' || estado === filter) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            // Confirmar cancelación
+            $('#btnConfirmarCancelar').on('click', function() {
+                if (pedidoIdCancelar) {
+                    cancelarPedido(pedidoIdCancelar);
+                }
+            });
+        });
+
+        function abrirModalCancelar(id) {
+            pedidoIdCancelar = id;
+            const modal = document.getElementById('modalCancelar');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalCancelar() {
+            const modal = document.getElementById('modalCancelar');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            pedidoIdCancelar = null;
+        }
+
+        function cancelarPedido(id) {
+            const btn = document.getElementById('btnConfirmarCancelar');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Cancelando...';
+
+            fetch('/api/pedido/cancelar/' + id, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                cerrarModalCancelar();
+                if (data.success) {
+                    mostrarToast('Pedido cancelado correctamente', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    mostrarToast(data.message || 'Error al cancelar el pedido', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Sí, cancelar';
+                }
+            })
+            .catch(error => {
+                cerrarModalCancelar();
+                mostrarToast('Error al conectar con el servidor', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Sí, cancelar';
+                console.error('Error:', error);
+            });
+        }
+
+        function mostrarToast(mensaje, tipo = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${tipo}`;
+            toast.innerHTML = `
+                <i class="bi bi-${tipo === 'success' ? 'check-circle-fill' : 'exclamation-circle-fill'}"></i>
+                ${mensaje}
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.5s ease forwards';
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('modalCancelar');
+            if (event.target === modal) {
+                cerrarModalCancelar();
+            }
+        });
+
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                cerrarModalCancelar();
+            }
+        });
+    </script>
+
+</body>
+</html>

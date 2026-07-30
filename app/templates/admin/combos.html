@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combos | ORION Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* ===== RESET & GLOBAL ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: #f5f6f8;
+            color: #1a1a2e;
+        }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 2px solid #e8e8e8;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-top: 10px;
+        }
+        .sidebar .admin-profile .email {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #e10098;
+            text-align: center;
+            padding: 15px 0 5px;
+            letter-spacing: -1px;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #888;
+            padding: 10px 25px 5px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #dc3545;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar .logout-btn i { color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px;
+            padding: 30px 35px 20px;
+            width: 100%;
+            min-height: 100vh;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag {
+            background: #e10098;
+            color: #fff;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* ===== BOTONES ===== */
+        .btn-custom {
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            background: #e0e0e0;
+            color: #1a1a2e;
+            white-space: nowrap;
+        }
+        .btn-custom i { font-size: 0.8rem; }
+        .btn-custom:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
+        .btn-primary-custom { background: #e10098; color: #fff; }
+        .btn-primary-custom:hover { background: #c00080; }
+        .btn-success-custom { background: #28a745; color: #fff; }
+        .btn-success-custom:hover { background: #218838; }
+        .btn-warning-custom { background: #f9a825; color: #fff; }
+        .btn-warning-custom:hover { background: #f57f17; }
+        .btn-danger-custom { background: #dc3545; color: #fff; }
+        .btn-danger-custom:hover { background: #c82333; }
+        .btn-info-custom { background: #17a2b8; color: #fff; }
+        .btn-info-custom:hover { background: #138496; }
+        .btn-secondary-custom { background: #6c757d; color: #fff; }
+        .btn-secondary-custom:hover { background: #5a6268; }
+
+        /* ===== CARDS ===== */
+        .card-box {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 30px;
+        }
+        .card-box h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1a1a2e;
+        }
+
+        /* ===== TABLA ===== */
+        .table-container {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 25px;
+        }
+        .table-container .table-header {
+            padding: 14px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .table-container .table-header h5 {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        .table-container table { margin-bottom: 0; width: 100%; }
+        .table-container thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            padding: 10px 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .table-container tbody td {
+            padding: 10px 16px;
+            vertical-align: middle;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .table-container tbody tr:hover { background: #fafafa; }
+
+        /* ===== MODAL ===== */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+        }
+        .modal-header {
+            border-bottom: 1px solid #e8e8e8;
+            padding: 18px 24px;
+        }
+        .modal-header .modal-title {
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-footer {
+            border-top: 1px solid #e8e8e8;
+            padding: 16px 24px;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #333;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e8e8e8;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            transition: border 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #e10098;
+            box-shadow: none;
+        }
+        .form-check-input:checked {
+            background-color: #e10098;
+            border-color: #e10098;
+        }
+        select[multiple] {
+            height: 150px;
+        }
+        select[multiple] option {
+            padding: 8px 12px;
+        }
+        select[multiple] option:checked {
+            background: #e10098;
+            color: #fff;
+        }
+
+        /* ===== BADGES ===== */
+        .badge-estado {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .badge-estado.activo { background: #e8f5e9; color: #2e7d32; }
+        .badge-estado.inactivo { background: #fce4ec; color: #c62828; }
+
+        /* ===== ALERTAS ===== */
+        .alert {
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-top: 18px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .alert-success { background: #e8f5e9; border: 1px solid #c8e6c9; color: #1b5e20; }
+        .alert-danger { background: #fce4ec; border: 1px solid #f8bbd0; color: #b71c1c; }
+        .alert-info { background: #e3f2fd; border: 1px solid #bbdefb; color: #0d47a1; }
+        .alert-warning { background: #fff3e0; border: 1px solid #ffe0b2; color: #e65100; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .main { margin-left: 70px; padding: 15px; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+        }
+
+        /* ===== ANIMACIONES ===== */
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="admin-profile">
+            <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+        <div class="logo">ORION<span>.</span></div>
+        <div class="menu-scroll">
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_empresas') }}"><i class="fas fa-building"></i> <span>Empresas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_combos') }}" class="active"><i class="fas fa-layer-group"></i> <span>Combos</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}"><i class="fas fa-gift"></i> <span>Promociones</span></a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}"><i class="fas fa-brain"></i> <span>Análisis Supervisado</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+
+        <!-- ===== TOP BAR ===== -->
+        <div class="top-bar">
+            <h1><i class="fas fa-layer-group"></i> Combos</h1>
+            <div class="tag"><i class="fas fa-tags"></i> Gestión de Combos</div>
+        </div>
+
+        <!-- ===== ALERTA DE RESULTADOS ===== -->
+        <div id="resultadoAccion" style="display: none;"></div>
+
+        <!-- ===== ACCIONES ===== -->
+        <div class="card-box">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <button onclick="abrirModalNuevo()" class="btn-custom btn-primary-custom">
+                    <i class="fas fa-plus"></i> Nuevo Combo
+                </button>
+                <button onclick="cargarCombos()" class="btn-custom btn-info-custom">
+                    <i class="fas fa-sync"></i> Actualizar Lista
+                </button>
+                <span style="margin-left: auto; color: #888; font-size: 0.85rem;">
+                    <i class="fas fa-database"></i> <span id="totalCombos">0</span> combos
+                </span>
+            </div>
+        </div>
+
+        <!-- ===== TABLA DE COMBOS ===== -->
+        <div class="table-container">
+            <div class="table-header">
+                <h5><i class="fas fa-list" style="color:#e10098;"></i> Lista de Combos</h5>
+                <span class="small text-muted">Gestiona los combos de productos</span>
+            </div>
+            <div class="table-responsive" style="max-height: 540px; overflow-y: auto;">
+                <table class="table" id="tablaCombos">
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Productos</th>
+                            <th style="width:100px;">Precio</th>
+                            <th style="width:80px;">Dto.</th>
+                            <th style="width:80px;">Estado</th>
+                            <th style="width:120px; text-align:center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyCombos">
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando combos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== MODAL CREAR/EDITAR ===== -->
+        <div class="modal fade" id="modalCombo" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalComboTitle">
+                            <i class="fas fa-layer-group" style="color:#e10098;"></i> Nuevo Combo
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formCombo">
+                            <input type="hidden" id="comboId" value="">
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="nombre" class="form-label">
+                                        Nombre <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="nombre" placeholder="Ej: Combo Familiar" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="precio" class="form-label">
+                                        Precio <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="precio" placeholder="0.00" step="0.01" min="0" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="descripcion" rows="2" placeholder="Descripción del combo"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="descuento" class="form-label">Descuento (%)</label>
+                                    <input type="number" class="form-control" id="descuento" value="0" step="0.01" min="0" max="100">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="imagen" class="form-label">URL Imagen</label>
+                                    <input type="text" class="form-control" id="imagen" placeholder="https://ejemplo.com/imagen.jpg">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="productos" class="form-label">
+                                    Productos <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="productos" multiple>
+                                    {% for prod in productos %}
+                                        <option value="{{ prod._id }}">{{ prod.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i>
+                                    Mantén presionado <kbd>Ctrl</kbd> (Windows) o <kbd>Cmd</kbd> (Mac) para seleccionar varios.
+                                </small>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="activo" checked>
+                                <label class="form-check-label" for="activo">
+                                    <i class="fas fa-check-circle" style="color:#28a745;"></i> Activo
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-custom btn-secondary-custom" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="button" class="btn-custom btn-primary-custom" id="btnGuardarCombo">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== INSTRUCCIONES ===== -->
+        <div class="card-box" style="background: #f8f9fc; margin-bottom: 0;">
+            <h2><i class="fas fa-info-circle" style="color:#0288d1;"></i> ¿Cómo funciona?</h2>
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.8;">
+                <strong>1. Crear combo:</strong> Selecciona varios productos y asígnales un precio especial.<br>
+                <strong>2. Editar combo:</strong> Modifica el nombre, productos, precio o descuento.<br>
+                <strong>3. Eliminar combo:</strong> Los combos eliminados no se pueden recuperar.<br>
+                <strong>4. Activo/Inactivo:</strong> Los combos inactivos no se mostrarán en la tienda.
+            </p>
+        </div>
+
+    </main>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ================================================================
+    // VARIABLES GLOBALES
+    // ================================================================
+    let comboEditandoId = null;
+    let modalComboInstance = null;
+
+    // ================================================================
+    // FUNCIONES DE UTILIDAD
+    // ================================================================
+    function mostrarResultado(mensaje, tipo = 'success') {
+        const div = document.getElementById('resultadoAccion');
+        div.style.display = 'block';
+        div.className = `alert alert-${tipo} fade-in`;
+        div.innerHTML = mensaje;
+        setTimeout(() => {
+            div.style.display = 'none';
+        }, 6000);
+    }
+
+    function formatearMoneda(valor) {
+        return '$' + parseFloat(valor).toFixed(2);
+    }
+
+    // ================================================================
+    // CARGAR COMBOS
+    // ================================================================
+    function cargarCombos() {
+        const tbody = document.getElementById('tbodyCombos');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-4">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando combos...
+                </td>
+            </tr>
+        `;
+
+        fetch('/api/combos')
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-center text-danger py-4">
+                                <i class="fas fa-exclamation-triangle"></i> Error al cargar combos
+                            </td>
+                        </tr>
+                    `;
+                    mostrarResultado('Error al cargar combos', 'danger');
+                    return;
+                }
+
+                const combos = data.combos || [];
+                document.getElementById('totalCombos').textContent = combos.length;
+
+                if (combos.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <i class="fas fa-inbox" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
+                                No hay combos registrados
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                combos.forEach((c, i) => {
+                    const estadoClass = c.activo !== false ? 'activo' : 'inactivo';
+                    const estadoText = c.activo !== false ? 'Activo' : 'Inactivo';
+                    const productosNombres = (c.productos_detalle || []).map(p => p.nombre).join(', ') || 'Sin productos';
+                    const descuento = c.descuento || 0;
+
+                    html += `
+                        <tr class="fade-in">
+                            <td><strong>${i + 1}</strong></td>
+                            <td>
+                                <strong>${c.nombre}</strong>
+                                ${c.imagen ? `<img src="${c.imagen}" style="width:30px;height:30px;border-radius:4px;object-fit:cover;margin-left:8px;">` : ''}
+                            </td>
+                            <td>${c.descripcion || '<span class="text-muted">Sin descripción</span>'}</td>
+                            <td>${productosNombres}</td>
+                            <td><strong>${formatearMoneda(c.precio)}</strong></td>
+                            <td>${descuento > 0 ? `<span class="badge bg-warning text-dark">${descuento}%</span>` : '0%'}</td>
+                            <td><span class="badge-estado ${estadoClass}">${estadoText}</span></td>
+                            <td class="text-center">
+                                <button class="btn-custom btn-warning-custom" style="padding:4px 10px; font-size:0.75rem;" onclick="editarCombo('${c._id}')" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-custom btn-danger-custom" style="padding:4px 10px; font-size:0.75rem; margin-left:4px;" onclick="eliminarCombo('${c._id}')" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            })
+            .catch(e => {
+                console.error(e);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-danger py-4">
+                            <i class="fas fa-exclamation-triangle"></i> Error de conexión
+                        </td>
+                    </tr>
+                `;
+                mostrarResultado('Error de conexión al servidor', 'danger');
+            });
+    }
+
+    // ================================================================
+    // MODAL - NUEVO COMBO
+    // ================================================================
+    function resetForm() {
+        document.getElementById('comboId').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('descripcion').value = '';
+        document.getElementById('precio').value = '';
+        document.getElementById('descuento').value = '0';
+        document.getElementById('imagen').value = '';
+        document.getElementById('productos').selectedIndex = -1;
+        for (let opt of document.getElementById('productos').options) {
+            opt.selected = false;
+        }
+        document.getElementById('activo').checked = true;
+        document.getElementById('modalComboTitle').innerHTML = '<i class="fas fa-layer-group" style="color:#e10098;"></i> Nuevo Combo';
+        comboEditandoId = null;
+    }
+
+    function abrirModalNuevo() {
+        resetForm();
+        if (!modalComboInstance) {
+            modalComboInstance = new bootstrap.Modal(document.getElementById('modalCombo'));
+        }
+        modalComboInstance.show();
+    }
+
+    // ================================================================
+    // MODAL - EDITAR COMBO
+    // ================================================================
+    function editarCombo(id) {
+        fetch(`/api/combos/${id}`)
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) {
+                    mostrarResultado('Error al cargar el combo', 'danger');
+                    return;
+                }
+                const c = data.combo;
+                document.getElementById('comboId').value = c._id;
+                document.getElementById('nombre').value = c.nombre || '';
+                document.getElementById('descripcion').value = c.descripcion || '';
+                document.getElementById('precio').value = c.precio || '';
+                document.getElementById('descuento').value = c.descuento || 0;
+                document.getElementById('imagen').value = c.imagen || '';
+
+                const select = document.getElementById('productos');
+                for (let opt of select.options) {
+                    opt.selected = c.productos && c.productos.includes(opt.value);
+                }
+                document.getElementById('activo').checked = c.activo !== false;
+
+                document.getElementById('modalComboTitle').innerHTML = '<i class="fas fa-layer-group" style="color:#e10098;"></i> Editar Combo';
+                comboEditandoId = c._id;
+
+                if (!modalComboInstance) {
+                    modalComboInstance = new bootstrap.Modal(document.getElementById('modalCombo'));
+                }
+                modalComboInstance.show();
+            })
+            .catch(e => {
+                mostrarResultado('Error: ' + e.message, 'danger');
+            });
+    }
+
+    // ================================================================
+    // ELIMINAR COMBO
+    // ================================================================
+    function eliminarCombo(id) {
+        if (!confirm('¿Estás seguro de eliminar este combo?\nEsta acción no se puede deshacer.')) return;
+
+        fetch(`/api/combos/${id}`, { method: 'DELETE' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarResultado('✅ Combo eliminado correctamente', 'success');
+                    cargarCombos();
+                } else {
+                    mostrarResultado('❌ Error al eliminar: ' + (data.error || 'desconocido'), 'danger');
+                }
+            })
+            .catch(e => {
+                mostrarResultado('Error: ' + e.message, 'danger');
+            });
+    }
+
+    // ================================================================
+    // GUARDAR COMBO (CREAR / ACTUALIZAR)
+    // ================================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar modal
+        modalComboInstance = new bootstrap.Modal(document.getElementById('modalCombo'));
+
+        // Cargar combos al inicio
+        cargarCombos();
+
+        // Evento guardar
+        document.getElementById('btnGuardarCombo').addEventListener('click', function() {
+            const id = document.getElementById('comboId').value;
+            const nombre = document.getElementById('nombre').value.trim();
+            const descripcion = document.getElementById('descripcion').value.trim();
+            const precio = parseFloat(document.getElementById('precio').value);
+            const descuento = parseFloat(document.getElementById('descuento').value) || 0;
+            const imagen = document.getElementById('imagen').value.trim();
+            const select = document.getElementById('productos');
+            const productos = Array.from(select.selectedOptions).map(o => o.value);
+            const activo = document.getElementById('activo').checked;
+
+            // Validaciones
+            if (!nombre) {
+                mostrarResultado('⚠️ El nombre es obligatorio', 'warning');
+                document.getElementById('nombre').focus();
+                return;
+            }
+            if (isNaN(precio) || precio <= 0) {
+                mostrarResultado('⚠️ El precio debe ser mayor a 0', 'warning');
+                document.getElementById('precio').focus();
+                return;
+            }
+            if (productos.length === 0) {
+                mostrarResultado('⚠️ Selecciona al menos un producto', 'warning');
+                document.getElementById('productos').focus();
+                return;
+            }
+
+            const data = { nombre, descripcion, productos, precio, descuento, imagen, activo };
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/combos/${id}` : '/api/combos';
+
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="btn-spinner"></span> Guardando...';
+
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Guardar';
+
+                if (data.success) {
+                    mostrarResultado(data.message || '✅ Operación exitosa', 'success');
+                    modalComboInstance.hide();
+                    cargarCombos();
+                    resetForm();
+                } else {
+                    mostrarResultado('❌ Error: ' + (data.error || 'desconocido'), 'danger');
+                }
+            })
+            .catch(e => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Guardar';
+                mostrarResultado('❌ Error: ' + e.message, 'danger');
+            });
+        });
+
+        // Reset al cerrar modal
+        document.getElementById('modalCombo').addEventListener('hidden.bs.modal', function() {
+            resetForm();
+        });
+
+        // Limpiar resultado al cerrar
+        document.getElementById('modalCombo').addEventListener('show.bs.modal', function() {
+            if (!comboEditandoId) {
+                resetForm();
+            }
+        });
+    });
+
+    // ================================================================
+    // CIERRE DE MODAL CON TECLA ESC
+    // ================================================================
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (modalComboInstance) {
+                modalComboInstance.hide();
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

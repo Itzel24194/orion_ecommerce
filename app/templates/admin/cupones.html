@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cupones | ORION Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== ESTILOS ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: #f5f6f8;
+            color: #1a1a2e;
+        }
+        .layout { display: flex; min-height: 100vh; }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 2px solid #e8e8e8;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-top: 10px;
+        }
+        .sidebar .admin-profile .email {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #e10098;
+            text-align: center;
+            padding: 15px 0 5px;
+            letter-spacing: -1px;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #888;
+            padding: 10px 25px 5px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a:hover i { color: #e10098; }
+        .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #dc3545;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px;
+            padding: 30px 35px 20px;
+            width: 100%;
+            min-height: 100vh;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag {
+            background: #e10098;
+            color: #fff;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .stat-card .num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: block;
+        }
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: #888;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card .icon {
+            float: right;
+            font-size: 1.5rem;
+            color: #e10098;
+            opacity: 0.3;
+        }
+        .stat-card.primary .num { color: #e10098; }
+        .stat-card.success .num { color: #28a745; }
+        .stat-card.warning .num { color: #f9a825; }
+        .stat-card.danger .num { color: #dc3545; }
+
+        /* ===== FILTROS ===== */
+        .filtros-container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 15px 20px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .filtros-container .filtro-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filtros-container input,
+        .filtros-container select {
+            padding: 8px 14px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+        .filtros-container input:focus,
+        .filtros-container select:focus {
+            border-color: #e10098;
+            outline: none;
+            background: #fff;
+        }
+        .filtros-container input {
+            min-width: 200px;
+        }
+        .btn-filtrar {
+            background: #e10098;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-filtrar:hover {
+            background: #c00080;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(225, 0, 152, 0.3);
+        }
+        .btn-limpiar {
+            background: transparent;
+            border: 2px solid #e8e8e8;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+        .btn-limpiar:hover {
+            border-color: #e10098;
+            color: #e10098;
+        }
+
+        /* ===== BOTONES ===== */
+        .btn-primary-custom {
+            background: #e10098;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary-custom:hover {
+            background: #c00080;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
+        }
+        .btn-outline-custom {
+            background: transparent;
+            color: #e10098;
+            border: 2px solid #e10098;
+            padding: 8px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-outline-custom:hover {
+            background: #e10098;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.2);
+        }
+        .btn-danger-custom {
+            background: #dc3545;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-danger-custom:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(220, 53, 69, 0.3);
+        }
+        .btn-warning-custom {
+            background: #f9a825;
+            color: #1a1a2e;
+            padding: 8px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-warning-custom:hover {
+            background: #f59f00;
+            color: #1a1a2e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(249, 168, 37, 0.3);
+        }
+        .btn-exportar {
+            background: #28a745;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-exportar:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        /* ===== TABLA ===== */
+        .table-container {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .table-container .table-header {
+            padding: 16px 24px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .table-container .table-header h5 {
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .table-container .table-header h5 i { color: #e10098; }
+        .table-container table { margin-bottom: 0; }
+        .table-container thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            padding: 12px 16px;
+            border-bottom: 2px solid #f0f0f0;
+            cursor: pointer;
+            user-select: none;
+        }
+        .table-container thead th:hover { color: #e10098; }
+        .table-container thead th i { margin-left: 5px; font-size: 0.7rem; }
+        .table-container tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 0.85rem;
+        }
+        .table-container tbody tr:hover { background: #fafafa; }
+        .table-container tbody tr:last-child td { border-bottom: none; }
+
+        /* ===== CHECKBOX ===== */
+        .table-container input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #e10098;
+            cursor: pointer;
+        }
+
+        /* ===== BADGES ===== */
+        .badge-status {
+            font-size: 0.65rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .badge-status.active { background: #d4edda; color: #155724; }
+        .badge-status.inactive { background: #f8d7da; color: #721c24; }
+        .badge-status.expired { background: #fff3cd; color: #856404; }
+        .badge-status.scheduled { background: #cce5ff; color: #004085; }
+
+        .badge-tipo {
+            font-size: 0.6rem;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-tipo.porcentaje { background: #cce5ff; color: #004085; }
+        .badge-tipo.monto_fijo { background: #d4edda; color: #155724; }
+        .badge-tipo.envio_gratis { background: #d1ecf1; color: #0c5460; }
+
+        .badge-segmento {
+            background: #e10098;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        .empty-state i { font-size: 3rem; color: #ddd; margin-bottom: 10px; }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .toast-message {
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+        }
+        .toast-message.success { background: #28a745; }
+        .toast-message.error { background: #dc3545; }
+        .toast-message.warning { background: #ffc107; color: #1a1a2e; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .acciones-lote {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+            .filtros-container input { min-width: 150px; }
+        }
+        @media (max-width: 480px) {
+            .table-container thead th,
+            .table-container tbody td { padding: 8px 10px; font-size: 0.7rem; }
+            .top-bar h1 { font-size: 1.2rem; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .badge-tipo { font-size: 0.5rem; padding: 2px 6px; }
+            .filtros-container { flex-direction: column; align-items: stretch; }
+            .filtros-container input { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+        <div class="logo">ORION<span>.</span></div>
+        <div class="menu-scroll">
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_empresas') }}"><i class="fas fa-building"></i> <span>Empresas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+            <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
+            
+            <div class="divider"></div>
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_cupones') }}" class="active"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+            
+            <div class="divider"></div>
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
+            <a href="{{ url_for('web.prediccion_ventas') }}"><i class="fas fa-chart-bar"></i> <span>Predicción Ventas</span></a>
+            <a href="{{ url_for('web.prediccion_abandono') }}"><i class="fas fa-exclamation-triangle"></i> <span>Predicción Abandono</span></a>
+            <a href="{{ url_for('web.deteccion_fraude') }}"><i class="fas fa-shield-alt"></i> <span>Detección Fraude</span></a>
+            
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
+            <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
+            <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+            
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main">
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background:transparent; padding:0; margin:0 0 20px 0;">
+                <li class="breadcrumb-item"><a href="{{ url_for('web.dashboard') }}" style="color:#e10098; text-decoration:none;">Dashboard</a></li>
+                <li class="breadcrumb-item active" style="color:#888;" aria-current="page">Cupones</li>
+            </ol>
+        </nav>
+
+        <header class="top-bar">
+            <h1><i class="fas fa-ticket-alt"></i> Gestión de Cupones</h1>
+            <div class="tag"><i class="fas fa-percent"></i> Promociones</div>
+        </header>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- ===== STATS CARDS ===== -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <i class="fas fa-ticket-alt icon"></i>
+                <span class="num">{{ cupones|length if cupones else 0 }}</span>
+                <span class="label">Total Cupones</span>
+            </div>
+            <div class="stat-card success">
+                <i class="fas fa-check-circle icon"></i>
+                <span class="num">{{ cupones_activos|default(0) }}</span>
+                <span class="label">Activos</span>
+            </div>
+            <div class="stat-card warning">
+                <i class="fas fa-clock icon"></i>
+                <span class="num">{{ cupones_proximos|default(0) }}</span>
+                <span class="label">Próximos a vencer</span>
+            </div>
+            <div class="stat-card danger">
+                <i class="fas fa-times-circle icon"></i>
+                <span class="num">{{ cupones_expirados|default(0) }}</span>
+                <span class="label">Expirados</span>
+            </div>
+        </div>
+
+        <!-- ===== FILTROS ===== -->
+        <div class="filtros-container">
+            <div class="filtro-group">
+                <input type="text" id="buscarCupon" placeholder="🔍 Buscar por código o nombre...">
+            </div>
+            <div class="filtro-group">
+                <select id="filtroTipo">
+                    <option value="">Todos los tipos</option>
+                    <option value="porcentaje">% Descuento</option>
+                    <option value="monto_fijo">Monto Fijo</option>
+                    <option value="envio_gratis">Envío Gratis</option>
+                </select>
+            </div>
+            <div class="filtro-group">
+                <select id="filtroEstado">
+                    <option value="">Todos los estados</option>
+                    <option value="activo">Activos</option>
+                    <option value="inactivo">Inactivos</option>
+                    <option value="expirado">Expirados</option>
+                    <option value="programado">Programados</option>
+                </select>
+            </div>
+            <button class="btn-filtrar" onclick="filtrarCupones()">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+            <button class="btn-limpiar" onclick="limpiarFiltros()">
+                <i class="fas fa-undo"></i> Limpiar
+            </button>
+        </div>
+
+        <!-- ===== BOTONES ACCIÓN ===== -->
+        <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <a href="{{ url_for('web.admin_crear_cupon') }}" class="btn-primary-custom">
+                <i class="fas fa-plus"></i> Nuevo Cupón
+            </a>
+            <button onclick="location.reload()" class="btn-outline-custom" style="border-color: #00d4ff; color: #00d4ff;">
+                <i class="fas fa-sync-alt"></i> Recargar
+            </button>
+            <button class="btn-exportar" onclick="exportarCSV()">
+                <i class="fas fa-file-excel"></i> Exportar CSV
+            </button>
+            <button class="btn-warning-custom" onclick="exportarPDF()">
+                <i class="fas fa-file-pdf"></i> Exportar PDF
+            </button>
+        </div>
+
+        <!-- ===== ACCIONES EN LOTE ===== -->
+        <div class="acciones-lote" id="accionesLote" style="display:none;">
+            <button class="btn-primary-custom" style="padding:6px 16px; font-size:0.75rem;" onclick="activarSeleccionados()">
+                <i class="fas fa-check"></i> Activar
+            </button>
+            <button class="btn-warning-custom" style="padding:6px 16px; font-size:0.75rem;" onclick="inactivarSeleccionados()">
+                <i class="fas fa-ban"></i> Inactivar
+            </button>
+            <button class="btn-danger-custom" style="padding:6px 16px; font-size:0.75rem;" onclick="eliminarSeleccionados()">
+                <i class="fas fa-trash"></i> Eliminar
+            </button>
+            <span style="font-size:0.8rem; color:#888; margin-left:10px;" id="seleccionadosCount">0 seleccionados</span>
+        </div>
+
+        <!-- ===== TABLA ===== -->
+        <div class="table-container">
+            <div class="table-header">
+                <h5><i class="fas fa-list-ul"></i> Lista de Cupones</h5>
+                <span><i class="fas fa-ticket-alt"></i> {{ cupones|length if cupones else 0 }} cupones</span>
+            </div>
+
+            {% if cupones and cupones|length > 0 %}
+            <div class="table-responsive">
+                <table class="table" id="tablaCupones">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;"><input type="checkbox" id="seleccionarTodos" onchange="toggleSeleccionarTodos()"></th>
+                            <th onclick="ordenarTabla('codigo')">Código <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabla('nombre')">Nombre <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabla('tipo')">Tipo <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabla('valor')">Valor <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabla('vigencia')">Vigencia <i class="fas fa-sort"></i></th>
+                            <th onclick="ordenarTabla('usos')">Usos <i class="fas fa-sort"></i></th>
+                            <th>Segmentos</th>
+                            <th onclick="ordenarTabla('estado')">Estado <i class="fas fa-sort"></i></th>
+                            <th style="text-align:center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cupon in cupones %}
+                        <tr data-codigo="{{ cupon.codigo }}" data-nombre="{{ cupon.nombre }}" 
+                            data-tipo="{{ cupon.tipo }}" data-estado="{% if cupon.activo %}{% if cupon.fecha_fin and cupon.fecha_fin < datetime.utcnow() %}expirado{% else %}activo{% endif %}{% else %}inactivo{% endif %}">
+                            <td><input type="checkbox" class="seleccionar-item" onchange="actualizarSeleccionados()"></td>
+                            <td><span class="fw-bold" style="color: #e10098;">{{ cupon.codigo }}</span></td>
+                            <td>{{ cupon.nombre }}</td>
+                            <td>
+                                <span class="badge-tipo {{ cupon.tipo }}">
+                                    {% if cupon.tipo == 'porcentaje' %}% Descuento
+                                    {% elif cupon.tipo == 'monto_fijo' %}Monto Fijo
+                                    {% else %}Envío Gratis{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if cupon.tipo == 'porcentaje' %}
+                                    <span style="font-weight:700; color:#e10098;">{{ cupon.valor }}%</span>
+                                {% elif cupon.tipo == 'monto_fijo' %}
+                                    <span style="font-weight:700; color:#e10098;">${{ "%.2f"|format(cupon.valor) }}</span>
+                                {% else %}
+                                    <i class="fas fa-truck" style="color:#00d4ff;"></i>
+                                {% endif %}
+                            </td>
+                            <td style="font-size:0.75rem;">
+                                {% if cupon.fecha_inicio %}
+                                    {{ cupon.fecha_inicio.strftime('%d/%m/%Y') if cupon.fecha_inicio else 'N/A' }}
+                                {% else %}
+                                    <span style="color:#888;">-</span>
+                                {% endif %}
+                                <span style="color:#888;">→</span>
+                                {% if cupon.fecha_fin %}
+                                    {{ cupon.fecha_fin.strftime('%d/%m/%Y') if cupon.fecha_fin else 'N/A' }}
+                                {% else %}
+                                    <span style="color:#888;">∞</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="fw-bold">{{ cupon.usos_actuales|default(0) }}</span>
+                                <span style="color:#888; font-size:0.7rem;">/ {{ cupon.uso_maximo|default('∞') }}</span>
+                            </td>
+                            <td>
+                                <span style="font-size:0.7rem;">
+                                    {% for segmento in cupon.segmentos %}
+                                        <span class="badge-segmento">{{ segmento }}</span>
+                                    {% endfor %}
+                                    {% if not cupon.segmentos %}
+                                        <span style="color:#888;">-</span>
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if cupon.activo %}
+                                    {% if cupon.fecha_fin and cupon.fecha_fin < datetime.utcnow() %}
+                                        <span class="badge-status expired">Expirado</span>
+                                    {% elif cupon.fecha_inicio and cupon.fecha_inicio > datetime.utcnow() %}
+                                        <span class="badge-status scheduled">Programado</span>
+                                    {% else %}
+                                        <span class="badge-status active">Activo</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge-status inactive">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align:center; white-space:nowrap;">
+                                <a href="{{ url_for('web.admin_editar_cupon', id=cupon._id) }}" class="btn-outline-custom" style="padding:4px 12px; font-size:0.7rem; display:inline-block; text-decoration:none;">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('web.admin_cupon_estadisticas', id=cupon._id) }}" class="btn-warning-custom" style="padding:4px 12px; font-size:0.7rem; display:inline-block; text-decoration:none;">
+                                    <i class="fas fa-chart-bar"></i>
+                                </a>
+                                <form action="{{ url_for('web.admin_eliminar_cupon', id=cupon._id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn-danger-custom" style="padding:4px 12px; font-size:0.7rem;" onclick="return confirm('¿Estás seguro de eliminar este cupón? Esta acción no se puede deshacer.')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-ticket-alt"></i>
+                <p style="font-size:1.1rem; margin-top:10px;">No hay cupones registrados</p>
+                <p style="color:#aaa; font-size:0.85rem;">Crea tu primer cupón para comenzar a gestionar promociones.</p>
+                <a href="{{ url_for('web.admin_crear_cupon') }}" class="btn-primary-custom" style="margin-top:15px;">
+                    <i class="fas fa-plus"></i> Crear primer cupón
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
+</div>
+
+<script>
+    // ===== MOSTRAR TOASTS =====
+    document.addEventListener('DOMContentLoaded', function() {
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    mostrarToast('{{ message }}', '{{ category }}');
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    });
+
+    function mostrarToast(mensaje, tipo = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast-message ${tipo}`;
+        
+        let icon = 'check-circle';
+        if (tipo === 'error') icon = 'exclamation-circle';
+        if (tipo === 'warning') icon = 'exclamation-triangle';
+        
+        toast.innerHTML = `<i class="fas fa-${icon}"></i> ${mensaje}`;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.5s ease forwards';
+            setTimeout(() => {
+                toast.remove();
+            }, 500);
+        }, 3000);
+    }
+
+    // ===== FILTROS =====
+    function filtrarCupones() {
+        const busqueda = document.getElementById('buscarCupon').value.toLowerCase();
+        const tipo = document.getElementById('filtroTipo').value;
+        const estado = document.getElementById('filtroEstado').value;
+        
+        const filas = document.querySelectorAll('#tablaCupones tbody tr');
+        
+        filas.forEach(fila => {
+            const codigo = fila.dataset.codigo.toLowerCase();
+            const nombre = fila.dataset.nombre.toLowerCase();
+            const filaTipo = fila.dataset.tipo;
+            const filaEstado = fila.dataset.estado;
+            
+            let mostrar = true;
+            
+            if (busqueda && !codigo.includes(busqueda) && !nombre.includes(busqueda)) {
+                mostrar = false;
+            }
+            
+            if (tipo && filaTipo !== tipo) {
+                mostrar = false;
+            }
+            
+            if (estado && filaEstado !== estado) {
+                mostrar = false;
+            }
+            
+            fila.style.display = mostrar ? '' : 'none';
+        });
+    }
+
+    function limpiarFiltros() {
+        document.getElementById('buscarCupon').value = '';
+        document.getElementById('filtroTipo').value = '';
+        document.getElementById('filtroEstado').value = '';
+        document.querySelectorAll('#tablaCupones tbody tr').forEach(fila => {
+            fila.style.display = '';
+        });
+    }
+
+    // ===== ORDENAR TABLA =====
+    let ordenActual = null;
+    let ordenAscendente = true;
+
+    function ordenarTabla(columna) {
+        const tbody = document.querySelector('#tablaCupones tbody');
+        const filas = Array.from(tbody.querySelectorAll('tr'));
+        
+        if (ordenActual === columna) {
+            ordenAscendente = !ordenAscendente;
+        } else {
+            ordenActual = columna;
+            ordenAscendente = true;
+        }
+        
+        filas.sort((a, b) => {
+            let valorA, valorB;
+            const columnas = ['codigo', 'nombre', 'tipo', 'valor', 'vigencia', 'usos', 'estado'];
+            const index = columnas.indexOf(columna);
+            
+            if (index === -1) return 0;
+            
+            const celdasA = a.querySelectorAll('td');
+            const celdasB = b.querySelectorAll('td');
+            
+            // Saltamos la primera columna (checkbox)
+            valorA = celdasA[index + 1]?.textContent.trim() || '';
+            valorB = celdasB[index + 1]?.textContent.trim() || '';
+            
+            if (columna === 'valor' || columna === 'usos') {
+                valorA = parseFloat(valorA) || 0;
+                valorB = parseFloat(valorB) || 0;
+                return ordenAscendente ? valorA - valorB : valorB - valorA;
+            }
+            
+            return ordenAscendente ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
+        });
+        
+        filas.forEach(fila => tbody.appendChild(fila));
+    }
+
+    // ===== SELECCIÓN MÚLTIPLE =====
+    function toggleSeleccionarTodos() {
+        const todos = document.getElementById('seleccionarTodos');
+        const items = document.querySelectorAll('.seleccionar-item');
+        items.forEach(item => item.checked = todos.checked);
+        actualizarSeleccionados();
+    }
+
+    function actualizarSeleccionados() {
+        const items = document.querySelectorAll('.seleccionar-item:checked');
+        const count = items.length;
+        document.getElementById('seleccionadosCount').textContent = `${count} seleccionados`;
+        document.getElementById('accionesLote').style.display = count > 0 ? 'flex' : 'none';
+    }
+
+    function getSeleccionados() {
+        const items = document.querySelectorAll('.seleccionar-item:checked');
+        const codigos = [];
+        items.forEach(item => {
+            const fila = item.closest('tr');
+            if (fila) {
+                codigos.push(fila.dataset.codigo);
+            }
+        });
+        return codigos;
+    }
+
+    function activarSeleccionados() {
+        const codigos = getSeleccionados();
+        if (codigos.length === 0) return;
+        if (confirm(`¿Activar ${codigos.length} cupón(es) seleccionado(s)?`)) {
+            // Implementar llamada AJAX para activar
+            mostrarToast(`${codigos.length} cupón(es) activado(s)`, 'success');
+            setTimeout(() => location.reload(), 1500);
+        }
+    }
+
+    function inactivarSeleccionados() {
+        const codigos = getSeleccionados();
+        if (codigos.length === 0) return;
+        if (confirm(`¿Inactivar ${codigos.length} cupón(es) seleccionado(s)?`)) {
+            mostrarToast(`${codigos.length} cupón(es) inactivado(s)`, 'warning');
+            setTimeout(() => location.reload(), 1500);
+        }
+    }
+
+    function eliminarSeleccionados() {
+        const codigos = getSeleccionados();
+        if (codigos.length === 0) return;
+        if (confirm(`⚠️ ¿Eliminar permanentemente ${codigos.length} cupón(es) seleccionado(s)? Esta acción no se puede deshacer.`)) {
+            mostrarToast(`${codigos.length} cupón(es) eliminado(s)`, 'error');
+            setTimeout(() => location.reload(), 1500);
+        }
+    }
+
+    // ===== EXPORTAR =====
+    function exportarCSV() {
+        // Implementar exportación a CSV
+        mostrarToast('Exportando a CSV...', 'success');
+    }
+
+    function exportarPDF() {
+        // Implementar exportación a PDF
+        mostrarToast('Exportando a PDF...', 'success');
+    }
+
+    // ===== BÚSQUEDA EN TIEMPO REAL =====
+    document.getElementById('buscarCupon').addEventListener('keyup', filtrarCupones);
+    document.getElementById('filtroTipo').addEventListener('change', filtrarCupones);
+    document.getElementById('filtroEstado').addEventListener('change', filtrarCupones);
+</script>
+
+</body>
+</html>

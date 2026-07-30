@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": ["."],
+    "python.defaultInterpreterPath": "C:\\Users\\famno\\miniconda3\\envs\\proyecto\\python.exe",
+    "python.analysis.diagnosticMode": "workspace",
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python-envs.defaultPackageManager": "ms-python.python:pip"
+}

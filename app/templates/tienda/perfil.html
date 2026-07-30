@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-secondary: #00d4ff;
+            --orion-dark: #1a1a2e;
+            --orion-gray: #f5f6f8;
+            --orion-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            --orion-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-color: var(--orion-gray);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: #1a1a2e;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        /* ===== TOP NAV ===== */
+        .top-nav {
+            font-size: 0.75rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            padding: 6px 0;
+        }
+
+        .top-nav a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .top-nav a:hover {
+            color: var(--orion-primary);
+        }
+
+        /* ===== NAVBAR ===== */
+        .main-navbar {
+            background: #ffffff;
+            border-bottom: 2px solid #f0f0f0;
+            padding: 12px 0 !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .brand-logo {
+            font-weight: 900;
+            font-size: 2.3rem;
+            color: var(--orion-primary) !important;
+            letter-spacing: -1.5px;
+            text-decoration: none;
+        }
+
+        .brand-logo:hover {
+            color: var(--orion-primary-dark) !important;
+        }
+
+        .navbar .dropdown-toggle {
+            font-weight: 700;
+            color: #1a1a2e;
+            background: transparent;
+            border: none;
+        }
+
+        .navbar .dropdown-toggle:hover {
+            color: var(--orion-primary);
+        }
+
+        .search-container {
+            border: 2px solid #eee !important;
+            border-radius: 50px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .search-container input {
+            border: none;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+        }
+
+        .search-container input:focus {
+            box-shadow: none;
+            background: #fff;
+        }
+
+        .search-container .btn-search {
+            background: #f8f9fa;
+            border: none;
+            padding: 8px 15px;
+        }
+
+        .search-container .btn-search:hover {
+            background: #eee;
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--orion-primary);
+        }
+
+        .brand-border {
+            height: 4px;
+            background: linear-gradient(90deg, var(--orion-primary), #1a1a2e);
+            width: 100%;
+        }
+
+        /* ===== SIDEBAR PERFIL ===== */
+        .panel-card {
+            background: #fff;
+            padding: 30px 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--orion-radius);
+            box-shadow: var(--orion-shadow);
+        }
+
+        .panel-card .avatar {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid var(--orion-primary);
+            margin-bottom: 10px;
+        }
+
+        .panel-card .user-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a1a2e;
+        }
+
+        .panel-card .user-email {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .panel-card .badge-rol {
+            background: var(--orion-primary);
+            color: #fff;
+            padding: 3px 15px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .nav-pills .nav-link {
+            color: #555;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-pills .nav-link i {
+            width: 20px;
+            font-size: 1.1rem;
+        }
+
+        .nav-pills .nav-link:hover {
+            background: rgba(225, 0, 152, 0.05);
+            color: var(--orion-primary);
+        }
+
+        .nav-pills .nav-link.active {
+            background: rgba(225, 0, 152, 0.10) !important;
+            color: var(--orion-primary);
+            border-left: 4px solid var(--orion-primary);
+            border-radius: 10px 0 0 10px;
+        }
+
+        .btn-logout {
+            border: 2px solid #dc3545;
+            color: #dc3545;
+            background: transparent;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-logout:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        /* ===== CONTENIDO ===== */
+        .content-panel {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 35px;
+            border-radius: var(--orion-radius);
+            min-height: 400px;
+            box-shadow: var(--orion-shadow);
+        }
+
+        .content-panel h4 {
+            border-bottom: 2px solid var(--orion-primary);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-panel h4 i {
+            color: var(--orion-primary);
+        }
+
+        /* ===== BOTONES ===== */
+        .btn-orion {
+            background: linear-gradient(135deg, var(--orion-primary), #c00080);
+            color: white;
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: 700;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-orion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
+            color: white;
+        }
+
+        .btn-orion-sm {
+            padding: 5px 16px;
+            font-size: 0.8rem;
+            border-radius: 50px;
+        }
+
+        .btn-orion-outline {
+            background: transparent;
+            border: 2px solid var(--orion-primary);
+            color: var(--orion-primary);
+            border-radius: 50px;
+            padding: 8px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-orion-outline:hover {
+            background: var(--orion-primary);
+            color: #fff;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--orion-primary);
+            box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.1);
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== STATUS BADGE ===== */
+        .status-badge {
+            font-size: 0.6rem;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .status-pendiente {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .status-confirmado {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-preparando {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-enviado {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-entregado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* ===== PEDIDO CARD MEJORADA ===== */
+        .pedido-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .pedido-card:hover {
+            border-color: var(--orion-primary);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .pedido-card .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .pedido-card .pedido-info-left {
+            flex: 1;
+        }
+
+        .pedido-card .pedido-id {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1a1a2e;
+        }
+
+        .pedido-card .pedido-id i {
+            color: var(--orion-primary);
+        }
+
+        .pedido-card .pedido-fecha {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .pedido-card .pedido-fecha i {
+            margin-right: 4px;
+        }
+
+        .pedido-card .pedido-estado {
+            text-align: right;
+        }
+
+        .pedido-card .pedido-estado .status-badge {
+            font-size: 0.65rem;
+            padding: 5px 16px;
+        }
+
+        .pedido-card .pedido-estado .pedido-tracking {
+            display: block;
+            font-size: 0.65rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .pedido-card .pedido-estado .pedido-tracking i {
+            color: var(--orion-primary);
+        }
+
+        .pedido-card .pedido-body {
+            padding-top: 14px;
+        }
+
+        .pedido-card .pedido-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pedido-card .pedido-item-mini {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            font-size: 0.8rem;
+        }
+
+        .pedido-card .pedido-item-mini .item-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pedido-card .pedido-item-mini .item-info i {
+            color: var(--orion-primary);
+            font-size: 0.9rem;
+        }
+
+        .pedido-card .pedido-item-mini .item-info .item-nombre {
+            color: #333;
+        }
+
+        .pedido-card .pedido-item-mini .item-info .item-cantidad {
+            color: #888;
+            font-size: 0.7rem;
+        }
+
+        .pedido-card .pedido-item-mini .item-precio {
+            font-weight: 600;
+            color: var(--orion-primary);
+            font-size: 0.85rem;
+        }
+
+        .pedido-card .pedido-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 14px;
+            margin-top: 14px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .pedido-card .pedido-total {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--orion-primary);
+        }
+
+        .pedido-card .pedido-total small {
+            font-weight: 400;
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .pedido-card .pedido-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .pedido-card .pedido-actions .btn-ver {
+            background: var(--orion-primary);
+            color: #fff;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pedido-card .pedido-actions .btn-ver:hover {
+            background: var(--orion-primary-dark);
+            transform: scale(1.05);
+        }
+
+        .pedido-card .pedido-actions .btn-ayuda {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pedido-card .pedido-actions .btn-ayuda:hover {
+            border-color: var(--orion-primary);
+            color: var(--orion-primary);
+        }
+
+        .pedido-card .pedido-actions .btn-cancelar {
+            background: transparent;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .pedido-card .pedido-actions .btn-cancelar:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .pedido-card .pedido-detalles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            padding-top: 10px;
+        }
+
+        .pedido-card .pedido-detalle-item {
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .pedido-card .pedido-detalle-item strong {
+            display: block;
+            color: #1a1a2e;
+            font-size: 0.75rem;
+        }
+
+        /* ===== FILTROS DE PEDIDOS ===== */
+        .pedido-filtros {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .pedido-filtros .btn-filtro {
+            padding: 4px 16px;
+            border-radius: 50px;
+            border: 1px solid #ddd;
+            background: transparent;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pedido-filtros .btn-filtro:hover,
+        .pedido-filtros .btn-filtro.active {
+            background: var(--orion-primary);
+            color: #fff;
+            border-color: var(--orion-primary);
+        }
+
+        /* ===== DIRECCIONES ===== */
+        .direccion-mini-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            border-left: 4px solid #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .direccion-mini-card.predeterminada {
+            border-left-color: #28a745;
+            background: #e8f5e9;
+        }
+
+        .direccion-mini-card:hover {
+            background: #f0f0f5;
+        }
+
+        /* ===== TOAST NOTIFICACION ===== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast-notification {
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.5s ease;
+            margin-bottom: 10px;
+        }
+
+        .toast-notification.error {
+            background: #dc3545;
+        }
+
+        .toast-notification i {
+            font-size: 1.2rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .panel-card {
+                margin-bottom: 20px;
+            }
+            .brand-logo {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-panel {
+                padding: 20px;
+            }
+            .panel-card {
+                padding: 20px;
+            }
+            .pedido-card .pedido-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pedido-card .pedido-estado {
+                text-align: left;
+                width: 100%;
+            }
+            .pedido-card .pedido-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pedido-card .pedido-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .pedido-card .pedido-detalles {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-panel {
+                padding: 15px;
+            }
+            .panel-card .avatar {
+                width: 70px;
+                height: 70px;
+            }
+            .brand-logo {
+                font-size: 1.5rem;
+            }
+            .pedido-card .pedido-detalles {
+                grid-template-columns: 1fr;
+            }
+            .pedido-card .pedido-item-mini {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+        }
+
+        /* ===== DROPDOWN CATEGORÍAS ===== */
+        .dropdown-submenu {
+            position: relative;
+        }
+        .dropdown-submenu>.dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -6px;
+            display: none;
+        }
+        .dropdown-submenu:hover>.dropdown-menu {
+            display: block;
+        }
+        .dropdown-submenu>a::after {
+            content: " ▶";
+            font-size: 0.6rem;
+            float: right;
+            margin-top: 5px;
+        }
+        .dropdown-menu {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+        }
+        .dropdown-item {
+            padding: 8px 20px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        .dropdown-item:hover {
+            background: rgba(225, 0, 152, 0.05);
+            color: var(--orion-primary);
+        }
+
+        /* ===== BOTÓN CARRITO ===== */
+        .btn-cart {
+            position: relative;
+            color: #1a1a2e;
+            font-size: 1.4rem;
+            text-decoration: none;
+        }
+        .btn-cart:hover {
+            color: var(--orion-primary);
+        }
+        .btn-cart .badge-cart {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: var(--orion-primary);
+            color: #fff;
+            font-size: 0.55rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            font-weight: 700;
+        }
+
+        /* ===== TEXTO USUARIO ===== */
+        .user-link {
+            color: #1a1a2e;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .user-link:hover {
+            color: var(--orion-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- ===== TOP NAV ===== -->
+        <div class="top-nav">
+            <div class="container d-flex justify-content-end gap-4">
+                <a href="#"><i class="bi bi-geo-alt"></i> Encuentra tu tienda</a>
+                <a href="/servicios"><i class="bi bi-truck"></i> Servicios</a>
+                <a href="#"><i class="bi bi-question-circle"></i> Ayuda</a>
+            </div>
+        </div>
+
+        <!-- ===== NAVBAR ===== -->
+        <nav class="navbar navbar-expand-lg navbar-light main-navbar">
+            <div class="container">
+                <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#orionNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="orionNavbar">
+                    <!-- Categorías Dropdown -->
+                    <div class="dropdown mx-lg-3">
+                        <button class="dropdown-toggle" data-bs-toggle="dropdown">
+                            Categorías
+                        </button>
+                        <ul class="dropdown-menu shadow border-0 py-2">
+                            {% if categorias %}
+                                {% for padre in categorias if not padre.padre_id %}
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item" href="/catalogo?categoria={{padre._id}}">{{ padre.nombre }}</a>
+                                    <ul class="dropdown-menu shadow border-0">
+                                        {% for hijo in categorias if hijo.padre_id == padre._id %}
+                                        <li><a class="dropdown-item" href="/catalogo?categoria={{hijo._id}}">{{ hijo.nombre }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% endfor %}
+                            {% else %}
+                                <li><a class="dropdown-item" href="/catalogo?categoria=electronica">Electrónica</a></li>
+                                <li><a class="dropdown-item" href="/catalogo?categoria=moda">Moda</a></li>
+                                <li><a class="dropdown-item" href="/catalogo?categoria=hogar">Hogar</a></li>
+                                <li><a class="dropdown-item" href="/catalogo?categoria=deportes">Deportes</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <!-- Buscador -->
+                    <form class="d-flex flex-grow-1" action="{{ url_for('web.catalogo') }}" method="GET">
+                        <div class="input-group search-container">
+                            <input class="form-control" type="search" name="q" placeholder="Buscar productos...">
+                            <button class="btn-search" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Usuario y Carrito -->
+                    <div class="ms-3 d-flex align-items-center gap-3">
+                        {% if session.get('nombre') %}
+                            <a href="{{ url_for('web.perfil') }}" class="user-link">
+                                {% if session.get('foto') %}
+                                    <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}?t={{ range(1, 10000) | random }}"
+                                         class="user-avatar" alt="Perfil">
+                                {% else %}
+                                    <i class="bi bi-person-circle fs-3"></i>
+                                {% endif %}
+                                HOLAAA, {{ session['nombre'] }}
+                            </a>
+                        {% else %}
+                            <a href="/login" class="user-link">
+                                <i class="bi bi-person-circle fs-3"></i>
+                                INICIAR SESIÓN
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('web.ver_carrito') }}" class="btn-cart">
+                            <i class="bi bi-bag"></i>
+                            {% if carrito_items|length > 0 %}
+                                <span class="badge-cart">{{ carrito_items|length }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="brand-border"></div>
+
+        <!-- ===== CONTENIDO PRINCIPAL ===== -->
+        <div class="container py-4 content">
+            <div class="row g-4">
+                <!-- ===== SIDEBAR ===== -->
+                <div class="col-lg-3">
+                    <div class="panel-card text-center">
+                        {% if usuario.foto %}
+                            <img src="{{ url_for('static', filename='uploads/' + usuario.foto) }}"
+                                 class="avatar" alt="Perfil">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ usuario.nombre }}&size=100&background=e10098&color=fff"
+                                 class="avatar" alt="Perfil">
+                        {% endif %}
+
+                        <div class="user-name">{{ usuario.nombre }} {{ usuario.apellido_paterno or '' }}</div>
+                        <div class="user-email">{{ usuario.email }}</div>
+                        <span class="badge-rol">{{ usuario.rol or 'Cliente' }}</span>
+
+                        <hr style="border-color: #e0e0e0;">
+
+                        <div class="nav flex-column nav-pills text-start" role="tablist">
+                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-perfil">
+                                <i class="bi bi-person"></i> Mi Perfil
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-seguridad">
+                                <i class="bi bi-shield-lock"></i> Seguridad
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-pedidos">
+                                <i class="bi bi-box-seam"></i> Mis Pedidos
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-direcciones">
+                                <i class="bi bi-geo-alt"></i> Direcciones
+                            </button>
+                        </div>
+
+                        <hr style="border-color: #e0e0e0;">
+
+                        <a href="{{ url_for('web.logout') }}" class="btn-logout">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ===== CONTENIDO ===== -->
+                <div class="col-lg-9">
+                    <div class="content-panel tab-content">
+
+                        <!-- ===== TAB PERFIL ===== -->
+                        <div class="tab-pane fade show active" id="tab-perfil">
+                            <h4><i class="bi bi-person"></i> Información Personal</h4>
+
+                            <form action="{{ url_for('web.actualizar') }}" method="POST" enctype="multipart/form-data" class="row g-3">
+                                <div class="col-12 mb-2">
+                                    <label class="form-label">Foto de Perfil</label>
+                                    <input type="file" name="foto" class="form-control" accept="image/*">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Nombre(s)</label>
+                                    <input type="text" name="nombre" class="form-control" value="{{ usuario.nombre }}" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Apellido Paterno</label>
+                                    <input type="text" name="apellido_paterno" class="form-control" value="{{ usuario.apellido_paterno or '' }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Apellido Materno</label>
+                                    <input type="text" name="apellido_materno" class="form-control" value="{{ usuario.apellido_materno or '' }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Teléfono</label>
+                                    <input type="text" name="telefono" class="form-control" value="{{ usuario.telefono or '' }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" name="fecha_nacimiento" class="form-control" value="{{ usuario.fecha_nacimiento or '' }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Género</label>
+                                    <select name="genero" class="form-select">
+                                        <option value="Mujer" {% if usuario.genero == 'Mujer' %}selected{% endif %}>Mujer</option>
+                                        <option value="Hombre" {% if usuario.genero == 'Hombre' %}selected{% endif %}>Hombre</option>
+                                        <option value="Indefinido" {% if usuario.genero == 'Indefinido' %}selected{% endif %}>Indefinido</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn-orion w-100">
+                                        <i class="bi bi-save"></i> Guardar Cambios
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- ===== TAB SEGURIDAD ===== -->
+                        <div class="tab-pane fade" id="tab-seguridad">
+                            <h4><i class="bi bi-shield-lock"></i> Cambiar Contraseña</h4>
+
+                            <form action="{{ url_for('web.cambiar_password') }}" method="POST" class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Contraseña Actual</label>
+                                    <input type="password" name="password_actual" class="form-control" required>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Nueva Contraseña</label>
+                                    <input type="password" name="password_nuevo" class="form-control" required minlength="6">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Confirmar Nueva Contraseña</label>
+                                    <input type="password" name="password_confirmar" class="form-control" required minlength="6">
+                                </div>
+
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn-orion w-100">
+                                        <i class="bi bi-key"></i> Actualizar Contraseña
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- ===== TAB PEDIDOS CON CANCELAR FUNCIONAL Y SIN JSON ===== -->
+                        <div class="tab-pane fade" id="tab-pedidos">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 class="mb-0"><i class="bi bi-box-seam"></i> Mis Pedidos</h4>
+                                <a href="{{ url_for('web.mis_pedidos_clientes') }}" class="btn-orion btn-orion-sm">
+                                    Ver todos <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+
+                            <!-- Filtros de pedidos -->
+                            <div class="pedido-filtros">
+                                <button class="btn-filtro active" data-filtro="todos">Todos</button>
+                                <button class="btn-filtro" data-filtro="pendiente">Pendientes</button>
+                                <button class="btn-filtro" data-filtro="enviado">Enviados</button>
+                                <button class="btn-filtro" data-filtro="entregado">Entregados</button>
+                                <button class="btn-filtro" data-filtro="cancelado">Cancelados</button>
+                            </div>
+
+                            <!-- Contenedor de toasts -->
+                            <div id="toastContainer" class="toast-container"></div>
+
+                            {% if pedidos and pedidos|length > 0 %}
+                                {% for pedido in pedidos %}
+                                <div class="pedido-card" data-estado="{{ pedido.estado|lower if pedido.estado else 'pendiente' }}" data-pedido-id="{{ pedido._id }}">
+                                    <div class="pedido-header">
+                                        <div class="pedido-info-left">
+                                            <div class="pedido-id">
+                                                <i class="bi bi-receipt"></i> Pedido #{{ pedido._id|string|truncate(8, True, '') }}
+                                            </div>
+                                            <div class="pedido-fecha">
+                                                <i class="bi bi-calendar3"></i>
+                                                {{ pedido.created_at.strftime('%d de %B, %Y') if pedido.created_at else 'Fecha no disponible' }}
+                                                <span class="mx-1">|</span>
+                                                <i class="bi bi-clock"></i>
+                                                {{ pedido.created_at.strftime('%I:%M %p') if pedido.created_at else '' }}
+                                            </div>
+                                            {% if pedido.numero_seguimiento %}
+                                            <div class="pedido-fecha">
+                                                <i class="bi bi-truck"></i> Guía: {{ pedido.numero_seguimiento }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="pedido-estado">
+                                            <span class="status-badge status-{{ pedido.estado if pedido.estado else 'pendiente' }}">
+                                                <i class="bi bi-circle-fill me-1" style="font-size: 0.4rem;"></i>
+                                                {{ pedido.estado|title if pedido.estado else 'Pendiente' }}
+                                            </span>
+                                            {% if pedido.fecha_entrega_estimada %}
+                                            <span class="pedido-tracking">
+                                                <i class="bi bi-calendar-check"></i> Entrega estimada: {{ pedido.fecha_entrega_estimada.strftime('%d/%m/%Y') }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="pedido-body">
+                                        <div class="pedido-items">
+                                            {% set items = pedido.items_list if pedido.items_list is defined else [] %}
+                                            {% if items and items|length > 0 %}
+                                                {% for producto in items %}
+                                                <div class="pedido-item-mini">
+                                                    <div class="item-info">
+                                                        <i class="bi bi-box"></i>
+                                                        <span class="item-nombre">{{ producto.nombre }}</span>
+                                                        <span class="item-cantidad">x{{ producto.cantidad }}</span>
+                                                    </div>
+                                                    <span class="item-precio">${{ "%.2f"|format(producto.precio|default(0)) }}</span>
+                                                </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Detalles adicionales -->
+                                        <div class="pedido-detalles">
+                                            {% if pedido.metodo_pago %}
+                                            <div class="pedido-detalle-item">
+                                                <strong><i class="bi bi-credit-card"></i> Pago</strong>
+                                                {{ pedido.metodo_pago }}
+                                            </div>
+                                            {% endif %}
+                                            {% if pedido.envio %}
+                                            <div class="pedido-detalle-item">
+                                                <strong><i class="bi bi-truck"></i> Envío</strong>
+                                                {{ pedido.envio }}
+                                            </div>
+                                            {% endif %}
+                                            {% if pedido.cantidad_articulos %}
+                                            <div class="pedido-detalle-item">
+                                                <strong><i class="bi bi-boxes"></i> Artículos</strong>
+                                                {{ pedido.cantidad_articulos }} productos
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="pedido-footer">
+                                        <div>
+                                            <span class="pedido-total">
+                                                ${{ "%.2f"|format(pedido.total|default(0)) }}
+                                                <small>Total</small>
+                                            </span>
+                                        </div>
+                                        <div class="pedido-actions">
+                                            <a href="{{ url_for('web.ver_pedido', id=pedido._id) }}" class="btn-ver">
+                                                <i class="bi bi-eye"></i> Ver detalle
+                                            </a>
+                                            <a href="#" class="btn-ayuda">
+                                                <i class="bi bi-headset"></i> Ayuda
+                                            </a>
+                                            {% if pedido.estado and pedido.estado|lower in ['pendiente', 'confirmado'] %}
+                                            <form class="cancelar-pedido-form d-inline" data-pedido-id="{{ pedido._id }}" data-url="{{ url_for('web.cancelar_pedido', id=pedido._id) }}">
+                                                <button type="button" class="btn-cancelar btn-cancelar-action">
+                                                    <i class="bi bi-x-circle"></i> Cancelar
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- ===== TAB DIRECCIONES ===== -->
+                        <div class="tab-pane fade" id="tab-direcciones">
+                            <h4><i class="bi bi-geo-alt"></i> Mis Direcciones</h4>
+
+                            {% if usuario.direcciones and usuario.direcciones|length > 0 %}
+                                {% for dir in usuario.direcciones %}
+                                <div class="direccion-mini-card {% if dir.predeterminada %}predeterminada{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="order-id">
+                                                <i class="bi bi-house"></i>
+                                                {% if dir.nombre %}{{ dir.nombre }}{% else %}Dirección {{ loop.index }}{% endif %}
+                                                {% if dir.predeterminada %}
+                                                    <span class="badge bg-success ms-1" style="font-size:0.55rem;">Predeterminada</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="order-date">
+                                                <i class="bi bi-geo"></i> {{ dir.calle }} #{{ dir.numero }}, {{ dir.colonia }}
+                                            </div>
+                                            <div class="order-date">
+                                                <i class="bi bi-map"></i> {{ dir.ciudad or '' }} {{ dir.estado or '' }} CP: {{ dir.cp }}
+                                            </div>
+                                            {% if dir.referencias %}
+                                            <div class="order-date">
+                                                <i class="bi bi-info-circle"></i> {{ dir.referencias }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-end">
+                                            {% if not dir.predeterminada %}
+                                            <form action="{{ url_for('web.establecer_predeterminada', usuario_id=usuario._id, direccion_id=loop.index0) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-success btn-sm" title="Establecer como predeterminada">
+                                                    <i class="bi bi-star"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                            <form action="{{ url_for('web.borrar_direccion', usuario_id=usuario._id, direccion_id=loop.index0) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar esta dirección?')">
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <i class="bi bi-geo-alt fs-1 text-muted"></i>
+                                    <p class="text-muted mt-2">No tienes direcciones registradas</p>
+                                </div>
+                            {% endif %}
+
+                            <!-- Agregar nueva dirección -->
+                            <div class="mt-3">
+                                <button class="btn-orion btn-orion-sm" onclick="toggleNuevaDireccion()">
+                                    <i class="bi bi-plus-circle"></i> Agregar dirección
+                                </button>
+
+                                <div id="nuevaDireccion" style="display:none;" class="mt-3 p-3 border rounded bg-light">
+                                    <h6 class="fw-bold"><i class="bi bi-plus-circle"></i> Nueva Dirección</h6>
+                                    <form action="{{ url_for('web.agregar_direccion', usuario_id=usuario._id) }}" method="POST">
+                                        <div class="row g-2">
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:0.65rem;">Nombre</label>
+                                                <input name="nombre" class="form-control" placeholder="Ej: Casa, Oficina">
+                                            </div>
+                                            <div class="col-5">
+                                                <label class="form-label" style="font-size:0.65rem;">Calle *</label>
+                                                <input name="calle" class="form-control" required>
+                                            </div>
+                                            <div class="col-3">
+                                                <label class="form-label" style="font-size:0.65rem;">Núm *</label>
+                                                <input name="numero" class="form-control" required>
+                                            </div>
+                                            <div class="col-4">
+                                                <label class="form-label" style="font-size:0.65rem;">CP *</label>
+                                                <input name="cp" class="form-control" required>
+                                            </div>
+                                            <div class="col-4">
+                                                <label class="form-label" style="font-size:0.65rem;">Colonia *</label>
+                                                <input name="colonia" class="form-control" required>
+                                            </div>
+                                            <div class="col-4">
+                                                <label class="form-label" style="font-size:0.65rem;">Ciudad</label>
+                                                <input name="ciudad" class="form-control">
+                                            </div>
+                                            <div class="col-4">
+                                                <label class="form-label" style="font-size:0.65rem;">Estado</label>
+                                                <input name="estado" class="form-control">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:0.65rem;">Referencias</label>
+                                                <input name="referencias" class="form-control" placeholder="Entre calles, piso, etc.">
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="predeterminada" value="1">
+                                                    <label class="form-check-label small">Establecer como predeterminada</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 mt-2">
+                                                <button type="submit" class="btn-orion btn-orion-sm">Guardar dirección</button>
+                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('nuevaDireccion').style.display='none'">Cancelar</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <footer>
+            <div class="container">
+                <p>© 2026 ORION SYSTEM. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleNuevaDireccion() {
+            const div = document.getElementById('nuevaDireccion');
+            if (div) {
+                div.style.display = div.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        // Filtros de pedidos con funcionalidad real
+        document.querySelectorAll('.btn-filtro').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filtro = this.getAttribute('data-filtro');
+                const pedidos = document.querySelectorAll('.pedido-card');
+                
+                pedidos.forEach(pedido => {
+                    const estado = pedido.getAttribute('data-estado');
+                    if (filtro === 'todos') {
+                        pedido.style.display = 'block';
+                    } else {
+                        pedido.style.display = estado === filtro ? 'block' : 'none';
+                    }
+                });
+            });
+        });
+
+        // Cancelar pedido con AJAX
+        document.querySelectorAll('.btn-cancelar-action').forEach(button => {
+            button.addEventListener('click', function() {
+                const form = this.closest('.cancelar-pedido-form');
+                const pedidoId = form.getAttribute('data-pedido-id');
+                const url = form.getAttribute('data-url');
+                
+                if (confirm('¿Estás seguro de cancelar este pedido?')) {
+                    // Mostrar estado de carga
+                    this.innerHTML = '<i class="bi bi-hourglass-split"></i> Cancelando...';
+                    this.disabled = true;
+                    
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Recargar la página para mostrar los cambios
+                            mostrarToast('Pedido cancelado correctamente', 'success');
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            mostrarToast(data.message || 'Error al cancelar el pedido', 'error');
+                            this.innerHTML = '<i class="bi bi-x-circle"></i> Cancelar';
+                            this.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        mostrarToast('Error al conectar con el servidor', 'error');
+                        this.innerHTML = '<i class="bi bi-x-circle"></i> Cancelar';
+                        this.disabled = false;
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        });
+
+        // Función para mostrar toasts
+        function mostrarToast(mensaje, tipo = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${tipo}`;
+            toast.innerHTML = `
+                <i class="bi bi-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${mensaje}
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.5s ease forwards';
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION | El Puerto del E-commerce</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root { --orion-primary: #e10098; --orion-discount: #d92121; }
+
+        /* ===== MENÚ CATEGORÍAS ===== */
+        .dropdown-submenu { position: relative; }
+        .dropdown-submenu > .dropdown-menu { 
+            top: 0; 
+            left: 100%; 
+            margin-top: -6px; 
+            display: none; 
+            border-radius: 12px; 
+            padding: 8px; 
+            min-width: 200px; 
+        }
+        .dropdown-submenu:hover > .dropdown-menu { display: block; }
+        .dropdown-submenu > a::after { 
+            content: " ▶"; 
+            font-size: 0.6rem; 
+            float: right; 
+            margin-top: 5px; 
+        }
+
+        /* ===== HERO ===== */
+        .hero-slide { height: 500px; background-size: cover; background-position: center; display: flex; align-items: center; }
+        .slide-1 { background-image: linear-gradient(rgba(11, 11, 11, 0.7), rgba(3, 3, 3, 0.7)), url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1920'); }
+        .slide-2 { background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=1920'); }
+
+        /* ===== BANNERS ===== */
+        .banner-full { 
+            height: 350px; 
+            background-size: cover; 
+            background-position: center; 
+            display: flex; 
+            align-items: center; 
+            border-radius: 20px; 
+            margin: 40px -50px; 
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1920'); 
+        }
+
+        /* ===== TENDENCIAS ===== */
+        .trend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; height: 500px; }
+        .trend-item { position: relative; overflow: hidden; border-radius: 15px; cursor: pointer; }
+        .trend-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .trend-item:hover img { transform: scale(1.1); }
+        .trend-item:first-child { grid-row: span 2; }
+        .trend-item:last-child { grid-column: span 2; }
+        .trend-overlay { position: absolute; bottom: 20px; left: 20px; color: white; font-weight: bold; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+
+        /* ===== MARQUEE ===== */
+        .marquee-banner { background: var(--orion-primary); color: white; padding: 10px 0; overflow: hidden; white-space: nowrap; font-weight: bold; font-size: 0.9rem; }
+        .marquee-text { display: inline-block; animation: marquee 20s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* ===== TARJETAS DESTACADAS ===== */
+        .featured-card { border-radius: 20px; overflow: hidden; transition: 0.4s; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .featured-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(225, 0, 152, 0.2); }
+
+        .brand-logo { font-weight: 900; font-size: 2.3rem; color: var(--orion-primary) !important; letter-spacing: -1.5px; }
+        .top-nav { font-size: 0.85rem; background: #f8f9fa; border-bottom: 1px solid #eee; }
+        .user-avatar { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 2px solid var(--orion-primary); }
+
+        /* ===== PROMOCIONES ===== */
+        .promo-card {
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: none;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            position: relative;
+            background: white;
+            height: 100%;
+        }
+        .promo-card:hover { transform: translateY(-8px); box-shadow: 0 15px 40px rgba(225,0,152,0.15); }
+        .promo-card .promo-img { height: 200px; object-fit: cover; width: 100%; }
+        .promo-card .promo-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--orion-discount);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 2;
+        }
+        .promo-card .promo-badge.vip { background: #f9a825; color: #1a1a2e; }
+        .promo-card .promo-badge.envio { background: #2e7d32; }
+        .promo-card .promo-body { padding: 20px; }
+        .promo-card .promo-body h5 { font-weight: 800; font-size: 1.1rem; }
+        .promo-card .promo-body .promo-desc { color: #666; font-size: 0.85rem; }
+        .promo-card .promo-body .promo-code {
+            background: #f5f5f5;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--orion-primary);
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+        .promo-card .promo-body .btn-aplicar {
+            background: var(--orion-primary);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .promo-card .promo-body .btn-aplicar:hover {
+            background: #c00080;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(225,0,152,0.3);
+        }
+        .promo-card .promo-body .btn-aplicar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast-message {
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            animation: slideIn 0.4s ease;
+        }
+        .toast-message.success { background: #2e7d32; }
+        .toast-message.error { background: #c62828; }
+        .toast-message.warning { background: #f9a825; color: #1a1a2e; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ===== VIDEO ===== */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .banner-promo {
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            background-size: cover;
+            background-position: center;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            padding: 40px;
+        }
+        .banner-promo:hover { transform: scale(1.02); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero-slide { height: 350px; }
+            .trend-grid { height: 350px; }
+            .banner-full { margin: 20px 0; height: 250px; }
+            .promo-card .promo-img { height: 150px; }
+        }
+        @media (max-width: 576px) {
+            .hero-slide { height: 250px; }
+            .trend-grid { grid-template-columns: 1fr 1fr; height: auto; }
+            .trend-item:first-child { grid-row: span 1; }
+            .trend-item:last-child { grid-column: span 2; }
+            .trend-item { height: 150px; }
+            .banner-promo { padding: 20px; min-height: 150px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== TOP NAV ===== -->
+    <div class="top-nav py-2 text-secondary d-none d-lg-block">
+        <div class="container d-flex justify-content-end gap-4">
+            <a href="#" class="text-secondary text-decoration-none">Encuentra tu tienda</a>
+            <a href="/servicios" class="text-secondary text-decoration-none">Servicios</a>
+            <a href="#" class="text-secondary text-decoration-none">Ayuda</a>
+            <!-- ✅ NUEVO: Mis cupones -->
+            <a href="{{ url_for('web.mis_cupones') }}" class="text-secondary text-decoration-none">
+                <i class="bi bi-ticket-perforated me-1"></i>Mis cupones
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="/">ORION</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#orionNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="orionNavbar">
+                <div class="dropdown mx-lg-4">
+                    <button class="btn btn-white fw-bold text-dark dropdown-toggle border-0" data-bs-toggle="dropdown">Categorías</button>
+                    <ul class="dropdown-menu shadow border-0 py-2" style="min-width: 220px;">
+                        {% if categorias %}
+                            {% for padre in categorias if not padre.padre_id %}
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item" href="/catalogo?categoria={{padre._id}}">{{ padre.nombre }}</a>
+                                <ul class="dropdown-menu shadow border-0" style="border-radius: 12px;">
+                                    {% for hijo in categorias if hijo.padre_id == padre._id %}
+                                    <li><a class="dropdown-item" href="/catalogo?categoria={{hijo._id}}">{{ hijo.nombre }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+                <form class="d-flex flex-grow-1" action="/catalogo" method="GET">
+                    <input class="form-control rounded-pill bg-light" type="search" name="q" placeholder="Buscar productos...">
+                </form>
+
+                <div class="ms-3 d-flex align-items-center gap-3">
+                    {% if session.get('nombre') %}
+                        <a href="/perfil" class="text-dark fw-bold text-decoration-none d-flex align-items-center gap-2">
+                            {% if session.get('foto') %}
+                                <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}?t={{ range(1, 10000) | random }}" class="user-avatar" alt="Perfil">
+                            {% else %}
+                                <i class="bi bi-person-circle fs-3"></i>
+                            {% endif %}
+                            HOLAAA, {{ session['nombre'] }}
+                        </a>
+                    {% else %}
+                        <a href="/login" class="text-dark fw-bold">INICIAR SESIÓN</a>
+                    {% endif %}
+                    <a href="{{ url_for('web.ver_carrito') }}" class="text-dark"><i class="bi bi-bag fs-4"></i></a>
+                    <a href="{{ url_for('web.listar_promociones_cliente') }}" class="btn btn-sm btn-outline-primary rounded-pill d-none d-md-inline-block" style="border-color:var(--orion-primary); color:var(--orion-primary);">
+                        <i class="bi bi-gift"></i> Promos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== MARQUEE ===== -->
+    <div class="marquee-banner">
+        <div class="marquee-text">¡ENVÍOS GRATIS A TODO MÉXICO! • OFERTAS ESPECIALES POR TIEMPO LIMITADO • ¡DESCUBRE LO NUEVO DE ORION!</div>
+    </div>
+
+    <!-- ===== HERO CAROUSEL ===== -->
+    <div id="orionCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-inner">
+            <div class="carousel-item active hero-slide slide-1">
+                <div class="container text-white">
+                    <h1 class="display-3 fw-bold">Estilo Urbano que Impacta</h1>
+                    <p class="fs-5 opacity-75">Descubre la nueva colección de moda y tecnología.</p>
+                    <a href="#" class="btn btn-light rounded-pill px-4 py-2 fw-bold">Comprar Ahora</a>
+                </div>
+            </div>
+            <div class="carousel-item hero-slide slide-2">
+                <div class="container text-white">
+                    <h1 class="display-3 fw-bold">Pasos con Estilo y Potencia</h1>
+                    <p class="fs-5 opacity-75">Los sneakers más buscados de la temporada.</p>
+                    <a href="#" class="btn btn-light rounded-pill px-4 py-2 fw-bold">Ver Colección</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PROMOCIONES DESTACADAS ===== -->
+    {% if promociones_home and promociones_home|length > 0 %}
+    <section class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3><i class="bi bi-gift-fill" style="color:var(--orion-primary);"></i> Promociones Destacadas</h3>
+            <a href="{{ url_for('web.listar_promociones_cliente') }}" class="text-decoration-none" style="color:var(--orion-primary); font-weight:600;">
+                Ver todas <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        <div class="row g-4">
+            {% for promo in promociones_home %}
+            <div class="col-md-4">
+                <div class="promo-card">
+                    <div class="position-relative">
+                        <img src="{{ promo.imagen if promo.imagen else 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?q=80&w=800' }}" class="promo-img" alt="{{ promo.nombre }}">
+                        {% if promo.tipo == 'descuento_directo' %}
+                            <span class="promo-badge">{{ promo.descuento_valor }}% OFF</span>
+                        {% elif promo.tipo == 'envio_gratis' %}
+                            <span class="promo-badge envio">🚚 ENVÍO GRATIS</span>
+                        {% elif promo.tipo == 'cantidad' %}
+                            <span class="promo-badge">{{ promo.cantidad_requerida }}x{{ promo.cantidad_gratis }}</span>
+                        {% elif promo.tipo == 'combo' %}
+                            <span class="promo-badge">🔥 COMBO</span>
+                        {% elif promo.tipo == 'pago' %}
+                            <span class="promo-badge">💳 {{ promo.descuento_valor }}%</span>
+                        {% elif promo.tipo == 'cumpleanos' %}
+                            <span class="promo-badge vip">🎂 CUMPLEAÑOS</span>
+                        {% else %}
+                            <span class="promo-badge">🎯 OFERTA</span>
+                        {% endif %}
+                    </div>
+                    <div class="promo-body">
+                        <h5>{{ promo.nombre }}</h5>
+                        <p class="promo-desc">{{ promo.descripcion }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if promo.codigo %}
+                                <span class="promo-code">{{ promo.codigo }}</span>
+                            {% else %}
+                                <span class="promo-code">APLICA</span>
+                            {% endif %}
+                            <button class="btn-aplicar" data-promo-id="{{ promo._id }}" onclick="aplicarPromocion(this)">
+                                Aplicar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- ===== BANNER PUBLICITARIO ===== -->
+    <section class="container my-5">
+        <div class="banner-promo text-white" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+            <div>
+                <h2 class="display-5 fw-bold"><i class="bi bi-lightning-fill" style="color:#f9a825;"></i> Ofertas Relámpago</h2>
+                <p class="fs-5">Descuentos de hasta <strong>50%</strong> en productos seleccionados. ¡Corre que se acaban!</p>
+                <a href="#" class="btn btn-light rounded-pill px-4 py-2 fw-bold">Ver ofertas <i class="bi bi-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TENDENCIAS ===== -->
+    <section class="container my-5">
+        <h3 class="mb-4">TENDENCIAS DE TEMPORADA</h3>
+        <div class="trend-grid">
+            <div class="trend-item"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f"><div class="trend-overlay">MODA</div></div>
+            <div class="trend-item"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff"><div class="trend-overlay">SNEAKERS</div></div>
+            <div class="trend-item"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e"><div class="trend-overlay">AUDIO</div></div>
+            <div class="trend-item"><img src="https://images.unsplash.com/photo-1583394838336-acd977736f90"><div class="trend-overlay">ACCESORIOS</div></div>
+        </div>
+    </section>
+
+    <!-- ===== NUEVA COLECCIÓN ===== -->
+    <section class="container my-5">
+        <h3 class="mb-4">NUEVA COLECCIÓN</h3>
+        <div class="banner-full p-5 text-white">
+            <div class="ms-5">
+                <h2>Lanzamiento Exclusivo</h2>
+                <p>Descubre lo último en diseño y tecnología para tu día a día.</p>
+                <a href="#" class="btn btn-outline-light">Ver Colección</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== VIDEO PROMOCIONAL ===== -->
+    <section class="container my-5">
+        <h3 class="mb-4"><i class="bi bi-play-circle-fill" style="color:var(--orion-primary);"></i> Descubre la Experiencia ORION</h3>
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="ORION Experience" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <!-- ===== SECCIÓN BIENVENIDA CLIENTE ===== -->
+    {% if session.get('user_id') %}
+    <section class="container my-5 py-4 bg-light rounded-4 shadow-sm">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center border-end">
+                <h5 class="text-uppercase text-muted">Tu beneficio exclusivo</h5>
+                <h2 class="display-6 fw-bold text-primary">¡Hola, {{ session['nombre'] }}!</h2>
+                <div class="bg-primary text-white p-3 rounded-pill my-3 shadow">
+                    CÓDIGO: <strong class="fs-4">ORION-VIP-20</strong>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h5 class="mb-3">Sugerencias para ti:</h5>
+                <div class="d-flex gap-3 overflow-auto">
+                    {% if sugerencias %}
+                        {% for prod in sugerencias %}
+                        <div class="card border-0 shadow-sm" style="min-width: 150px;">
+                            <img src="{{ prod.imagen }}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                            <div class="card-body p-2 text-center">
+                                <p class="small fw-bold mb-0 text-truncate">{{ prod.nombre }}</p>
+                                <small class="text-primary">${{ prod.precio }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">Sigue navegando para recibir recomendaciones personalizadas.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- ===== MÁS VENDIDOS ===== -->
+    <section class="container my-5 pb-5">
+        <h3 class="mb-4">MÁS VENDIDOS</h3>
+        <div class="row g-4">
+            <div class="col-md-4"><div class="card featured-card p-4 text-center"><h4>Producto Top 1</h4></div></div>
+            <div class="col-md-4"><div class="card featured-card p-4 text-center"><h4>Producto Top 2</h4></div></div>
+            <div class="col-md-4"><div class="card featured-card p-4 text-center"><h4>Producto Top 3</h4></div></div>
+        </div>
+    </section>
+
+    <!-- ===== BANNERS INFERIORES ===== -->
+    <section class="container my-5">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="banner-promo text-white" style="background: linear-gradient(135deg, #6f42c1, #e10098);">
+                    <div>
+                        <h3><i class="bi bi-phone"></i> Descarga nuestra App</h3>
+                        <p>Compra desde tu móvil y obtén beneficios exclusivos.</p>
+                        <div>
+                            <a href="#" class="btn btn-light rounded-pill px-3 btn-sm"><i class="bi bi-apple"></i> App Store</a>
+                            <a href="#" class="btn btn-light rounded-pill px-3 btn-sm"><i class="bi bi-google-play"></i> Google Play</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="banner-promo text-white" style="background: linear-gradient(135deg, #0f3460, #1a1a2e);">
+                    <div>
+                        <h3><i class="bi bi-envelope-paper"></i> Suscríbete</h3>
+                        <p>Recibe ofertas exclusivas y novedades.</p>
+                        <div class="input-group">
+                            <input type="email" class="form-control rounded-start-pill" placeholder="Tu email">
+                            <button class="btn btn-light rounded-end-pill">Suscribirme</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-dark text-white p-5 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 text-start">
+                    <h4 class="brand-logo mb-3">ORION</h4>
+                    <p class="text-secondary">El puerto del e-commerce donde encuentras todo lo que necesitas con estilo y calidad.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-secondary"><i class="bi bi-facebook fs-5"></i></a>
+                        <a href="#" class="text-secondary"><i class="bi bi-instagram fs-5"></i></a>
+                        <a href="#" class="text-secondary"><i class="bi bi-tiktok fs-5"></i></a>
+                        <a href="#" class="text-secondary"><i class="bi bi-youtube fs-5"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 text-start">
+                    <h6 class="fw-bold">COMPRAS</h6>
+                    <ul class="list-unstyled text-secondary">
+                        <li><a href="#" class="text-secondary text-decoration-none">Ofertas</a></li>
+                        <li><a href="#" class="text-secondary text-decoration-none">Nuevo</a></li>
+                        <li><a href="#" class="text-secondary text-decoration-none">Más vendidos</a></li>
+                        <li><a href="#" class="text-secondary text-decoration-none">Categorías</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 text-start">
+                    <h6 class="fw-bold">AYUDA</h6>
+                    <ul class="list-unstyled text-secondary">
+                        <li><a href="#" class="text-secondary text-decoration-none">Contacto</a></li>
+                        <li><a href="#" class="text-secondary text-decoration-none">Preguntas frecuentes</a></li>
+                        <li><a href="#" class="text-secondary text-decoration-none">Devoluciones</a></li>
+                        <li><a href="#" class="text-secondary text-decoration-none">Términos</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 text-start">
+                    <h6 class="fw-bold">SUSCRÍBETE</h6>
+                    <p class="text-secondary">Recibe ofertas exclusivas y novedades.</p>
+                    <div class="input-group">
+                        <input type="email" class="form-control bg-dark text-white border-secondary" placeholder="Tu email">
+                        <button class="btn btn-primary rounded-end" style="background:var(--orion-primary); border:none;">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <span class="badge bg-secondary me-1"><i class="bi bi-credit-card"></i> Tarjetas</span>
+                        <span class="badge bg-secondary me-1"><i class="bi bi-paypal"></i> PayPal</span>
+                        <span class="badge bg-secondary"><i class="bi bi-shield-check"></i> Seguro</span>
+                    </div>
+                </div>
+            </div>
+            <hr class="border-secondary mt-4">
+            <p class="text-center text-secondary mb-0">© 2026 ORION System - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ===== TOAST =====
+        function mostrarToast(mensaje, tipo = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-message ${tipo}`;
+            let icon = 'check-circle';
+            if (tipo === 'error') icon = 'exclamation-circle';
+            if (tipo === 'warning') icon = 'exclamation-triangle';
+            toast.innerHTML = `<i class="bi bi-${icon} me-2"></i> ${mensaje}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.5s ease forwards';
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+
+        // ===== APLICAR PROMOCIÓN =====
+        async function aplicarPromocion(btn) {
+            const promoId = btn.dataset.promoId;
+            
+            // Deshabilitar botón para evitar doble clic
+            btn.disabled = true;
+            btn.textContent = 'Aplicando...';
+
+            try {
+                // 1. Obtener el total del carrito desde la API
+                let montoCarrito = 0;
+                try {
+                    const res = await fetch("{{ url_for('web.api_carrito') }}", {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await res.json();
+                    if (data.total) {
+                        montoCarrito = data.total;
+                    } else if (data.items) {
+                        // Calcular total si no viene directamente
+                        montoCarrito = data.items.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+                    }
+                } catch (e) {
+                    console.warn('No se pudo obtener el carrito:', e);
+                    // Fallback: buscar en el DOM
+                    const totalElement = document.querySelector('.cart-total, .total-price, #cart-total, .subtotal');
+                    if (totalElement) {
+                        const raw = totalElement.innerText.replace(/[$,]/g, '').trim();
+                        montoCarrito = parseFloat(raw) || 0;
+                    }
+                }
+
+                // 2. Enviar solicitud para aplicar la promoción
+                const res = await fetch("{{ url_for('web.aplicar_promocion') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        promocion_id: promoId, 
+                        monto_carrito: montoCarrito 
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    mostrarToast('✅ ' + data.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('web.ver_carrito') }}";
+                    }, 1500);
+                } else {
+                    mostrarToast('❌ ' + data.message, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Aplicar';
+                }
+            } catch (error) {
+                console.error('Error al aplicar promoción:', error);
+                mostrarToast('❌ Error al aplicar la promoción. Intenta de nuevo.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Aplicar';
+            }
+        }
+
+        // ===== ANIMACIÓN DE TARJETAS =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const promoCards = document.querySelectorAll('.promo-card');
+            promoCards.forEach((card, i) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200 + i * 150);
+            });
+        });
+    </script>
+</body>
+</html>

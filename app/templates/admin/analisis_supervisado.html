@@ -1,0 +1,2311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Supervisado | ORION Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ===== RESET & GLOBAL ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 2px solid #e8e8e8;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-top: 10px;
+        }
+        .sidebar .admin-profile .email {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #e10098;
+            text-align: center;
+            padding: 15px 0 5px;
+            letter-spacing: -1px;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #888;
+            padding: 10px 25px 5px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #dc3545;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar .logout-btn i { color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px;
+            padding: 30px 35px 20px;
+            width: 100%;
+            min-height: 100vh;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag {
+            background: #e10098;
+            color: #fff;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .stat-card .num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: block;
+        }
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: #888;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card .icon {
+            float: right;
+            font-size: 1.5rem;
+            opacity: 0.3;
+        }
+        .stat-card.primary .num { color: #e10098; }
+        .stat-card.success .num { color: #28a745; }
+        .stat-card.warning .num { color: #f9a825; }
+        .stat-card.info .num { color: #17a2b8; }
+        .stat-card.danger .num { color: #dc3545; }
+
+        /* ===== BOTONES ===== */
+        .btn-custom {
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            background: #e0e0e0;
+            color: #1a1a2e;
+            white-space: nowrap;
+        }
+        .btn-custom i { font-size: 0.8rem; }
+        .btn-custom:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
+        .btn-primary { background: #e10098; color: #fff; }
+        .btn-primary:hover { background: #c00080; }
+        .btn-success { background: #28a745; color: #fff; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: #f9a825; color: #fff; }
+        .btn-warning:hover { background: #f57f17; }
+        .btn-danger { background: #dc3545; color: #fff; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-info { background: #17a2b8; color: #fff; }
+        .btn-info:hover { background: #138496; }
+        .btn-purple { background: #6a1b9a; color: #fff; }
+        .btn-purple:hover { background: #5a1480; }
+        .btn-secondary { background: #6c757d; color: #fff; }
+        .btn-secondary:hover { background: #5a6268; }
+
+        /* ===== CARD GENÉRICA ===== */
+        .card-box {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 30px;
+        }
+        .card-box h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1a1a2e;
+        }
+        .card-box h2 i { color: #e10098; }
+        .card-box .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        /* ===== GRÁFICOS ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .chart-card h5 {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: #1a1a2e;
+        }
+        .chart-card .chart-container {
+            position: relative;
+            height: 250px;
+        }
+
+        /* ===== MATRIZ DE CONFUSIÓN ===== */
+        .matriz-confusion {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            gap: 8px;
+            max-width: 420px;
+            margin: 0 auto;
+            font-size: 0.95rem;
+        }
+        .matriz-confusion .celda {
+            padding: 14px 22px;
+            text-align: center;
+            font-weight: 700;
+            background: #f8f9fc;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            min-width: 60px;
+        }
+        .matriz-confusion .celda.header {
+            background: transparent;
+            font-weight: 600;
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .matriz-confusion .celda.tp { background: #e8f5e9; color: #1b5e20; }
+        .matriz-confusion .celda.fn { background: #fff3e0; color: #e65100; }
+        .matriz-confusion .celda.fp { background: #fce4ec; color: #b71c1c; }
+        .matriz-confusion .celda.tn { background: #e3f2fd; color: #0d47a1; }
+
+        .matriz-leyenda {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px 28px;
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+        .matriz-leyenda span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .matriz-leyenda .color-box {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+        }
+        .matriz-leyenda .color-box.tp { background: #e8f5e9; }
+        .matriz-leyenda .color-box.fn { background: #fff3e0; }
+        .matriz-leyenda .color-box.fp { background: #fce4ec; }
+        .matriz-leyenda .color-box.tn { background: #e3f2fd; }
+
+        .diagnostico-info {
+            background: #f8f9fc;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: #1a1a2e;
+            border-left: 4px solid #e10098;
+        }
+
+        /* ===== IMPORTANCIA ===== */
+        .importancia-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 8px 0;
+            font-size: 0.85rem;
+        }
+        .importancia-item .barra {
+            flex: 1;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .importancia-item .barra .fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.8s ease;
+        }
+        .importancia-item .valor {
+            font-weight: 700;
+            min-width: 48px;
+            text-align: right;
+        }
+
+        /* ===== SEGMENTACIÓN ===== */
+        .cluster-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .cluster-card-item {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            border: 1px solid #eaecf0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .cluster-card-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .cluster-card-item .ranking-tag {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #aaa;
+        }
+        .cluster-card-item .cluster-badge {
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .cluster-badge.VIP { background: #ffd700; color: #1a1a2e; }
+        .cluster-badge.Frecuente { background: #0288d1; color: #fff; }
+        .cluster-badge.Regular { background: #2e7d32; color: #fff; }
+        .cluster-badge.Ocasional { background: #6c757d; color: #fff; }
+        .cluster-badge.Inactivo { background: #d32f2f; color: #fff; }
+        .cluster-badge.General { background: #455a64; color: #fff; }
+        .cluster-badge.badge-generico { background: #8e24aa; color: #fff; }
+        .cluster-card-item .cluster-count {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+        .cluster-card-item .cluster-label {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        .cluster-card-item .cluster-gasto {
+            font-size: 0.8rem;
+            margin-top: 6px;
+            font-weight: 600;
+            color: #e10098;
+        }
+        .cluster-card-item .cluster-puntaje {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            color: #888;
+        }
+        .cluster-table-wrap {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .cluster-table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .cluster-table-wrap th,
+        .cluster-table-wrap td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f3f5;
+            font-size: 0.85rem;
+        }
+        .cluster-table-wrap th {
+            background: #f8f9fc;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+        }
+
+        .metodo-info {
+            background: #f3e8fb;
+            border: 1px solid #e0c3f2;
+            border-left: 4px solid #6a1b9a;
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin: 14px 0 20px 0;
+            font-size: 0.85rem;
+            color: #4a148c;
+            line-height: 1.7;
+        }
+        .metodo-info strong { color: #6a1b9a; }
+
+        .kmeans-steps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: #f8f9fc;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin: 16px 0 20px 0;
+            border: 1px solid #eaecf0;
+        }
+        .kmeans-steps .step {
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .kmeans-steps .step .num {
+            background: #e10098;
+            color: #fff;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .kmeans-steps .step .text {
+            font-size: 0.85rem;
+            color: #333;
+        }
+        .kmeans-steps .step .text strong {
+            display: block;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Scatter y PCA */
+        .scatter-wrapper {
+            height: 300px;
+            position: relative;
+        }
+        .scatter-legend {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        /* ===== FILTROS Y TABLA ===== */
+        .filtro-estado {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .filtro-estado .btn-filtro {
+            padding: 5px 16px;
+            border-radius: 30px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .filtro-estado .btn-filtro:hover {
+            border-color: #e10098;
+            color: #e10098;
+        }
+        .filtro-estado .btn-filtro.active {
+            background: #e10098;
+            color: #fff;
+            border-color: #e10098;
+        }
+        .filtro-estado .btn-filtro .count {
+            background: rgba(0,0,0,0.08);
+            padding: 0 8px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            margin-left: 4px;
+        }
+        .filtro-estado .btn-filtro.active .count {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .table-container {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 25px;
+        }
+        .table-container .table-header {
+            padding: 14px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .table-container .table-header h5 {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        .table-container table { margin-bottom: 0; width: 100%; }
+        .table-container thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            padding: 10px 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .table-container tbody td {
+            padding: 10px 16px;
+            vertical-align: middle;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .table-container tbody tr:hover { background: #fafafa; }
+        .badge-riesgo {
+            font-size: 0.65rem;
+            padding: 3px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .badge-riesgo.alto { background: #fce4ec; color: #c62828; }
+        .badge-riesgo.medio { background: #fff3e0; color: #e65100; }
+        .badge-riesgo.bajo { background: #e8f5e9; color: #2e7d32; }
+        .badge-riesgo.activo { background: #e3f2fd; color: #0d47a1; }
+        .badge-estado {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .badge-estado.existe { background: #e8f5e9; color: #2e7d32; }
+        .badge-estado.no-existe { background: #fce4ec; color: #c62828; }
+
+        .table-responsive {
+            max-height: 540px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #e10098 #f0f0f0;
+        }
+        .table-responsive::-webkit-scrollbar { width: 6px; }
+        .table-responsive::-webkit-scrollbar-track { background: #f0f0f0; }
+        .table-responsive::-webkit-scrollbar-thumb { background: #e10098; border-radius: 10px; }
+        .table-responsive thead { position: sticky; top: 0; z-index: 10; }
+        .table-responsive thead th { background: #f8f9fa; border-bottom: 2px solid #e10098; }
+
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pagination-wrapper .info {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .pagination {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .pagination button {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid #e8e8e8;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pagination button:hover:not(:disabled) {
+            background: #f8f0f5;
+            border-color: #e10098;
+            color: #e10098;
+        }
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .pagination .page-number {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: #e10098;
+            border-color: #e10098;
+            color: #fff;
+        }
+        .per-page-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        .per-page-selector select {
+            padding: 4px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-top: 18px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .alert-success { background: #e8f5e9; border: 1px solid #c8e6c9; color: #1b5e20; }
+        .alert-danger { background: #fce4ec; border: 1px solid #f8bbd0; color: #b71c1c; }
+        .alert-info { background: #e3f2fd; border: 1px solid #bbdefb; color: #0d47a1; }
+        .alert-warning { background: #fff3e0; border: 1px solid #ffe0b2; color: #e65100; }
+
+        .input-umbral {
+            width: 80px;
+            padding: 6px 10px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            transition: border 0.2s;
+        }
+        .input-umbral:focus {
+            border-color: #e10098;
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .main { margin-left: 70px; padding: 15px; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .pagination-wrapper { flex-direction: column; align-items: stretch; }
+            .pagination { justify-content: center; }
+            .matriz-confusion { max-width: 280px; }
+            .kmeans-steps { flex-direction: column; }
+            .scatter-wrapper { height: 250px; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .filtro-estado .btn-filtro { font-size: 0.65rem; padding: 4px 12px; }
+            .cluster-cards-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .scatter-wrapper { height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+        <div class="logo">ORION<span>.</span></div>
+        <div class="menu-scroll">
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_empresas') }}"><i class="fas fa-building"></i> <span>Empresas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}"><i class="fas fa-gift"></i> <span>Promociones</span></a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}" class="active"><i class="fas fa-brain"></i> <span>Análisis Supervisado</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+
+        <!-- ===== TOP BAR ===== -->
+        <div class="top-bar">
+            <h1><i class="fas fa-brain"></i> Análisis Supervisado</h1>
+            <div class="tag"><i class="fas fa-microchip"></i> Machine Learning</div>
+        </div>
+
+        <div id="resultadoAccion" style="display: none;"></div>
+
+        <!-- ===== ESTADO DE MODELOS ===== -->
+        <div class="card-box">
+            <h2><i class="fas fa-server"></i> Estado de Modelos</h2>
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <div>
+                    <span class="badge-estado" id="estado-ventas">⏳ Cargando...</span>
+                    <span style="font-weight: 600; margin-left: 8px;">Ventas</span>
+                </div>
+                <div>
+                    <span class="badge-estado" id="estado-abandono">⏳ Cargando...</span>
+                    <span style="font-weight: 600; margin-left: 8px;">Random Forest</span>
+                </div>
+                <div>
+                    <span class="badge-estado" id="estado-logistico">⏳ Cargando...</span>
+                    <span style="font-weight: 600; margin-left: 8px;">Regresión Logística</span>
+                </div>
+                <div>
+                    <span class="badge-estado" id="estado-segmentacion">⏳ Cargando...</span>
+                    <span style="font-weight: 600; margin-left: 8px;">Segmentación</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ACCIONES RÁPIDAS ===== -->
+        <div class="card-box">
+            <h2><i class="fas fa-rocket"></i> Acciones de Entrenamiento</h2>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="entrenarVentas()" class="btn-custom btn-primary" id="btnEntrenarVentas">
+                    <i class="fas fa-chart-line"></i> Entrenar Ventas
+                </button>
+                <button onclick="entrenarAbandono()" class="btn-custom btn-success" id="btnEntrenarAbandono">
+                    <i class="fas fa-tree"></i> Random Forest
+                </button>
+                <button onclick="entrenarLogistico()" class="btn-custom btn-warning" id="btnEntrenarLogistico">
+                    <i class="fas fa-chart-line"></i> Regresión Logística
+                </button>
+                <button onclick="entrenarSegmentacion()" class="btn-custom btn-purple" id="btnEntrenarSegmentacion">
+                    <i class="fas fa-vector-square"></i> Segmentación
+                </button>
+                <button onclick="predecirVentas()" class="btn-custom btn-info" id="btnPredecirVentas">
+                    <i class="fas fa-calculator"></i> Predecir Ventas
+                </button>
+                <button onclick="predecirAbandono()" class="btn-custom btn-danger" id="btnPredecirAbandono">
+                    <i class="fas fa-users"></i> Riesgo (RF)
+                </button>
+                <button onclick="predecirLogistico()" class="btn-custom btn-warning" id="btnPredecirLogistico">
+                    <i class="fas fa-users"></i> Riesgo (Log)
+                </button>
+                <button onclick="limpiarModelos()" class="btn-custom btn-secondary">
+                    <i class="fas fa-trash"></i> Limpiar Modelos
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== MÉTRICAS GLOBALES ===== -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <i class="fas fa-chart-line icon"></i>
+                <span class="num" id="r2_ventas">N/A</span>
+                <span class="label">R² - Ventas</span>
+            </div>
+            <div class="stat-card success">
+                <i class="fas fa-check-circle icon"></i>
+                <span class="num" id="accuracy_abandono">N/A</span>
+                <span class="label">Accuracy - RF</span>
+            </div>
+            <div class="stat-card warning">
+                <i class="fas fa-check-circle icon"></i>
+                <span class="num" id="accuracy_logistico">N/A</span>
+                <span class="label">Accuracy - Logística</span>
+            </div>
+            <div class="stat-card info">
+                <i class="fas fa-database icon"></i>
+                <span class="num" id="n_muestras">0</span>
+                <span class="label">Muestras de Entrenamiento</span>
+            </div>
+            <div class="stat-card primary">
+                <i class="fas fa-vector-square icon"></i>
+                <span class="num" id="silhouette_segmentacion">N/A</span>
+                <span class="label">Silhouette - Segmentación</span>
+            </div>
+        </div>
+
+        <!-- ===== GRÁFICOS ===== -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h5><i class="fas fa-chart-line" style="color:#e10098;"></i> Predicción de Ventas</h5>
+                <div class="chart-container">
+                    <canvas id="chartPrediccionVentas"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h5><i class="fas fa-chart-pie" style="color:#e10098;"></i> Distribución de Riesgo (Random Forest)</h5>
+                <div class="chart-container">
+                    <canvas id="chartDistribucionRiesgo"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 1. RANDOM FOREST -->
+        <!-- ============================================================ -->
+        <div class="card-box">
+            <h2><i class="fas fa-tree" style="color:#28a745;"></i> Random Forest – Abandono</h2>
+            <p class="subtitle">Modelo de clasificación basado en árboles de decisión. Mide la importancia de cada característica.</p>
+
+            <h5 style="font-weight:700; font-size:0.9rem; margin-top:10px;">
+                <i class="fas fa-list-ul"></i> Importancia de Características
+            </h5>
+            <div id="importanciaContainer">
+                <p class="text-muted text-center" style="padding:20px;">Cargando importancia...</p>
+            </div>
+
+            <h5 style="font-weight:700; font-size:0.9rem; margin-top:20px;">
+                <i class="fas fa-th"></i> Matriz de Confusión
+            </h5>
+            <p style="color:#666; font-size:0.85rem; text-align:center;">Filas = <strong>Real</strong>, Columnas = <strong>Predicho</strong></p>
+            <div class="diagnostico-info">
+                <i class="fas fa-info-circle" style="color:#e10098; margin-right:8px;"></i>
+                <strong>Análisis:</strong>
+                <span id="analisisRF">Cargando...</span>
+            </div>
+            <div id="matrizRFContainer" style="margin-top:16px;">
+                <p class="text-muted text-center" style="padding:20px;">Cargando matriz...</p>
+            </div>
+            <div class="matriz-leyenda">
+                <span><span class="color-box tp"></span> TP (Verdadero Positivo)</span>
+                <span><span class="color-box fn"></span> FN (Falso Negativo)</span>
+                <span><span class="color-box fp"></span> FP (Falso Positivo)</span>
+                <span><span class="color-box tn"></span> TN (Verdadero Negativo)</span>
+            </div>
+
+            <h5 style="font-weight:700; font-size:0.9rem; margin-top:20px;">
+                <i class="fas fa-file-alt"></i> Reporte de Clasificación
+            </h5>
+            <div id="reporteRFContainer">
+                <p class="text-muted text-center" style="padding:20px;">Cargando reporte...</p>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 2. REGRESIÓN LOGÍSTICA -->
+        <!-- ============================================================ -->
+        <div class="card-box" style="border-left: 4px solid #ff9800;">
+            <h2><i class="fas fa-chart-line" style="color:#ff9800;"></i> Regresión Logística</h2>
+            <p class="subtitle">Modelo lineal que estima la probabilidad de abandono. <strong>Coeficientes</strong> indican la influencia de cada característica.</p>
+
+            <!-- Métricas Logísticas -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); margin-bottom:15px;">
+                <div class="stat-card success"><span class="num" id="log_accuracy">N/A</span><span class="label">Accuracy</span></div>
+                <div class="stat-card info"><span class="num" id="log_precision">N/A</span><span class="label">Precisión</span></div>
+                <div class="stat-card warning"><span class="num" id="log_recall">N/A</span><span class="label">Recall</span></div>
+                <div class="stat-card danger"><span class="num" id="log_f1">N/A</span><span class="label">F1-Score</span></div>
+                <div class="stat-card primary"><span class="num" id="log_auc">N/A</span><span class="label">AUC</span></div>
+                <div class="stat-card info"><span class="num" id="log_muestras">0</span><span class="label">Muestras</span></div>
+            </div>
+
+            <h5 style="font-weight:700; font-size:0.9rem; margin-top:10px;">
+                <i class="fas fa-list-ul"></i> Coeficientes (importancia)
+            </h5>
+            <div id="importanciaLogContainer">
+                <p class="text-muted text-center" style="padding:20px;">Cargando coeficientes...</p>
+            </div>
+
+            <h5 style="font-weight:700; font-size:0.9rem; margin-top:20px;">
+                <i class="fas fa-th"></i> Matriz de Confusión – Logística
+            </h5>
+            <div id="matrizLogContainer">
+                <p class="text-muted text-center" style="padding:20px;">Cargando matriz...</p>
+            </div>
+
+            <!-- ===== CURVA ROC (NUEVO) ===== -->
+            <div style="margin-top: 25px;">
+                <h5 style="font-weight:700; font-size:0.9rem; margin-bottom:10px;">
+                    <i class="fas fa-chart-area" style="color:#ff9800;"></i> Curva ROC
+                </h5>
+                <div class="chart-container" style="height:250px;">
+                    <canvas id="chartROCLogistico"></canvas>
+                </div>
+                <div style="display:flex; justify-content:center; gap:20px; margin-top:8px; font-size:0.85rem;">
+                    <span><strong>AUC:</strong> <span id="roc_auc_log">Cargando...</span></span>
+                    <span class="text-muted">La curva ROC muestra el rendimiento del modelo en todos los umbrales.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 3. SEGMENTACIÓN K-MEANS -->
+        <!-- ============================================================ -->
+        <div class="card-box" style="border-left: 4px solid #6a1b9a;">
+            <h2><i class="fas fa-vector-square" style="color:#6a1b9a;"></i> Segmentación de Clientes (K‑Means)</h2>
+            <p class="subtitle">
+                Agrupa clientes según <strong>frecuencia de compra</strong>, <strong>gasto total</strong> y <strong>días de inactividad</strong>.
+                Incluye <strong>método del codo</strong>, <strong>índice de silueta</strong> y <strong>visualización PCA</strong> para elegir el mejor K.
+            </p>
+
+            <!-- ===== PASOS DEL ALGORITMO ===== -->
+            <div class="kmeans-steps">
+                <div class="step">
+                    <span class="num">1</span>
+                    <div class="text">
+                        <strong>Distancia Euclidiana</strong>
+                        <span style="font-family: monospace;">d = √((x₂–x₁)² + (y₂–y₁)²)</span>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="num">2</span>
+                    <div class="text">
+                        <strong>Asignar elementos</strong>
+                        Cada punto se asigna al centroide más cercano.
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="num">3</span>
+                    <div class="text">
+                        <strong>Actualizar centroides</strong>
+                        Recalcular como media de los puntos asignados.
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="num">4</span>
+                    <div class="text">
+                        <strong>Convergencia</strong>
+                        Repetir hasta que los centroides no cambien.
+                    </div>
+                </div>
+            </div>
+
+            <div class="metodo-info">
+                <i class="fas fa-circle-info"></i>
+                <strong>¿Cómo se nombra cada segmento?</strong> No se usan números fijos (como "más de 60 días" o "gasto mayor a $X").
+                En cada entrenamiento, el sistema compara los clusters <strong>entre sí</strong>: calcula un puntaje por cluster
+                (45% gasto promedio + 35% pedidos promedio + 20% qué tan reciente compró) y los ordena de mejor a peor.
+                El mejor cluster de esa corrida siempre se llama <strong>VIP</strong> y el peor <strong>Inactivo</strong>,
+                sin importar los valores exactos — por eso el resultado se recalcula solo en cada entrenamiento.
+            </div>
+
+            <!-- ===== CONTROLES ===== -->
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;">
+                <div>
+                    <label style="font-weight: 600; font-size: 0.85rem;">Número de clusters (K):</label>
+                    <input type="number" id="nClustersInput" class="input-umbral" value="4" min="2" max="10">
+                </div>
+                <button onclick="entrenarSegmentacion()" class="btn-custom btn-purple">
+                    <i class="fas fa-vector-square"></i> Entrenar con K elegido
+                </button>
+                <button onclick="cargarCodoSilueta()" class="btn-custom btn-info">
+                    <i class="fas fa-chart-line"></i> Evaluar K (Codo + Silueta)
+                </button>
+                <button onclick="cargarPCASegmentacion()" class="btn-custom btn-primary">
+                    <i class="fas fa-chart-scatter"></i> Ver PCA
+                </button>
+                <button onclick="cargarSegmentacion()" class="btn-custom btn-secondary">
+                    <i class="fas fa-sync"></i> Actualizar
+                </button>
+            </div>
+
+            <!-- ===== GRÁFICOS DE EVALUACIÓN (CODO Y SILUETA) ===== -->
+            <div id="evaluacionContainer" style="display: none; margin-top: 15px;">
+                <div class="charts-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 10px;">
+                    <div class="chart-card">
+                        <h5><i class="fas fa-chart-line" style="color:#e10098;"></i> Método del Codo (Inercia)</h5>
+                        <div class="chart-container" style="height:200px;">
+                            <canvas id="chartCodo"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h5><i class="fas fa-chart-bar" style="color:#e10098;"></i> Índice de Silueta</h5>
+                        <div class="chart-container" style="height:200px;">
+                            <canvas id="chartSilueta"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size:0.85rem; color:#666; text-align:center; margin-bottom:10px;">
+                    <span id="recomendacionK">Selecciona un K donde la inercia deje de caer bruscamente y la silueta sea alta.</span>
+                </div>
+            </div>
+
+            <!-- ===== VISUALIZACIÓN PCA ===== -->
+            <div id="pcaContainer" style="display: none; margin-top: 15px;">
+                <h5 style="font-weight:700; font-size:0.9rem; margin-bottom:8px;">
+                    <i class="fas fa-chart-scatter"></i> Proyección PCA (2D) – Clusters
+                </h5>
+                <div class="scatter-wrapper" style="height:300px;">
+                    <canvas id="chartPCA"></canvas>
+                </div>
+                <div class="scatter-legend">
+                    ⚪ Cada punto es un cliente proyectado en las 2 primeras componentes principales.
+                    ⭐ Centroides de los clusters.
+                </div>
+            </div>
+
+            <!-- ===== SCATTER ORIGINAL (GASTO vs DÍAS) ===== -->
+            <div id="scatterContainer" style="display: none; margin-top: 20px;">
+                <h5 style="font-weight:700; font-size:0.9rem; margin-bottom:10px;">
+                    <i class="fas fa-chart-scatter"></i> Visualización Original (Gasto vs Días sin comprar)
+                </h5>
+                <div class="scatter-wrapper" style="height:300px;">
+                    <canvas id="chartScatter"></canvas>
+                </div>
+                <div class="scatter-legend">
+                    ⚪ Cada punto es un cliente. ⭐ Los centroides de cada cluster.
+                </div>
+            </div>
+
+            <!-- ===== TARJETAS DE CLUSTERS ===== -->
+            <div id="clusterStatsContainer" style="margin-top: 24px; display: none;">
+                <h4 style="font-size:1rem; font-weight:700; margin-bottom:4px;"><i class="fas fa-chart-bar"></i> Distribución de Clusters</h4>
+                <p style="color:#888; font-size:0.8rem; margin-bottom:14px;">Ordenados de mejor a peor según su puntaje relativo en esta corrida (no por umbrales fijos).</p>
+                <div class="cluster-cards-grid" id="clusterCards"></div>
+                <div style="margin-top:24px; height:220px;">
+                    <canvas id="chartClusterDistribucion"></canvas>
+                </div>
+                <div class="cluster-table-wrap">
+                    <table class="table table-striped table-sm" id="clusterTable">
+                        <thead><tr><th>#</th><th>Cluster</th><th>Segmento</th><th>Puntaje</th><th>Clientes</th><th>Pedidos promedio</th><th>Gasto promedio ($)</th><th>Días sin comprar</th></tr></thead>
+                        <tbody id="clusterTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="segmentacionInfo"><p class="text-muted">Entrena el modelo o evalúa K para ver los resultados.</p></div>
+        </div>
+
+        <!-- ===== TABLA DE CLIENTES CON RIESGO ===== -->
+        <div class="table-container">
+            <div class="table-header">
+                <h5><i class="fas fa-list" style="color:#d32f2f;"></i> Clientes con Riesgo de Abandono (Random Forest)</h5>
+                <span class="small text-muted" id="totalClientes">0 clientes</span>
+            </div>
+            <div style="padding: 12px 20px 0;">
+                <div class="filtro-estado">
+                    <button class="btn-filtro active" data-filtro="todos" onclick="filtrarRiesgo('todos')">
+                        Todos <span class="count" id="count-todos">0</span>
+                    </button>
+                    <button class="btn-filtro" data-filtro="alto" onclick="filtrarRiesgo('alto')">
+                        🔴 Alto <span class="count" id="count-alto">0</span>
+                    </button>
+                    <button class="btn-filtro" data-filtro="medio" onclick="filtrarRiesgo('medio')">
+                        🟡 Medio <span class="count" id="count-medio">0</span>
+                    </button>
+                    <button class="btn-filtro" data-filtro="bajo" onclick="filtrarRiesgo('bajo')">
+                        🟢 Bajo <span class="count" id="count-bajo">0</span>
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive" id="tablaScroll">
+                <table class="table" id="tablaRiesgo">
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th>Cliente</th>
+                            <th>Email</th>
+                            <th style="width:130px;">Días sin comprar</th>
+                            <th style="width:80px;">Pedidos</th>
+                            <th style="width:120px;">Nivel de Riesgo</th>
+                            <th style="width:100px;">Probabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaRiesgoBody">
+                        <tr><td colspan="7" class="text-center text-muted">Carga de datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-wrapper">
+                <div class="info">
+                    Mostrando <strong id="paginacion-desde">0</strong> - <strong id="paginacion-hasta">0</strong> de <strong id="paginacion-total">0</strong> clientes
+                </div>
+                <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+                    <div class="per-page-selector">
+                        <span>Mostrar:</span>
+                        <select id="perPageSelect" onchange="cambiarPerPage()">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="9999">Todos</option>
+                        </select>
+                    </div>
+                    <div class="pagination">
+                        <button onclick="irPagina(1)" id="btnPrimera" disabled><i class="fas fa-angle-double-left"></i></button>
+                        <button onclick="irPagina(paginaActual - 1)" id="btnAnterior" disabled><i class="fas fa-angle-left"></i></button>
+                        <span class="page-number" id="paginaInfo">1</span>
+                        <button onclick="irPagina(paginaActual + 1)" id="btnSiguiente" disabled><i class="fas fa-angle-right"></i></button>
+                        <button onclick="irPagina(totalPaginas)" id="btnUltima" disabled><i class="fas fa-angle-double-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== INSTRUCCIONES ===== -->
+        <div class="card-box" style="background: #f8f9fc; margin-bottom: 0;">
+            <h2><i class="fas fa-info-circle" style="color:#0288d1;"></i> ¿Cómo funciona?</h2>
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.8;">
+                <strong>1. Entrenar modelos:</strong> Utiliza los datos históricos de pedidos y usuarios.<br>
+                <strong>2. Predecir ventas:</strong> Random Forest Regressor para estimar ventas futuras.<br>
+                <strong>3. Detectar abandono:</strong> Random Forest Classifier y Regresión Logística.<br>
+                <strong>4. Segmentar clientes:</strong> K-Means agrupa por comportamiento y nombra cada segmento comparando los
+                clusters entre sí en cada corrida (sin números fijos). Puedes usar el método del codo y la silueta para elegir el mejor K.<br>
+                <strong>5. Tomar acción:</strong> Usa estos insights para campañas de retención.
+            </p>
+        </div>
+
+    </main>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT COMPLETO -->
+<!-- ============================================================ -->
+<script>
+    // ================================================================
+    // VARIABLES GLOBALES
+    // ================================================================
+    let usuariosRiesgo = [];
+    let usuariosFiltrados = [];
+    let filtroActual = 'todos';
+    let paginaActual = 1;
+    let itemsPorPagina = 10;
+    let totalPaginas = 1;
+    let chartPrediccion = null;
+    let chartRiesgo = null;
+    let chartCluster = null;
+    let chartScatter = null;
+    let chartCodo = null;
+    let chartSilueta = null;
+    let chartPCA = null;
+    let chartROC = null;
+
+    const SEGMENTOS_CON_ESTILO = ['VIP', 'Frecuente', 'Regular', 'Ocasional', 'Inactivo', 'General'];
+    function claseBadgeSegmento(segmento) {
+        return SEGMENTOS_CON_ESTILO.includes(segmento) ? segmento : 'badge-generico';
+    }
+
+    // ================================================================
+    // UTILIDADES
+    // ================================================================
+    function mostrarResultado(mensaje, tipo = 'success') {
+        const div = document.getElementById('resultadoAccion');
+        div.style.display = 'block';
+        div.className = `alert alert-${tipo}`;
+        div.innerHTML = mensaje;
+        setTimeout(() => { div.style.display = 'none'; }, 8000);
+    }
+
+    function deshabilitarBoton(id, deshabilitar) {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.disabled = deshabilitar;
+            if (deshabilitar) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+        }
+    }
+
+    function restaurarBoton(id, texto, icono) {
+        const btn = document.getElementById(id);
+        if (btn) { btn.disabled = false; btn.innerHTML = `<i class="${icono}"></i> ${texto}`; }
+    }
+
+    // ================================================================
+    // ENTRENAR MODELOS
+    // ================================================================
+    function entrenarVentas() {
+        deshabilitarBoton('btnEntrenarVentas', true);
+        fetch('/api/ml/entrenar/ventas', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                restaurarBoton('btnEntrenarVentas', 'Entrenar Ventas', 'fas fa-chart-line');
+                if (data.success) {
+                    mostrarResultado(`✅ Ventas entrenado! R²: ${data.r2.toFixed(3)}`, 'success');
+                    cargarMetricas(); cargarEstadoModelos(); predecirVentas();
+                } else {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                }
+            })
+            .catch(e => mostrarResultado(`❌ Error: ${e.message}`, 'danger'));
+    }
+
+    function entrenarAbandono() {
+        deshabilitarBoton('btnEntrenarAbandono', true);
+        fetch('/api/ml/entrenar/abandono', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                restaurarBoton('btnEntrenarAbandono', 'Random Forest', 'fas fa-tree');
+                if (data.success) {
+                    mostrarResultado(`✅ Random Forest entrenado! Accuracy: ${data.accuracy.toFixed(3)}`, 'success');
+                    cargarMetricas(); cargarEstadoModelos();
+                    cargarImportancia(); cargarMatrizRF(); cargarReporteRF();
+                    predecirAbandono();
+                } else {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                }
+            })
+            .catch(e => mostrarResultado(`❌ Error: ${e.message}`, 'danger'));
+    }
+
+    function entrenarLogistico() {
+        deshabilitarBoton('btnEntrenarLogistico', true);
+        fetch('/api/ml/entrenar/logistico', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                restaurarBoton('btnEntrenarLogistico', 'Regresión Logística', 'fas fa-chart-line');
+                if (data.success) {
+                    mostrarResultado(`✅ Logístico entrenado! Accuracy: ${data.accuracy.toFixed(3)}`, 'success');
+                    cargarMetricas(); cargarEstadoModelos();
+                    cargarMetricasLogistico();
+                    cargarImportanciaLogistico();
+                    cargarMatrizLogistico();
+                    cargarCurvaROC(); // <--- Recargar curva después de entrenar
+                } else {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                }
+            })
+            .catch(e => mostrarResultado(`❌ Error: ${e.message}`, 'danger'));
+    }
+
+    function entrenarSegmentacion() {
+        const nClusters = parseInt(document.getElementById('nClustersInput').value) || 4;
+        deshabilitarBoton('btnEntrenarSegmentacion', true);
+        fetch(`/api/ml/entrenar/segmentacion?n_clusters=${nClusters}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                restaurarBoton('btnEntrenarSegmentacion', 'Entrenar Segmentación', 'fas fa-vector-square');
+                if (data.success) {
+                    mostrarResultado(`✅ Segmentación entrenada! Silhouette: ${data.silhouette.toFixed(3)}`, 'success');
+                    cargarMetricas(); cargarEstadoModelos();
+                    document.getElementById('evaluacionContainer').style.display = 'none';
+                    document.getElementById('pcaContainer').style.display = 'none';
+                    cargarSegmentacion();
+                } else {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                }
+            })
+            .catch(e => mostrarResultado(`❌ Error: ${e.message}`, 'danger'));
+    }
+
+    function limpiarModelos() {
+        if (!confirm('¿Eliminar todos los modelos?')) return;
+        fetch('/api/ml/limpiar-modelos', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarResultado('🗑️ Modelos eliminados', 'warning');
+                    cargarEstadoModelos(); cargarMetricas();
+                    ['importanciaContainer','matrizRFContainer','reporteRFContainer',
+                     'importanciaLogContainer','matrizLogContainer'].forEach(id => {
+                        document.getElementById(id).innerHTML = '<p class="text-muted">Sin datos</p>';
+                    });
+                    document.getElementById('segmentacionInfo').innerHTML = '<p class="text-muted">Entrena para ver segmentos</p>';
+                    document.getElementById('clusterStatsContainer').style.display = 'none';
+                    document.getElementById('scatterContainer').style.display = 'none';
+                    document.getElementById('evaluacionContainer').style.display = 'none';
+                    document.getElementById('pcaContainer').style.display = 'none';
+                    document.getElementById('roc_auc_log').textContent = 'N/A';
+                    if (chartROC) { chartROC.destroy(); chartROC = null; }
+                } else {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                }
+            })
+            .catch(e => mostrarResultado(`❌ Error: ${e.message}`, 'danger'));
+    }
+
+    // ================================================================
+    // PREDICCIONES
+    // ================================================================
+    function predecirVentas() {
+        deshabilitarBoton('btnPredecirVentas', true);
+        fetch('/api/ml/predecir/ventas?dias=7')
+            .then(r => r.json())
+            .then(data => {
+                restaurarBoton('btnPredecirVentas', 'Predecir Ventas', 'fas fa-calculator');
+                if (data.success) {
+                    mostrarResultado(`📊 Total 7 días: $${data.total_estimado.toFixed(2)}`, 'info');
+                    actualizarGraficoPrediccion(data.predicciones);
+                } else {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                }
+            })
+            .catch(e => mostrarResultado(`❌ Error: ${e.message}`, 'danger'));
+    }
+
+    function predecirAbandono() {
+        deshabilitarBoton('btnPredecirAbandono', true);
+        fetch('/api/ml/predecir/abandono')
+            .then(r => r.json())
+            .then(data => {
+                restaurarBoton('btnPredecirAbandono', 'Riesgo (RF)', 'fas fa-users');
+                if (data.success) {
+                    usuariosRiesgo = data.usuarios || [];
+                    mostrarResultado(`👥 ${data.total_analizados} clientes analizados`, 'success');
+                    aplicarFiltroYActualizar();
+                    cargarGraficoRiesgo(usuariosRiesgo);
+                } else {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                }
+            })
+            .catch(e => mostrarResultado(`❌ Error: ${e.message}`, 'danger'));
+    }
+
+    function predecirLogistico() {
+        deshabilitarBoton('btnPredecirLogistico', true);
+        fetch('/api/ml/predecir/logistico')
+            .then(r => r.json())
+            .then(data => {
+                restaurarBoton('btnPredecirLogistico', 'Riesgo (Log)', 'fas fa-users');
+                if (data.success) {
+                    mostrarResultado(`👥 ${data.total_analizados} clientes analizados con Logística`, 'info');
+                } else {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                }
+            })
+            .catch(e => mostrarResultado(`❌ Error: ${e.message}`, 'danger'));
+    }
+
+    // ================================================================
+    // CURVA ROC (MEJORADA)
+    // ================================================================
+    function cargarCurvaROC() {
+        const ctx = document.getElementById('chartROCLogistico');
+        if (!ctx) {
+            console.warn('Canvas chartROCLogistico no encontrado');
+            return;
+        }
+
+        fetch('/api/ml/logistico/curva-roc')
+            .then(r => {
+                if (!r.ok) throw new Error('Error HTTP: ' + r.status);
+                return r.json();
+            })
+            .then(data => {
+                console.log('Datos ROC:', data); // Para depuración
+
+                if (!data.success) {
+                    document.getElementById('roc_auc_log').textContent = 'No disponible';
+                    mostrarResultado('⚠️ El modelo logístico no está entrenado. Ejecuta "Entrenar Logístico" primero.', 'warning');
+                    // Si no hay datos, mostrar un gráfico vacío
+                    if (chartROC) { chartROC.destroy(); chartROC = null; }
+                    return;
+                }
+
+                // Verificar que los datos tengan longitud suficiente
+                if (!data.fpr || !data.tpr || data.fpr.length < 2) {
+                    document.getElementById('roc_auc_log').textContent = 'Datos insuficientes';
+                    mostrarResultado('⚠️ No hay suficientes puntos para dibujar la curva ROC. Asegúrate de tener más datos.', 'warning');
+                    if (chartROC) { chartROC.destroy(); chartROC = null; }
+                    return;
+                }
+
+                const auc = data.auc || 0;
+                document.getElementById('roc_auc_log').textContent = auc.toFixed(3);
+
+                // Destruir gráfico anterior si existe
+                if (chartROC) {
+                    chartROC.destroy();
+                    chartROC = null;
+                }
+
+                // Crear nuevo gráfico
+                chartROC = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.fpr,
+                        datasets: [{
+                            label: 'ROC (AUC = ' + auc.toFixed(3) + ')',
+                            data: data.tpr,
+                            borderColor: '#ff9800',
+                            backgroundColor: 'rgba(255,152,0,0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: { font: { size: 10 } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'TPR: ' + context.parsed.y.toFixed(3) + ' | FPR: ' + context.parsed.x.toFixed(3);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Tasa de Falsos Positivos (FPR)' },
+                                min: 0,
+                                max: 1,
+                                grid: { color: 'rgba(0,0,0,0.05)' }
+                            },
+                            y: {
+                                title: { display: true, text: 'Tasa de Verdaderos Positivos (TPR)' },
+                                min: 0,
+                                max: 1,
+                                grid: { color: 'rgba(0,0,0,0.05)' }
+                            }
+                        }
+                    }
+                });
+
+                mostrarResultado('✅ Curva ROC cargada correctamente (AUC = ' + auc.toFixed(3) + ')', 'success');
+            })
+            .catch(error => {
+                console.error('Error cargando ROC:', error);
+                document.getElementById('roc_auc_log').textContent = 'Error';
+                mostrarResultado('❌ Error al cargar la curva ROC: ' + error.message, 'danger');
+                if (chartROC) { chartROC.destroy(); chartROC = null; }
+            });
+    }
+
+    // ================================================================
+    // EVALUACIÓN K (CODO + SILUETA)
+    // ================================================================
+    function cargarCodoSilueta() {
+        const maxK = 10;
+        deshabilitarBoton('btnEntrenarSegmentacion', true);
+        fetch(`/api/ml/segmentacion/codo-silueta?max_k=${maxK}`)
+            .then(r => r.json())
+            .then(data => {
+                restaurarBoton('btnEntrenarSegmentacion', 'Entrenar Segmentación', 'fas fa-vector-square');
+                if (!data.success) {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                    return;
+                }
+                document.getElementById('evaluacionContainer').style.display = 'block';
+                document.getElementById('pcaContainer').style.display = 'none';
+
+                const ks = data.ks;
+                const inertias = data.inertias;
+                const siluetas = data.siluetas;
+
+                // Gráfico del codo
+                const ctxCodo = document.getElementById('chartCodo').getContext('2d');
+                if (chartCodo) chartCodo.destroy();
+                chartCodo = new Chart(ctxCodo, {
+                    type: 'line',
+                    data: {
+                        labels: ks,
+                        datasets: [{
+                            label: 'Inercia',
+                            data: inertias,
+                            borderColor: '#e10098',
+                            backgroundColor: 'rgba(225,0,152,0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: '#e10098'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { title: { display: true, text: 'Número de clusters (K)' } },
+                            y: { title: { display: true, text: 'Inercia' }, beginAtZero: true }
+                        }
+                    }
+                });
+
+                // Gráfico de silueta
+                const ctxSil = document.getElementById('chartSilueta').getContext('2d');
+                if (chartSilueta) chartSilueta.destroy();
+                const silData = siluetas.filter(s => s !== null);
+                const silLabels = ks.filter((_, i) => siluetas[i] !== null);
+                chartSilueta = new Chart(ctxSil, {
+                    type: 'bar',
+                    data: {
+                        labels: silLabels,
+                        datasets: [{
+                            label: 'Silueta',
+                            data: silData,
+                            backgroundColor: 'rgba(40,167,69,0.6)',
+                            borderColor: '#28a745',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { title: { display: true, text: 'K' } },
+                            y: { title: { display: true, text: 'Coeficiente de Silueta' }, beginAtZero: true, max: 1 }
+                        }
+                    }
+                });
+
+                const mejorK = silLabels[silData.indexOf(Math.max(...silData))];
+                document.getElementById('recomendacionK').innerHTML =
+                    `📊 <strong>Recomendación:</strong> K = ${mejorK} parece ser el mejor (mayor silueta). También observa el "codo" en la inercia.`;
+
+                mostrarResultado(`✅ Evaluación completada para K de 2 a ${maxK}.`, 'success');
+            })
+            .catch(e => {
+                restaurarBoton('btnEntrenarSegmentacion', 'Entrenar Segmentación', 'fas fa-vector-square');
+                mostrarResultado(`❌ Error: ${e.message}`, 'danger');
+            });
+    }
+
+    // ================================================================
+    // PCA VISUALIZATION
+    // ================================================================
+    function cargarPCASegmentacion() {
+        const nClusters = parseInt(document.getElementById('nClustersInput').value) || 4;
+        deshabilitarBoton('btnEntrenarSegmentacion', true);
+        fetch(`/api/ml/segmentacion/pca?n_clusters=${nClusters}`)
+            .then(r => r.json())
+            .then(data => {
+                restaurarBoton('btnEntrenarSegmentacion', 'Entrenar Segmentación', 'fas fa-vector-square');
+                if (!data.success) {
+                    mostrarResultado(`❌ ${data.message}`, 'danger');
+                    return;
+                }
+                document.getElementById('pcaContainer').style.display = 'block';
+                document.getElementById('evaluacionContainer').style.display = 'none';
+
+                const pca = data.pca;
+                const labels = data.labels;
+                const centroids = data.centroids_pca;
+                const colores = ['#e10098', '#ff6b35', '#00b4d8', '#ffd700', '#2ecc71', '#9b59b6', '#e74c3c', '#1abc9c'];
+                const clusters = {};
+                pca.forEach((p, i) => {
+                    const label = labels[i];
+                    if (!clusters[label]) clusters[label] = [];
+                    clusters[label].push({ x: p[0], y: p[1] });
+                });
+
+                const datasets = [];
+                Object.keys(clusters).forEach((label, index) => {
+                    const color = colores[index % colores.length];
+                    datasets.push({
+                        label: `Cluster ${label}`,
+                        data: clusters[label],
+                        backgroundColor: color,
+                        borderColor: color,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        showLine: false
+                    });
+                });
+
+                if (centroids && centroids.length > 0) {
+                    datasets.push({
+                        label: 'Centroides',
+                        data: centroids.map(c => ({ x: c[0], y: c[1] })),
+                        backgroundColor: '#000',
+                        borderColor: '#000',
+                        pointRadius: 10,
+                        pointStyle: 'star',
+                        pointBackgroundColor: '#ff0000',
+                        pointBorderColor: '#ff0000',
+                        showLine: false,
+                        pointHoverRadius: 12
+                    });
+                }
+
+                const ctxPCA = document.getElementById('chartPCA').getContext('2d');
+                if (chartPCA) chartPCA.destroy();
+                chartPCA = new Chart(ctxPCA, {
+                    type: 'scatter',
+                    data: { datasets: datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top', labels: { font: { size: 10 } } },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.dataset.label || '';
+                                        return `${label}: (${context.parsed.x.toFixed(2)}, ${context.parsed.y.toFixed(2)})`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: 'Componente Principal 1' }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                            y: { title: { display: true, text: 'Componente Principal 2' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                        }
+                    }
+                });
+
+                mostrarResultado(`✅ PCA visualizada con K=${nClusters}. Varianza explicada: ${(data.explained_variance[0]*100).toFixed(1)}% y ${(data.explained_variance[1]*100).toFixed(1)}%`, 'success');
+            })
+            .catch(e => {
+                restaurarBoton('btnEntrenarSegmentacion', 'Entrenar Segmentación', 'fas fa-vector-square');
+                mostrarResultado(`❌ Error: ${e.message}`, 'danger');
+            });
+    }
+
+    // ================================================================
+    // SEGMENTACIÓN
+    // ================================================================
+    function cargarSegmentacion() {
+        fetch('/api/ml/segmentacion/cluster-stats')
+            .then(r => r.json())
+            .then(data => {
+                if (data.success && data.cluster_stats) {
+                    mostrarSegmentacion(data.cluster_stats);
+                    cargarMetricasSegmentacion();
+                    cargarScatterSegmentacion();
+                    document.getElementById('evaluacionContainer').style.display = 'none';
+                    document.getElementById('pcaContainer').style.display = 'none';
+                } else {
+                    document.getElementById('segmentacionInfo').innerHTML = `<p class="text-muted">${data.message || 'No entrenado'}</p>`;
+                    document.getElementById('clusterStatsContainer').style.display = 'none';
+                    document.getElementById('scatterContainer').style.display = 'none';
+                    document.getElementById('silhouette_segmentacion').textContent = 'N/A';
+                }
+            })
+            .catch(e => {
+                document.getElementById('segmentacionInfo').innerHTML = `<p class="text-muted text-danger">⚠️ Error: ${e.message}</p>`;
+                document.getElementById('clusterStatsContainer').style.display = 'none';
+                document.getElementById('scatterContainer').style.display = 'none';
+                document.getElementById('silhouette_segmentacion').textContent = 'N/A';
+            });
+    }
+
+    function cargarMetricasSegmentacion() {
+        fetch('/api/ml/segmentacion/metricas')
+            .then(r => r.json())
+            .then(data => {
+                if (data.success && data.metricas) {
+                    const s = data.metricas.silhouette;
+                    document.getElementById('silhouette_segmentacion').textContent = s ? s.toFixed(3) : 'N/A';
+                }
+            })
+            .catch(e => console.warn('Error métricas segmentación:', e));
+    }
+
+    function mostrarSegmentacion(clusterStats) {
+        const totalClientesSeg = clusterStats.reduce((sum, c) => sum + c.cantidad_clientes, 0);
+        document.getElementById('segmentacionInfo').innerHTML = `
+            <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:4px;">
+                <div><strong>Clusters entrenados:</strong> ${clusterStats.length}</div>
+                <div><strong>Total clientes analizados:</strong> ${totalClientesSeg}</div>
+            </div>
+            <p style="color:#888; font-size:0.8rem; margin-top:2px;">
+                Los nombres (VIP, Frecuente, Regular, Ocasional, Inactivo) se recalculan cada vez que entrenas,
+                comparando los clusters entre sí — no se usan valores fijos de días o de gasto.
+            </p>
+        `;
+        document.getElementById('clusterStatsContainer').style.display = 'block';
+
+        const cardsDiv = document.getElementById('clusterCards');
+        cardsDiv.innerHTML = '';
+        clusterStats.forEach((c, i) => {
+            const claseBadge = claseBadgeSegmento(c.segmento);
+            const puntaje = (c.puntaje !== undefined && c.puntaje !== null) ? c.puntaje : null;
+            const card = document.createElement('div');
+            card.className = 'cluster-card-item';
+            card.innerHTML = `
+                <span class="ranking-tag">#${c.ranking || (i + 1)}</span>
+                <div class="cluster-badge ${claseBadge}">${c.segmento}</div>
+                <div class="cluster-count">${c.cantidad_clientes}</div>
+                <div class="cluster-label">clientes</div>
+                <div class="cluster-gasto">Gasto $${c.gasto_promedio.toFixed(0)}</div>
+                ${puntaje !== null ? `<div class="cluster-puntaje">Puntaje: ${puntaje.toFixed(2)}</div>` : ''}
+            `;
+            cardsDiv.appendChild(card);
+        });
+
+        const tbody = document.getElementById('clusterTableBody');
+        tbody.innerHTML = '';
+        clusterStats.forEach((c, i) => {
+            const claseBadge = claseBadgeSegmento(c.segmento);
+            const puntaje = (c.puntaje !== undefined && c.puntaje !== null) ? c.puntaje.toFixed(2) : 'N/A';
+            tbody.innerHTML += `
+                <tr>
+                    <td>${c.ranking || (i + 1)}</td>
+                    <td>${c.cluster}</td>
+                    <td><span class="cluster-badge ${claseBadge}">${c.segmento}</span></td>
+                    <td>${puntaje}</td>
+                    <td>${c.cantidad_clientes}</td>
+                    <td>${c.pedidos_promedio.toFixed(1)}</td>
+                    <td>$${c.gasto_promedio.toFixed(2)}</td>
+                    <td>${c.dias_sin_comprar_promedio.toFixed(0)}</td>
+                </tr>
+            `;
+        });
+
+        const coloresBadge = { VIP: '#ffd700', Frecuente: '#0288d1', Regular: '#2e7d32', Ocasional: '#6c757d', Inactivo: '#d32f2f', General: '#455a64' };
+        const ctx = document.getElementById('chartClusterDistribucion').getContext('2d');
+        if (chartCluster) chartCluster.destroy();
+        chartCluster = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: clusterStats.map(c => c.segmento),
+                datasets: [{
+                    label: 'Clientes',
+                    data: clusterStats.map(c => c.cantidad_clientes),
+                    backgroundColor: clusterStats.map(c => coloresBadge[c.segmento] || '#8e24aa'),
+                    borderRadius: 6
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+        });
+    }
+
+    // ================================================================
+    // SCATTER PLOT DE SEGMENTACIÓN (original)
+    // ================================================================
+    function cargarScatterSegmentacion() {
+        fetch('/api/ml/segmentacion/datos')
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success || !data.puntos || data.puntos.length === 0) {
+                    document.getElementById('scatterContainer').style.display = 'none';
+                    return;
+                }
+                document.getElementById('scatterContainer').style.display = 'block';
+
+                const puntos = data.puntos;
+                const labels = data.labels;
+                const centroides = data.centroides;
+                const puntos_raw = data.puntos_raw || [];
+
+                const idxX = 1;
+                const idxY = 2;
+                const colores = ['#e10098', '#ff6b35', '#00b4d8', '#ffd700', '#2ecc71', '#9b59b6', '#e74c3c', '#1abc9c'];
+
+                const clusters = {};
+                puntos.forEach((p, i) => {
+                    const label = labels[i];
+                    if (!clusters[label]) clusters[label] = [];
+                    clusters[label].push({
+                        x: p[idxX],
+                        y: p[idxY],
+                        raw: puntos_raw[i] || [0, 0, 0]
+                    });
+                });
+
+                const datasets = [];
+                Object.keys(clusters).forEach((label, index) => {
+                    const color = colores[index % colores.length];
+                    const pts = clusters[label];
+                    datasets.push({
+                        label: `Cluster ${label}`,
+                        data: pts.map(p => ({ x: p.x, y: p.y })),
+                        backgroundColor: color,
+                        borderColor: color,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        showLine: false
+                    });
+                });
+
+                const centroidsData = centroides.map(c => ({ x: c[idxX], y: c[idxY] }));
+                datasets.push({
+                    label: 'Centroides',
+                    data: centroidsData,
+                    backgroundColor: '#000',
+                    borderColor: '#000',
+                    pointRadius: 10,
+                    pointStyle: 'star',
+                    pointBackgroundColor: '#ff0000',
+                    pointBorderColor: '#ff0000',
+                    showLine: false,
+                    pointHoverRadius: 12
+                });
+
+                const ctx = document.getElementById('chartScatter').getContext('2d');
+                if (chartScatter) chartScatter.destroy();
+
+                chartScatter = new Chart(ctx, {
+                    type: 'scatter',
+                    data: { datasets: datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { font: { size: 10 } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.dataset.label || '';
+                                        const raw = context.raw;
+                                        if (label === 'Centroides') {
+                                            return `Centroide (${raw.x.toFixed(2)}, ${raw.y.toFixed(2)})`;
+                                        }
+                                        const idx = puntos.findIndex(p => p[0] === context.parsed.x && p[1] === context.parsed.y);
+                                        if (idx !== -1 && puntos_raw[idx]) {
+                                            const r = puntos_raw[idx];
+                                            return `${label}: Gasto $${r[1].toFixed(0)}, Días ${r[2]}`;
+                                        }
+                                        return `${label}: (${raw.x.toFixed(2)}, ${raw.y.toFixed(2)})`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Gasto total (escalado)' },
+                                grid: { color: 'rgba(0,0,0,0.05)' }
+                            },
+                            y: {
+                                title: { display: true, text: 'Días sin comprar (escalado)' },
+                                grid: { color: 'rgba(0,0,0,0.05)' }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(e => {
+                console.warn('Error cargando scatter:', e);
+                document.getElementById('scatterContainer').style.display = 'none';
+            });
+    }
+
+    // ================================================================
+    // FILTROS Y PAGINACIÓN
+    // ================================================================
+    function filtrarRiesgo(filtro) {
+        filtroActual = filtro;
+        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.toggle('active', b.dataset.filtro === filtro));
+        aplicarFiltroYActualizar();
+    }
+
+    function aplicarFiltroYActualizar() {
+        usuariosFiltrados = filtroActual === 'todos' ? [...usuariosRiesgo] : usuariosRiesgo.filter(u => u.nivel.toLowerCase() === filtroActual);
+        paginaActual = 1;
+        actualizarContadores(usuariosRiesgo);
+        renderizarPagina();
+    }
+
+    function actualizarContadores(usuarios) {
+        const counts = { todos: usuarios.length, alto: 0, medio: 0, bajo: 0 };
+        usuarios.forEach(u => { const n = u.nivel.toLowerCase(); if (n in counts) counts[n]++; });
+        document.getElementById('count-todos').textContent = counts.todos;
+        document.getElementById('count-alto').textContent = counts.alto;
+        document.getElementById('count-medio').textContent = counts.medio;
+        document.getElementById('count-bajo').textContent = counts.bajo;
+        document.getElementById('totalClientes').textContent = counts.todos + ' clientes';
+    }
+
+    function cambiarPerPage() {
+        itemsPorPagina = parseInt(document.getElementById('perPageSelect').value);
+        paginaActual = 1;
+        renderizarPagina();
+    }
+
+    function irPagina(pagina) {
+        if (pagina < 1 || pagina > totalPaginas) return;
+        paginaActual = pagina;
+        renderizarPagina();
+    }
+
+    function renderizarPagina() {
+        const total = usuariosFiltrados.length;
+        totalPaginas = Math.ceil(total / itemsPorPagina) || 1;
+        if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+        if (paginaActual < 1) paginaActual = 1;
+        const inicio = (paginaActual - 1) * itemsPorPagina;
+        const fin = Math.min(inicio + itemsPorPagina, total);
+        const paginaItems = usuariosFiltrados.slice(inicio, fin);
+        actualizarTablaRiesgo(paginaItems, inicio);
+        document.getElementById('paginacion-desde').textContent = total > 0 ? inicio + 1 : 0;
+        document.getElementById('paginacion-hasta').textContent = fin;
+        document.getElementById('paginacion-total').textContent = total;
+        document.getElementById('paginaInfo').textContent = `${paginaActual} / ${totalPaginas}`;
+        document.getElementById('btnPrimera').disabled = paginaActual <= 1;
+        document.getElementById('btnAnterior').disabled = paginaActual <= 1;
+        document.getElementById('btnSiguiente').disabled = paginaActual >= totalPaginas;
+        document.getElementById('btnUltima').disabled = paginaActual >= totalPaginas;
+    }
+
+    function actualizarTablaRiesgo(usuarios, offset) {
+        const tbody = document.getElementById('tablaRiesgoBody');
+        if (!usuarios || usuarios.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No hay datos</td></tr>`;
+            return;
+        }
+        let html = '';
+        usuarios.forEach((u, i) => {
+            const badgeClass = u.nivel.toLowerCase();
+            const icon = badgeClass === 'alto' ? '🔴' : badgeClass === 'medio' ? '🟡' : '🟢';
+            html += `
+                <tr>
+                    <td><strong>${offset + i + 1}</strong></td>
+                    <td><strong>${u.nombre || 'Usuario'}</strong></td>
+                    <td>${u.email || 'N/A'}</td>
+                    <td>${u.dias_sin_comprar || 0}</td>
+                    <td>${u.total_pedidos || 0}</td>
+                    <td><span class="badge-riesgo ${badgeClass}">${icon} ${u.nivel}</span></td>
+                    <td>${(u.riesgo * 100).toFixed(1)}%</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    // ================================================================
+    // GRÁFICOS EXISTENTES
+    // ================================================================
+    function actualizarGraficoPrediccion(predicciones) {
+        const ctx = document.getElementById('chartPrediccionVentas').getContext('2d');
+        if (chartPrediccion) chartPrediccion.destroy();
+        if (!predicciones || predicciones.length === 0) {
+            chartPrediccion = new Chart(ctx, { type: 'bar', data: { labels: ['Sin datos'], datasets: [{ label: 'Venta ($)', data: [0], backgroundColor: '#e0e0e0' }] }, options: { responsive: true, maintainAspectRatio: false } });
+            return;
+        }
+        const labels = predicciones.map(p => p.fecha);
+        const datos = predicciones.map(p => p.venta_estimada);
+        chartPrediccion = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ label: 'Venta Estimada ($)', data: datos, backgroundColor: 'rgba(225,0,152,0.6)', borderColor: 'rgba(225,0,152,1)', borderWidth: 2 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + v } } } }
+        });
+    }
+
+    function cargarGraficoRiesgo(usuarios) {
+        const ctx = document.getElementById('chartDistribucionRiesgo').getContext('2d');
+        if (chartRiesgo) chartRiesgo.destroy();
+        if (!usuarios || usuarios.length === 0) {
+            chartRiesgo = new Chart(ctx, { type: 'doughnut', data: { labels: ['Sin datos'], datasets: [{ data: [1], backgroundColor: ['#e0e0e0'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
+            return;
+        }
+        const niveles = { 'Alto': 0, 'Medio': 0, 'Bajo': 0 };
+        usuarios.forEach(u => { if (u.nivel in niveles) niveles[u.nivel]++; });
+        const colores = { 'Alto': '#d32f2f', 'Medio': '#ed6c02', 'Bajo': '#2e7d32' };
+        chartRiesgo = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: Object.keys(niveles), datasets: [{ data: Object.values(niveles), backgroundColor: Object.keys(niveles).map(n => colores[n]) }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    // ================================================================
+    // RANDOM FOREST
+    // ================================================================
+    function cargarImportancia() {
+        fetch('/api/ml/importancia')
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('importanciaContainer');
+                if (!data.success || !data.importancia || Object.keys(data.importancia).length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center" style="padding:20px;">Sin importancia</p>';
+                    return;
+                }
+                const items = Object.entries(data.importancia).sort((a, b) => b[1] - a[1]);
+                const max = items[0][1] || 1;
+                let html = '';
+                items.forEach(([key, value]) => {
+                    const pct = (value / max * 100).toFixed(1);
+                    html += `
+                        <div class="importancia-item">
+                            <span style="min-width:120px;font-weight:600;">${key}</span>
+                            <div class="barra"><div class="fill" style="width:${pct}%; background:linear-gradient(90deg,#e10098,#c00080);"></div></div>
+                            <span class="valor" style="color:#e10098;">${(value * 100).toFixed(1)}%</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            })
+            .catch(() => document.getElementById('importanciaContainer').innerHTML = '<p class="text-muted">Error</p>');
+    }
+
+    function cargarMatrizRF() {
+        fetch('/api/ml/matriz-confusion')
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('matrizRFContainer');
+                if (!data.success || !data.confusion_matrix) {
+                    container.innerHTML = '<p class="text-muted">Sin matriz</p>';
+                    document.getElementById('analisisRF').textContent = 'No disponible';
+                    return;
+                }
+                const cm = data.confusion_matrix;
+                const labels = data.labels || ['No Abandona', 'Abandona'];
+                const tn = cm[0][0], fp = cm[0][1], fn = cm[1][0], tp = cm[1][1];
+                container.innerHTML = `
+                    <div class="matriz-confusion">
+                        <div class="celda header"></div>
+                        <div class="celda header">Predicho: ${labels[1]}</div>
+                        <div class="celda header">Predicho: ${labels[0]}</div>
+                        <div class="celda header">Real: ${labels[1]}</div>
+                        <div class="celda tp">${tp}</div>
+                        <div class="celda fn">${fn}</div>
+                        <div class="celda header">Real: ${labels[0]}</div>
+                        <div class="celda fp">${fp}</div>
+                        <div class="celda tn">${tn}</div>
+                    </div>
+                    <div style="display:flex; justify-content:center; gap:20px; margin-top:12px; font-size:0.9rem;">
+                        <span><strong>TP:</strong> ${tp}</span>
+                        <span><strong>FN:</strong> ${fn}</span>
+                        <span><strong>FP:</strong> ${fp}</span>
+                        <span><strong>TN:</strong> ${tn}</span>
+                    </div>
+                `;
+                const analisis = document.getElementById('analisisRF');
+                if (fp === 0 && fn === 0) {
+                    analisis.innerHTML = '✅ <strong>Clasificación perfecta</strong> en el conjunto de entrenamiento. Sin errores.';
+                } else if (fp === 0) {
+                    analisis.innerHTML = `✅ <strong>Sin falsos positivos (FP = 0)</strong>. El modelo nunca predice abandono cuando no lo hay. <span style="color:#e65100;">FN = ${fn}</span>`;
+                } else if (fn === 0) {
+                    analisis.innerHTML = `✅ <strong>Sin falsos negativos (FN = 0)</strong>. El modelo detecta todos los abandonos reales. <span style="color:#b71c1c;">FP = ${fp}</span>`;
+                } else {
+                    analisis.innerHTML = `⚠️ <strong>FP = ${fp}, FN = ${fn}</strong>. El modelo tiene errores en ambas direcciones.`;
+                }
+            })
+            .catch(() => {
+                document.getElementById('matrizRFContainer').innerHTML = '<p class="text-muted">Error</p>';
+                document.getElementById('analisisRF').textContent = 'Error';
+            });
+    }
+
+    function cargarReporteRF() {
+        fetch('/api/ml/reporte-clasificacion')
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('reporteRFContainer');
+                if (!data.success || !data.reporte) {
+                    container.innerHTML = '<p class="text-muted">Sin reporte</p>';
+                    return;
+                }
+                const reporte = data.reporte;
+                let html = `
+                    <table class="table table-striped table-sm">
+                        <thead><tr><th>Clase</th><th>Precisión</th><th>Recall</th><th>F1-Score</th><th>Soporte</th></tr></thead>
+                        <tbody>
+                `;
+                const clases = ['No Abandona', 'Abandona'];
+                clases.forEach(clase => {
+                    if (reporte[clase]) {
+                        html += `<tr><td><strong>${clase}</strong></td>
+                            <td>${(reporte[clase].precision || 0).toFixed(3)}</td>
+                            <td>${(reporte[clase].recall || 0).toFixed(3)}</td>
+                            <td>${(reporte[clase]['f1-score'] || 0).toFixed(3)}</td>
+                            <td>${reporte[clase].support || 0}</td></tr>`;
+                    }
+                });
+                if (reporte['weighted avg']) {
+                    html += `<tr class="table-secondary"><td><strong>Promedio Ponderado</strong></td>
+                        <td>${(reporte['weighted avg'].precision || 0).toFixed(3)}</td>
+                        <td>${(reporte['weighted avg'].recall || 0).toFixed(3)}</td>
+                        <td>${(reporte['weighted avg']['f1-score'] || 0).toFixed(3)}</td>
+                        <td>${reporte['weighted avg'].support || 0}</td></tr>`;
+                }
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            })
+            .catch(() => document.getElementById('reporteRFContainer').innerHTML = '<p class="text-muted">Error</p>');
+    }
+
+    // ================================================================
+    // REGRESIÓN LOGÍSTICA
+    // ================================================================
+    function cargarMetricasLogistico() {
+        fetch('/api/ml/metricas/logistico')
+            .then(r => r.json())
+            .then(data => {
+                if (data.success && data.metricas) {
+                    const m = data.metricas;
+                    document.getElementById('log_accuracy').textContent = m.accuracy ? m.accuracy.toFixed(3) : 'N/A';
+                    document.getElementById('log_precision').textContent = m.precision ? m.precision.toFixed(3) : 'N/A';
+                    document.getElementById('log_recall').textContent = m.recall ? m.recall.toFixed(3) : 'N/A';
+                    document.getElementById('log_f1').textContent = m.f1 ? m.f1.toFixed(3) : 'N/A';
+                    document.getElementById('log_auc').textContent = m.auc ? m.auc.toFixed(3) : 'N/A';
+                    document.getElementById('log_muestras').textContent = m.n_muestras || 0;
+                    document.getElementById('accuracy_logistico').textContent = m.accuracy ? m.accuracy.toFixed(3) : 'N/A';
+                } else {
+                    ['log_accuracy','log_precision','log_recall','log_f1','log_auc'].forEach(id => document.getElementById(id).textContent = 'N/A');
+                    document.getElementById('log_muestras').textContent = '0';
+                    document.getElementById('accuracy_logistico').textContent = 'N/A';
+                }
+            })
+            .catch(() => console.warn('Error métricas logísticas'));
+    }
+
+    function cargarImportanciaLogistico() {
+        fetch('/api/ml/importancia/logistico')
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('importanciaLogContainer');
+                if (!data.success || !data.importancia || Object.keys(data.importancia).length === 0) {
+                    container.innerHTML = '<p class="text-muted">Sin coeficientes</p>';
+                    return;
+                }
+                const items = Object.entries(data.importancia).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+                const max = Math.max(...items.map(([_, v]) => Math.abs(v)), 1);
+                let html = '';
+                items.forEach(([key, value]) => {
+                    const pct = (Math.abs(value) / max * 100).toFixed(1);
+                    const color = value >= 0 ? '#28a745' : '#dc3545';
+                    const signo = value >= 0 ? '+' : '';
+                    html += `
+                        <div class="importancia-item">
+                            <span style="min-width:120px;font-weight:600;">${key}</span>
+                            <div class="barra"><div class="fill" style="width:${pct}%; background:${color};"></div></div>
+                            <span class="valor" style="color:${color};">${signo}${value.toFixed(3)}</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            })
+            .catch(() => document.getElementById('importanciaLogContainer').innerHTML = '<p class="text-muted">Error</p>');
+    }
+
+    function cargarMatrizLogistico() {
+        fetch('/api/ml/matriz-confusion/logistico')
+            .then(r => r.json())
+            .then(data => {
+                const container = document.getElementById('matrizLogContainer');
+                if (!data.success || !data.confusion_matrix) {
+                    container.innerHTML = '<p class="text-muted">Sin matriz</p>';
+                    return;
+                }
+                const cm = data.confusion_matrix;
+                const labels = data.labels || ['No Abandona', 'Abandona'];
+                const tn = cm[0][0], fp = cm[0][1], fn = cm[1][0], tp = cm[1][1];
+                container.innerHTML = `
+                    <div class="matriz-confusion">
+                        <div class="celda header"></div>
+                        <div class="celda header">Predicho: ${labels[1]}</div>
+                        <div class="celda header">Predicho: ${labels[0]}</div>
+                        <div class="celda header">Real: ${labels[1]}</div>
+                        <div class="celda tp">${tp}</div>
+                        <div class="celda fn">${fn}</div>
+                        <div class="celda header">Real: ${labels[0]}</div>
+                        <div class="celda fp">${fp}</div>
+                        <div class="celda tn">${tn}</div>
+                    </div>
+                    <div style="display:flex; justify-content:center; gap:20px; margin-top:12px; font-size:0.9rem;">
+                        <span><strong>TP:</strong> ${tp}</span>
+                        <span><strong>FN:</strong> ${fn}</span>
+                        <span><strong>FP:</strong> ${fp}</span>
+                        <span><strong>TN:</strong> ${tn}</span>
+                    </div>
+                `;
+            })
+            .catch(() => document.getElementById('matrizLogContainer').innerHTML = '<p class="text-muted">Error</p>');
+    }
+
+    // ================================================================
+    // MÉTRICAS COMUNES, ESTADO
+    // ================================================================
+    function cargarMetricas() {
+        fetch('/api/ml/metricas')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('r2_ventas').textContent = data.r2 ? data.r2.toFixed(3) : 'N/A';
+                document.getElementById('accuracy_abandono').textContent = data.accuracy ? data.accuracy.toFixed(3) : 'N/A';
+                document.getElementById('n_muestras').textContent = data.n_muestras || 0;
+            })
+            .catch(e => console.warn('Error métricas comunes'));
+    }
+
+    function cargarEstadoModelos() {
+        fetch('/api/ml/verificar-modelos')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('estado-ventas').className = `badge-estado ${data.ventas ? 'existe' : 'no-existe'}`;
+                document.getElementById('estado-ventas').textContent = data.ventas ? '✅ Existe' : '❌ No existe';
+                document.getElementById('estado-abandono').className = `badge-estado ${data.abandono ? 'existe' : 'no-existe'}`;
+                document.getElementById('estado-abandono').textContent = data.abandono ? '✅ Existe' : '❌ No existe';
+                document.getElementById('estado-logistico').className = `badge-estado ${data.logistico ? 'existe' : 'no-existe'}`;
+                document.getElementById('estado-logistico').textContent = data.logistico ? '✅ Existe' : '❌ No existe';
+                document.getElementById('estado-segmentacion').className = `badge-estado ${data.segmentacion ? 'existe' : 'no-existe'}`;
+                document.getElementById('estado-segmentacion').textContent = data.segmentacion ? '✅ Existe' : '❌ No existe';
+            })
+            .catch(e => console.warn('Error estado modelos'));
+    }
+
+    // ================================================================
+    // CARGA INICIAL
+    // ================================================================
+    function cargarDatosIniciales() {
+        cargarEstadoModelos();
+        cargarMetricas();
+        cargarImportancia();
+        cargarMatrizRF();
+        cargarReporteRF();
+        cargarMetricasLogistico();
+        cargarImportanciaLogistico();
+        cargarMatrizLogistico();
+        cargarCurvaROC(); // <--- Llamar para cargar la curva al inicio
+        cargarSegmentacion();
+        setTimeout(() => {
+            predecirVentas();
+            predecirAbandono();
+        }, 500);
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarDatosIniciales);
+</script>
+
+</body>
+</html>

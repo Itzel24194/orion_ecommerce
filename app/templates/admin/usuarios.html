@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION Admin - Gestión de Usuarios</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== VARIABLES ===== */
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-secondary: #6c5ce7;
+            --orion-success: #00b894;
+            --orion-warning: #fdcb6e;
+            --orion-danger: #e17055;
+            --orion-gray: #636e72;
+            --orion-light: #f8f9fa;
+            --orion-dark: #2d3436;
+            --orion-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            --orion-shadow-hover: 0 12px 40px rgba(225,0,152,0.15);
+            --orion-radius: 16px;
+        }
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* ===== ADMIN CONTAINER ===== */
+        .admin-container {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .admin-header {
+            background: linear-gradient(135deg, #1a2332 0%, #2d3436 100%);
+            border-radius: var(--orion-radius);
+            padding: 24px 32px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: var(--orion-shadow);
+        }
+
+        .admin-header h2 {
+            color: white;
+            font-weight: 800;
+            font-size: 1.6rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-header h2 i {
+            color: var(--orion-primary);
+            font-size: 2rem;
+        }
+
+        .admin-header .badge-count {
+            background: var(--orion-primary);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .admin-header .btn-dashboard {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .admin-header .btn-dashboard:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            border: none;
+            border-radius: var(--orion-radius);
+            box-shadow: var(--orion-shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            box-shadow: var(--orion-shadow-hover);
+        }
+
+        .card-header-custom {
+            background: white;
+            padding: 20px 24px;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--orion-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header-custom i {
+            color: var(--orion-primary);
+            font-size: 1.3rem;
+        }
+
+        /* ===== FORMULARIO ===== */
+        .form-label-custom {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--orion-gray);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--orion-primary);
+            box-shadow: 0 0 0 4px rgba(225, 0, 152, 0.1);
+        }
+
+        .form-control-custom::placeholder {
+            color: #adb5bd;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary-custom {
+            background: var(--orion-primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary-custom:hover {
+            background: var(--orion-primary-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(225, 0, 152, 0.3);
+        }
+
+        .btn-success-custom {
+            background: var(--orion-success);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-success-custom:hover {
+            background: #00a381;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.3);
+        }
+
+        /* ===== TABLA ===== */
+        .table-container {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .table-custom {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .table-custom thead {
+            background: linear-gradient(135deg, #1a2332, #2d3436);
+            color: white;
+        }
+
+        .table-custom thead th {
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 16px;
+            border: none;
+        }
+
+        .table-custom tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .table-custom tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .table-custom tbody tr:hover {
+            background: #faf5ff;
+        }
+
+        .table-scroll {
+            max-height: 750px;
+            overflow-y: auto;
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .table-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: var(--orion-primary);
+            border-radius: 10px;
+        }
+
+        /* ===== AVATAR ===== */
+        .avatar-profile {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--orion-primary);
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--orion-primary);
+            transition: all 0.3s ease;
+        }
+
+        .avatar-profile:hover {
+            transform: scale(1.05);
+            border-color: var(--orion-primary-dark);
+        }
+
+        /* ===== BADGES ===== */
+        .badge-status {
+            font-size: 0.6rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-role {
+            font-size: 0.6rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            background: var(--orion-secondary);
+            color: white;
+        }
+
+        /* ===== DIRECCIONES ===== */
+        .direccion-card {
+            background: white;
+            border-radius: 12px;
+            padding: 14px 16px;
+            border-left: 4px solid #dee2e6;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .direccion-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transform: translateX(4px);
+        }
+
+        .direccion-card.predeterminada {
+            border-left-color: var(--orion-success);
+            background: linear-gradient(135deg, #f0fff4, #e8f5e9);
+        }
+
+        .direccion-card .dir-titulo {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--orion-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .direccion-card .dir-titulo .badge-predeterminada {
+            background: var(--orion-success);
+            color: white;
+            font-size: 0.55rem;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-weight: 700;
+        }
+
+        .direccion-card .dir-detalle {
+            font-size: 0.8rem;
+            color: var(--orion-gray);
+            margin-top: 4px;
+        }
+
+        .direccion-card .dir-detalle i {
+            width: 16px;
+            color: var(--orion-primary);
+        }
+
+        .direccion-card .btn-accion-dir {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-predeterminar {
+            background: var(--orion-success);
+            color: white;
+        }
+
+        .btn-predeterminar:hover {
+            background: #00a381;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-editar-dir {
+            background: var(--orion-warning);
+            color: var(--orion-dark);
+        }
+
+        .btn-editar-dir:hover {
+            background: #fdcb6e;
+            color: var(--orion-dark);
+            transform: scale(1.05);
+        }
+
+        .btn-eliminar-dir {
+            background: var(--orion-danger);
+            color: white;
+        }
+
+        .btn-eliminar-dir:hover {
+            background: #d63031;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* ===== EDIT DIRECCIÓN ===== */
+        .edit-dir-form {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 12px;
+            border: 2px dashed #dee2e6;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-custom .modal-content {
+            border-radius: var(--orion-radius);
+            border: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-custom .modal-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding: 20px 24px;
+        }
+
+        .modal-custom .modal-header h5 {
+            font-weight: 800;
+            color: var(--orion-dark);
+        }
+
+        .modal-custom .modal-header h5 i {
+            color: var(--orion-primary);
+        }
+
+        .modal-custom .modal-body {
+            padding: 24px;
+        }
+
+        .modal-custom .modal-footer {
+            border-top: 2px solid #f0f0f0;
+            padding: 16px 24px;
+        }
+
+        /* ===== BOTONES DE ACCIÓN ===== */
+        .btn-action-group {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action-group .btn {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-group .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-action-group .btn-warning {
+            background: var(--orion-warning);
+            color: var(--orion-dark);
+            border: none;
+        }
+
+        .btn-action-group .btn-info {
+            background: var(--orion-secondary);
+            color: white;
+            border: none;
+        }
+
+        .btn-action-group .btn-danger {
+            background: var(--orion-danger);
+            color: white;
+            border: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .admin-container { padding: 1rem; }
+            .admin-header { flex-direction: column; align-items: flex-start; }
+            .admin-header h2 { font-size: 1.3rem; }
+            .sidebar-form { position: relative; top: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .admin-container { padding: 0.75rem; }
+            .admin-header { padding: 16px 20px; }
+            .admin-header h2 { font-size: 1.1rem; }
+            .table-custom { font-size: 0.8rem; }
+            .direccion-card .d-flex { flex-direction: column; align-items: stretch !important; }
+            .direccion-card .btn-group-vertical { flex-direction: row; margin-top: 8px; }
+        }
+
+        /* ===== ANIMACIONES ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-down {
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        /* ===== SCROLLBAR PERSONALIZADA ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--orion-primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--orion-primary-dark);
+        }
+
+        /* ===== UTILITY ===== */
+        .text-orion-primary { color: var(--orion-primary); }
+        .bg-orion-primary { background: var(--orion-primary); }
+        .border-orion-primary { border-color: var(--orion-primary); }
+        
+        .gap-1 { gap: 4px; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        
+        <!-- ===== HEADER ===== -->
+        <header class="admin-header">
+            <div>
+                <h2>
+                    <i class="fas fa-users-cog"></i>
+                    Gestión de Usuarios
+                    <span class="badge-count">{{ usuarios|length }}</span>
+                </h2>
+                <div class="text-white-50 small mt-1">
+                    <i class="fas fa-users me-1"></i> Total de usuarios registrados
+                </div>
+            </div>
+            <div>
+                <a href="{{ url_for('web.dashboard') }}" class="btn-dashboard">
+                    <i class="fas fa-arrow-left me-2"></i> Dashboard
+                </a>
+            </div>
+        </header>
+
+        <div class="row g-4">
+            
+            <!-- ===== COLUMNA IZQUIERDA: FORMULARIO ===== -->
+            <div class="col-lg-4">
+                <div class="card sidebar-form fade-in-up">
+                    <div class="card-header-custom">
+                        <i class="fas fa-user-plus"></i>
+                        Registrar Nuevo Usuario
+                    </div>
+                    <div class="p-4">
+                        <form action="{{ url_for('web.agregar_usuario') }}" method="POST" enctype="multipart/form-data">
+                            <!-- Nombre -->
+                            <div class="mb-3">
+                                <label class="form-label-custom">
+                                    <i class="fas fa-user me-1"></i> Nombre completo *
+                                </label>
+                                <input name="nombre" class="form-control form-control-custom" required placeholder="Ej: Juan Carlos">
+                            </div>
+                            
+                            <!-- Apellidos -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label-custom">Ap. Paterno</label>
+                                    <input name="apellido_paterno" class="form-control form-control-custom" placeholder="Pérez">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label-custom">Ap. Materno</label>
+                                    <input name="apellido_materno" class="form-control form-control-custom" placeholder="García">
+                                </div>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label class="form-label-custom">
+                                    <i class="fas fa-envelope me-1"></i> Email *
+                                </label>
+                                <input name="email" class="form-control form-control-custom" type="email" required placeholder="usuario@ejemplo.com">
+                            </div>
+                            
+                            <!-- Teléfono -->
+                            <div class="mb-3">
+                                <label class="form-label-custom">
+                                    <i class="fas fa-phone me-1"></i> Teléfono
+                                </label>
+                                <input name="telefono" class="form-control form-control-custom" type="tel" placeholder="55 1234 5678">
+                            </div>
+                            
+                            <!-- Fecha Nacimiento -->
+                            <div class="mb-3">
+                                <label class="form-label-custom">
+                                    <i class="fas fa-calendar me-1"></i> Fecha Nacimiento *
+                                </label>
+                                <input name="fecha_nacimiento" type="date" class="form-control form-control-custom" required>
+                            </div>
+                            
+                            <!-- Género -->
+                            <div class="mb-3">
+                                <label class="form-label-custom">
+                                    <i class="fas fa-venus-mars me-1"></i> Género
+                                </label>
+                                <select name="genero" class="form-select form-control-custom">
+                                    <option value="Mujer">👩 Mujer</option>
+                                    <option value="Hombre">👨 Hombre</option>
+                                    <option value="Indefinido">⚧ Indefinido</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Rol -->
+                            <div class="mb-3">
+                                <label class="form-label-custom">
+                                    <i class="fas fa-user-tag me-1"></i> Rol
+                                </label>
+                                <select name="rol" class="form-select form-control-custom">
+                                    <option value="cliente">🛒 Cliente</option>
+                                    <option value="vendedor">📦 Vendedor</option>
+                                    <option value="administrador">👑 Administrador</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Contraseña -->
+                            <div class="mb-3">
+                                <label class="form-label-custom">
+                                    <i class="fas fa-lock me-1"></i> Contraseña *
+                                </label>
+                                <input name="password" type="password" class="form-control form-control-custom" required placeholder="Mínimo 6 caracteres">
+                            </div>
+                            
+                            <!-- Foto -->
+                            <div class="mb-3">
+                                <label class="form-label-custom">
+                                    <i class="fas fa-camera me-1"></i> Foto de perfil
+                                </label>
+                                <input type="file" name="foto" class="form-control form-control-custom" accept="image/*">
+                            </div>
+                            
+                            <button type="submit" class="btn-success-custom">
+                                <i class="fas fa-save me-2"></i> Guardar Usuario
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ===== COLUMNA DERECHA: LISTA ===== -->
+            <div class="col-lg-8">
+                <div class="card fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="card-header-custom">
+                        <i class="fas fa-list"></i>
+                        Lista de Usuarios
+                        <span class="badge bg-secondary ms-2">{{ usuarios|length }}</span>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-scroll">
+                            <table class="table table-custom">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;">Foto</th>
+                                        <th>Usuario</th>
+                                        <th>Contacto</th>
+                                        <th style="width: 160px;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for u in usuarios %}
+                                    <tr>
+                                        <!-- Foto -->
+                                        <td>
+                                            {% if u.get('foto') %}
+                                                <img src="{{ url_for('static', filename='uploads/' + u.foto) }}" class="avatar-profile" alt="{{ u.nombre }}">
+                                            {% else %}
+                                                <div class="avatar-profile">{{ u.nombre[0]|upper if u.nombre else '?' }}</div>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        <!-- Usuario -->
+                                        <td>
+                                            <div class="fw-bold">{{ u.nombre }} {{ u.apellido_paterno or '' }}</div>
+                                            <div class="d-flex gap-1 mt-1 flex-wrap">
+                                                <span class="badge-status {{ 'active' if u.activo != False else 'inactive' }}">
+                                                    <i class="fas fa-circle me-1" style="font-size: 0.4rem;"></i>
+                                                    {{ 'Activo' if u.activo != False else 'Inactivo' }}
+                                                </span>
+                                                <span class="badge-role">
+                                                    <i class="fas fa-user-tag me-1"></i>
+                                                    {{ u.rol or 'cliente' }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        
+                                        <!-- Contacto -->
+                                        <td>
+                                            <div><i class="fas fa-envelope me-1 text-orion-primary"></i> {{ u.email }}</div>
+                                            <div class="small text-muted">
+                                                <i class="fas fa-phone me-1"></i> {{ u.telefono or 'Sin teléfono' }}
+                                            </div>
+                                        </td>
+                                        
+                                        <!-- Acciones -->
+                                        <td>
+                                            <div class="btn-action-group">
+                                                <button class="btn btn-warning" data-bs-toggle="collapse" data-bs-target="#edit-{{u._id}}" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <a href="{{ url_for('web.ver_usuario', id=u._id) }}" class="btn btn-info" title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ url_for('web.borrar_usuario', id=u._id) }}" class="btn btn-danger" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar este usuario?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- ===== EDITAR USUARIO (COLLAPSE) ===== -->
+                                    <tr class="collapse {% if edit_id == u._id|string %}show{% endif %}" id="edit-{{u._id}}">
+                                        <td colspan="4" class="p-4" style="background: #faf5ff;">
+                                            <form action="{{ url_for('web.editar_usuario', id=u._id) }}" method="POST" enctype="multipart/form-data">
+                                                
+                                                <!-- Datos Personales -->
+                                                <h6 class="fw-bold text-orion-primary mb-3">
+                                                    <i class="fas fa-user-edit me-2"></i> Editar Datos Personales
+                                                </h6>
+                                                <div class="row g-2 mb-3">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">Nombre</label>
+                                                        <input name="nombre" class="form-control form-control-custom" value="{{ u.nombre }}">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">Ap. Paterno</label>
+                                                        <input name="apellido_paterno" class="form-control form-control-custom" value="{{ u.apellido_paterno or '' }}">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">Ap. Materno</label>
+                                                        <input name="apellido_materno" class="form-control form-control-custom" value="{{ u.apellido_materno or '' }}">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">Email</label>
+                                                        <input name="email" class="form-control form-control-custom" value="{{ u.email }}">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">Teléfono</label>
+                                                        <input name="telefono" class="form-control form-control-custom" value="{{ u.telefono or '' }}">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">F. Nacimiento</label>
+                                                        <input name="fecha_nacimiento" type="date" class="form-control form-control-custom" value="{{ u.fecha_nacimiento }}">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">Género</label>
+                                                        <select name="genero" class="form-select form-control-custom">
+                                                            <option value="Mujer" {% if u.genero=='Mujer' %}selected{% endif %}>Mujer</option>
+                                                            <option value="Hombre" {% if u.genero=='Hombre' %}selected{% endif %}>Hombre</option>
+                                                            <option value="Indefinido" {% if u.genero=='Indefinido' %}selected{% endif %}>Indefinido</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">Rol</label>
+                                                        <select name="rol" class="form-select form-control-custom">
+                                                            <option value="cliente" {% if u.rol=='cliente' %}selected{% endif %}>Cliente</option>
+                                                            <option value="vendedor" {% if u.rol=='vendedor' %}selected{% endif %}>Vendedor</option>
+                                                            <option value="administrador" {% if u.rol=='administrador' %}selected{% endif %}>Administrador</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">Nueva Contraseña</label>
+                                                        <input name="password" type="password" class="form-control form-control-custom" placeholder="Dejar vacío para no cambiar">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label-custom">Foto</label>
+                                                        <input type="file" name="foto" class="form-control form-control-custom" accept="image/*">
+                                                    </div>
+                                                </div>
+                                                
+                                                <hr>
+                                                
+                                                <!-- ===== DIRECCIONES ===== -->
+                                                <div class="section-title-dir">
+                                                    <i class="fas fa-map-marker-alt text-orion-primary"></i>
+                                                    <span class="fw-bold">Direcciones Registradas</span>
+                                                    <span class="badge bg-secondary">{{ u.get('direcciones', [])|length }}</span>
+                                                </div>
+                                                
+                                                <div class="row g-2 mb-3">
+                                                    {% for dir in u.get('direcciones', []) %}
+                                                    <div class="col-md-6">
+                                                        <div class="direccion-card {% if dir.predeterminada %}predeterminada{% endif %}">
+                                                            <div class="d-flex justify-content-between align-items-start">
+                                                                <div class="flex-grow-1">
+                                                                    <div class="dir-titulo">
+                                                                        {% if dir.nombre %}
+                                                                            <i class="fas fa-tag"></i> {{ dir.nombre }}
+                                                                        {% else %}
+                                                                            <i class="fas fa-home"></i> Dirección {{ loop.index }}
+                                                                        {% endif %}
+                                                                        {% if dir.predeterminada %}
+                                                                            <span class="badge-predeterminada">
+                                                                                <i class="fas fa-check-circle me-1"></i> Predeterminada
+                                                                            </span>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                    <div class="dir-detalle">
+                                                                        <div><i class="fas fa-road"></i> {{ dir.calle }} #{{ dir.numero }}</div>
+                                                                        <div><i class="fas fa-map-pin"></i> {{ dir.colonia }}, CP {{ dir.cp }}</div>
+                                                                        {% if dir.ciudad or dir.estado %}
+                                                                            <div><i class="fas fa-city"></i> {{ dir.ciudad or '' }} {{ dir.estado or '' }}</div>
+                                                                        {% endif %}
+                                                                        {% if dir.referencias %}
+                                                                            <div><i class="fas fa-info-circle"></i> <span class="text-secondary">{{ dir.referencias }}</span></div>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="btn-group-vertical btn-group-sm ms-2">
+                                                                    {% if not dir.predeterminada %}
+                                                                    <form action="{{ url_for('web.establecer_predeterminada', usuario_id=u._id, direccion_id=loop.index0) }}" method="POST" class="d-inline">
+                                                                        <button type="submit" class="btn-accion-dir btn-predeterminar" title="Establecer como predeterminada">
+                                                                            <i class="fas fa-star"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                    {% endif %}
+                                                                    <button type="button" class="btn-accion-dir btn-editar-dir" onclick="toggleEditarDir('{{ u._id }}', {{ loop.index0 }})" title="Editar">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+                                                                    <form action="{{ url_for('web.borrar_direccion', usuario_id=u._id, direccion_id=loop.index0) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar esta dirección?')">
+                                                                        <button type="submit" class="btn-accion-dir btn-eliminar-dir" title="Eliminar">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Formulario de edición de dirección -->
+                                                            <div id="editDir-{{ u._id }}-{{ loop.index0 }}" style="display:none;" class="edit-dir-form slide-down">
+                                                                <form action="{{ url_for('web.editar_direccion', usuario_id=u._id, direccion_id=loop.index0) }}" method="POST">
+                                                                    <div class="row g-1">
+                                                                        <div class="col-12">
+                                                                            <label class="form-label-custom">Nombre</label>
+                                                                            <input name="nombre" class="form-control form-control-custom" value="{{ dir.nombre or '' }}" placeholder="Ej: Casa, Oficina">
+                                                                        </div>
+                                                                        <div class="col-5">
+                                                                            <label class="form-label-custom">Calle *</label>
+                                                                            <input name="calle" class="form-control form-control-custom" value="{{ dir.calle }}" placeholder="Calle" required>
+                                                                        </div>
+                                                                        <div class="col-3">
+                                                                            <label class="form-label-custom">Núm *</label>
+                                                                            <input name="numero" class="form-control form-control-custom" value="{{ dir.numero }}" placeholder="Núm" required>
+                                                                        </div>
+                                                                        <div class="col-4">
+                                                                            <label class="form-label-custom">CP *</label>
+                                                                            <input name="cp" class="form-control form-control-custom" value="{{ dir.cp }}" placeholder="CP" required>
+                                                                        </div>
+                                                                        <div class="col-4">
+                                                                            <label class="form-label-custom">Colonia *</label>
+                                                                            <input name="colonia" class="form-control form-control-custom" value="{{ dir.colonia }}" placeholder="Colonia" required>
+                                                                        </div>
+                                                                        <div class="col-4">
+                                                                            <label class="form-label-custom">Ciudad</label>
+                                                                            <input name="ciudad" class="form-control form-control-custom" value="{{ dir.ciudad or '' }}" placeholder="Ciudad">
+                                                                        </div>
+                                                                        <div class="col-4">
+                                                                            <label class="form-label-custom">Estado</label>
+                                                                            <input name="estado" class="form-control form-control-custom" value="{{ dir.estado or '' }}" placeholder="Estado">
+                                                                        </div>
+                                                                        <div class="col-12">
+                                                                            <label class="form-label-custom">Referencias</label>
+                                                                            <input name="referencias" class="form-control form-control-custom" value="{{ dir.referencias or '' }}" placeholder="Entre calles, piso, etc.">
+                                                                        </div>
+                                                                        <div class="col-12">
+                                                                            <div class="form-check mt-1">
+                                                                                <input class="form-check-input" type="checkbox" name="predeterminada" id="predEdit{{ loop.index0 }}" value="1" {% if dir.predeterminada %}checked{% endif %}>
+                                                                                <label class="form-check-label small fw-bold" for="predEdit{{ loop.index0 }}">
+                                                                                    <i class="fas fa-star text-warning"></i> Establecer como predeterminada
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-12 mt-2">
+                                                                            <button type="submit" class="btn btn-primary btn-sm px-4">
+                                                                                <i class="fas fa-save me-1"></i> Guardar
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('editDir-{{ u._id }}-{{ loop.index0 }}').style.display='none'">
+                                                                                Cancelar
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="col-12">
+                                                        <div class="text-center py-3 text-muted">
+                                                            <i class="fas fa-info-circle me-2"></i>
+                                                            No hay direcciones registradas para este usuario
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                
+                                                <!-- ===== AGREGAR NUEVA DIRECCIÓN ===== -->
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="toggleNuevaDir('{{ u._id }}')">
+                                                        <i class="fas fa-plus-circle me-1"></i> Agregar nueva dirección
+                                                    </button>
+                                                    
+                                                    <div id="nuevaDir-{{ u._id }}" style="display:none;" class="edit-dir-form slide-down mt-2">
+                                                        <h6 class="fw-bold text-orion-primary mb-2">
+                                                            <i class="fas fa-plus-circle me-1"></i> Nueva Dirección
+                                                        </h6>
+                                                        <form action="{{ url_for('web.agregar_direccion', usuario_id=u._id) }}" method="POST">
+                                                            <div class="row g-1">
+                                                                <div class="col-12">
+                                                                    <label class="form-label-custom">Nombre</label>
+                                                                    <input name="nombre" class="form-control form-control-custom" placeholder="Ej: Casa, Oficina">
+                                                                </div>
+                                                                <div class="col-5">
+                                                                    <label class="form-label-custom">Calle *</label>
+                                                                    <input name="calle" class="form-control form-control-custom" placeholder="Calle" required>
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <label class="form-label-custom">Núm *</label>
+                                                                    <input name="numero" class="form-control form-control-custom" placeholder="Núm" required>
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <label class="form-label-custom">CP *</label>
+                                                                    <input name="cp" class="form-control form-control-custom" placeholder="CP" required>
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <label class="form-label-custom">Colonia *</label>
+                                                                    <input name="colonia" class="form-control form-control-custom" placeholder="Colonia" required>
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <label class="form-label-custom">Ciudad</label>
+                                                                    <input name="ciudad" class="form-control form-control-custom" placeholder="Ciudad">
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <label class="form-label-custom">Estado</label>
+                                                                    <input name="estado" class="form-control form-control-custom" placeholder="Estado">
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <label class="form-label-custom">Referencias</label>
+                                                                    <input name="referencias" class="form-control form-control-custom" placeholder="Entre calles, piso, etc.">
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <div class="form-check mt-1">
+                                                                        <input class="form-check-input" type="checkbox" name="predeterminada" value="1">
+                                                                        <label class="form-check-label small fw-bold">
+                                                                            <i class="fas fa-star text-warning"></i> Establecer como predeterminada
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-12 mt-2">
+                                                                    <button type="submit" class="btn btn-primary btn-sm px-4">
+                                                                        <i class="fas fa-save me-1"></i> Guardar dirección
+                                                                    </button>
+                                                                    <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('nuevaDir-{{ u._id }}').style.display='none'">
+                                                                        Cancelar
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Botón Actualizar -->
+                                                <div class="text-end mt-4 pt-3 border-top">
+                                                    <button type="submit" class="btn btn-primary-custom" style="width: auto; padding: 10px 40px;">
+                                                        <i class="fas fa-save me-2"></i> Actualizar Usuario
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL VER USUARIO ===== -->
+    {% if usuario_seleccionado %}
+    <div class="modal fade show modal-custom" style="display: block; background: rgba(0,0,0,0.6); z-index: 1050;">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-circle me-2"></i>
+                        Detalles del Usuario
+                    </h5>
+                    <a href="{{ url_for('web.lista_usuarios') }}" class="btn-close"></a>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Columna Izquierda -->
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                {% if usuario_seleccionado.get('foto') %}
+                                    <img src="{{ url_for('static', filename='uploads/' + usuario_seleccionado.foto) }}" class="avatar-profile" style="width: 64px; height: 64px; border-width: 3px;">
+                                {% else %}
+                                    <div class="avatar-profile" style="width: 64px; height: 64px; font-size: 1.8rem; border-width: 3px;">
+                                        {{ usuario_seleccionado.nombre[0]|upper if usuario_seleccionado.nombre else '?' }}
+                                    </div>
+                                {% endif %}
+                                <div class="ms-3">
+                                    <h5 class="fw-bold mb-0">{{ usuario_seleccionado.nombre }} {{ usuario_seleccionado.apellido_paterno or '' }}</h5>
+                                    <span class="badge-status {{ 'active' if usuario_seleccionado.activo != False else 'inactive' }}">
+                                        {{ 'Activo' if usuario_seleccionado.activo != False else 'Inactivo' }}
+                                    </span>
+                                    <span class="badge-role ms-1">{{ usuario_seleccionado.rol or 'cliente' }}</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="mb-2">
+                                <i class="fas fa-envelope text-orion-primary me-2"></i>
+                                <strong>Email:</strong> {{ usuario_seleccionado.email }}
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-phone text-orion-primary me-2"></i>
+                                <strong>Teléfono:</strong> {{ usuario_seleccionado.telefono or 'N/A' }}
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-venus-mars text-orion-primary me-2"></i>
+                                <strong>Género:</strong> {{ usuario_seleccionado.genero or 'No especificado' }}
+                            </div>
+                        </div>
+                        
+                        <!-- Columna Derecha -->
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <i class="fas fa-calendar text-orion-primary me-2"></i>
+                                <strong>Fecha Nacimiento:</strong> {{ usuario_seleccionado.fecha_nacimiento or 'N/A' }}
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-calendar-plus text-orion-primary me-2"></i>
+                                <strong>Registrado:</strong> {{ usuario_seleccionado.created_at.strftime('%d/%m/%Y %H:%M') if usuario_seleccionado.created_at else 'N/A' }}
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-clock text-orion-primary me-2"></i>
+                                <strong>Última actualización:</strong> {{ usuario_seleccionado.updated_at.strftime('%d/%m/%Y %H:%M') if usuario_seleccionado.updated_at else 'N/A' }}
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-check-circle text-orion-primary me-2"></i>
+                                <strong>Confirmado:</strong> {{ 'Sí' if usuario_seleccionado.confirmado else 'No' }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Direcciones -->
+                    <hr>
+                    <h6 class="fw-bold">
+                        <i class="fas fa-map-marker-alt text-orion-primary me-2"></i>
+                        Direcciones Registradas
+                        <span class="badge bg-secondary">{{ usuario_seleccionado.get('direcciones', [])|length }}</span>
+                    </h6>
+                    
+                    <div class="row g-2 mt-2">
+                        {% for dir in usuario_seleccionado.get('direcciones', []) %}
+                        <div class="col-md-6">
+                            <div class="direccion-card {% if dir.predeterminada %}predeterminada{% endif %}" style="margin-bottom: 0;">
+                                <div class="dir-titulo">
+                                    {% if dir.nombre %}
+                                        <i class="fas fa-tag"></i> {{ dir.nombre }}
+                                    {% else %}
+                                        <i class="fas fa-home"></i> Dirección {{ loop.index }}
+                                    {% endif %}
+                                    {% if dir.predeterminada %}
+                                        <span class="badge-predeterminada">
+                                            <i class="fas fa-check-circle me-1"></i> Predeterminada
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="dir-detalle">
+                                    <div><i class="fas fa-road"></i> {{ dir.calle }} #{{ dir.numero }}</div>
+                                    <div><i class="fas fa-map-pin"></i> {{ dir.colonia }}, CP {{ dir.cp }}</div>
+                                    {% if dir.ciudad or dir.estado %}
+                                        <div><i class="fas fa-city"></i> {{ dir.ciudad or '' }} {{ dir.estado or '' }}</div>
+                                    {% endif %}
+                                    {% if dir.referencias %}
+                                        <div><i class="fas fa-info-circle"></i> {{ dir.referencias }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="col-12">
+                            <div class="text-center py-3 text-muted">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No hay direcciones registradas
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ url_for('web.lista_usuarios') }}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i> Cerrar
+                    </a>
+                    <a href="{{ url_for('web.editar_usuario', id=usuario_seleccionado._id) }}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i> Editar Usuario
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ===== FUNCIONES PARA DIRECCIONES =====
+        function toggleEditarDir(usuarioId, index) {
+            const div = document.getElementById('editDir-' + usuarioId + '-' + index);
+            if (div) {
+                div.style.display = div.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        function toggleNuevaDir(usuarioId) {
+            const div = document.getElementById('nuevaDir-' + usuarioId);
+            if (div) {
+                div.style.display = div.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        // ===== CONFIRMACIÓN PARA ELIMINAR =====
+        document.querySelectorAll('.btn-eliminar-dir').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('¿Estás seguro de eliminar esta dirección?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+        
+        // ===== TOOLTIPS =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

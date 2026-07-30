@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION | Mi Carrito</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-success: #28a745;
+            --orion-warning: #ffc107;
+            --orion-danger: #dc3545;
+            --orion-gray: #6c757d;
+            --orion-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            --orion-shadow-hover: 0 6px 24px rgba(225,0,152,0.12);
+            --orion-radius: 10px;
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: #f0f2f5;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content { flex: 1 0 auto; }
+
+        /* ===== TOP NAV ===== */
+        .top-nav {
+            font-size: 0.6rem;
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 4px 0;
+        }
+        .top-nav a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        .top-nav a:hover { color: var(--orion-primary); }
+
+        /* ===== NAVBAR ===== */
+        .navbar-main {
+            background: #fff;
+            border-bottom: 2px solid #f0f0f0;
+            padding: 8px 0;
+        }
+        .brand-logo {
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: var(--orion-primary) !important;
+            letter-spacing: -1px;
+            text-decoration: none;
+        }
+        .brand-logo:hover { color: var(--orion-primary-dark) !important; }
+
+        .search-bar {
+            border: 2px solid #e5e5e5 !important;
+            border-radius: 50px !important;
+            padding: 6px 16px !important;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .search-bar:focus {
+            border-color: var(--orion-primary) !important;
+            box-shadow: none !important;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--orion-primary);
+        }
+
+        .nav-icon {
+            color: #333;
+            font-size: 1.1rem;
+            text-decoration: none;
+            position: relative;
+        }
+        .nav-icon:hover { color: var(--orion-primary); }
+        .nav-icon .badge-cart {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--orion-primary);
+            color: #fff;
+            font-size: 0.5rem;
+            padding: 2px 5px;
+            border-radius: 50%;
+            font-weight: 700;
+        }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb-custom {
+            background: transparent;
+            padding: 12px 0 0 0;
+            margin-bottom: 0;
+        }
+        .breadcrumb-custom .breadcrumb-item a {
+            color: #777;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+        .breadcrumb-custom .breadcrumb-item a:hover { color: var(--orion-primary); }
+        .breadcrumb-custom .breadcrumb-item.active {
+            color: var(--orion-primary);
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+
+        /* ===== TÍTULO ===== */
+        .page-title {
+            font-weight: 900;
+            font-size: 1.3rem;
+            color: #222;
+            padding: 12px 0 0 0;
+        }
+        .page-title i { color: var(--orion-primary); }
+
+        /* ===== PRODUCTOS ===== */
+        .cart-product {
+            background: #fff;
+            border-radius: var(--orion-radius);
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            box-shadow: var(--orion-shadow);
+            transition: 0.3s;
+        }
+        .cart-product:hover {
+            box-shadow: var(--orion-shadow-hover);
+        }
+        .cart-product-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .cart-product-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #222;
+        }
+        .cart-product-attr {
+            font-size: 0.65rem;
+            color: #777;
+        }
+        .cart-product-price {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--orion-primary);
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            width: fit-content;
+        }
+        .qty-btn {
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: #f8f8f8;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .qty-btn:hover { background: #eee; }
+        .qty-input {
+            width: 34px;
+            height: 26px;
+            border: none;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .badge-mayorista {
+            background: var(--orion-warning);
+            color: #000;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 20px;
+            font-size: 0.5rem;
+            display: inline-block;
+        }
+        .badge-volumen {
+            background: #17a2b8;
+            color: #fff;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 20px;
+            font-size: 0.5rem;
+            display: inline-block;
+        }
+
+        .stock-bajo { color: var(--orion-danger); }
+        .stock-medio { color: var(--orion-warning); }
+        .stock-alto { color: var(--orion-success); }
+
+        /* ===== CUPÓN APLICADO ===== */
+        .cupon-aplicado-box {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border: 1px solid #b7d7c0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .cupon-aplicado-box .cupon-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cupon-aplicado-box .cupon-info .badge-cupon {
+            background: var(--orion-primary);
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 700;
+        }
+        .cupon-aplicado-box .cupon-info .cupon-code {
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #155724;
+        }
+        .cupon-aplicado-box .cupon-info .cupon-desc {
+            font-size: 0.65rem;
+            color: #155724;
+        }
+        .cupon-aplicado-box .btn-quitar-cupon {
+            background: transparent;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .cupon-aplicado-box .btn-quitar-cupon:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+        .cupon-aplicado-box .descuento-cupon {
+            font-weight: 700;
+            color: #155724;
+            font-size: 0.9rem;
+        }
+
+        /* ===== PROMOCIÓN APLICADA (NUEVO) ===== */
+        .promocion-aplicado-box {
+            background: linear-gradient(135deg, #cce5ff 0%, #b8d4f0 100%);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border: 1px solid #a8c8e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .promocion-aplicado-box .promocion-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .promocion-aplicado-box .promocion-info .badge-promo {
+            background: #007bff;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 700;
+        }
+        .promocion-aplicado-box .promocion-info .promo-name {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #004085;
+        }
+        .promocion-aplicado-box .promocion-info .promo-desc {
+            font-size: 0.65rem;
+            color: #004085;
+        }
+        .promocion-aplicado-box .btn-quitar-promo {
+            background: transparent;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .promocion-aplicado-box .btn-quitar-promo:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+        .promocion-aplicado-box .descuento-promo {
+            font-weight: 700;
+            color: #004085;
+            font-size: 0.9rem;
+        }
+
+        /* ===== RESUMEN ===== */
+        .summary-card {
+            background: #fff;
+            border-radius: var(--orion-radius);
+            padding: 16px 18px;
+            box-shadow: var(--orion-shadow);
+            position: sticky;
+            top: 20px;
+        }
+        .summary-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #222;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 0.8rem;
+        }
+        .summary-row.total {
+            font-weight: 700;
+            font-size: 1rem;
+            border-top: 2px solid #f0f0f0;
+            padding-top: 8px;
+            margin-top: 6px;
+        }
+        .summary-row.total .price { color: var(--orion-primary); }
+        .summary-row.descuento-cupon-row {
+            color: var(--orion-success);
+            font-weight: 600;
+            background: #f0fff4;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin: 2px 0;
+        }
+        .summary-row.descuento-promo-row {
+            color: #004085;
+            font-weight: 600;
+            background: #e3f2fd;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin: 2px 0;
+        }
+
+        .summary-item {
+            display: flex;
+            gap: 6px;
+            padding: 4px 0;
+            border-bottom: 1px solid #f5f5f5;
+            align-items: center;
+        }
+        .summary-item:last-child { border-bottom: none; }
+        .summary-item-img {
+            width: 28px;
+            height: 28px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .summary-item-name {
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex: 1;
+        }
+        .summary-item-qty {
+            font-size: 0.6rem;
+            color: #999;
+        }
+        .summary-item-price {
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+
+        .descuento-box {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-radius: 5px;
+            padding: 6px 10px;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+        }
+        .envio-box {
+            background: linear-gradient(135deg, #cce5ff 0%, #b8d4f0 100%);
+            border-radius: 5px;
+            padding: 6px 10px;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+        }
+
+        /* ===== BOTONES ===== */
+        .btn-pagar {
+            background: var(--orion-primary);
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-weight: 700;
+            border-radius: var(--orion-radius);
+            transition: 0.3s;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+        .btn-pagar:hover {
+            background: var(--orion-primary-dark);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(225,0,152,0.3);
+        }
+        .btn-pagar i { margin-right: 6px; }
+
+        .btn-continuar {
+            background: #e5e5e5;
+            color: #555;
+            border: none;
+            padding: 10px;
+            font-weight: 600;
+            border-radius: var(--orion-radius);
+            transition: 0.3s;
+            font-size: 0.8rem;
+            width: 100%;
+        }
+        .btn-continuar:hover {
+            background: #d5d5d5;
+            color: #333;
+        }
+
+        /* ===== MODAL CHECKOUT ===== */
+        .modal-checkout .modal-content {
+            border-radius: var(--orion-radius);
+            border: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-height: 92vh;
+            overflow-y: auto;
+        }
+        .modal-checkout .modal-content::-webkit-scrollbar {
+            width: 3px;
+        }
+        .modal-checkout .modal-content::-webkit-scrollbar-thumb {
+            background: var(--orion-primary);
+            border-radius: 10px;
+        }
+        .modal-checkout .modal-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding: 14px 20px;
+            background: #fff;
+            border-radius: var(--orion-radius) var(--orion-radius) 0 0;
+        }
+        .modal-checkout .modal-header h5 {
+            font-weight: 800;
+            color: var(--orion-dark);
+            font-size: 1rem;
+        }
+        .modal-checkout .modal-header h5 i {
+            color: var(--orion-primary);
+        }
+        .modal-checkout .modal-body {
+            padding: 16px 18px;
+            background: #f8f9fa;
+        }
+        .modal-checkout .modal-footer {
+            border-top: 2px solid #f0f0f0;
+            padding: 12px 20px;
+            background: #fff;
+            border-radius: 0 0 var(--orion-radius) var(--orion-radius);
+        }
+
+        .modal-progress-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 14px;
+            padding: 8px 0;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+        }
+        .modal-step-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #999;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+        .modal-step-item .step-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #e5e5e5;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.5rem;
+            transition: 0.3s;
+        }
+        .modal-step-item.active .step-circle {
+            background: var(--orion-primary);
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(225,0,152,0.3);
+        }
+        .modal-step-item.active { color: #333; }
+        .modal-step-item.done .step-circle {
+            background: var(--orion-success);
+            color: #fff;
+        }
+        .modal-step-item.done { color: var(--orion-success); }
+        .modal-step-line {
+            width: 20px;
+            height: 2px;
+            background: #e5e5e5;
+            margin: 0 2px;
+        }
+        .modal-step-line.done { background: var(--orion-success); }
+
+        .modal-section {
+            margin-bottom: 12px;
+            background: #fff;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+        }
+        .modal-section-title {
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: #222;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .modal-section-title i {
+            color: var(--orion-primary);
+            font-size: 0.85rem;
+        }
+
+        .form-label-modal {
+            font-weight: 600;
+            font-size: 0.6rem;
+            color: #555;
+            margin-bottom: 2px;
+        }
+        .form-control-modal {
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            transition: 0.3s;
+            background: #fff;
+        }
+        .form-control-modal:focus {
+            border-color: var(--orion-primary);
+            box-shadow: 0 0 0 3px rgba(225,0,152,0.08);
+        }
+        .form-control-modal::placeholder {
+            color: #adb5bd;
+            font-size: 0.7rem;
+        }
+
+        .radio-card-modal {
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            height: 100%;
+            background: #fff;
+        }
+        .radio-card-modal:hover { 
+            border-color: #ccc;
+            background: #fafafa;
+        }
+        .radio-card-modal.active {
+            border-color: var(--orion-primary);
+            background: rgba(225,0,152,0.04);
+            box-shadow: 0 0 0 2px rgba(225,0,152,0.08);
+        }
+        .radio-card-modal input[type="radio"] { 
+            accent-color: var(--orion-primary);
+            margin-right: 6px;
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+        }
+        .radio-card-modal .radio-label {
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: #222;
+        }
+        .radio-card-modal .radio-desc {
+            font-size: 0.55rem;
+            color: #777;
+            margin-top: 1px;
+        }
+
+        .btn-modal-submit {
+            background: var(--orion-primary);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-weight: 700;
+            border-radius: var(--orion-radius);
+            transition: 0.3s;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+        .btn-modal-submit:hover {
+            background: var(--orion-primary-dark);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(225,0,152,0.3);
+        }
+        .btn-modal-submit i { margin-right: 6px; }
+
+        .btn-modal-close {
+            background: #e5e5e5;
+            color: #555;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 600;
+            border-radius: var(--orion-radius);
+            transition: 0.3s;
+            font-size: 0.75rem;
+        }
+        .btn-modal-close:hover {
+            background: #d5d5d5;
+            color: #333;
+        }
+
+        .btn-close-custom {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #999;
+            cursor: pointer;
+            padding: 0 4px;
+            transition: 0.3s;
+        }
+        .btn-close-custom:hover { color: #333; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container { padding-left: 15px !important; padding-right: 15px !important; }
+        }
+
+        @media (max-width: 500px) {
+            .cart-product {
+                flex-direction: column !important;
+                text-align: center;
+            }
+            .cart-product-img {
+                width: 80px;
+                height: 80px;
+                margin: 0 auto 8px;
+            }
+            .cart-product .text-end {
+                text-align: center !important;
+                margin-top: 8px;
+            }
+            .summary-card {
+                position: relative;
+                top: 0;
+                margin-top: 12px;
+            }
+            .qty-control { margin: 0 auto; }
+            .page-title { font-size: 1.1rem; }
+            .modal-checkout .modal-body { padding: 12px; }
+            .modal-section { padding: 10px 12px; }
+            .modal-step-item { font-size: 0.5rem; gap: 3px; }
+            .modal-step-item .step-circle { width: 18px; height: 18px; font-size: 0.4rem; }
+            .modal-step-line { width: 12px; }
+            .radio-card-modal { padding: 5px 8px; }
+            .radio-card-modal .radio-label { font-size: 0.65rem; }
+            .radio-card-modal .radio-desc { font-size: 0.5rem; }
+            .cupon-aplicado-box, .promocion-aplicado-box {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+        }
+
+        .container {
+            max-width: 80% !important;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1600px;
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                max-width: 100% !important;
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .cart-product {
+            animation: fadeIn 0.4s ease;
+        }
+
+        .modal.fade .modal-dialog {
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+        .modal.show .modal-dialog {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOP NAV ===== -->
+    <div class="top-nav">
+        <div class="container">
+            <div class="d-flex justify-content-end">
+                <a href="#"><i class="bi bi-geo-alt me-1"></i> Tiendas</a>
+                <a href="#"><i class="bi bi-question-circle me-1"></i> Ayuda</a>
+                <a href="#"><i class="bi bi-person me-1"></i> Mi cuenta</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar-main">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between">
+                <a class="brand-logo" href="/">ORION</a>
+
+                <form class="d-flex flex-grow-1 mx-3" action="{{ url_for('web.catalogo') }}" method="GET">
+                    <div class="input-group">
+                        <input class="form-control search-bar" type="search" name="q" placeholder="Buscar productos...">
+                    </div>
+                </form>
+
+                <div class="d-flex align-items-center gap-2">
+                    {% if session.get('nombre') %}
+                        <a href="/perfil" class="nav-icon d-flex align-items-center gap-1 text-decoration-none">
+                            {% if session.get('foto') %}
+                                <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}?t={{ range(1, 10000) | random }}" class="user-avatar" alt="Perfil">
+                            {% else %}
+                                <i class="bi bi-person-circle fs-5"></i>
+                            {% endif %}
+                            <span class="small fw-bold text-dark" style="font-size:0.7rem;">{{ session['nombre'] }}</span>
+                        </a>
+                    {% else %}
+                        <a href="/login" class="nav-icon">
+                            <i class="bi bi-person-circle fs-5"></i>
+                            <span class="small fw-bold" style="font-size:0.7rem;">Login</span>
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('web.ver_carrito') }}" class="nav-icon">
+                        <i class="bi bi-bag fs-5"></i>
+                        {% if carrito_items|length > 0 %}
+                            <span class="badge-cart">{{ carrito_items|length }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== BREADCRUMB ===== -->
+    <div class="container">
+        <nav aria-label="breadcrumb" class="breadcrumb-custom">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Carrito</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- ===== CONTENIDO ===== -->
+    <div class="main-content">
+        <div class="container pb-4">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="page-title">
+                    <i class="bi bi-cart3 me-2"></i>Mi Carrito
+                </h1>
+                {% if carrito_items|length > 0 %}
+                    <span class="badge bg-secondary rounded-pill py-1 px-2" style="font-size:0.7rem;">
+                        <i class="bi bi-box me-1"></i> {{ total_unidades }} unidades
+                    </span>
+                {% endif %}
+            </div>
+
+            {% if carrito_items|length == 0 %}
+
+            <!-- ===== CARRITO VACÍO ===== -->
+            <div class="text-center py-4 mt-3 bg-white rounded-4 shadow-sm">
+                <i class="bi bi-cart-x display-4 text-secondary"></i>
+                <h5 class="mt-2 fw-bold">Tu carrito está vacío</h5>
+                <p class="text-muted small">Agrega productos para comenzar tu compra.</p>
+                <a href="{{ url_for('web.raiz_tienda') }}" class="btn btn-dark rounded-pill px-4 py-1" style="font-size:0.85rem;">
+                    <i class="bi bi-arrow-left me-2"></i> Seguir comprando
+                </a>
+            </div>
+
+            {% else %}
+
+            <div class="row g-3 mt-1">
+
+                <!-- ===== COLUMNA IZQUIERDA ===== -->
+                <div class="col-lg-8">
+
+                    <!-- ===== PRODUCTOS ===== -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small" style="font-size:0.7rem;">{{ carrito_items|length }} productos</span>
+                    </div>
+
+                    {% for item in carrito_items %}
+                    <div class="cart-product d-flex align-items-center">
+                        <img src="{{ url_for('static', filename='uploads/productos/' + (item.imagen or 'default.jpg')) }}"
+                             class="cart-product-img me-2" alt="{{ item.nombre }}">
+
+                        <div class="flex-grow-1">
+                            <div class="cart-product-title">{{ item.nombre }}</div>
+                            {% if item.atributos %}
+                                <div class="cart-product-attr">
+                                    {% if item.atributos.color %}Color: {{ item.atributos.color }}{% endif %}
+                                    {% if item.atributos.tamano %} | Talla: {{ item.atributos.tamano }}{% endif %}
+                                </div>
+                            {% endif %}
+
+                            <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
+                                <div class="qty-control">
+                                    <button type="button" class="qty-btn" onclick="cambiarCantidad('{{ item.id }}', -1)">−</button>
+                                    <input type="number" id="qty-{{ item.id }}" class="qty-input" value="{{ item.cantidad }}" min="1" max="{{ item.stock_disponible or 999999 }}">
+                                    <button type="button" class="qty-btn" onclick="cambiarCantidad('{{ item.id }}', 1)">+</button>
+                                </div>
+                                <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1" onclick="eliminarProducto('{{ item.id }}')" style="font-size:0.7rem;">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+
+                            <div class="mt-1">
+                                <span class="stock-indicator small" style="font-size:0.6rem;">
+                                    <span class="text-muted">Stock:</span>
+                                    {% if item.stock_disponible is defined %}
+                                        <span class="fw-bold 
+                                            {% if item.stock_disponible <= 10 %}stock-bajo
+                                            {% elif item.stock_disponible <= 50 %}stock-medio
+                                            {% else %}stock-alto{% endif %}">
+                                            {{ item.stock_disponible }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">Sin límite</span>
+                                    {% endif %}
+                                </span>
+                                {% if item.cantidad >= 50 %}
+                                    <span class="badge-mayorista ms-1"><i class="bi bi-truck"></i> Mayorista</span>
+                                {% elif item.cantidad >= 10 %}
+                                    <span class="badge-volumen ms-1"><i class="bi bi-box-seam"></i> Volumen</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <div class="cart-product-price">${{ "%.2f"|format(item.precio|float * item.cantidad|int) }}</div>
+                            <div class="small text-muted" style="font-size:0.6rem;">${{ "%.2f"|format(item.precio|float) }} c/u</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="mt-2">
+                        <a href="{{ url_for('web.raiz_tienda') }}" class="btn btn-outline-secondary btn-sm rounded-pill" style="font-size:0.75rem; padding:4px 14px;">
+                            <i class="bi bi-arrow-left me-1"></i> Seguir comprando
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- ===== COLUMNA DERECHA: RESUMEN ===== -->
+                <div class="col-lg-4">
+
+                    <div class="summary-card">
+
+                        <div class="summary-title">
+                            <i class="bi bi-receipt me-2"></i> Resumen
+                        </div>
+
+                        <!-- 🔥 CUPÓN APLICADO -->
+                        {% if cupon_aplicado and descuento_cupon > 0 %}
+                        <div class="cupon-aplicado-box">
+                            <div class="cupon-info">
+                                <span class="badge-cupon"><i class="bi bi-ticket-perforated"></i> Cupón</span>
+                                <span class="cupon-code">{{ cupon_aplicado.codigo }}</span>
+                                <span class="cupon-desc">({{ cupon_aplicado.nombre }})</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="descuento-cupon">-${{ "%.2f"|format(descuento_cupon) }}</span>
+                                <a href="{{ url_for('web.quitar_cupon') }}" class="btn-quitar-cupon">
+                                    <i class="bi bi-x-circle"></i> Quitar
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- 🔥 PROMOCIÓN APLICADA (CORREGIDO) -->
+                        {% if promocion_aplicada %}
+                        <div class="promocion-aplicado-box">
+                            <div class="promocion-info">
+                                <span class="badge-promo"><i class="bi bi-gift"></i> Promoción</span>
+                                <span class="promo-name">{{ promocion_aplicada.nombre }}</span>
+                                <span class="promo-desc">
+                                    {% if promocion_aplicada.codigo %}({{ promocion_aplicada.codigo }}){% endif %}
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="descuento-promo">
+                                    {% if descuento_promocion > 0 %}
+                                        -${{ "%.2f"|format(descuento_promocion) }}
+                                    {% elif promocion_aplicada.tipo == 'envio_gratis' %}
+                                        <i class="bi bi-truck"></i> Envío gratis
+                                    {% else %}
+                                        Aplicada
+                                    {% endif %}
+                                </span>
+                                <a href="{{ url_for('web.quitar_promocion') }}" class="btn-quitar-promo">
+                                    <i class="bi bi-x-circle"></i> Quitar
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- DESCUENTOS POR VOLUMEN -->
+                        {% if total_unidades >= 200 %}
+                            <div class="descuento-box">
+                                <i class="bi bi-gift me-1"></i>
+                                <strong>25%</strong> por 200+ unidades
+                            </div>
+                        {% elif total_unidades >= 150 %}
+                            <div class="descuento-box">
+                                <i class="bi bi-gift me-1"></i>
+                                <strong>20%</strong> por 150+ unidades
+                            </div>
+                        {% elif total_unidades >= 100 %}
+                            <div class="descuento-box">
+                                <i class="bi bi-gift me-1"></i>
+                                <strong>15%</strong> por 100+ unidades
+                            </div>
+                        {% elif total_unidades >= 50 %}
+                            <div class="descuento-box">
+                                <i class="bi bi-gift me-1"></i>
+                                <strong>10%</strong> por 50+ unidades
+                            </div>
+                        {% elif total_unidades >= 25 %}
+                            <div class="descuento-box">
+                                <i class="bi bi-gift me-1"></i>
+                                <strong>7%</strong> por 25+ unidades
+                            </div>
+                        {% elif total_unidades >= 10 %}
+                            <div class="descuento-box">
+                                <i class="bi bi-gift me-1"></i>
+                                <strong>5%</strong> por 10+ unidades
+                            </div>
+                        {% endif %}
+
+                        <!-- ITEMS RESUMEN -->
+                        {% for item in carrito_items %}
+                        <div class="summary-item">
+                            <img src="{{ url_for('static', filename='uploads/productos/' + (item.imagen or 'default.jpg')) }}" class="summary-item-img">
+                            <div>
+                                <div class="summary-item-name">{{ item.nombre }}</div>
+                                <div class="summary-item-qty">x{{ item.cantidad }}</div>
+                            </div>
+                            <div class="summary-item-price">${{ "%.2f"|format(item.precio * item.cantidad) }}</div>
+                        </div>
+                        {% endfor %}
+
+                        <hr class="my-1">
+
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span>${{ "%.2f"|format(subtotal) }}</span>
+                        </div>
+
+                        {% if descuento_volumen > 0 %}
+                        <div class="summary-row text-success" style="font-size:0.75rem;">
+                            <span>Descuento volumen ({{ porcentaje_descuento }}%)</span>
+                            <span>-${{ "%.2f"|format(descuento_volumen) }}</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- 🔥 DESCUENTO CUPÓN -->
+                        {% if descuento_cupon > 0 %}
+                        <div class="summary-row descuento-cupon-row" style="font-size:0.8rem;">
+                            <span>
+                                <i class="bi bi-ticket-perforated me-1"></i>
+                                Cupón {{ cupon_aplicado.codigo }}
+                            </span>
+                            <span>-${{ "%.2f"|format(descuento_cupon) }}</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- 🔥 DESCUENTO PROMOCIÓN (NUEVO) -->
+                        {% if descuento_promocion > 0 %}
+                        <div class="summary-row descuento-promo-row" style="font-size:0.8rem;">
+                            <span>
+                                <i class="bi bi-gift me-1"></i>
+                                Promoción {{ promocion_aplicada.nombre }}
+                            </span>
+                            <span>-${{ "%.2f"|format(descuento_promocion) }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="summary-row" style="font-size:0.75rem;">
+                            <span>IVA (16%)</span>
+                            <span>${{ "%.2f"|format(iva) }}</span>
+                        </div>
+
+                        <div class="summary-row" style="font-size:0.75rem;">
+                            <span>Envío</span>
+                            <span>
+                                {% if total_unidades >= 50 %}
+                                    $199.00 <span class="small text-info" style="font-size:0.5rem;">(prioritario)</span>
+                                {% else %}
+                                    $99.00
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span class="price">${{ "%.2f"|format(total_carrito) }}</span>
+                        </div>
+
+                        <!-- ===== BOTÓN PAGAR ===== -->
+                        <button class="btn-pagar mt-2" data-bs-toggle="modal" data-bs-target="#checkoutModal" style="padding:8px;">
+                            <i class="bi bi-credit-card"></i> Pagar ${{ "%.2f"|format(total_carrito) }}
+                        </button>
+
+                        <a href="{{ url_for('web.raiz_tienda') }}" class="btn-continuar mt-1" style="padding:8px;">
+                            <i class="bi bi-arrow-left me-2"></i> Seguir comprando
+                        </a>
+
+                        {% if total_unidades >= 50 %}
+                            <div class="envio-box mt-2">
+                                <i class="bi bi-clock me-1"></i>
+                                <strong>Envío prioritario</strong>
+                                <div class="small" style="font-size:0.6rem;">Entrega en 1 día</div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="badge-mayorista"><i class="bi bi-truck"></i> Mayorista</span>
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- ===== MODAL CHECKOUT ===== -->
+    <div class="modal fade modal-checkout" id="checkoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                
+                <!-- HEADER -->
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-credit-card me-2"></i>
+                        Finalizar compra
+                    </h5>
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Cerrar">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                
+                <!-- BODY -->
+                <div class="modal-body">
+                    
+                    <!-- PROGRESS STEPS -->
+                    <div class="modal-progress-steps">
+                        <div class="modal-step-item done">
+                            <span class="step-circle"><i class="bi bi-check"></i></span>
+                            <span>Carrito</span>
+                        </div>
+                        <div class="modal-step-line done"></div>
+                        <div class="modal-step-item active">
+                            <span class="step-circle">2</span>
+                            <span>Envío</span>
+                        </div>
+                        <div class="modal-step-line"></div>
+                        <div class="modal-step-item">
+                            <span class="step-circle">3</span>
+                            <span>Pago</span>
+                        </div>
+                        <div class="modal-step-line"></div>
+                        <div class="modal-step-item">
+                            <span class="step-circle">4</span>
+                            <span>Confirmar</span>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('web.procesar_checkout') }}" id="checkoutForm">
+
+                        <!-- ===== DATOS DE ENVÍO ===== -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">
+                                <i class="bi bi-truck"></i> Datos de envío
+                            </div>
+
+                            <div class="row g-1 mb-2">
+                                <div class="col-md-6">
+                                    <div class="radio-card-modal active" onclick="seleccionarEnvioModal('domicilio')">
+                                        <div class="d-flex align-items-center">
+                                            <input class="form-check-input" type="radio" name="tipo_envio" id="domicilioModal" value="domicilio" checked>
+                                            <div>
+                                                <div class="radio-label">
+                                                    <i class="bi bi-house"></i> Domicilio
+                                                </div>
+                                                <div class="radio-desc">Recibe en tu casa</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="radio-card-modal" onclick="seleccionarEnvioModal('click_collect')">
+                                        <div class="d-flex align-items-center">
+                                            <input class="form-check-input" type="radio" name="tipo_envio" id="clickCollectModal" value="click_collect">
+                                            <div>
+                                                <div class="radio-label">
+                                                    <i class="bi bi-shop"></i> Click & Collect
+                                                </div>
+                                                <div class="radio-desc">Recoge en tienda</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dirección de envío -->
+                            <div id="direccionEnvioModal">
+                                <div class="row g-1">
+                                    <div class="col-12">
+                                        <label class="form-label-modal">Calle y número *</label>
+                                        <input type="text" name="calle" class="form-control form-control-modal" required placeholder="Av. Insurgentes Sur 123">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label-modal">Núm. exterior</label>
+                                        <input type="text" name="numero" class="form-control form-control-modal" placeholder="123">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label-modal">C.P. *</label>
+                                        <input type="text" name="cp" class="form-control form-control-modal" required placeholder="03810">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label-modal">Colonia *</label>
+                                        <input type="text" name="colonia" class="form-control form-control-modal" required placeholder="Del Valle">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label-modal">Ciudad</label>
+                                        <input type="text" name="ciudad" class="form-control form-control-modal" placeholder="Ciudad de México">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label-modal">Estado</label>
+                                        <input type="text" name="estado" class="form-control form-control-modal" placeholder="CDMX">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label-modal">Referencias</label>
+                                        <input type="text" name="referencias" class="form-control form-control-modal" placeholder="Entre calles, piso, etc.">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Click & Collect -->
+                            <div id="clickCollectDivModal" style="display:none;">
+                                <div class="row g-1">
+                                    <div class="col-12">
+                                        <label class="form-label-modal">Tienda de recogida *</label>
+                                        <select name="tienda_recogida" class="form-select form-control-modal">
+                                            <option value="">Seleccionar...</option>
+                                            {% if tiendas %}
+                                                {% for tienda in tiendas %}
+                                                    <option value="{{ tienda.nombre }}">{{ tienda.nombre }}</option>
+                                                {% endfor %}
+                                            {% else %}
+                                                <option value="Liverpool Polanco">Liverpool Polanco</option>
+                                                <option value="Liverpool Perisur">Liverpool Perisur</option>
+                                                <option value="Liverpool Insurgentes">Liverpool Insurgentes</option>
+                                                <option value="Liverpool Santa Fe">Liverpool Santa Fe</option>
+                                            {% endif %}
+                                        </select>
+                                        <small class="text-muted" style="font-size:0.55rem;"><i class="bi bi-info-circle"></i> Recibirás código de confirmación</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== MÉTODO DE PAGO ===== -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">
+                                <i class="bi bi-credit-card"></i> Método de pago
+                            </div>
+                            <div class="row g-1">
+                                <div class="col-md-6">
+                                    <div class="radio-card-modal active" onclick="seleccionarPagoModal('tarjeta')">
+                                        <div class="d-flex align-items-center">
+                                            <input class="form-check-input" type="radio" name="metodo_pago" id="tarjetaModal" value="tarjeta" checked>
+                                            <div>
+                                                <div class="radio-label">
+                                                    <i class="bi bi-credit-card"></i> Tarjeta
+                                                </div>
+                                                <div class="radio-desc">Visa, Mastercard, AMEX</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="radio-card-modal" onclick="seleccionarPagoModal('paypal')">
+                                        <div class="d-flex align-items-center">
+                                            <input class="form-check-input" type="radio" name="metodo_pago" id="paypalModal" value="paypal">
+                                            <div>
+                                                <div class="radio-label">
+                                                    <i class="bi bi-paypal"></i> PayPal
+                                                </div>
+                                                <div class="radio-desc">Pago seguro con PayPal</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== NOTAS ===== -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">
+                                <i class="bi bi-pencil"></i> Notas adicionales
+                            </div>
+                            <textarea name="notas" class="form-control form-control-modal" rows="1" placeholder="Comentarios sobre tu pedido..."></textarea>
+                        </div>
+
+                        <!-- ===== BOTÓN REALIZAR PEDIDO ===== -->
+                        <button type="submit" class="btn-modal-submit">
+                            <i class="bi bi-check-circle"></i> Realizar pedido
+                        </button>
+
+                    </form>
+
+                </div>
+                
+                <!-- FOOTER -->
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                        <i class="bi bi-x me-1"></i> Cancelar
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-dark text-white py-3 mt-3">
+        <div class="container text-center">
+            <p class="mb-0" style="font-size:0.75rem;">© 2026 ORION System - Todos los derechos reservados</p>
+            <p class="mb-0 small text-secondary" style="font-size:0.65rem;">
+                <i class="bi bi-geo-alt"></i> México |
+                <i class="bi bi-envelope"></i> contacto@orion.com |
+                <i class="bi bi-telephone"></i> 55 1234 5678
+            </p>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    function cambiarCantidad(id, delta) {
+        const input = document.getElementById('qty-' + id);
+        let valor = parseInt(input.value) || 1;
+        valor = Math.max(1, valor + delta);
+        const max = parseInt(input.max) || 999999;
+        if (valor > max) return;
+        input.value = valor;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("web.actualizar_carrito", id="") }}' + id;
+        const inputCantidad = document.createElement('input');
+        inputCantidad.type = 'hidden';
+        inputCantidad.name = 'cantidad';
+        inputCantidad.value = valor;
+        form.appendChild(inputCantidad);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function eliminarProducto(id) {
+        if (confirm('¿Eliminar este producto del carrito?')) {
+            window.location.href = '{{ url_for("web.eliminar_del_carrito", id="") }}' + id;
+        }
+    }
+
+    // ===== FUNCIONES MODAL =====
+    function seleccionarEnvioModal(tipo) {
+        document.querySelectorAll('#checkoutModal .radio-card-modal').forEach(el => el.classList.remove('active'));
+        
+        if (tipo === 'domicilio') {
+            document.querySelector('#domicilioModal').closest('.radio-card-modal').classList.add('active');
+            document.getElementById('domicilioModal').checked = true;
+            document.getElementById('domicilioModal').dispatchEvent(new Event('change'));
+        } else {
+            document.querySelector('#clickCollectModal').closest('.radio-card-modal').classList.add('active');
+            document.getElementById('clickCollectModal').checked = true;
+            document.getElementById('clickCollectModal').dispatchEvent(new Event('change'));
+        }
+    }
+
+    function seleccionarPagoModal(tipo) {
+        document.querySelectorAll('#checkoutModal .radio-card-modal').forEach(el => el.classList.remove('active'));
+        if (tipo === 'tarjeta') {
+            document.querySelector('#tarjetaModal').closest('.radio-card-modal').classList.add('active');
+            document.getElementById('tarjetaModal').checked = true;
+        } else {
+            document.querySelector('#paypalModal').closest('.radio-card-modal').classList.add('active');
+            document.getElementById('paypalModal').checked = true;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const tipoEnvio = document.querySelectorAll('#checkoutModal input[name="tipo_envio"]');
+        const direccionDiv = document.getElementById('direccionEnvioModal');
+        const clickCollectDiv = document.getElementById('clickCollectDivModal');
+
+        tipoEnvio.forEach(function(el) {
+            el.addEventListener('change', function() {
+                if (this.value === 'click_collect') {
+                    direccionDiv.style.display = 'none';
+                    clickCollectDiv.style.display = 'block';
+                } else {
+                    direccionDiv.style.display = 'block';
+                    clickCollectDiv.style.display = 'none';
+                }
+            });
+        });
+    });
+    </script>
+
+</body>
+</html>

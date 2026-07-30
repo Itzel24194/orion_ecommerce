@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Cupón | ORION Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== ESTILOS BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: #f5f6f8;
+            color: #1a1a2e;
+        }
+        .layout { display: flex; min-height: 100vh; }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 2px solid #e8e8e8;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-top: 10px;
+        }
+        .sidebar .admin-profile .email {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #e10098;
+            text-align: center;
+            padding: 15px 0 5px;
+            letter-spacing: -1px;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #888;
+            padding: 10px 25px 5px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a:hover i { color: #e10098; }
+        .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #dc3545;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px;
+            padding: 30px 35px 20px;
+            width: 100%;
+            min-height: 100vh;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag {
+            background: #e10098;
+            color: #fff;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin: 0 0 20px 0;
+            font-size: 0.85rem;
+        }
+        .breadcrumb .breadcrumb-item a {
+            color: #e10098;
+            text-decoration: none;
+        }
+        .breadcrumb .breadcrumb-item a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb .breadcrumb-item.active {
+            color: #888;
+        }
+
+        .btn-primary-custom {
+            background: #e10098;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary-custom:hover {
+            background: #c00080;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
+        }
+        .btn-secondary-custom {
+            background: #6c757d;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-secondary-custom:hover {
+            background: #5a6268;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .form-container {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .form-container .form-group {
+            margin-bottom: 20px;
+        }
+        .form-container .form-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #555;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .form-container .form-group label .required {
+            color: #dc3545;
+        }
+        .form-container .form-group input,
+        .form-container .form-group select,
+        .form-container .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #fff;
+        }
+        .form-container .form-group input:focus,
+        .form-container .form-group select:focus,
+        .form-container .form-group textarea:focus {
+            border-color: #e10098;
+            box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.1);
+            outline: none;
+        }
+        .form-container .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-container .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-container .form-check-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .form-container .form-check-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #555;
+            cursor: pointer;
+        }
+        .form-container .form-check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #e10098;
+        }
+        .form-container .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            padding-top: 20px;
+            border-top: 1px solid #e8e8e8;
+        }
+        .form-container .form-actions .btn-cancel {
+            background: #e9ecef;
+            color: #495057;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .form-container .form-actions .btn-cancel:hover {
+            background: #dee2e6;
+        }
+        .form-container .form-actions .btn-save {
+            background: #e10098;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .form-container .form-actions .btn-save:hover {
+            background: #c00080;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
+        }
+        .form-container .help-text {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 4px;
+        }
+        .form-container .segmento-auto {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e10098;
+        }
+        .form-container .segmento-auto label {
+            font-weight: 700;
+            color: #e10098;
+        }
+        .form-container .segmento-auto p {
+            font-size: 0.85rem;
+            color: #555;
+            margin-top: 5px;
+        }
+        .form-container .segmento-auto .badge-ia {
+            background: #e10098;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .toast-message {
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+        }
+        .toast-message.success { background: #28a745; }
+        .toast-message.error { background: #dc3545; }
+        .toast-message.warning { background: #ffc107; color: #1a1a2e; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+        }
+        @media (max-width: 480px) {
+            .top-bar h1 { font-size: 1.2rem; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .form-container .form-row { grid-template-columns: 1fr; }
+            .form-container { padding: 20px; }
+            .form-container .form-actions { flex-direction: column; }
+            .form-container .form-actions .btn-cancel,
+            .form-container .form-actions .btn-save { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+        <div class="logo">ORION<span>.</span></div>
+        <div class="menu-scroll">
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_empresas') }}"><i class="fas fa-building"></i> <span>Empresas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+            <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
+            
+            <div class="divider"></div>
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_cupones') }}" class="active"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+            
+            <div class="divider"></div>
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
+            <a href="{{ url_for('web.prediccion_ventas') }}"><i class="fas fa-chart-bar"></i> <span>Predicción Ventas</span></a>
+            <a href="{{ url_for('web.prediccion_abandono') }}"><i class="fas fa-exclamation-triangle"></i> <span>Predicción Abandono</span></a>
+            <a href="{{ url_for('web.deteccion_fraude') }}"><i class="fas fa-shield-alt"></i> <span>Detección Fraude</span></a>
+            
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
+            <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
+            <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+            
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main">
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('web.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('web.admin_listar_cupones') }}">Cupones</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Crear Cupón</li>
+            </ol>
+        </nav>
+
+        <header class="top-bar">
+            <h1><i class="fas fa-plus-circle"></i> Nuevo Cupón</h1>
+            <div class="tag"><i class="fas fa-percent"></i> Promociones</div>
+        </header>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <div class="form-container">
+            <form id="formCrearCupon" action="{{ url_for('web.admin_crear_cupon') }}" method="POST">
+                <!-- Código y Nombre -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Código</label>
+                        <input type="text" name="codigo" id="codigo" placeholder="Dejar en blanco para generar automático" style="text-transform:uppercase;">
+                        <div class="help-text">Deja en blanco para generar automáticamente</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre <span class="required">*</span></label>
+                        <input type="text" name="nombre" required placeholder="Ej: Descuento Verano 2024">
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea name="descripcion" placeholder="Descripción del cupón..."></textarea>
+                </div>
+
+                <!-- Tipo y Valor -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo <span class="required">*</span></label>
+                        <select name="tipo" id="tipo" required onchange="cambiarTipo()">
+                            <option value="porcentaje">% Descuento</option>
+                            <option value="monto_fijo">Monto Fijo</option>
+                            <option value="envio_gratis">Envío Gratis</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor <span class="required">*</span></label>
+                        <input type="number" name="valor" id="valor" step="0.01" required placeholder="0.00">
+                        <div class="help-text" id="valor_help">Ej: 10 = 10% de descuento</div>
+                    </div>
+                </div>
+
+                <!-- Fechas -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha Inicio</label>
+                        <input type="date" name="fecha_inicio">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha Fin</label>
+                        <input type="date" name="fecha_fin">
+                    </div>
+                </div>
+
+                <!-- Uso Máximo y Mínimo Compra -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Uso Máximo</label>
+                        <input type="number" name="uso_maximo" placeholder="0 = ilimitado">
+                        <div class="help-text">0 significa ilimitado</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mínimo de Compra</label>
+                        <input type="number" name="minimo_compra" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+
+                <!-- ===== SEGMENTO ASIGNADO AUTOMÁTICAMENTE ===== -->
+                <div class="form-group segmento-auto">
+                    <label><i class="fas fa-magic"></i> Segmento asignado automáticamente</label>
+                    <p>
+                        El sistema analizará el tipo, valor y mínimo de compra para asignar 
+                        <strong>automáticamente</strong> el segmento de clientes (VIP, Frecuentes, Inactivos, etc.).
+                        Tú solo preocúpate de crear la oferta.
+                    </p>
+                    <div class="badge-ia"><i class="fas fa-robot"></i> IA asignará el segmento</div>
+                </div>
+
+                <!-- 🔥 CATEGORÍAS -->
+                <div class="form-group">
+                    <label>Categorías (Ctrl+clic para múltiple)</label>
+                    <select name="categorias" multiple style="height:120px;">
+                        <option value="">-- Seleccionar categorías --</option>
+                        {% if categorias %}
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria._id }}">
+                                    {% if categoria.padre_id %}
+                                        └─ 
+                                    {% endif %}
+                                    {{ categoria.nombre }}
+                                </option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled>No hay categorías disponibles</option>
+                        {% endif %}
+                    </select>
+                    <div class="help-text">Selecciona las categorías donde aplica el descuento</div>
+                </div>
+
+                <!-- 🔥 PRODUCTOS -->
+                <div class="form-group">
+                    <label>Productos (Ctrl+clic para múltiple)</label>
+                    <select name="productos" multiple style="height:120px;">
+                        <option value="">-- Seleccionar productos --</option>
+                        {% if productos %}
+                            {% for producto in productos %}
+                                <option value="{{ producto._id }}">{{ producto.nombre }} ({{ producto.sku if producto.sku else 'Sin SKU' }})</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled>No hay productos disponibles</option>
+                        {% endif %}
+                    </select>
+                    <div class="help-text">Selecciona los productos específicos donde aplica el descuento</div>
+                </div>
+
+                <!-- Activo y Mostrar en tienda -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="form-check-group">
+                            <label>
+                                <input type="checkbox" name="activo" value="1" checked>
+                                Activo
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check-group">
+                            <label>
+                                <input type="checkbox" name="mostrar_en_tienda" value="1" checked>
+                                Mostrar en tienda
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="form-actions">
+                    <a href="{{ url_for('web.admin_listar_cupones') }}" class="btn-cancel">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Crear Cupón
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    mostrarToast('{{ message }}', '{{ category }}');
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        document.getElementById('codigo').addEventListener('focus', function() {
+            if (!this.value) {
+                this.value = generarCodigo();
+            }
+        });
+    });
+
+    function mostrarToast(mensaje, tipo = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast-message ${tipo}`;
+        let icon = 'check-circle';
+        if (tipo === 'error') icon = 'exclamation-circle';
+        if (tipo === 'warning') icon = 'exclamation-triangle';
+        toast.innerHTML = `<i class="fas fa-${icon}"></i> ${mensaje}`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.5s ease forwards';
+            setTimeout(() => {
+                toast.remove();
+            }, 500);
+        }, 3000);
+    }
+
+    function generarCodigo() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let codigo = '';
+        for (let i = 0; i < 8; i++) {
+            codigo += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return codigo;
+    }
+
+    function cambiarTipo() {
+        const tipo = document.getElementById('tipo').value;
+        const valorHelp = document.getElementById('valor_help');
+        const valorInput = document.getElementById('valor');
+        
+        if (tipo === 'porcentaje') {
+            valorHelp.textContent = 'Ej: 10 = 10% de descuento (máximo 100%)';
+            valorInput.max = 100;
+            valorInput.disabled = false;
+        } else if (tipo === 'monto_fijo') {
+            valorHelp.textContent = 'Ej: 50 = $50 de descuento';
+            valorInput.max = null;
+            valorInput.disabled = false;
+        } else {
+            valorHelp.textContent = 'El valor se ignora para envío gratis';
+            valorInput.value = 0;
+            valorInput.disabled = true;
+        }
+    }
+
+    document.querySelectorAll('.sidebar a').forEach(link => {
+        if (link.href === window.location.href) {
+            link.classList.add('active');
+        }
+    });
+</script>
+
+</body>
+</html>

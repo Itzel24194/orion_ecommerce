@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION | Servicios Exclusivos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pagina.css') }}">
+    <style>
+        .dropdown-submenu { position: relative; }
+        .dropdown-submenu > .dropdown-menu { top: 0; left: 100%; margin-top: -6px; }
+        .dropdown-submenu:hover > .dropdown-menu { display: block; }
+        /* Estilos específicos de servicios */
+        .premium-card { background: rgba(255, 255, 255, 0.9); border-radius: 30px; border: 1px solid rgba(225, 0, 152, 0.1); transition: 0.5s; }
+        .premium-card:hover { border-color: #e10098; transform: translateY(-10px); }
+        .badge-exclusive { background: #e10098; color: white; font-size: 0.7rem; padding: 5px 15px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .icon-wrapper { width: 90px; height: 90px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 25px; box-shadow: 0 15px 25px rgba(0,0,0,0.05); font-size: 2.5rem; color: #e10098; }
+        .trust-section { background: #fff; padding: 2rem; border-radius: 30px; border-left: 5px solid #e10098; }
+    </style>
+</head>
+<body>
+
+    <div class="top-utility-bar py-2 d-none d-lg-block border-bottom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-3">
+                <a href="#" class="text-decoration-none text-muted small"><i class="bi bi-geo-alt me-1"></i>Encuentra tu tienda</a>
+            </div>
+            <div class="d-flex gap-3"><a href="#" class="text-decoration-none text-muted small"><i class="bi bi-gift me-1"></i>Mesa de regalos</a></div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light main-navbar py-2 py-lg-3 sticky-top shadow-sm bg-white">
+        <div class="container">
+            <div class="d-flex w-100 justify-content-between align-items-center d-lg-none mb-2">
+                <button class="navbar-toggler border-0 ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#orionNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand brand-logo m-0 mx-auto" href="/">ORION</a>
+            </div>
+            <a class="navbar-brand brand-logo d-none d-lg-inline-block m-0 pe-4" href="/">ORION</a>
+            
+            <div class="collapse navbar-collapse" id="orionNavbar">
+                <div class="dropdown my-2 my-lg-0">
+                    <button class="btn btn-white fw-bold text-dark dropdown-toggle border-0" type="button" data-bs-toggle="dropdown">Categorías</button>
+                    <ul class="dropdown-menu shadow border-0 py-2">
+                        {% if categorias %}
+                            {% for cat in categorias if not cat.padre_id %}
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="/catalogo?categoria={{cat._id}}">
+                                        {{ cat.nombre }} <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                    <ul class="dropdown-menu shadow border-0">
+                                        {% for sub in categorias if sub.padre_id|string == cat._id|string %}
+                                            <li><a class="dropdown-item" href="/catalogo?categoria={{sub._id}}">{{ sub.nombre }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/catalogo">Ver Todo el Catálogo</a></li>
+                    </ul>
+                </div>
+
+                <form class="d-flex flex-grow-1 mx-lg-4 my-2 my-lg-0">
+                    <div class="input-group rounded-pill overflow-hidden bg-light" style="border: 1px solid #bbb;">
+                        <input class="form-control border-0 bg-light ps-4 py-2 shadow-none" type="search" placeholder="Buscar servicios...">
+                        <button class="btn btn-light border-0 text-muted px-3"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
+
+                <div class="d-flex align-items-center gap-3 ms-lg-auto">
+                    {% if session.get('nombre') %}
+                        <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                            {% if session.get('foto') %}<img src="{{ url_for('static', filename='uploads/' + session['foto']) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit: cover;">{% endif %}
+                            Hola, {{ session['nombre'] }}
+                        </a>
+                    {% else %}
+                        <a href="/login" class="text-dark fw-bold small text-uppercase text-decoration-none"><i class="bi bi-person fs-5 align-middle me-1"></i> Iniciar sesión</a>
+                    {% endif %}
+                    <a href="{{ url_for('web.ver_carrito') }}" class="text-dark"><i class="bi bi-bag fs-4"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="display-3 fw-bold">ORION <span style="color: #e10098;">Experience</span></h2>
+            <p class="text-muted">Servicios diseñados para quienes exigen más que una simple compra.</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="premium-card p-4 text-center">
+                    <span class="badge-exclusive">Disponible</span>
+                    <div class="icon-wrapper mt-3"><i class="bi bi-rocket-takeoff"></i></div>
+                    <h4 class="fw-bold mt-4">Click & Collect Pro</h4>
+                    <p class="text-muted small">Prioridad de preparación en tienda. Tu pedido listo en tiempo récord.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="premium-card p-4 text-center">
+                    <span class="badge-exclusive" style="background:#222;">Protección</span>
+                    <div class="icon-wrapper mt-3"><i class="bi bi-shield-lock"></i></div>
+                    <h4 class="fw-bold mt-4">Garantía Origen</h4>
+                    <p class="text-muted small">Sustitución inmediata por equipo nuevo. Cero reparaciones.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="premium-card p-4 text-center">
+                    <span class="badge-exclusive" style="background:#555;">Logística</span>
+                    <div class="icon-wrapper mt-3"><i class="bi bi-map"></i></div>
+                    <h4 class="fw-bold mt-4">Rastreo GPS Live</h4>
+                    <p class="text-muted small">Visualiza a tu repartidor en tiempo real con precisión milimétrica.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="trust-section shadow-sm mb-5">
+            <h5 class="fw-bold"><i class="bi bi-star-fill text-warning me-2"></i>¿Por qué somos diferentes?</h5>
+            <p class="text-muted">A diferencia de otras tiendas, en ORION tú controlas la logística. Si tu producto llega tarde, tu siguiente envío es totalmente gratis.</p>
+        </div>
+
+        <div class="p-5 text-white text-center shadow-lg rounded-5" style="background: radial-gradient(circle, #e10098, #940065);">
+            <h2 class="fw-bold">Conexión Humana</h2>
+            <p class="opacity-75">No usamos bots. Habla con un especialista técnico de ORION ahora mismo.</p>
+            <button class="btn btn-outline-light rounded-pill px-5 py-3 fw-bold mt-3">Iniciar Conversación</button>
+        </div>
+    </main>
+
+    <footer class="pt-5 pb-3 mt-5 bg-light border-top">
+        <div class="container text-center text-muted">
+            <p>© 2026 ORION System / Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

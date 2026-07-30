@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas de Promoción | ORION Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== ESTILOS BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 2px solid #e8e8e8;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            flex-shrink: 0;
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-top: 10px;
+        }
+        .sidebar .admin-profile .email {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #e10098;
+            text-align: center;
+            padding: 15px 0 5px;
+            letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #888;
+            padding: 10px 25px 5px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #dc3545;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .sidebar .logout-btn i { color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px;
+            padding: 30px 35px 20px;
+            width: 100%;
+            min-height: 100vh;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag {
+            background: #e10098;
+            color: #fff;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #e10098, #00d4ff);
+        }
+        .stat-card .num { font-size: 1.8rem; font-weight: 800; color: #1a1a2e; display: block; }
+        .stat-card .label { font-size: 0.75rem; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .icon { float: right; font-size: 1.5rem; opacity: 0.3; color: #e10098; }
+        .stat-card.primary .num { color: #e10098; }
+        .stat-card.success .num { color: #28a745; }
+        .stat-card.warning .num { color: #f9a825; }
+        .stat-card.info .num { color: #17a2b8; }
+
+        /* ===== TABLA MEJORADA ===== */
+        .table-container {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .table-container .table-header {
+            padding: 16px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .table-container .table-header h5 {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        .table-container .table-header h5 i { color: #e10098; }
+        .table-container .table-header .badge-count {
+            background: #e9ecef;
+            color: #495057;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .table-container table { margin-bottom: 0; width: 100%; border-collapse: collapse; }
+        .table-container thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #495057;
+            padding: 14px 16px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .table-container tbody td {
+            padding: 14px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f3f5;
+            font-size: 0.85rem;
+        }
+        .table-container tbody tr:last-child td { border-bottom: none; }
+        .table-container tbody tr:hover { background: #f8f9fa; }
+
+        .badge-status {
+            font-size: 0.65rem;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            display: inline-block;
+            letter-spacing: 0.3px;
+        }
+        .badge-status.pendiente { background: #fff3cd; color: #856404; }
+        .badge-status.pagado { background: #d4edda; color: #155724; }
+        .badge-status.enviado { background: #cce5ff; color: #004085; }
+        .badge-status.completado { background: #d1ecf1; color: #0c5460; }
+        .badge-status.cancelado { background: #f8d7da; color: #721c24; }
+
+        /* ===== BOTÓN VOLVER MEJORADO ===== */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            cursor: pointer;
+        }
+        .btn-back i {
+            font-size: 1rem;
+            transition: transform 0.2s ease;
+        }
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #ced4da;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        .btn-back:hover i {
+            transform: translateX(-4px);
+        }
+
+        /* ===== ALERTA DE DEPURACIÓN PROFESIONAL ===== */
+        .debug-alert {
+            background: #e3f2fd;
+            border-left: 4px solid #0d6efd;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(13,110,253,0.08);
+            color: #0a3b6e;
+        }
+        .debug-alert .debug-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .debug-alert .debug-content i {
+            font-size: 1.2rem;
+            color: #0d6efd;
+        }
+        .debug-alert .debug-close {
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 0 4px;
+        }
+        .debug-alert .debug-close:hover {
+            color: #dc3545;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        .empty-state i { font-size: 3rem; color: #ddd; margin-bottom: 10px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .table-container thead th,
+            .table-container tbody td { padding: 8px 10px; font-size: 0.7rem; }
+            .top-bar h1 { font-size: 1.2rem; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .debug-alert { flex-direction: column; align-items: stretch; text-align: center; }
+            .debug-alert .debug-close { align-self: flex-end; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+        <div class="logo">ORION<span>.</span></div>
+        <div class="menu-scroll">
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_empresas') }}"><i class="fas fa-building"></i> <span>Empresas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}" class="active"><i class="fas fa-gift"></i> <span>Promociones</span></a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}"><i class="fas fa-brain" style="color:#6f42c1;"></i> <span>Análisis Supervisado</span></a>
+            <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
+            <a href="{{ url_for('web.prediccion_ventas') }}"><i class="fas fa-chart-bar"></i> <span>Predicción Ventas</span></a>
+            <a href="{{ url_for('web.prediccion_abandono') }}"><i class="fas fa-exclamation-triangle"></i> <span>Predicción Abandono</span></a>
+            <a href="{{ url_for('web.deteccion_fraude') }}"><i class="fas fa-shield-alt"></i> <span>Detección Fraude</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
+            <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
+            <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin:0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main">
+
+        <!-- ===== ALERTA DE DEPURACIÓN MEJORADA ===== -->
+        <div class="debug-alert" id="debugAlert">
+            <div class="debug-content">
+                <i class="fas fa-chart-simple"></i>
+                <span> Depuración: <strong>{{ pedidos|length if pedidos else 0 }}</strong> pedidos encontrados con esta promoción.</span>
+            </div>
+            <button class="debug-close" onclick="document.getElementById('debugAlert').style.display='none'" aria-label="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background:transparent; padding:0; margin:0 0 20px 0;">
+                <li class="breadcrumb-item"><a href="{{ url_for('web.dashboard') }}" style="color:#e10098; text-decoration:none;">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('web.admin_listar_promociones') }}" style="color:#e10098; text-decoration:none;">Promociones</a></li>
+                <li class="breadcrumb-item active" style="color:#888;" aria-current="page">Estadísticas</li>
+            </ol>
+        </nav>
+
+        <header class="top-bar">
+            <h1><i class="fas fa-chart-bar"></i> Estadísticas: {{ promocion.nombre }}</h1>
+            <div class="tag"><i class="fas fa-gift"></i> {{ promocion.tipo }}</div>
+        </header>
+
+        <!-- ===== STATS CARDS ===== -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <i class="fas fa-ticket-alt icon"></i>
+                <span class="num">{{ estadisticas.usos_actuales|default(0) }}</span>
+                <span class="label">Usos Totales</span>
+            </div>
+            <div class="stat-card success">
+                <i class="fas fa-users icon"></i>
+                <span class="num">{{ estadisticas.total_usuarios|default(0) }}</span>
+                <span class="label">Usuarios Únicos</span>
+            </div>
+            <div class="stat-card info">
+                <i class="fas fa-percent icon"></i>
+                <span class="num">
+                    {% if promocion.uso_maximo %}
+                        {{ "%.1f"|format((estadisticas.usos_actuales|default(0) / promocion.uso_maximo) * 100) }}%
+                    {% else %}
+                        ∞
+                    {% endif %}
+                </span>
+                <span class="label">Capacidad Utilizada</span>
+            </div>
+            <div class="stat-card warning">
+                <i class="fas fa-clock icon"></i>
+                <span class="num">
+                    {% if promocion.fecha_fin %}
+                        {{ ((promocion.fecha_fin - datetime.utcnow()).days) }} días
+                    {% else %}
+                        ∞
+                    {% endif %}
+                </span>
+                <span class="label">Días Restantes</span>
+            </div>
+        </div>
+
+        <!-- ===== TABLA DE PEDIDOS MEJORADA ===== -->
+        <div class="table-container">
+            <div class="table-header">
+                <h5><i class="fas fa-shopping-cart"></i> Últimos pedidos con esta promoción</h5>
+                <span class="badge-count">{{ pedidos|length if pedidos else 0 }} registros</span>
+            </div>
+            {% if pedidos and pedidos|length > 0 %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pedido in pedidos %}
+                        <tr>
+                            <td><span class="fw-bold" style="color:#e10098;">#{{ pedido.numero_pedido }}</span></td>
+                            <td>{{ pedido.usuario_nombre }}</td>
+                            <td>{{ pedido.created_at.strftime('%d/%m/%Y') if pedido.created_at else 'N/A' }}</td>
+                            <td>${{ "%.2f"|format(pedido.total or 0) }}</td>
+                            <td>
+                                <span class="badge-status {{ pedido.estado|lower }}">
+                                    {{ pedido.estado|capitalize }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-shopping-cart"></i>
+                <p style="margin-top:10px;">No hay pedidos registrados con esta promoción.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ===== BOTÓN VOLVER MEJORADO ===== -->
+        <div style="margin-top: 25px;">
+            <a href="{{ url_for('web.admin_listar_promociones') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Volver a Promociones
+            </a>
+        </div>
+
+    </main>
+</div>
+
+<!-- ===== SCRIPT PARA CERRAR ALERTA (OPCIONAL) ===== -->
+<script>
+    // La alerta ya tiene un botón de cierre con onclick, no se necesita más.
+</script>
+
+</body>
+</html>

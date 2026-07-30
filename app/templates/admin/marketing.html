@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Marketing | Panel Administrativo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+        .card { border-radius: 10px; }
+        .btn-dark { background-color: #000; border: none; }
+        .nav-pills .nav-link.active { background-color: #000 !important; }
+        .table thead { background-color: #f1f1f1; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5" style="max-width: 1100px;">
+    <h2 class="fw-bold mb-4">Gestión de Promociones</h2>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white pt-4 border-0">
+            <ul class="nav nav-pills gap-2" role="tablist">
+                <li class="nav-item"><button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#banners">Banners</button></li>
+                <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#cupones">Cupones</button></li>
+            </ul>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="tab-content">
+                
+                <div class="tab-pane fade show active" id="banners">
+                    <form action="/admin/marketing/banners/agregar" method="POST" class="row g-2 mb-4 bg-light p-3 rounded">
+                        <div class="col-md-4"><input name="titulo" class="form-control" placeholder="Título del Banner" required></div>
+                        <div class="col-md-3"><input name="imagen_url" class="form-control" placeholder="URL Imagen" required></div>
+                        <div class="col-md-3">
+                            <select name="tipo_plantilla" class="form-select">
+                                <option value="full-width">Full Width (Grande)</option>
+                                <option value="grid-half">Doble Columna (2x1)</option>
+                                <option value="promo-banner">Promocional (Pequeño)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><button type="submit" class="btn btn-dark w-100">Publicar</button></div>
+                    </form>
+                    
+                    <table class="table align-middle">
+                        <thead><tr><th>Título</th><th>Plantilla</th><th>Acción</th></tr></thead>
+                        <tbody>
+                            {% for b in banners %}
+                            <tr>
+                                <td><strong>{{ b.titulo }}</strong><br><small class="text-muted">{{ b.imagen_url }}</small></td>
+                                <td><span class="badge bg-secondary">{{ b.tipo_plantilla }}</span></td>
+                                <td>
+                                    <form action="/admin/marketing/banners/eliminar/{{b._id}}" method="POST">
+                                        <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tab-pane fade" id="cupones">
+                    <form action="/admin/marketing/cupones/crear" method="POST" class="row g-2 mb-4 bg-light p-3 rounded">
+                        <div class="col-md-3"><input name="codigo" class="form-control" placeholder="Código (ej: ORION20)" required></div>
+                        <div class="col-md-2"><input name="descuento" type="number" class="form-control" placeholder="Desc %" required></div>
+                        <div class="col-md-2"><input name="fecha_inicio" type="date" class="form-control" title="Inicio" required></div>
+                        <div class="col-md-2"><input name="fecha_fin" type="date" class="form-control" title="Fin" required></div>
+                        <div class="col-md-1"><input name="limite_usos" type="number" class="form-control" placeholder="Usos"></div>
+                        <div class="col-md-2"><button type="submit" class="btn btn-dark w-100">Crear</button></div>
+                    </form>
+
+                    <table class="table align-middle">
+                        <thead><tr><th>Código</th><th>Desc</th><th>Vigencia</th><th>Usos</th><th>Acción</th></tr></thead>
+                        <tbody>
+                            {% for c in cupones %}
+                            <tr>
+                                <td><span class="badge bg-dark">{{ c.codigo }}</span></td>
+                                <td>{{ c.descuento }}%</td>
+                                <td><small>{{ c.fecha_inicio }} al {{ c.fecha_fin }}</small></td>
+                                <td><small>{{ c.usos_actuales }} / {{ c.limite_usos }}</small></td>
+                                <td>
+                                    <form action="/admin/marketing/cupones/eliminar/{{c._id}}" method="POST">
+                                        <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

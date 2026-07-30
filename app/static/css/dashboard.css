@@ -1,0 +1,204 @@
+*{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
+      background:#f4f4f4;
+      color:#222;
+    }
+
+    .layout{
+      display:flex;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      width:260px;
+      background:linear-gradient(180deg,#111,#2b0030);
+      color:white;
+      padding:30px 20px;
+      position:fixed;
+      height:100vh;
+      left:0;
+      top:0;
+    }
+
+    .logo{
+      font-size:38px;
+      font-weight:bold;
+      color:#e6007e;
+      margin-bottom:8px;
+    }
+
+    .panel-title{
+      font-size:14px;
+      color:#ddd;
+      margin-bottom:38px;
+      letter-spacing:1px;
+    }
+
+    .sidebar a{
+      display:block;
+      text-decoration:none;
+      color:#eee;
+      padding:15px 18px;
+      border-radius:16px;
+      margin-bottom:10px;
+      font-weight:bold;
+      transition:.25s;
+    }
+
+    .sidebar a:hover{
+      background:#e6007e;
+      color:white;
+      transform:translateX(6px);
+    }
+
+    .divider{
+      height:1px;
+      background:rgba(255,255,255,.2);
+      margin:28px 0;
+    }
+
+    .exit{
+      color:#ffc400 !important;
+    }
+
+    .main{
+      margin-left:260px;
+      width:calc(100% - 260px);
+      min-height:100vh;
+      background:#f4f4f4;
+    }
+
+    .top-bar{
+      background:white;
+      padding:25px 45px;
+      border-bottom:4px solid #e6007e;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.07);
+    }
+
+    .top-bar h1{
+      color:#111;
+      font-size:30px;
+    }
+
+    .tag{
+      background:#111;
+      color:white;
+      padding:11px 22px;
+      border-radius:30px;
+      font-weight:bold;
+    }
+
+    .hero{
+      background:linear-gradient(135deg,#111 0%,#2b0030 55%,#e6007e 100%);
+      color:white;
+      padding:58px 45px;
+    }
+
+    .hero h2{
+      font-size:48px;
+      margin-bottom:14px;
+    }
+
+    .hero p{
+      font-size:18px;
+      max-width:850px;
+      line-height:1.7;
+    }
+
+    .content{
+      padding:42px 45px;
+    }
+
+    .section-box{
+      background:white;
+      border-radius:28px;
+      padding:38px;
+      box-shadow:0 8px 24px rgba(0,0,0,.08);
+      border-left:9px solid #e6007e;
+    }
+
+    .section-box h2{
+      color:#e6007e;
+      margin-bottom:15px;
+      font-size:36px;
+    }
+
+    .section-box p{
+      color:#444;
+      line-height:1.7;
+      font-size:17px;
+    }
+
+    .crud-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:24px;
+      margin-top:30px;
+    }
+
+    .crud-item{
+      background:#fafafa;
+      border-radius:24px;
+      padding:30px;
+      border-top:7px solid #e6007e;
+      text-decoration:none;
+      transition:.25s;
+      box-shadow:0 6px 18px rgba(0,0,0,.07);
+      color:#222;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .crud-item::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg,rgba(230,0,126,.08),transparent);
+    }
+
+    .crud-item:hover{
+      transform:translateY(-8px) scale(1.02);
+      box-shadow:0 12px 28px rgba(0,0,0,.16);
+      border-top-color:#ffc400;
+    }
+
+    .crud-item h4{
+      margin-bottom:12px;
+      color:#e6007e;
+      font-size:25px;
+      position:relative;
+      z-index:2;
+    }
+
+    .crud-item p{
+      color:#555;
+      line-height:1.7;
+      font-size:16px;
+      position:relative;
+      z-index:2;
+    }
+
+    .crud-item:nth-child(2){ border-top-color:#ffc400; }
+    .crud-item:nth-child(3){ border-top-color:#00a6ff; }
+    .crud-item:nth-child(4){ border-top-color:#7b2cff; }
+    .crud-item:nth-child(5){ border-top-color:#ff4da6; }
+    .crud-item:nth-child(6){ border-top-color:#111; }
+    /* Estilo para el nuevo item de inteligencia */
+    .crud-item:nth-child(7){ border-top-color:#e6007e; }
+
+    @media(max-width:850px){
+      .layout{ flex-direction:column; }
+      .sidebar{ position:relative; width:100%; height:auto; }
+      .main{ margin-left:0; width:100%; }
+      .top-bar{ flex-direction:column; gap:15px; }
+      .hero h2{ font-size:38px; }
+    }

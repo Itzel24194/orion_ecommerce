@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Promociones | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-success: #28a745;
+            --orion-warning: #ffc107;
+            --orion-danger: #dc3545;
+            --orion-gray: #6c757d;
+            --orion-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            --orion-shadow-hover: 0 6px 24px rgba(225,0,152,0.12);
+            --orion-radius: 10px;
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: #f0f2f5;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content { flex: 1 0 auto; }
+
+        /* ===== TOP NAV ===== */
+        .top-nav {
+            font-size: 0.6rem;
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 4px 0;
+        }
+        .top-nav a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        .top-nav a:hover { color: var(--orion-primary); }
+
+        /* ===== NAVBAR ===== */
+        .navbar-main {
+            background: #fff;
+            border-bottom: 2px solid #f0f0f0;
+            padding: 8px 0;
+        }
+        .brand-logo {
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: var(--orion-primary) !important;
+            letter-spacing: -1px;
+            text-decoration: none;
+        }
+        .brand-logo:hover { color: var(--orion-primary-dark) !important; }
+
+        .search-bar {
+            border: 2px solid #e5e5e5 !important;
+            border-radius: 50px !important;
+            padding: 6px 16px !important;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .search-bar:focus {
+            border-color: var(--orion-primary) !important;
+            box-shadow: none !important;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--orion-primary);
+        }
+
+        .nav-icon {
+            color: #333;
+            font-size: 1.1rem;
+            text-decoration: none;
+            position: relative;
+        }
+        .nav-icon:hover { color: var(--orion-primary); }
+        .nav-icon .badge-cart {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--orion-primary);
+            color: #fff;
+            font-size: 0.5rem;
+            padding: 2px 5px;
+            border-radius: 50%;
+            font-weight: 700;
+        }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb-custom {
+            background: transparent;
+            padding: 12px 0 0 0;
+            margin-bottom: 0;
+        }
+        .breadcrumb-custom .breadcrumb-item a {
+            color: #777;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+        .breadcrumb-custom .breadcrumb-item a:hover { color: var(--orion-primary); }
+        .breadcrumb-custom .breadcrumb-item.active {
+            color: var(--orion-primary);
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+
+        /* ===== TÍTULO ===== */
+        .page-title {
+            font-weight: 900;
+            font-size: 1.3rem;
+            color: #222;
+            padding: 12px 0 0 0;
+        }
+        .page-title i { color: var(--orion-primary); }
+
+        /* ===== BADGE SEGMENTO ===== */
+        .segment-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f0f0f0;
+            color: #888;
+        }
+        .segment-badge.nuevo { background: #e3f2fd; color: #1565c0; }
+        .segment-badge.regular { background: #e8f5e9; color: #2e7d32; }
+        .segment-badge.vip { background: #fff8e1; color: #f9a825; border: 1px solid #f9a825; }
+        .segment-badge.inactivo { background: #ffebee; color: #c62828; border: 1px solid #c62828; }
+        .segment-badge.todos { background: #f0f0f0; color: #888; }
+
+        /* ===== SECCIÓN TÍTULOS ===== */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 30px 0 16px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+        .section-title i { color: var(--orion-primary); font-size: 1.2rem; }
+        .section-title .badge-count {
+            background: var(--orion-primary);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 30px;
+            margin-left: 6px;
+        }
+
+        /* ===== GRID ===== */
+        .promo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* ===== TARJETA ===== */
+        .promo-card {
+            background: #fff;
+            border-radius: var(--orion-radius);
+            border: 1px solid #eaecf0;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: var(--orion-shadow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .promo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--orion-primary), #f06292);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .promo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--orion-shadow-hover);
+            border-color: var(--orion-primary);
+        }
+        .promo-card:hover::before { opacity: 1; }
+
+        .promo-card .card-body {
+            padding: 18px 20px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .promo-card .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            align-self: flex-start;
+            margin-bottom: 8px;
+        }
+        .badge-active { background: #e8f5e9; color: #2e7d32; }
+        .badge-used { background: #fce4ec; color: #c62828; }
+        .badge-promo { background: #f3e5f5; color: #6a1b9a; }
+
+        .promo-card h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        .promo-card .desc {
+            color: #666;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            flex: 1;
+        }
+        .promo-card .descuento {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--orion-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .promo-card .descuento i { font-size: 1.2rem; color: var(--orion-warning); }
+
+        .promo-card .condiciones {
+            font-size: 0.7rem;
+            color: #888;
+            border-top: 1px solid #f0f2f5;
+            padding-top: 10px;
+            margin-top: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 12px;
+        }
+        .promo-card .condiciones i { color: var(--orion-primary); width: 16px; }
+
+        .promo-card .card-footer {
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn-aplicar {
+            background: var(--orion-primary);
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-aplicar:hover {
+            background: var(--orion-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(225,0,152,0.25);
+        }
+        .btn-aplicar:active { transform: scale(0.96); }
+        .btn-aplicar i { font-size: 0.8rem; }
+
+        .btn-disabled {
+            background: #e9ecef;
+            color: #999;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .btn-disabled:hover {
+            background: #e9ecef;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .minimo-alerta {
+            font-size: 0.65rem;
+            color: var(--orion-danger);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .minimo-alerta i { font-size: 0.7rem; }
+
+        .sin-promos {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            background: #fff;
+            border-radius: var(--orion-radius);
+            border: 2px dashed #e8ecf0;
+            margin-top: 10px;
+        }
+        .sin-promos i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .sin-promos p {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #555;
+        }
+        .sin-promos .sub {
+            color: #aaa;
+            font-size: 0.85rem;
+            font-weight: 400;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        .container {
+            max-width: 80% !important;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1600px;
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                max-width: 100% !important;
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .promo-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .promo-card .card-body { padding: 14px 16px 16px; }
+            .promo-card .descuento { font-size: 1.2rem; }
+            .promo-card h3 { font-size: 0.9rem; }
+            .page-title { font-size: 1.1rem; }
+            .btn-aplicar { font-size: 0.7rem; padding: 5px 14px; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .promo-card {
+            animation: fadeIn 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOP NAV ===== -->
+    <div class="top-nav">
+        <div class="container">
+            <div class="d-flex justify-content-end">
+                <a href="#"><i class="bi bi-geo-alt me-1"></i> Tiendas</a>
+                <a href="#"><i class="bi bi-question-circle me-1"></i> Ayuda</a>
+                <a href="#"><i class="bi bi-person me-1"></i> Mi cuenta</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar-main">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between">
+                <a class="brand-logo" href="/">ORION</a>
+
+                <form class="d-flex flex-grow-1 mx-3" action="{{ url_for('web.catalogo') }}" method="GET">
+                    <div class="input-group">
+                        <input class="form-control search-bar" type="search" name="q" placeholder="Buscar productos...">
+                    </div>
+                </form>
+
+                <div class="d-flex align-items-center gap-2">
+                    {% if session.get('nombre') %}
+                        <a href="/perfil" class="nav-icon d-flex align-items-center gap-1 text-decoration-none">
+                            {% if session.get('foto') %}
+                                <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}?t={{ range(1, 10000) | random }}" class="user-avatar" alt="Perfil">
+                            {% else %}
+                                <i class="bi bi-person-circle fs-5"></i>
+                            {% endif %}
+                            <span class="small fw-bold text-dark" style="font-size:0.7rem;">{{ session['nombre'] }}</span>
+                        </a>
+                    {% else %}
+                        <a href="/login" class="nav-icon">
+                            <i class="bi bi-person-circle fs-5"></i>
+                            <span class="small fw-bold" style="font-size:0.7rem;">Login</span>
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('web.ver_carrito') }}" class="nav-icon">
+                        <i class="bi bi-bag fs-5"></i>
+                        {% if carrito_items|length > 0 %}
+                            <span class="badge-cart">{{ carrito_items|length }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <div class="main-content">
+        <div class="container">
+
+            <!-- ===== BREADCRUMB ===== -->
+            <nav aria-label="breadcrumb" class="breadcrumb-custom">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Mis Promociones</li>
+                </ol>
+            </nav>
+
+            <!-- ===== TÍTULO ===== -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h1 class="page-title">
+                    <i class="bi bi-gift me-2"></i>Mis Promociones
+                </h1>
+                <div>
+                    <span class="segment-badge {{ segmento|lower if segmento else 'todos' }}">
+                        <i class="bi bi-tag me-1"></i> {{ segmento|capitalize if segmento else 'Todos' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- ===== PROMOCIONES DESTACADAS ===== -->
+            {% if destacadas %}
+            <div class="section-title">
+                <i class="bi bi-star-fill" style="color:#f9a825;"></i> Promociones destacadas
+                <span class="badge-count">{{ destacadas|length }}</span>
+            </div>
+            <div class="promo-grid">
+                {% for promo in destacadas %}
+                <div class="promo-card">
+                    <div class="card-body">
+                        <span class="badge badge-promo"><i class="bi bi-star-fill me-1"></i> Destacada</span>
+                        <h3>{{ promo.nombre }}</h3>
+                        <div class="desc">{{ promo.descripcion }}</div>
+                        <div class="descuento">
+                            {% if promo.tipo == 'descuento_directo' or promo.tipo == 'pago' %}
+                                {% if promo.descuento_tipo == 'porcentaje' %}{{ promo.descuento_valor }}% OFF{% else %}${{ "%.0f"|format(promo.descuento_valor) }} OFF{% endif %}
+                            {% elif promo.tipo == 'cantidad' %}
+                                {{ promo.cantidad_requerida }}x{{ promo.cantidad_gratis }}
+                            {% elif promo.tipo == 'combo' %}
+                                Combo {{ promo.combo_descuento }}% OFF
+                            {% elif promo.tipo == 'envio_gratis' %}
+                                <i class="bi bi-truck"></i> Envío gratis
+                            {% endif %}
+                        </div>
+                        <div class="condiciones">
+                            <span><i class="bi bi-info-circle"></i> 
+                                {% if promo.monto_minimo > 0 %}Mínimo ${{ "%.0f"|format(promo.monto_minimo) }} | {% endif %}
+                                {% if promo.fecha_fin %}Válido hasta {{ promo.fecha_fin.strftime('%d/%m/%Y') }}{% endif %}
+                            </span>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn-aplicar" onclick="aplicarPromocion('{{ promo._id }}')">
+                                <i class="bi bi-check-circle"></i> Aplicar promoción
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- ===== PROMOCIONES DISPONIBLES ===== -->
+            {% if disponibles %}
+            <div class="section-title">
+                <i class="bi bi-ticket-perforated"></i> Promociones disponibles para ti
+                <span class="badge-count">{{ disponibles|length - usadas_ids|length }}</span>
+            </div>
+            <div class="promo-grid">
+                {% for promo in disponibles %}
+                    {% if promo._id not in usadas_ids %}
+                    <div class="promo-card">
+                        <div class="card-body">
+                            {% if promo.codigo %}
+                                <span class="badge badge-active"><i class="bi bi-tag"></i> Código: {{ promo.codigo }}</span>
+                            {% else %}
+                                <span class="badge badge-active">Disponible</span>
+                            {% endif %}
+                            <h3>{{ promo.nombre }}</h3>
+                            <div class="desc">{{ promo.descripcion }}</div>
+                            <div class="descuento">
+                                {% if promo.tipo == 'descuento_directo' or promo.tipo == 'pago' %}
+                                    {% if promo.descuento_tipo == 'porcentaje' %}{{ promo.descuento_valor }}% OFF{% else %}${{ "%.0f"|format(promo.descuento_valor) }} OFF{% endif %}
+                                {% elif promo.tipo == 'cantidad' %}
+                                    {{ promo.cantidad_requerida }}x{{ promo.cantidad_gratis }}
+                                {% elif promo.tipo == 'combo' %}
+                                    Combo {{ promo.combo_descuento }}% OFF
+                                {% elif promo.tipo == 'envio_gratis' %}
+                                    <i class="bi bi-truck"></i> Envío gratis
+                                {% endif %}
+                            </div>
+                            <div class="condiciones">
+                                <span><i class="bi bi-info-circle"></i> 
+                                    {% if promo.monto_minimo > 0 %}Mínimo ${{ "%.0f"|format(promo.monto_minimo) }} | {% endif %}
+                                    {% if promo.fecha_fin %}Válido hasta {{ promo.fecha_fin.strftime('%d/%m/%Y') }}{% endif %}
+                                </span>
+                                {% if promo.monto_minimo > 0 %}
+                                <span><i class="bi bi-cart"></i> Tu carrito: ${{ "%.2f"|format(monto_carrito) }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                {% if promo.cumple_minimo %}
+                                    <button class="btn-aplicar" onclick="aplicarPromocion('{{ promo._id }}')">
+                                        <i class="bi bi-check-circle"></i> Aplicar promoción
+                                    </button>
+                                {% else %}
+                                    <button class="btn-aplicar btn-disabled" disabled>
+                                        <i class="bi bi-lock"></i> Agrega más al carrito
+                                    </button>
+                                    <div class="minimo-alerta">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        Faltan ${{ "%.2f"|format(promo.monto_minimo - monto_carrito) }} para aplicar
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+                {% if not destacadas %}
+                <div class="sin-promos">
+                    <i class="bi bi-gift"></i>
+                    <p>No hay promociones disponibles en este momento</p>
+                    <span class="sub">Vuelve pronto para descubrir nuevas ofertas.</span>
+                    <div style="margin-top: 8px; font-size: 0.75rem; color: #999;">
+                        <i class="bi bi-info-circle"></i> Tu segmento actual: <strong>{{ segmento|capitalize if segmento else 'Todos' }}</strong>
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- ===== FOOTER FIJO ===== -->
+    <footer class="bg-dark text-white py-3 mt-3">
+        <div class="container text-center">
+            <p class="mb-0" style="font-size:0.75rem;">© 2026 ORION System - Todos los derechos reservados</p>
+            <p class="mb-0 small text-secondary" style="font-size:0.65rem;">
+                <i class="bi bi-geo-alt"></i> México |
+                <i class="bi bi-envelope"></i> contacto@orion.com |
+                <i class="bi bi-telephone"></i> 55 1234 5678
+            </p>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function aplicarPromocion(promocionId) {
+            fetch("{{ url_for('web.aplicar_promocion') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ promocion_id: promocionId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    window.location.href = "{{ url_for('web.ver_carrito') }}";
+                } else {
+                    alert('❌ ' + data.message);
+                }
+            })
+            .catch(err => alert('Error al aplicar promoción'));
+        }
+
+        console.log('Segmento del usuario:', '{{ segmento }}');
+        console.log('Monto carrito:', '{{ monto_carrito }}');
+    </script>
+
+</body>
+</html>

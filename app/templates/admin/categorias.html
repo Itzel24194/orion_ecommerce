@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ORION Admin - Gestión de Categorías</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .table-container { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .badge-nivel { font-size: 0.75rem; font-weight: 600; }
+        /* Estilos para el menú desplegable dinámico */
+        .dropdown-submenu { position: relative; }
+        .dropdown-submenu .dropdown-menu { top: 0; left: 100%; margin-top: -6px; }
+        .dropdown-submenu:hover > .dropdown-menu { display: block; }
+    </style>
+</head>
+<body class="bg-light p-4">
+    <div class="container">
+        <h2 class="mb-4 text-primary fw-bold">Gestión de Categorías 3/3</h2>
+
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <span id="form-header">Nueva Categoría</span>
+                <button type="button" id="btn-cancelar" class="btn btn-sm btn-light d-none" onclick="resetForm()">Cancelar</button>
+            </div>
+            <div class="card-body">
+                <form id="cat-form" action="{{ url_for('web.agregar_categoria') }}" method="POST" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="small fw-bold">Nombre</label>
+                        <input name="nombre" id="nombre" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold">Categoría Padre</label>
+                        <select name="padre_id" id="padre_id" class="form-select">
+                            <option value="">-- Es Raíz (Nivel 1) --</option>
+                            {% for c in categorias %}
+                                {% if c.nivel < 3 %}
+                                    <option value="{{ c._id }}" class="cat-option">{{ c.nombre }} (Nv. {{c.nivel}})</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold">Imagen (URL)</label>
+                        <input name="imagen" id="imagen" class="form-control">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="small fw-bold">Activo</label>
+                        <div class="form-check form-switch pt-1">
+                            <input class="form-check-input" type="checkbox" name="activo" id="activo" checked>
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100" id="btn-save">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr><th>Img</th><th>Nombre</th><th>Nivel (3/3)</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                    {% for c in categorias %}
+                    <tr>
+                        <td><img src="{{ c.imagen or 'https://via.placeholder.com/40' }}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;"></td>
+                        <td><span class="fw-bold">{{ c.nombre }}</span></td>
+                        <td>
+                            <span class="badge {{ 'bg-dark' if c.nivel == 1 else 'bg-primary' if c.nivel == 2 else 'bg-info text-dark' }} badge-nivel">
+                                NIVEL {{ c.nivel }}
+                            </span>
+                            <small class="text-muted d-block">{{ c.padre_nombre }}</small>
+                        </td>
+                        <td>
+                            <span class="badge {{ 'bg-success' if c.activo else 'bg-secondary' }}">{{ 'Activo' if c.activo else 'Inactivo' }}</span>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-warning btn-editar"
+                                    data-id="{{ c._id }}" data-nombre="{{ c.nombre }}" 
+                                    data-padre="{{ c.padre_id or '' }}" data-imagen="{{ c.imagen }}" 
+                                    data-activo="{{ c.activo }}">Editar</button>
+                            
+                            <form action="{{ url_for('web.borrar_categoria', id=c._id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Borrar categoría?')">Borrar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function resetForm() {
+            document.getElementById('cat-form').action = "{{ url_for('web.agregar_categoria') }}";
+            document.getElementById('cat-form').reset();
+            document.getElementById('form-header').innerText = 'Nueva Categoría';
+            document.getElementById('btn-save').innerText = 'Guardar';
+            document.getElementById('btn-cancelar').classList.add('d-none');
+        }
+
+        document.querySelectorAll('.btn-editar').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                document.getElementById('cat-form').action = "/admin/categorias/editar/" + id;
+                document.getElementById('nombre').value = this.dataset.nombre;
+                document.getElementById('padre_id').value = this.dataset.padre;
+                document.getElementById('imagen').value = this.dataset.imagen;
+                document.getElementById('activo').checked = (this.dataset.activo === 'True');
+                document.getElementById('form-header').innerText = 'Editando: ' + this.dataset.nombre;
+                document.getElementById('btn-save').innerText = 'Actualizar';
+                document.getElementById('btn-cancelar').classList.remove('d-none');
+                window.scrollTo(0, 0);
+            });
+        });
+    </script>
+</body>
+</html>

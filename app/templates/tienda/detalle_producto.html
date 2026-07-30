@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ producto.nombre }} | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --orion-primary: #e10098; --orion-primary-dark: #c00080; --orion-ink: #1a1a1a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; color: #2b2b2b; }
+
+        @media (min-width: 1400px) {
+            .container { max-width: 2000px; }
+        }
+
+        .main-navbar { background: #fff; border-bottom: 2px solid #f0f0f0; padding: 10px 0 !important; }
+        .brand-logo { font-weight: 900; font-size: 2.3rem; color: var(--orion-primary) !important; letter-spacing: -1.5px; text-decoration: none; }
+
+        .breadcrumb-orion { margin-bottom: 1.25rem; }
+        .breadcrumb-orion .breadcrumb { background: transparent; padding: 0; margin: 0; }
+        .breadcrumb-orion a { color: #777; text-decoration: none; font-weight: 600; }
+        .breadcrumb-orion a:hover { color: var(--orion-primary); text-decoration: underline; }
+        .breadcrumb-orion .breadcrumb-item.active { color: #999; }
+        .breadcrumb-orion .breadcrumb-item + .breadcrumb-item::before { color: #ccc; }
+
+        .marca-link { 
+            display: inline-block; 
+            font-weight: 800; 
+            font-size: 0.95rem; 
+            letter-spacing: 0.5px; 
+            color: var(--orion-primary); 
+            text-decoration: none; 
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .marca-link:hover { 
+            text-decoration: underline; 
+            color: var(--orion-primary-dark);
+        }
+
+        .zoom-wrapper { position: relative; width: 100%; height: 500px; border-radius: 12px; overflow: hidden; background: #fafafa; }
+        .main-img { width: 100%; height: 100%; object-fit: contain; cursor: crosshair; }
+        .img-zoom-lens { position: absolute; width: 200px; height: 200px; background-repeat: no-repeat; border: 2px solid #ddd; display: none; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 1000; pointer-events: none; }
+
+        .color-input { display: none; }
+        .color-swatch-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .color-swatch { width: 38px; height: 38px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #ccc; transition: box-shadow 0.2s, transform 0.2s; display: block; background: #e9e9e9; }
+        .color-input:checked + .color-swatch-wrap .color-swatch { box-shadow: 0 0 0 3px var(--orion-primary); transform: scale(1.12); }
+        .color-swatch-label-text { font-size: 0.72rem; color: #555; }
+
+        .talla-input { display: none; }
+        .talla-label { border: 2px solid #ddd; padding: 8px 18px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-weight: 600; background: #fff; display: inline-block; font-size: 0.92rem; min-width: 52px; text-align: center; }
+        .talla-input:checked + .talla-label { border-color: var(--orion-primary); background: var(--orion-primary); color: #fff; box-shadow: 0 4px 10px rgba(225,0,152,0.3); }
+        .talla-label.sin-stock { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; border-color: #ddd; background: #f5f5f5; }
+        .talla-label.sin-stock:hover { border-color: #ddd; background: #f5f5f5; }
+
+        .variant-group-header { font-size: 0.92rem; color: #222; margin-bottom: 10px; font-weight: 700; }
+        .variant-group-header span { font-weight: 400; color: #555; margin-left: 4px; }
+
+        .qty-control { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; width: fit-content; }
+        .qty-btn { width: 40px; height: 40px; border: none; background: #f8f8f8; font-size: 1.2rem; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .qty-btn:hover { background: #eee; }
+        .qty-input { width: 50px; height: 40px; border: none; border-left: 1px solid #ddd; border-right: 1px solid #ddd; text-align: center; font-weight: 700; font-size: 1rem; }
+
+        .btn-buy { background-color: var(--orion-primary); color: #fff; border: none; padding: 15px; font-weight: 800; border-radius: 50px; transition: 0.3s; }
+        .btn-buy:hover { background-color: var(--orion-primary-dark); color: #fff; transform: scale(1.02); }
+        .btn-favorito { width: 54px; height: 54px; border-radius: 50%; border: 2px solid #eee; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #999; flex-shrink: 0; transition: 0.2s; }
+        .btn-favorito:hover { border-color: var(--orion-primary); color: var(--orion-primary); }
+        .btn-favorito.activo { border-color: var(--orion-primary); color: var(--orion-primary); background: rgba(225,0,152,0.06); }
+
+        .star-gold { color: #ffc107; }
+        .product-price-box { background: linear-gradient(135deg, #fdf2f8 0%, #fef6fb 100%); border: 1px solid #fce4f1; }
+        .badge-stock { font-size: 0.78rem; font-weight: 700; padding: 5px 12px; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px; }
+        .badge-stock.disponible { background: #e8f5e9; color: #2e7d32; }
+        .badge-stock.agotado { background: #fdecea; color: #c0392b; }
+        .login-modal-icon { width: 70px; height: 70px; background: rgba(225,0,152,0.08); color: var(--orion-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px; }
+
+        .shipping-info-row { display: flex; flex-wrap: wrap; gap: 14px; margin: 18px 0; padding: 14px 16px; background: #fafafa; border-radius: 12px; }
+        .shipping-info-row > div { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: #555; }
+        .shipping-info-row i { color: var(--orion-primary); font-size: 1.05rem; }
+
+        .descripcion-tabs .nav-link { color: #777; font-weight: 700; border: none; border-bottom: 3px solid transparent; padding: 12px 4px; margin-right: 28px; background: transparent; }
+        .descripcion-tabs .nav-link.active { color: var(--orion-ink); border-bottom-color: var(--orion-primary); background: transparent; }
+        .tabla-detalles th { width: 160px; color: #777; font-weight: 600; font-size: 0.88rem; border: none; padding: 8px 0; }
+        .tabla-detalles td { font-weight: 600; font-size: 0.88rem; border: none; padding: 8px 0; }
+
+        .carousel-track-wrap { position: relative; }
+        .carousel-track { display: flex; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; scrollbar-width: none; }
+        .carousel-track::-webkit-scrollbar { display: none; }
+        .carousel-arrow { position: absolute; top: 40%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 50%; border: 1px solid #eee; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; z-index: 5; cursor: pointer; color: #555; }
+        .carousel-arrow:hover { color: var(--orion-primary); border-color: var(--orion-primary); }
+        .carousel-arrow-left { left: -14px; }
+        .carousel-arrow-right { right: -14px; }
+
+        .prod-card { flex: 0 0 200px; scroll-snap-align: start; text-decoration: none; color: inherit; display: block; border: 1px solid #f0f0f0; border-radius: 14px; overflow: hidden; transition: 0.2s; background: #fff; }
+        .prod-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.08); transform: translateY(-2px); }
+        .prod-card-img-wrap { width: 100%; height: 200px; background: #fafafa; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .prod-card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .prod-card-noimg { color: #ccc; font-size: 1.8rem; }
+        .prod-card-body { padding: 12px 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+        .prod-card-marca { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.4px; color: var(--orion-primary); }
+        .prod-card-nombre { font-size: 0.85rem; font-weight: 600; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .prod-card-precio { font-size: 0.95rem; font-weight: 800; color: var(--orion-ink); margin-top: 4px; }
+
+        .resena-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--orion-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+        .resena-card { border-bottom: 1px solid #eee; padding: 24px 0; }
+        .resena-card:last-child { border-bottom: none; }
+        .resena-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+        .resena-user-block { display: flex; align-items: center; gap: 10px; }
+        .resena-usuario { font-weight: 700; font-size: 0.95rem; color: #222; }
+        .resena-fecha { color: #999; font-size: 0.85rem; }
+        .badge-verificado { background: #e8f5e9; color: #2e7d32; font-weight: 700; font-size: 0.72rem; padding: 4px 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; }
+        .resena-titulo { font-weight: 700; margin: 8px 0 4px; font-size: 1.05rem; }
+        .resena-comentario { color: #555; line-height: 1.5; }
+        .resena-fotos { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .resena-foto-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid #eee; transition: 0.2s; }
+        .resena-foto-thumb:hover { opacity: 0.85; transform: scale(1.03); }
+        .resena-acciones { display: flex; align-items: center; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+        .btn-util { border: 1px solid #ddd; background: #fff; border-radius: 50px; padding: 5px 14px; font-size: 0.85rem; color: #555; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-util:hover, .btn-util.voted { border-color: var(--orion-primary); color: var(--orion-primary); background: rgba(225,0,152,0.06); }
+        .link-accion { color: #777; font-size: 0.85rem; text-decoration: none; font-weight: 600; cursor: pointer; }
+        .link-accion:hover { color: var(--orion-primary); text-decoration: underline; }
+        .link-accion.danger:hover { color: #dc3545; }
+        .resena-edit-form { display: none; margin-top: 12px; background: #f8f9fa; padding: 16px; border-radius: 10px; }
+        .summary-bars .bar-row { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; margin-bottom: 4px; }
+        .summary-bars .progress { height: 8px; flex-grow: 1; border-radius: 50px; }
+        .summary-bars .progress-bar { background-color: #ffc107; }
+        .thumb-container { position: relative; display: inline-block; }
+        .thumb-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; }
+        .remove-btn { position: absolute; top: -6px; right: -6px; background: #333; color: #fff; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .upload-btn-custom { border: 2px dashed #ccc; border-radius: 8px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: #555; background: #fafafa; }
+
+        #modalOpinion .modal-content { border-radius: 16px; border: none; }
+        #modalOpinion .modal-header-custom { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #eee; }
+        #modalOpinion .modal-header-custom h5 { font-weight: 800; margin: 0; }
+        #modalOpinion .btn-close-custom { background: none; border: none; font-size: 1.4rem; color: #999; cursor: pointer; }
+        #modalOpinion .modal-product-row { display: flex; gap: 16px; align-items: flex-start; padding: 20px 24px 0; }
+        #modalOpinion .modal-product-img-lg { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid #eee; flex-shrink: 0; }
+        #modalOpinion .modal-body-custom { padding: 20px 24px; }
+        #modalOpinion .rating-label { font-weight: 700; font-size: 0.95rem; margin-bottom: 10px; display: block; }
+        #modalOpinion #star-rating i { font-size: 1.9rem; transition: 0.15s; }
+        #modalOpinion .form-control { border-radius: 10px; border: 1px solid #ddd; padding: 12px 14px; font-size: 0.95rem; }
+        #modalOpinion .form-control:focus { border-color: var(--orion-primary); box-shadow: 0 0 0 3px rgba(225,0,152,0.1); }
+        #modalOpinion .btn-enviar-opinion { background: var(--orion-primary); color: #fff; border: none; font-weight: 800; border-radius: 50px; padding: 14px; width: 100%; transition: 0.3s; font-size: 1rem; }
+        #modalOpinion .btn-enviar-opinion:hover { background: var(--orion-primary-dark); }
+
+        .precio-display { font-size: 2rem; font-weight: 900; color: var(--orion-primary); }
+
+        .marca-section {
+            border-left: 4px solid var(--orion-primary);
+            padding-left: 20px;
+            margin-top: 30px;
+        }
+        .marca-section h3 {
+            color: var(--orion-primary);
+        }
+
+        @media (max-width: 767px) {
+            .zoom-wrapper { height: 360px; }
+            .prod-card { flex: 0 0 160px; }
+            .prod-card-img-wrap { height: 160px; }
+        }
+    </style>
+</head>
+<body class="bg-light"
+    data-logueado="{{ '1' if session.get('user_id') else '0' }}"
+    data-carrito-url="{{ url_for('web.agregar_al_carrito') }}"
+    data-carrito-redir="{{ url_for('web.ver_carrito') }}"
+    data-util-url="{{ url_for('web.marcar_util') }}"
+    data-reporte-url="{{ url_for('web.reportar_opinion') }}"
+    data-producto-id="{{ producto._id }}"
+    data-session-userid="{{ session.get('user_id', '') }}">
+
+{# ─── USAR 'variantes_para_template' que viene del controlador ─── #}
+{% set variantes_data = producto.variantes_para_template or [] %}
+
+{# ============================================================== #}
+{# 🔥 OBTENER MARCA (EMPRESA) - USANDO EMPRESA_NOMBRE DEL PRODUCTO #}
+{# ============================================================== #}
+{% set marca_nombre = producto.empresa_nombre or 'Marca no especificada' %}
+
+{# ============================================================== #}
+{# 🔥 FUNCIONES AUXILIARES #}
+{# ============================================================== #}
+
+{# FUNCIÓN PARA EXTRAER COLOR #}
+{% macro get_color(v) %}
+    {% if v.color and v.color|trim != '' %}
+        {{ v.color | trim }}
+    {% elif v.nombre_attr and 'Color' in v.nombre_attr %}
+        {% set parts = v.nombre_attr.split(':') %}
+        {% if parts|length > 1 %}
+            {{ parts[1] | trim }}
+        {% else %}
+            {{ v.nombre_attr | replace('Color:', '') | replace('Color', '') | trim }}
+        {% endif %}
+    {% else %}
+        ''
+    {% endif %}
+{% endmacro %}
+
+{# FUNCIÓN PARA EXTRAER TALLA #}
+{% macro get_tamano(v) %}
+    {% if v.tamano and v.tamano|trim != '' %}
+        {{ v.tamano | trim }}
+    {% elif v.valor_attr %}
+        {% set cleaned = v.valor_attr | replace('Talla', '') | replace('talla', '') | replace('\t', '') | replace(':', '') | trim %}
+        {% if cleaned != '' %}
+            {{ cleaned }}
+        {% else %}
+            ''
+        {% endif %}
+    {% else %}
+        ''
+    {% endif %}
+{% endmacro %}
+
+{# ============================================================== #}
+{# 🔥 TARJETA DE PRODUCTO - CORREGIDA #}
+{# ============================================================== #}
+{% macro tarjeta_producto(p) %}
+    {% set p_precio = (p.variantes[0].precio if p.variantes else (p.precio or 0)) %}
+    {% set p_marca = p.empresa_nombre or '' %}
+    <a href="{{ url_for('web.ver_detalle_producto', id=p._id) }}" class="prod-card">
+        <div class="prod-card-img-wrap">
+            {% if p.fotos and p.fotos|length > 0 %}
+                <img src="{{ url_for('static', filename='uploads/productos/' + p.fotos[0]) }}" alt="{{ p.nombre }}" loading="lazy">
+            {% else %}
+                <div class="prod-card-noimg"><i class="bi bi-image"></i></div>
+            {% endif %}
+        </div>
+        <div class="prod-card-body">
+            {% if p_marca and p_marca != '' %}<span class="prod-card-marca">{{ p_marca | upper }}</span>{% endif %}
+            <span class="prod-card-nombre">{{ p.nombre }}</span>
+            <span class="prod-card-precio">${{ "%.2f"|format(p_precio) }}</span>
+        </div>
+    </a>
+{% endmacro %}
+
+{# ============================================================== #}
+{# 🔥 CONSTRUIR LISTA DE VARIANTES PARA JS #}
+{# ============================================================== #}
+{% set variantes_json = [] %}
+{% for v in variantes_data %}
+    {% set color_val = get_color(v) %}
+    {% set tamano_val = get_tamano(v) %}
+    {% set _ = variantes_json.append({
+        'color': color_val,
+        'tamano': tamano_val,
+        'precio': v.precio | default(0),
+        'stock': v.stock | default(0),
+        'sku': v.sku | default('')
+    }) %}
+{% endfor %}
+
+{# ============================================================== #}
+{# 🔥 LISTAS ÚNICAS DE COLORES Y TALLAS #}
+{# ============================================================== #}
+{% set colores_vistos = [] %}
+{% set tamanos_vistos = [] %}
+{% for v in variantes_data %}
+    {% set c = get_color(v) %}
+    {% set t = get_tamano(v) %}
+    {% if c and c not in colores_vistos %}{% set _ = colores_vistos.append(c) %}{% endif %}
+    {% if t and t not in tamanos_vistos %}{% set _ = tamanos_vistos.append(t) %}{% endif %}
+{% endfor %}
+
+{# ============================================================== #}
+{# 🔥 NAVBAR #}
+{# ============================================================== #}
+<nav class="navbar navbar-light main-navbar shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand brand-logo" href="/">ORION</a>
+        <form class="d-flex flex-grow-1 mx-4" action="{{ url_for('web.catalogo') }}" method="GET">
+            <div class="input-group rounded-pill overflow-hidden bg-light" style="border:2px solid #eee;">
+                <input class="form-control border-0 bg-light ps-4" type="search" name="q" placeholder="Buscar productos...">
+                <button class="btn btn-light border-0 text-muted px-3" type="submit"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+        <div class="d-flex align-items-center gap-3">
+            {% if session.get('nombre') %}
+                <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                    {% if session.get('foto') %}
+                        <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;">
+                    {% endif %}
+                    Hola, {{ session['nombre'] }}
+                </a>
+            {% else %}
+                <a href="/login" class="text-dark fw-bold small text-uppercase text-decoration-none"><i class="bi bi-person fs-5 me-1"></i> Iniciar sesión</a>
+            {% endif %}
+            <a href="{{ url_for('web.ver_carrito') }}" class="text-dark"><i class="bi bi-bag fs-4"></i></a>
+        </div>
+    </div>
+</nav>
+
+{# ============================================================== #}
+{# 🔥 CONTENIDO PRINCIPAL #}
+{# ============================================================== #}
+<main class="container py-5">
+
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb" class="breadcrumb-orion">
+        <ol class="breadcrumb mb-0 small">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            {% if marca_nombre and marca_nombre != 'Marca no especificada' %}
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('web.catalogo', empresa=producto.empresa_id) }}">{{ marca_nombre }}</a>
+                </li>
+            {% endif %}
+            {% if producto.genero %}
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('web.catalogo', empresa=producto.empresa_id, genero=producto.genero) }}">{{ producto.genero }}</a>
+                </li>
+            {% endif %}
+            {% if producto.categoria %}
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('web.catalogo', empresa=producto.empresa_id, categoria=producto.categoria) }}">{{ producto.categoria }}</a>
+                </li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ producto.nombre }}</li>
+        </ol>
+    </nav>
+
+    <div class="row bg-white p-5 rounded-4 shadow-sm mb-5">
+
+        <!-- GALERÍA -->
+        <div class="col-md-6">
+            <div class="zoom-wrapper" id="zoomWrapper">
+                <img src="{{ url_for('static', filename='uploads/productos/' + producto.fotos[0]) }}" class="main-img" id="mainImage">
+                <div id="lens" class="img-zoom-lens"></div>
+            </div>
+            <div class="d-flex gap-2 mt-3 flex-wrap">
+                {% for foto in producto.fotos %}
+                    <img src="{{ url_for('static', filename='uploads/productos/' + foto) }}"
+                         style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid #eee;cursor:pointer;"
+                         onclick="document.getElementById('mainImage').src=this.src">
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- INFO PRODUCTO -->
+        <div class="col-md-6 ps-md-5">
+            {# MOSTRAR LA MARCA (EMPRESA) CON ENLACE A PRODUCTOS DE LA MISMA MARCA #}
+            {% if marca_nombre and marca_nombre != 'Marca no especificada' %}
+                <a href="{{ url_for('web.catalogo', empresa=producto.empresa_id) }}" class="marca-link" id="marcaLink">
+                    <i class="bi bi-tag"></i> {{ marca_nombre | upper }}
+                    <i class="bi bi-chevron-right small"></i>
+                </a>
+            {% endif %}
+            <h1 class="fw-bold display-6">{{ producto.nombre }}</h1>
+
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <div id="starsHeader" style="cursor:pointer;">
+                    {% if producto.opiniones and producto.opiniones|length > 0 %}
+                        {% set total_h = namespace(val=0) %}
+                        {% for op in producto.opiniones %}{% set total_h.val = total_h.val + op.calificacion %}{% endfor %}
+                        {% set avg_h = total_h.val / producto.opiniones|length %}
+                        {% for i in range(1, 6) %}
+                            <i class="bi {{ 'bi-star-fill star-gold' if i <= avg_h|round(0,'floor') else 'bi-star text-secondary' }}"></i>
+                        {% endfor %}
+                    {% else %}
+                        {% for i in range(1, 6) %}<i class="bi bi-star text-secondary"></i>{% endfor %}
+                    {% endif %}
+                </div>
+                {% if producto.opiniones and producto.opiniones|length > 0 %}
+                    {% set total_h = namespace(val=0) %}
+                    {% for op in producto.opiniones %}{% set total_h.val = total_h.val + op.calificacion %}{% endfor %}
+                    {% set avg_h = total_h.val / producto.opiniones|length %}
+                    <a href="#opiniones" class="text-muted text-decoration-none small">{{ "%.1f"|format(avg_h) }} · {{ producto.opiniones|length }} opiniones</a>
+                {% else %}
+                    <a href="#opiniones" class="text-muted text-decoration-none small">Sin opiniones — ¡sé el primero!</a>
+                {% endif %}
+            </div>
+
+            <!-- PRECIO -->
+            <div class="p-3 product-price-box rounded-3 mb-4">
+                <span class="text-muted small text-uppercase fw-bold d-block mb-1">Precio</span>
+                <div id="precioDisplay" class="precio-display">${{ "%.2f"|format(variantes_json[0].precio if variantes_json else producto.precio or 0) }}</div>
+                <div id="stockBadge" class="mt-2"></div>
+            </div>
+
+            <!-- COLOR -->
+            {% if colores_vistos and colores_vistos|length > 0 %}
+            <div class="mb-4">
+                <div class="variant-group-header">Color: <span id="labelColor">—</span></div>
+                <div class="d-flex flex-wrap gap-3 align-items-center">
+                    {% for color in colores_vistos %}
+                        <label title="{{ color }}" class="color-swatch-wrap" style="cursor:pointer;">
+                            <input type="radio" name="sel_color" class="color-input" value="{{ color }}">
+                            <span class="color-swatch-wrap">
+                                <span class="color-swatch" data-color="{{ color }}"></span>
+                                <span class="color-swatch-label-text">{{ color }}</span>
+                            </span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- TAMAÑO -->
+            {% if tamanos_vistos and tamanos_vistos|length > 0 %}
+            <div class="mb-4">
+                <div class="variant-group-header">Tamaño: <span id="labelTalla">—</span></div>
+                <div class="d-flex flex-wrap gap-2 align-items-center" id="tallasContainer">
+                    {% for talla in tamanos_vistos %}
+                        <label>
+                            <input type="radio" name="sel_talla" class="talla-input" value="{{ talla }}">
+                            <div class="talla-label" data-talla="{{ talla }}">{{ talla }}</div>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- CANTIDAD -->
+            <div class="mb-4">
+                <label class="fw-bold d-block mb-2">Cantidad:</label>
+                <div class="qty-control">
+                    <button type="button" class="qty-btn" id="btnMenos">−</button>
+                    <input type="number" id="cantidad" class="qty-input" value="1" min="1" max="99">
+                    <button type="button" class="qty-btn" id="btnMas">+</button>
+                </div>
+            </div>
+
+            <div id="atributoWarning" class="alert alert-warning py-2 px-3 small d-none" role="alert">
+                <i class="bi bi-exclamation-triangle me-1"></i> Por favor selecciona color y talla antes de continuar.
+            </div>
+
+            <div class="d-flex gap-2 mb-3">
+                <button class="btn btn-buy w-100" id="btnCarrito">AGREGAR A LA BOLSA</button>
+                <button type="button" class="btn-favorito" id="btnFavorito" title="Agregar a favoritos">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+
+            <div class="shipping-info-row">
+                <div><i class="bi bi-truck"></i> Envío a domicilio</div>
+                <div><i class="bi bi-arrow-return-left"></i> Devolución gratis 30 días</div>
+                <div><i class="bi bi-shield-check"></i> Pago 100% seguro</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DESCRIPCIÓN ESTILO LIVERPOOL (tabs) -->
+    <div class="bg-white p-5 rounded-4 shadow-sm mb-5">
+        <ul class="nav descripcion-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-descripcion" type="button" role="tab">Descripción</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-detalles" type="button" role="tab">Detalles del producto</button>
+            </li>
+        </ul>
+        <div class="tab-content pt-4">
+            <div class="tab-pane fade show active" id="tab-descripcion" role="tabpanel">
+                <p class="text-secondary fs-6 mb-0">{{ producto.descripcion or 'Sin descripción disponible.' }}</p>
+            </div>
+            <div class="tab-pane fade" id="tab-detalles" role="tabpanel">
+                <table class="table tabla-detalles mb-0">
+                    <tbody>
+                        {% if producto.categoria %}<tr><th>Categoría</th><td>{{ producto.categoria }}</td></tr>{% endif %}
+                        {% if producto.genero %}<tr><th>Género</th><td>{{ producto.genero }}</td></tr>{% endif %}
+                        {% if variantes_json and variantes_json|length > 0 %}<tr><th>SKU</th><td>{{ variantes_json[0].sku }}</td></tr>{% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCTOS DE LA MISMA MARCA (EMPRESA) -->
+    {% if productos_de_marca and productos_de_marca|length > 0 and marca_nombre != 'Marca no especificada' %}
+    <div class="bg-white p-5 rounded-4 shadow-sm mb-5 marca-section">
+        <h3 class="fw-bold mb-4">
+            <i class="bi bi-tag"></i> 
+            Más productos de <span style="color:var(--orion-primary);">{{ marca_nombre }}</span>
+        </h3>
+        <div class="carousel-track-wrap">
+            <button type="button" class="carousel-arrow carousel-arrow-left" data-target="track-marca"><i class="bi bi-chevron-left"></i></button>
+            <div class="carousel-track" id="track-marca">
+                {% for p in productos_de_marca %}
+                    {{ tarjeta_producto(p) }}
+                {% endfor %}
+            </div>
+            <button type="button" class="carousel-arrow carousel-arrow-right" data-target="track-marca"><i class="bi bi-chevron-right"></i></button>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{{ url_for('web.catalogo', empresa=producto.empresa_id) }}" class="btn btn-outline-primary rounded-pill">
+                Ver todos los productos de {{ marca_nombre }} <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ARTÍCULOS RELACIONADOS -->
+    {% if productos_relacionados and productos_relacionados|length > 0 %}
+    <div class="bg-white p-5 rounded-4 shadow-sm mb-5">
+        <h3 class="fw-bold mb-4">Artículos relacionados</h3>
+        <div class="carousel-track-wrap">
+            <button type="button" class="carousel-arrow carousel-arrow-left" data-target="track-relacionados"><i class="bi bi-chevron-left"></i></button>
+            <div class="carousel-track" id="track-relacionados">
+                {% for p in productos_relacionados %}{{ tarjeta_producto(p) }}{% endfor %}
+            </div>
+            <button type="button" class="carousel-arrow carousel-arrow-right" data-target="track-relacionados"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- COMPLEMENTA CON -->
+    {% if productos_complementa and productos_complementa|length > 0 %}
+    <div class="bg-white p-5 rounded-4 shadow-sm mb-5">
+        <h3 class="fw-bold mb-4">Complementa con</h3>
+        <div class="carousel-track-wrap">
+            <button type="button" class="carousel-arrow carousel-arrow-left" data-target="track-complementa"><i class="bi bi-chevron-left"></i></button>
+            <div class="carousel-track" id="track-complementa">
+                {% for p in productos_complementa %}{{ tarjeta_producto(p) }}{% endfor %}
+            </div>
+            <button type="button" class="carousel-arrow carousel-arrow-right" data-target="track-complementa"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- OPINIONES -->
+    <div class="bg-white p-5 rounded-4 shadow-sm mb-5" id="opiniones">
+        <h3 class="fw-bold mb-4">Opiniones de clientes</h3>
+
+        {% if producto.opiniones and producto.opiniones|length > 0 %}
+            {% set total = namespace(val=0) %}
+            {% set conteo = namespace(c5=0,c4=0,c3=0,c2=0,c1=0) %}
+            {% for op in producto.opiniones %}
+                {% set total.val = total.val + op.calificacion %}
+                {% if op.calificacion == 5 %}{% set conteo.c5 = conteo.c5+1 %}
+                {% elif op.calificacion == 4 %}{% set conteo.c4 = conteo.c4+1 %}
+                {% elif op.calificacion == 3 %}{% set conteo.c3 = conteo.c3+1 %}
+                {% elif op.calificacion == 2 %}{% set conteo.c2 = conteo.c2+1 %}
+                {% else %}{% set conteo.c1 = conteo.c1+1 %}{% endif %}
+            {% endfor %}
+            {% set avg = total.val / producto.opiniones|length %}
+            {% set tot_count = producto.opiniones|length %}
+
+            <div class="row mb-5 align-items-center">
+                <div class="col-md-3 text-center border-end">
+                    <span class="display-4 fw-bold">{{ "%.1f"|format(avg) }}</span>
+                    <div>{% for i in range(1,6) %}<i class="bi {{ 'bi-star-fill star-gold' if i <= avg|round(0,'floor') else 'bi-star' }} fs-5"></i>{% endfor %}</div>
+                    <div class="text-muted small mt-1">{{ tot_count }} valoraciones</div>
+                </div>
+                <div class="col-md-9 summary-bars mt-3 mt-md-0">
+                    {% for estrella, cant in {5:conteo.c5, 4:conteo.c4, 3:conteo.c3, 2:conteo.c2, 1:conteo.c1}.items() %}
+                        <div class="bar-row">
+                            <span style="width:50px;">{{ estrella }} <i class="bi bi-star-fill star-gold"></i></span>
+                            <div class="progress"><div class="progress-bar" data-pct="{{ (cant/tot_count*100)|round(1) }}"></div></div>
+                            <span class="text-muted" style="width:30px;">{{ cant }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% for op in producto.opiniones %}
+                <div class="resena-card" id="resena-{{ op._id }}">
+                    <div class="resena-header">
+                        <div class="resena-user-block">
+                            <div class="resena-avatar">{{ (op.usuario_nombre or 'O')[0]|upper }}</div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="resena-usuario">{{ op.usuario_nombre or 'Usuario ORION' }}</span>
+                                    {% if op.compra_verificada %}
+                                        <span class="badge-verificado"><i class="bi bi-check-circle-fill"></i> Compra verificada</span>
+                                    {% endif %}
+                                </div>
+                                <div class="resena-fecha mt-1">{{ op.fecha }}</div>
+                            </div>
+                        </div>
+                        <div>{% for i in range(1,6) %}<i class="bi {{ 'bi-star-fill star-gold' if i <= op.calificacion else 'bi-star' }}"></i>{% endfor %}</div>
+                    </div>
+                    <div class="resena-titulo" style="margin-left:46px;">{{ op.titulo }}</div>
+                    <p class="resena-comentario mb-2" style="margin-left:46px;">{{ op.comentario }}</p>
+                    {% if op.foto_path and op.foto_path|length > 0 %}
+                        <div class="resena-fotos" style="margin-left:46px;">
+                            {% for foto in op.foto_path %}
+                                <img src="{{ url_for('static', filename='uploads/resenas/'+foto) }}"
+                                     class="resena-foto-thumb"
+                                     data-bs-toggle="modal" data-bs-target="#modalFotoAmpliada"
+                                     data-foto="{{ url_for('static', filename='uploads/resenas/'+foto) }}">
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="resena-acciones" style="margin-left:46px;">
+                        <button class="btn-util {% if op.votos_utiles and session.get('user_id') in op.votos_utiles %}voted{% endif %}"
+                                data-opinion="{{ op._id }}">
+                            <i class="bi bi-hand-thumbs-up"></i> ¿Te fue útil?
+                            <span class="contador-util">({{ op.votos_utiles|length if op.votos_utiles else 0 }})</span>
+                        </button>
+                        <span class="link-accion btn-reportar" data-opinion="{{ op._id }}"><i class="bi bi-flag"></i> Marcar como inapropiado</span>
+                        {% if session.get('user_id') == op.usuario_id %}
+                            <span class="link-accion" data-editar="{{ op._id }}"><i class="bi bi-pencil"></i> Editar</span>
+                            <span class="link-accion danger" data-eliminar="{{ op._id }}" data-producto="{{ producto._id }}"><i class="bi bi-trash"></i> Eliminar</span>
+                        {% endif %}
+                    </div>
+                    {% if session.get('user_id') == op.usuario_id %}
+                        <form class="resena-edit-form" id="edit-form-{{ op._id }}"
+                              action="{{ url_for('web.editar_opinion') }}" method="POST" enctype="multipart/form-data"
+                              style="margin-left:46px;">
+                            <input type="hidden" name="opinion_id" value="{{ op._id }}">
+                            <input type="hidden" name="producto_id" value="{{ producto._id }}">
+                            <div class="d-flex mb-2">
+                                {% for i in range(1,6) %}
+                                    <i class="bi {{ 'bi-star-fill' if i <= op.calificacion else 'bi-star' }} fs-4 text-warning star-edit"
+                                       data-value="{{ i }}" data-target="calificacion-edit-{{ op._id }}" style="cursor:pointer"></i>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="calificacion" id="calificacion-edit-{{ op._id }}" value="{{ op.calificacion }}">
+                            <input type="text" name="titulo" class="form-control mb-2" value="{{ op.titulo }}" required>
+                            <textarea name="comentario" class="form-control mb-2" required>{{ op.comentario }}</textarea>
+                            {% if op.foto_path and op.foto_path|length > 0 %}
+                                <label class="small fw-bold d-block mb-2">Fotos actuales (marca para eliminar):</label>
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    {% for foto in op.foto_path %}
+                                        <label class="thumb-container" style="cursor:pointer;">
+                                            <img src="{{ url_for('static', filename='uploads/resenas/'+foto) }}" class="thumb-preview">
+                                            <input type="checkbox" name="eliminar_foto" value="{{ foto }}" class="position-absolute top-0 start-0 m-1">
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <label class="upload-btn-custom mb-2">
+                                <i class="bi bi-camera"></i> Agregar más fotos
+                                <input type="file" name="fotos" class="d-none" accept="image/*" multiple>
+                            </label>
+                            <div class="d-flex gap-2 mt-2">
+                                <button type="submit" class="btn btn-dark btn-sm">Guardar cambios</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-cancelar="{{ op._id }}">Cancelar</button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">Aún no hay opiniones. ¡Sé el primero en compartir tu experiencia!</div>
+        {% endif %}
+    </div>
+
+    <!-- LOS MÁS VENDIDOS -->
+    {% if productos_mas_vendidos and productos_mas_vendidos|length > 0 %}
+    <div class="bg-white p-5 rounded-4 shadow-sm mb-5">
+        <h3 class="fw-bold mb-4">Los más vendidos</h3>
+        <div class="carousel-track-wrap">
+            <button type="button" class="carousel-arrow carousel-arrow-left" data-target="track-vendidos"><i class="bi bi-chevron-left"></i></button>
+            <div class="carousel-track" id="track-vendidos">
+                {% for p in productos_mas_vendidos %}{{ tarjeta_producto(p) }}{% endfor %}
+            </div>
+            <button type="button" class="carousel-arrow carousel-arrow-right" data-target="track-vendidos"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- VISTOS RECIENTEMENTE (localStorage) -->
+    <div class="bg-white p-5 rounded-4 shadow-sm mb-5 d-none" id="seccion-recientes">
+        <h3 class="fw-bold mb-4">Vistos recientemente</h3>
+        <div class="carousel-track-wrap">
+            <button type="button" class="carousel-arrow carousel-arrow-left" data-target="track-recientes"><i class="bi bi-chevron-left"></i></button>
+            <div class="carousel-track" id="track-recientes"></div>
+            <button type="button" class="carousel-arrow carousel-arrow-right" data-target="track-recientes"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+</main>
+
+<!-- Datos de variantes en JSON -->
+<script id="variantes-data" type="application/json">{{ variantes_json | tojson }}</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    var body = document.body;
+    var logueado = body.dataset.logueado === '1';
+    var carritoUrl = body.dataset.carritoUrl;
+    var carritoRedir = body.dataset.carritoRedir;
+    var utilUrl = body.dataset.utilUrl;
+    var reporteUrl = body.dataset.reporteUrl;
+    var productoId = body.dataset.productoId;
+
+    // ── Variantes desde JSON ──
+    var VARIANTES = [];
+    try {
+        var dataElement = document.getElementById('variantes-data');
+        if (dataElement && dataElement.textContent) {
+            VARIANTES = JSON.parse(dataElement.textContent);
+        }
+    } catch(e) {
+        console.error('Error parsing variants:', e);
+    }
+
+    // ── RESOLUCIÓN DE COLORES ──
+    function pintarSwatches() {
+        document.querySelectorAll('.color-swatch[data-color]').forEach(function(el) {
+            var color = el.getAttribute('data-color');
+            var testEl = document.createElement('div');
+            testEl.style.color = '';
+            testEl.style.color = color;
+            var esValido = testEl.style.color !== '';
+            if (esValido) {
+                el.style.background = color;
+            } else {
+                var lowerColor = color.toLowerCase();
+                var coloresBasicos = {
+                    'negro': '#1a1a1a', 'blanco': '#ffffff', 'gris': '#9ca3af', 'gris claro': '#d1d5db',
+                    'azul': '#2563eb', 'azul claro': '#7dd3fc', 'azul marino': '#1e3a5f', 'azul cielo': '#7dd3fc',
+                    'rojo': '#dc2626', 'vino': '#7f1d3a', 'verde': '#16a34a', 'verde claro': '#86efac',
+                    'amarillo': '#facc15', 'naranja': '#f97316', 'rosa': '#ec4899', 'rosa claro': '#f9a8d4',
+                    'morado': '#9333ea', 'lila': '#c4b5fd', 'cafe': '#6b4423', 'marron': '#6b4423',
+                    'dorado': '#d4af37', 'plateado': '#c0c0c0', 'turquesa': '#06b6d4', 'coral': '#ff7f50',
+                    'beige': '#e8dcc8', 'crema': '#fffdd0', 'hueso': '#f5f0e6', 'khaki': '#c3b091'
+                };
+                if (coloresBasicos[lowerColor]) {
+                    el.style.background = coloresBasicos[lowerColor];
+                } else {
+                    for (var key in coloresBasicos) {
+                        if (lowerColor.indexOf(key) !== -1) {
+                            el.style.background = coloresBasicos[key];
+                            return;
+                        }
+                    }
+                    el.style.background = 'repeating-linear-gradient(45deg, #e9e9e9, #e9e9e9 4px, #f8f8f8 4px, #f8f8f8 8px)';
+                }
+            }
+        });
+    }
+    pintarSwatches();
+
+    console.log('✅ Variantes cargadas:', VARIANTES);
+
+    if (VARIANTES.length === 0) {
+        var precioDisplayVacio = document.getElementById('precioDisplay');
+        if (precioDisplayVacio) precioDisplayVacio.textContent = 'Sin variantes configuradas';
+        return;
+    }
+
+    // ── Modales ──
+    var modalOpinionEl = document.getElementById('modalOpinion');
+    var modalLoginEl = document.getElementById('modalLoginRequerido');
+    var modalEliminarEl = document.getElementById('modalConfirmarEliminar');
+    var modalOpinion = modalOpinionEl ? new bootstrap.Modal(modalOpinionEl) : null;
+    var modalLogin = modalLoginEl ? new bootstrap.Modal(modalLoginEl) : null;
+    var modalEliminar = modalEliminarEl ? new bootstrap.Modal(modalEliminarEl) : null;
+
+    function abrirModalOpinion() {
+        if (logueado) { if (modalOpinion) modalOpinion.show(); }
+        else { if (modalLogin) modalLogin.show(); }
+    }
+    var starsHeaderEl = document.getElementById('starsHeader');
+    var btnOpinionEl = document.getElementById('btnOpinion');
+    if (starsHeaderEl) starsHeaderEl.addEventListener('click', abrirModalOpinion);
+    if (btnOpinionEl) btnOpinionEl.addEventListener('click', abrirModalOpinion);
+
+    // ── Favorito ──
+    var btnFavorito = document.getElementById('btnFavorito');
+    if (btnFavorito) {
+        btnFavorito.addEventListener('click', function() {
+            if (!logueado) { if (modalLogin) modalLogin.show(); return; }
+            btnFavorito.classList.toggle('activo');
+            var icono = btnFavorito.querySelector('i');
+            icono.className = btnFavorito.classList.contains('activo') ? 'bi bi-heart-fill' : 'bi bi-heart';
+        });
+    }
+
+    // ── Barras de progreso ──
+    document.querySelectorAll('.progress-bar[data-pct]').forEach(function(b){
+        b.style.width = b.getAttribute('data-pct') + '%';
+    });
+
+    // ── Zoom ──
+    var zImg = document.getElementById('mainImage');
+    var lens = document.getElementById('lens');
+    var wrapper = document.getElementById('zoomWrapper');
+    if (wrapper && zImg && lens) {
+        wrapper.addEventListener('mousemove', function(e){
+            lens.style.display = 'block';
+            var rect = zImg.getBoundingClientRect();
+            var x = e.clientX - rect.left, y = e.clientY - rect.top;
+            lens.style.left = (x - 100) + 'px';
+            lens.style.top = (y - 100) + 'px';
+            lens.style.backgroundImage = "url('" + zImg.src + "')";
+            lens.style.backgroundSize = (zImg.width * 2) + 'px ' + (zImg.height * 2) + 'px';
+            lens.style.backgroundPosition = '-' + (x*2 - 100) + 'px -' + (y*2 - 100) + 'px';
+        });
+        wrapper.addEventListener('mouseleave', function(){ lens.style.display = 'none'; });
+    }
+
+    // ── Selección color / talla ──
+    var colorInputs = document.querySelectorAll('input[name="sel_color"]');
+    var tallaInputs = document.querySelectorAll('input[name="sel_talla"]');
+    var labelColor = document.getElementById('labelColor');
+    var labelTalla = document.getElementById('labelTalla');
+    var precioDisplay = document.getElementById('precioDisplay');
+    var stockBadge = document.getElementById('stockBadge');
+
+    function colorSel() {
+        var r = document.querySelector('input[name="sel_color"]:checked');
+        return r ? r.value : null;
+    }
+
+    function tallaSel() {
+        var r = document.querySelector('input[name="sel_talla"]:checked');
+        return r ? r.value : null;
+    }
+
+    function buscarVariante(color, talla) {
+        return VARIANTES.find(function(v){ 
+            return v.color === color && v.tamano === talla; 
+        }) || null;
+    }
+
+    function obtenerStock(color, talla) {
+        var v = buscarVariante(color, talla);
+        return v ? v.stock : 0;
+    }
+
+    function actualizarUI() {
+        var color = colorSel();
+        var talla = tallaSel();
+
+        if (labelColor) labelColor.textContent = color || '—';
+        if (labelTalla) labelTalla.textContent = talla || '—';
+
+        if (color) {
+            tallaInputs.forEach(function(inp){
+                var lbl = inp.nextElementSibling;
+                if (!lbl) return;
+                var stock = obtenerStock(color, inp.value);
+                lbl.classList.remove('sin-stock');
+                if (stock === 0) {
+                    lbl.classList.add('sin-stock');
+                }
+                inp.disabled = false;
+            });
+        } else {
+            tallaInputs.forEach(function(inp){
+                var lbl = inp.nextElementSibling;
+                if (!lbl) return;
+                lbl.classList.add('sin-stock');
+                inp.disabled = true;
+                inp.checked = false;
+            });
+            if (labelTalla) labelTalla.textContent = '—';
+        }
+
+        if (color && talla) {
+            var v = buscarVariante(color, talla);
+            if (v) {
+                precioDisplay.textContent = '$' + parseFloat(v.precio).toFixed(2);
+                if (v.stock > 0) {
+                    stockBadge.innerHTML = '<span class="badge-stock disponible"><i class="bi bi-check-circle-fill"></i> En stock (' + v.stock + ' disponibles)</span>';
+                } else {
+                    stockBadge.innerHTML = '<span class="badge-stock agotado"><i class="bi bi-x-circle-fill"></i> Agotado</span>';
+                }
+            } else {
+                precioDisplay.textContent = '$' + parseFloat(VARIANTES[0].precio || 0).toFixed(2);
+                stockBadge.innerHTML = '<span class="badge-stock agotado"><i class="bi bi-x-circle-fill"></i> Combinación no disponible</span>';
+            }
+        } else if (color && !talla) {
+            var primerPrecio = VARIANTES.find(function(v){ return v.color === color; });
+            if (primerPrecio) {
+                precioDisplay.textContent = '$' + parseFloat(primerPrecio.precio).toFixed(2);
+            }
+            stockBadge.innerHTML = '';
+        } else {
+            precioDisplay.textContent = '$' + parseFloat(VARIANTES[0].precio || 0).toFixed(2);
+            stockBadge.innerHTML = '';
+        }
+    }
+
+    colorInputs.forEach(function(inp){ 
+        inp.addEventListener('change', function(){
+            tallaInputs.forEach(function(t){ t.checked = false; });
+            actualizarUI();
+        }); 
+    });
+    tallaInputs.forEach(function(inp){ 
+        inp.addEventListener('change', function(){
+            var color = colorSel();
+            if (color) {
+                var stock = obtenerStock(color, inp.value);
+                if (stock === 0) {
+                    inp.checked = false;
+                    alert('Esta combinación no tiene stock disponible');
+                    actualizarUI();
+                    return;
+                }
+            }
+            actualizarUI();
+        }); 
+    });
+
+    function autoSeleccionarPrimeraDisponible() {
+        if (document.querySelector('input[name="sel_color"]:checked')) return;
+        var primeraConStock = VARIANTES.find(function(v){ return v.stock > 0; }) || VARIANTES[0];
+        if (!primeraConStock) return;
+
+        if (primeraConStock.color) {
+            var inputColor = document.querySelector('input[name="sel_color"][value="' + CSS.escape(primeraConStock.color) + '"]');
+            if (inputColor) {
+                inputColor.checked = true;
+                inputColor.dispatchEvent(new Event('change'));
+            }
+        }
+        if (primeraConStock.tamano) {
+            setTimeout(function(){
+                var inputTalla = document.querySelector('input[name="sel_talla"][value="' + CSS.escape(primeraConStock.tamano) + '"]');
+                if (inputTalla && !inputTalla.disabled) {
+                    var lbl = inputTalla.nextElementSibling;
+                    if (!lbl || !lbl.classList.contains('sin-stock')) {
+                        inputTalla.checked = true;
+                        inputTalla.dispatchEvent(new Event('change'));
+                    }
+                }
+            }, 0);
+        }
+    }
+
+    actualizarUI();
+    autoSeleccionarPrimeraDisponible();
+
+    // ── Cantidad ──
+    document.getElementById('btnMenos').addEventListener('click', function(){
+        var inp = document.getElementById('cantidad');
+        inp.value = Math.max(1, parseInt(inp.value || 1) - 1);
+    });
+    document.getElementById('btnMas').addEventListener('click', function(){
+        var inp = document.getElementById('cantidad');
+        inp.value = Math.min(99, parseInt(inp.value || 1) + 1);
+    });
+
+    // ── Agregar al carrito ──
+    document.getElementById('btnCarrito').addEventListener('click', function(){
+        var color = colorSel();
+        var talla = tallaSel();
+        var warning = document.getElementById('atributoWarning');
+        
+        if (VARIANTES.length > 0 && (!color || !talla)) {
+            warning.classList.remove('d-none');
+            return;
+        }
+        warning.classList.add('d-none');
+
+        var stock = obtenerStock(color, talla);
+        if (stock === 0) {
+            alert('Lo sentimos, esta combinación no tiene stock disponible');
+            return;
+        }
+        
+        var cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+        if (cantidad > stock) {
+            alert('Solo hay ' + stock + ' unidades disponibles');
+            return;
+        }
+
+        var atributos = {};
+        if (color) atributos['color'] = color;
+        if (talla) atributos['tamano'] = talla;
+
+        fetch(carritoUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                producto_id: productoId, 
+                cantidad: cantidad, 
+                atributos: atributos 
+            })
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            if (data.success) {
+                window.location.href = carritoRedir;
+            } else {
+                alert('Error: ' + (data.message || 'No se pudo agregar'));
+            }
+        })
+        .catch(function(err){
+            console.error('Error:', err);
+            alert('Error al agregar al carrito');
+        });
+    });
+
+    // ── Estrellas opinión ──
+    var stars = document.querySelectorAll('#star-rating i');
+    stars.forEach(function(s){
+        s.addEventListener('click', function(){
+            var val = parseInt(s.getAttribute('data-value'));
+            document.getElementById('calificacion-input').value = val;
+            stars.forEach(function(st, i){
+                st.className = i < val ? 'bi bi-star-fill text-warning' : 'bi bi-star text-warning';
+            });
+        });
+    });
+
+    // ── Estrellas edición ──
+    document.querySelectorAll('.star-edit').forEach(function(s){
+        s.addEventListener('click', function(){
+            var val = parseInt(s.getAttribute('data-value'));
+            document.getElementById(s.getAttribute('data-target')).value = val;
+            s.parentElement.querySelectorAll('.star-edit').forEach(function(st, i){
+                st.className = i < val ? 'bi bi-star-fill fs-4 text-warning star-edit' : 'bi bi-star fs-4 text-warning star-edit';
+            });
+        });
+    });
+
+    // ── Editar / Cancelar reseña ──
+    document.querySelectorAll('[data-editar]').forEach(function(el){
+        el.addEventListener('click', function(){
+            var f = document.getElementById('edit-form-' + el.getAttribute('data-editar'));
+            if (f) {
+                f.style.display = f.style.display === 'block' ? 'none' : 'block';
+            }
+        });
+    });
+    document.querySelectorAll('[data-cancelar]').forEach(function(el){
+        el.addEventListener('click', function(){
+            var f = document.getElementById('edit-form-' + el.getAttribute('data-cancelar'));
+            if (f) f.style.display = 'none';
+        });
+    });
+
+    // ── Eliminar reseña ──
+    document.querySelectorAll('[data-eliminar]').forEach(function(el){
+        el.addEventListener('click', function(){
+            document.getElementById('eliminarOpinionId').value = el.getAttribute('data-eliminar');
+            document.getElementById('eliminarProductoId').value = el.getAttribute('data-producto');
+            if (modalEliminar) modalEliminar.show();
+        });
+    });
+
+    // ── Útil ──
+    document.querySelectorAll('.btn-util[data-opinion]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            if (!logueado){ if (modalLogin) modalLogin.show(); return; }
+            var opinionId = btn.getAttribute('data-opinion');
+            fetch(utilUrl, {
+                method:'POST', 
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ opinion_id: opinionId })
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+                if (data.success){
+                    btn.classList.toggle('voted');
+                    var contador = btn.querySelector('.contador-util');
+                    if (contador) {
+                        contador.textContent = '(' + (data.total || 0) + ')';
+                    }
+                } else {
+                    console.error('No se pudo registrar el voto útil:', data.message);
+                }
+            })
+            .catch(function(err){
+                console.error('Error al marcar útil:', err);
+            });
+        });
+    });
+
+    // ── Reportar ──
+    document.querySelectorAll('.btn-reportar').forEach(function(el){
+        el.addEventListener('click', function(){
+            if (!logueado){ if (modalLogin) modalLogin.show(); return; }
+            el.innerHTML = '<i class="bi bi-check-circle"></i> ¡Gracias!';
+            el.style.pointerEvents = 'none';
+            el.style.color = '#28a745';
+            fetch(reporteUrl, { 
+                method:'POST', 
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ opinion_id: el.getAttribute('data-opinion') }) 
+            });
+        });
+    });
+
+    // ── Ampliar foto reseña ──
+    document.querySelectorAll('.resena-foto-thumb').forEach(function(img){
+        img.addEventListener('click', function(){
+            document.getElementById('fotoAmpliadaImg').src = img.getAttribute('data-foto');
+        });
+    });
+
+    // ── Preview fotos modal opinión ──
+    var fileInput = document.getElementById('file-input');
+    var previewContainer = document.getElementById('preview-container');
+    var selectedFiles = [];
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e){
+            selectedFiles = selectedFiles.concat(Array.from(e.target.files));
+            renderPreviews();
+        });
+    }
+
+    function renderPreviews() {
+        if (!previewContainer) return;
+        previewContainer.innerHTML = '';
+        selectedFiles.forEach(function(file, index){
+            var reader = new FileReader();
+            reader.onload = function(ev){
+                var div = document.createElement('div');
+                div.className = 'thumb-container';
+                div.innerHTML = '<img src="' + ev.target.result + '" class="thumb-preview"><div class="remove-btn" data-idx="' + index + '">&times;</div>';
+                previewContainer.appendChild(div);
+                div.querySelector('.remove-btn').addEventListener('click', function(){
+                    selectedFiles.splice(parseInt(this.getAttribute('data-idx')), 1);
+                    renderPreviews();
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+        var dt = new DataTransfer();
+        selectedFiles.forEach(function(f){ dt.items.add(f); });
+        fileInput.files = dt.files;
+    }
+
+    // ── Carruseles ──
+    document.querySelectorAll('.carousel-arrow').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            var track = document.getElementById(btn.getAttribute('data-target'));
+            if (!track) return;
+            var dir = btn.classList.contains('carousel-arrow-left') ? -1 : 1;
+            track.scrollBy({ left: dir * 280, behavior: 'smooth' });
+        });
+    });
+
+    // ── Vistos recientemente (localStorage) ──
+    (function gestionarVistosRecientemente(){
+        var STORAGE_KEY = 'orion_vistos_recientemente';
+
+        var actual = {
+            id: productoId,
+            nombre: {{ producto.nombre | tojson }},
+            marca: {{ (marca_nombre or '') | tojson }},
+            precio: {{ (variantes_json[0].precio if variantes_json else (producto.precio or 0)) | tojson }},
+            imagen: {{ (url_for('static', filename='uploads/productos/' + producto.fotos[0]) if producto.fotos else '') | tojson }},
+            url: window.location.pathname
+        };
+
+        var lista = [];
+        try { lista = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { lista = []; }
+
+        lista = lista.filter(function(item){ return item.id !== actual.id; });
+        lista.unshift(actual);
+        lista = lista.slice(0, 12);
+
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(lista)); } catch(e) {}
+
+        var paraMostrar = lista.filter(function(item){ return item.id !== actual.id; }).slice(0, 8);
+        var seccion = document.getElementById('seccion-recientes');
+        var track = document.getElementById('track-recientes');
+
+        if (paraMostrar.length > 0 && seccion && track) {
+            track.innerHTML = '';
+            paraMostrar.forEach(function(item){
+                var a = document.createElement('a');
+                a.href = item.url;
+                a.className = 'prod-card';
+
+                var imgHtml = item.imagen
+                    ? '<img src="' + item.imagen + '" alt="">'
+                    : '<div class="prod-card-noimg"><i class="bi bi-image"></i></div>';
+                var marcaHtml = item.marca && item.marca !== 'Marca no especificada'
+                    ? '<span class="prod-card-marca">' + item.marca.toUpperCase() + '</span>'
+                    : '';
+
+                a.innerHTML =
+                    '<div class="prod-card-img-wrap">' + imgHtml + '</div>' +
+                    '<div class="prod-card-body">' +
+                        marcaHtml +
+                        '<span class="prod-card-nombre"></span>' +
+                        '<span class="prod-card-precio"></span>' +
+                    '</div>';
+
+                a.querySelector('.prod-card-nombre').textContent = item.nombre;
+                a.querySelector('.prod-card-precio').textContent = '$' + parseFloat(item.precio || 0).toFixed(2);
+
+                track.appendChild(a);
+            });
+            seccion.classList.remove('d-none');
+        }
+    })();
+
+    // ── Manejar clic en el enlace de marca para scroll suave a la sección ──
+    var marcaLink = document.getElementById('marcaLink');
+    if (marcaLink) {
+        marcaLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            var marcaSection = document.querySelector('.marca-section');
+            if (marcaSection) {
+                marcaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                window.location.href = this.href;
+            }
+        });
+    }
+});
+</script>
+
+<!-- Modales -->
+<div class="modal fade" id="modalOpinion" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" action="{{ url_for('web.agregar_opinion') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="producto_id" value="{{ producto._id }}">
+            <div class="modal-header-custom">
+                <h5>Enviar opinión</h5>
+                <button type="button" class="btn-close-custom" data-bs-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-product-row">
+                <img src="{{ url_for('static', filename='uploads/productos/' + producto.fotos[0]) }}"
+                     class="modal-product-img-lg" alt="{{ producto.nombre }}">
+                <div>
+                    <p class="mb-0 fw-bold">{{ producto.nombre }}</p>
+                    <span class="text-muted small">Comparte tu opinión con otros compradores.</span>
+                </div>
+            </div>
+            <div class="modal-body-custom">
+                <label class="rating-label"><span style="color:var(--orion-primary)">*</span> Calificación:</label>
+                <div id="star-rating" class="d-flex gap-1 mb-3">
+                    <i class="bi bi-star text-warning" data-value="1"></i>
+                    <i class="bi bi-star text-warning" data-value="2"></i>
+                    <i class="bi bi-star text-warning" data-value="3"></i>
+                    <i class="bi bi-star text-warning" data-value="4"></i>
+                    <i class="bi bi-star text-warning" data-value="5"></i>
+                </div>
+                <input type="hidden" name="calificacion" id="calificacion-input" value="0">
+                <input type="text" name="titulo" class="form-control mb-3" placeholder="Título de tu opinión" required>
+                <textarea name="comentario" class="form-control mb-3" rows="3" placeholder="Escribe aquí tu opinión." required></textarea>
+                <div id="preview-container" class="d-flex flex-wrap gap-2 mb-2"></div>
+                <label class="upload-btn-custom">
+                    <i class="bi bi-camera"></i> Agregar foto
+                    <input type="file" name="fotos" id="file-input" class="d-none" accept="image/*" multiple>
+                </label>
+                <button type="submit" class="btn-enviar-opinion mt-3">Enviar opinión</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="modalFotoAmpliada" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body text-center pt-0">
+                <img id="fotoAmpliadaImg" src="" class="img-fluid rounded-3" style="max-height:80vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalLoginRequerido" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4 text-center">
+            <div class="login-modal-icon"><i class="bi bi-person-circle"></i></div>
+            <h5 class="fw-bold mb-2">Inicia sesión para continuar</h5>
+            <p class="text-muted mb-4">Necesitas una cuenta para escribir opiniones, votar o reportar.</p>
+            <div class="d-flex gap-2">
+                <a href="/login" class="btn btn-buy w-100">Iniciar sesión</a>
+                <button type="button" class="btn btn-outline-secondary w-100 rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalConfirmarEliminar" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4 text-center">
+            <div class="login-modal-icon" style="background:rgba(220,53,69,0.08);color:#dc3545;"><i class="bi bi-trash"></i></div>
+            <h5 class="fw-bold mb-2">¿Eliminar esta opinión?</h5>
+            <p class="text-muted mb-4">Esta acción no se puede deshacer.</p>
+            <div class="d-flex gap-2">
+                <form id="formEliminarOpinion" action="{{ url_for('web.eliminar_opinion') }}" method="POST" class="w-100">
+                    <input type="hidden" name="opinion_id" id="eliminarOpinionId">
+                    <input type="hidden" name="producto_id" id="eliminarProductoId">
+                    <button type="submit" class="btn btn-danger w-100 rounded-pill">Eliminar</button>
+                </form>
+                <button type="button" class="btn btn-outline-secondary w-100 rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

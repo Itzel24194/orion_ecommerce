@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Pedido Admin | ORION Admin</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --orion-primary: #e10098; 
+            --orion-secondary: #00d4ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: #f5f6f8;
+            color: #1a1a2e;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 2px solid #e8e8e8;
+            padding: 0;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            flex-shrink: 0;
+        }
+
+        .sidebar .admin-profile .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .sidebar .admin-profile .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-top: 10px;
+        }
+
+        .sidebar .admin-profile .email {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .sidebar .logo {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #e10098;
+            text-align: center;
+            padding: 15px 0 5px;
+            letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+
+        .sidebar .logo span {
+            color: #1a1a2e;
+        }
+
+        .sidebar .menu-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 10px;
+        }
+
+        .sidebar .menu-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+        .sidebar .menu-scroll::-webkit-scrollbar-track {
+            background: #f5f6f8;
+        }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb {
+            background: #e10098;
+            border-radius: 4px;
+        }
+
+        .sidebar .panel-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #888;
+            padding: 10px 25px 5px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .sidebar a i {
+            width: 20px;
+            font-size: 1rem;
+            color: #888;
+        }
+
+        .sidebar a:hover {
+            background: #f8f0f5;
+            color: #e10098;
+            border-left-color: #e10098;
+        }
+
+        .sidebar a:hover i {
+            color: #e10098;
+        }
+
+        .sidebar a.active {
+            background: #f8f0f5;
+            color: #e10098;
+            border-left-color: #e10098;
+        }
+
+        .sidebar a.active i {
+            color: #e10098;
+        }
+
+        .sidebar .divider {
+            height: 1px;
+            background: #e8e8e8;
+            margin: 10px 25px;
+        }
+
+        .sidebar .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #dc3545;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar .logout-btn i {
+            width: 20px;
+            font-size: 1rem;
+            color: #dc3545;
+        }
+
+        .sidebar .logout-btn:hover {
+            background: #fdf0f0;
+            border-left-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .sidebar .logout-btn:hover i {
+            color: #dc3545;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            margin-left: 280px;
+            padding: 30px 35px 20px;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .top-bar h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-bar h1 i {
+            color: #e10098;
+        }
+
+        .top-bar .tag {
+            background: #e10098;
+            color: #fff;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== DETALLE ===== */
+        .detail-card {
+            background: #ffffff;
+            border: 1px solid #e8e8e8;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: relative;
+        }
+
+        .detail-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #e10098, #00d4ff);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .detail-card h4 {
+            color: #1a1a2e;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-weight: 800;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-card h4 i {
+            color: var(--orion-primary);
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pendiente { background: #fff3cd; color: #856404; }
+        .status-pendiente::before { content: '⏳ '; }
+        .status-confirmado { background: #cce5ff; color: #004085; }
+        .status-confirmado::before { content: '✅ '; }
+        .status-preparando { background: #fff3cd; color: #856404; }
+        .status-preparando::before { content: '📦 '; }
+        .status-enviado { background: #d1ecf1; color: #0c5460; }
+        .status-enviado::before { content: '🚚 '; }
+        .status-entregado { background: #d4edda; color: #155724; }
+        .status-entregado::before { content: '✅ '; }
+        .status-cancelado { background: #f8d7da; color: #721c24; }
+        .status-cancelado::before { content: '❌ '; }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row .label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .info-row .value {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1a1a2e;
+        }
+
+        .btn-orion {
+            background: var(--orion-primary);
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .btn-orion:hover {
+            background: #c00080;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(225, 0, 152, 0.3);
+        }
+
+        .btn-orion-outline {
+            background: transparent;
+            border: 2px solid var(--orion-primary);
+            color: var(--orion-primary);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-orion-outline:hover {
+            background: var(--orion-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger-custom {
+            background: transparent;
+            border: 2px solid #dc3545;
+            color: #dc3545;
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-danger-custom:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .producto-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .producto-item:last-child {
+            border-bottom: none;
+        }
+
+        .producto-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .producto-item .info {
+            flex: 1;
+        }
+
+        .producto-item .nombre {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1a1a2e;
+        }
+
+        .producto-item .atributos {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .producto-item .precio {
+            font-weight: 700;
+            color: var(--orion-primary);
+            font-size: 0.9rem;
+        }
+
+        .producto-item .cantidad {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .producto-item .subtotal {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1a1a2e;
+        }
+
+        .select-estado {
+            background: #ffffff;
+            color: #1a1a2e;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 150px;
+        }
+
+        .select-estado:focus {
+            border-color: var(--orion-primary);
+            outline: none;
+        }
+
+        .badge-click-collect {
+            background: #ffc107;
+            color: #000;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e8e8e8;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e8e8e8;
+            border: 2px solid #ffffff;
+        }
+
+        .timeline-item.active::before {
+            background: var(--orion-primary);
+            box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.2);
+        }
+
+        .timeline-item.done::before {
+            background: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+        }
+
+        .timeline-item .time {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .timeline-item .title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1a1a2e;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-info {
+            background: #ffffff;
+            padding: 15px 25px;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            text-align: center;
+            margin-top: auto;
+            flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+        }
+
+        .footer-info p {
+            color: #888;
+            font-size: 0.75rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-info p .separator {
+            color: #ddd;
+        }
+
+        .footer-info i {
+            color: #e10098;
+        }
+
+        .footer-info .heart {
+            color: #e10098;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar .logo,
+            .sidebar .panel-title,
+            .sidebar a span,
+            .sidebar .admin-profile .name,
+            .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol,
+            .sidebar .logout-btn span {
+                display: none;
+            }
+            .sidebar a {
+                padding: 15px;
+                justify-content: center;
+            }
+            .sidebar a i {
+                font-size: 1.3rem;
+            }
+            .sidebar .admin-profile .avatar {
+                width: 40px;
+                height: 40px;
+            }
+            .sidebar .admin-profile {
+                padding: 10px;
+            }
+            .sidebar .logout-btn {
+                padding: 15px;
+                justify-content: center;
+            }
+            .main {
+                margin-left: 70px;
+                padding: 15px;
+            }
+            .producto-item {
+                flex-wrap: wrap;
+            }
+            .producto-item img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .top-bar h1 {
+                font-size: 1.2rem;
+            }
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .detail-card {
+                padding: 15px;
+            }
+            .producto-item img {
+                width: 40px;
+                height: 40px;
+            }
+            .footer-info p {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .select-estado {
+                min-width: 120px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+
+        <!-- ===== PERFIL ADMIN ===== -->
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+
+        <!-- ===== LOGO ===== -->
+        <div class="logo">ORION<span>.</span></div>
+
+        <!-- ===== MENÚ ===== -->
+        <div class="menu-scroll">
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Inicio</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_empresas') }}"><i class="fas fa-building"></i> <span>Empresas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}" class="active"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
+            <a href="{{ url_for('web.prediccion_ventas') }}"><i class="fas fa-chart-bar"></i> <span>Predicción Ventas</span></a>
+            <a href="{{ url_for('web.prediccion_abandono') }}"><i class="fas fa-exclamation-triangle"></i> <span>Predicción Abandono</span></a>
+            <a href="{{ url_for('web.deteccion_fraude') }}"><i class="fas fa-shield-alt"></i> <span>Detección Fraude</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-analytics"></i> <span>Análisis</span></a>
+            <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
+            <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+
+    </nav>
+
+    <!-- ===== CONTENIDO ===== -->
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-receipt"></i> Detalle del Pedido</h1>
+            <div class="tag"><i class="fas fa-shield-alt"></i> Admin</div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <!-- ===== BOTÓN VOLVER ===== -->
+            <a href="{{ url_for('web.admin_listar_pedidos') }}" class="btn-orion-outline" style="margin-bottom: 20px; display: inline-block; align-self: flex-start;">
+                <i class="fas fa-arrow-left"></i> Volver a pedidos
+            </a>
+
+            <!-- ===== CABECERA ===== -->
+            <div class="detail-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h3 style="margin: 0; font-weight: 800; color: #1a1a2e;">
+                            Pedido #{{ pedido.numero_pedido if pedido.numero_pedido else pedido._id|string|truncate(8, True, '') }}
+                        </h3>
+                        <div style="color: #888; font-size: 0.85rem; margin-top: 5px;">
+                            <i class="fas fa-calendar-alt" style="color: #e10098;"></i> 
+                            {{ pedido.created_at.strftime('%d/%m/%Y %H:%M') if pedido.created_at else 'Fecha no disponible' }}
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <span class="status-badge status-{{ pedido.estado if pedido.estado else 'pendiente' }}">
+                            {{ pedido.estado|title if pedido.estado else 'Pendiente' }}
+                        </span>
+                        {% if pedido.tipo_envio == 'click_collect' %}
+                            <span class="badge-click-collect">
+                                <i class="fas fa-store"></i> Click & Collect
+                            </span>
+                        {% endif %}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 0.75rem; color: #888; font-weight: 600;">Cambiar estado:</label>
+                            <select class="select-estado" onchange="actualizarEstado('{{ pedido._id }}', this.value)">
+                                <option value="pendiente" {% if pedido.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                <option value="confirmado" {% if pedido.estado == 'confirmado' %}selected{% endif %}>Confirmado</option>
+                                <option value="preparando" {% if pedido.estado == 'preparando' %}selected{% endif %}>Preparando</option>
+                                <option value="enviado" {% if pedido.estado == 'enviado' %}selected{% endif %}>Enviado</option>
+                                <option value="entregado" {% if pedido.estado == 'entregado' %}selected{% endif %}>Entregado</option>
+                                <option value="cancelado" {% if pedido.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== CONTENIDO PRINCIPAL ===== -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+
+                <!-- ===== COLUMNA IZQUIERDA ===== -->
+                <div>
+
+                    <!-- ===== LÍNEA DE TIEMPO ===== -->
+                    <div class="detail-card">
+                        <h4><i class="fas fa-clock"></i> Línea de tiempo</h4>
+                        <div class="timeline">
+                            <div class="timeline-item {% if pedido.estado in ['confirmado','preparando','enviado','entregado'] %}done{% elif pedido.estado == 'pendiente' %}active{% endif %}">
+                                <div class="title">Pedido confirmado</div>
+                                <div class="time">{{ pedido.created_at.strftime('%d/%m/%Y %H:%M') if pedido.created_at else 'Pendiente' }}</div>
+                            </div>
+                            <div class="timeline-item {% if pedido.estado in ['preparando','enviado','entregado'] %}done{% elif pedido.estado == 'confirmado' %}active{% endif %}">
+                                <div class="title">En preparación</div>
+                                <div class="time">{{ pedido.fecha_preparacion.strftime('%d/%m/%Y %H:%M') if pedido.fecha_preparacion else 'Pendiente' }}</div>
+                            </div>
+                            <div class="timeline-item {% if pedido.estado in ['enviado','entregado'] %}done{% elif pedido.estado == 'preparando' %}active{% endif %}">
+                                <div class="title">Enviado</div>
+                                <div class="time">{{ pedido.fecha_envio.strftime('%d/%m/%Y %H:%M') if pedido.fecha_envio else 'Pendiente' }}</div>
+                            </div>
+                            <div class="timeline-item {% if pedido.estado == 'entregado' %}done{% elif pedido.estado == 'enviado' %}active{% endif %}">
+                                <div class="title">Entregado</div>
+                                <div class="time">{{ pedido.fecha_entrega_real.strftime('%d/%m/%Y %H:%M') if pedido.fecha_entrega_real else 'Pendiente' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================================ -->
+                    <!-- PRODUCTOS - CORREGIDO USANDO items_list                       -->
+                    <!-- ============================================================ -->
+                    <div class="detail-card">
+                        {% set items_list = pedido.items_list if pedido.items_list is defined else [] %}
+                        <h4><i class="fas fa-box"></i> Productos ({{ items_list|length if items_list else 0 }})</h4>
+                        
+                        {% if items_list and items_list|length > 0 %}
+                            {% for item in items_list %}
+                            <div class="producto-item">
+                                {% set imagen = item.imagen or item.foto or 'default.jpg' %}
+                                <img src="{{ url_for('static', filename='uploads/productos/' + imagen) }}" alt="{{ item.nombre }}" onerror="this.src='https://via.placeholder.com/60/1a1a2e/666?text=Producto'">
+                                <div class="info">
+                                    <div class="nombre">{{ item.nombre }}</div>
+                                    <div class="atributos">
+                                        {% if item.atributos %}
+                                            {% if item.atributos.color %}Color: {{ item.atributos.color }}{% endif %}
+                                            {% if item.atributos.tamano %}{% if item.atributos.color %} | {% endif %}Talla: {{ item.atributos.tamano }}{% endif %}
+                                        {% endif %}
+                                        {% if item.sku %}{% if item.atributos %} | {% endif %}SKU: {{ item.sku }}{% endif %}
+                                    </div>
+                                    <div class="cantidad">Cantidad: {{ item.cantidad|default(1) }}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="precio">${{ "%.2f"|format(item.precio|default(0)) }}</div>
+                                    <div class="subtotal">Subtotal: ${{ "%.2f"|format((item.precio|default(0)) * (item.cantidad|default(1))) }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="color: #888; text-align: center; padding: 20px;">
+                                <i class="fas fa-cart-x" style="font-size: 2rem; color: #ddd;"></i>
+                                <p style="margin-top: 10px;">No hay productos en este pedido</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <!-- ===== COLUMNA DERECHA ===== -->
+                <div>
+
+                    <!-- ===== RESUMEN ===== -->
+                    <div class="detail-card">
+                        <h4><i class="fas fa-calculator"></i> Resumen</h4>
+                        <div class="info-row">
+                            <span class="label">Subtotal</span>
+                            <span class="value">${{ "%.2f"|format(pedido.subtotal|default(0)) }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">IVA (16%)</span>
+                            <span class="value">${{ "%.2f"|format(pedido.iva|default(0)) }}</span>
+                        </div>
+                        {% if pedido.descuento and pedido.descuento > 0 %}
+                        <div class="info-row">
+                            <span class="label" style="color: #28a745;">Descuento ({{ pedido.porcentaje_descuento|default(0) }}%)</span>
+                            <span class="value" style="color: #28a745;">-${{ "%.2f"|format(pedido.descuento|default(0)) }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="info-row">
+                            <span class="label">Envío</span>
+                            <span class="value">${{ "%.2f"|format(pedido.envio|default(0)) }}</span>
+                        </div>
+                        <div class="info-row" style="border-bottom: none; font-size: 1.2rem; padding-top: 12px; border-top: 2px solid #e8e8e8;">
+                            <span class="label" style="font-weight: 700;">Total</span>
+                            <span class="value" style="color: var(--orion-primary); font-weight: 900; font-size: 1.3rem;">
+                                ${{ "%.2f"|format(pedido.total|default(0)) }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- ===== CLIENTE ===== -->
+                    <div class="detail-card">
+                        <h4><i class="fas fa-user"></i> Cliente</h4>
+                        <div class="info-row">
+                            <span class="label">Nombre</span>
+                            <span class="value">{{ pedido.usuario_nombre or 'No disponible' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Email</span>
+                            <span class="value">{{ pedido.usuario_email or 'No disponible' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Teléfono</span>
+                            <span class="value">{{ pedido.usuario_telefono or 'No disponible' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- ===== DIRECCIÓN ===== -->
+                    <div class="detail-card">
+                        <h4><i class="fas fa-map-marker-alt"></i> Dirección</h4>
+                        {% if pedido.direccion %}
+                            <div style="font-size: 0.9rem; line-height: 1.7; color: #1a1a2e;">
+                                {{ pedido.direccion.calle }} {{ pedido.direccion.numero }}<br>
+                                {{ pedido.direccion.colonia }}<br>
+                                {{ pedido.direccion.ciudad }}, {{ pedido.direccion.estado }}<br>
+                                CP {{ pedido.direccion.cp }}
+                                {% if pedido.direccion.referencias %}
+                                    <br><span style="color: #888; font-size: 0.8rem;">Referencias: {{ pedido.direccion.referencias }}</span>
+                                {% endif %}
+                            </div>
+                        {% elif pedido.tienda_recogida %}
+                            <div style="font-size: 0.9rem; color: #1a1a2e;">
+                                <i class="fas fa-store" style="color: var(--orion-primary);"></i>
+                                <strong>Click & Collect</strong><br>
+                                Tienda: {{ pedido.tienda_recogida }}
+                                {% if pedido.codigo_recogida %}
+                                    <br><span style="color: #28a745; font-weight: 700; font-size: 0.85rem;">
+                                        <i class="fas fa-qrcode"></i> Código: {{ pedido.codigo_recogida }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div style="color: #888;">No hay dirección registrada</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- ===== INFORMACIÓN ADICIONAL ===== -->
+                    <div class="detail-card">
+                        <h4><i class="fas fa-info-circle"></i> Información adicional</h4>
+                        <div class="info-row">
+                            <span class="label">Método de pago</span>
+                            <span class="value">{{ pedido.metodo_pago|title if pedido.metodo_pago else 'No especificado' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Tipo de envío</span>
+                            <span class="value">
+                                {% if pedido.tipo_envio == 'click_collect' %}
+                                    <i class="fas fa-store"></i> Click & Collect
+                                {% else %}
+                                    <i class="fas fa-truck"></i> Domicilio
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Total de unidades</span>
+                            <span class="value">{{ pedido.total_unidades|default(0) }}</span>
+                        </div>
+                        {% if pedido.notas %}
+                        <div class="info-row" style="border-bottom: none;">
+                            <span class="label">Notas</span>
+                            <span class="value" style="font-size: 0.85rem; color: #888;">{{ pedido.notas }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- ===== ACCIONES ===== -->
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                        <button class="btn-orion" onclick="window.print()">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                        <button class="btn-danger-custom" onclick="eliminarPedido('{{ pedido._id }}')">
+                            <i class="fas fa-trash"></i> Eliminar pedido
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ===== FOOTER ===== -->
+            <div class="footer-info">
+                <p>
+                    <i class="fas fa-clock"></i> 
+                    {{ "Ahora"|format }}
+                    <span class="separator">|</span>
+                    <i class="fas fa-shield-alt"></i> ORION System v2.0
+                    <span class="separator">|</span>
+                    <i class="fas fa-copyright"></i> Todos los derechos reservados
+                    <span class="separator">|</span>
+                    <span class="heart"><i class="fas fa-heart"></i></span>
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    function actualizarEstado(id, estado) {
+        if (!confirm('¿Cambiar estado del pedido a "' + estado + '"?')) {
+            location.reload();
+            return;
+        }
+        
+        fetch('/api/admin/pedidos/estado/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ estado: estado })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error || 'Error al actualizar el estado');
+            }
+        })
+        .catch(error => {
+            alert('Error al actualizar el estado');
+        });
+    }
+
+    function eliminarPedido(id) {
+        if (!confirm('¿Estás seguro de eliminar este pedido?\nEsta acción no se puede deshacer.')) return;
+        
+        fetch('/api/admin/pedidos/eliminar/' + id, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = "{{ url_for('web.admin_listar_pedidos') }}";
+            } else {
+                alert(data.error || 'Error al eliminar el pedido');
+            }
+        })
+        .catch(error => {
+            alert('Error al eliminar el pedido');
+        });
+    }
+</script>
+
+</body>
+</html>

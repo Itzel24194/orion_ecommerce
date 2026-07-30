@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificación Binaria | ORION</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ===== ESTILOS COMPACTOS (similares a los anteriores) ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f6fa; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: #fff; border-right: 2px solid #e8e8e8; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; z-index: 1000; display: flex; flex-direction: column; box-shadow: 2px 0 12px rgba(0,0,0,0.04); }
+        .sidebar .admin-profile { padding: 30px 20px 25px; text-align: center; border-bottom: 1px solid #e8e8e8; background: linear-gradient(145deg, #6a1b9a, #9c27b0); position: relative; overflow: hidden; }
+        .sidebar .admin-profile .avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; z-index: 1; }
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 12px; }
+        .sidebar .admin-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .admin-profile .rol { font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700; background: rgba(255,255,255,0.2); padding: 2px 14px; border-radius: 20px; display: inline-block; margin-top: 6px; }
+        .sidebar .logo { font-size: 1.8rem; font-weight: 900; color: #6a1b9a; text-align: center; padding: 18px 0 8px; letter-spacing: -1px; }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title { font-size: 0.6rem; text-transform: uppercase; color: #999; padding: 14px 25px 6px; letter-spacing: 2px; font-weight: 700; }
+        .sidebar a { display: flex; align-items: center; gap: 12px; padding: 10px 25px; color: #555; text-decoration: none; transition: all 0.25s; border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500; }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f3edf7; color: #6a1b9a; border-left-color: #6a1b9a; }
+        .sidebar a.active i { color: #6a1b9a; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 8px 25px; }
+        .sidebar .logout-btn { display: flex; align-items: center; gap: 12px; padding: 10px 25px; color: #dc3545; text-decoration: none; transition: all 0.25s; border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500; cursor: pointer; background: transparent; border: none; width: 100%; text-align: left; }
+        .sidebar .logout-btn i { color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+        .main { margin-left: 280px; padding: 40px 50px 50px; width: 100%; min-height: 100vh; background: #f4f6fa; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 22px; border-bottom: 2px solid #e8e8e8; margin-bottom: 40px; flex-wrap: wrap; gap: 15px; }
+        .top-bar h1 { font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; gap: 14px; color: #1a1a2e; }
+        .top-bar h1 i { color: #6a1b9a; }
+        .top-bar .tag { background: linear-gradient(135deg, #6a1b9a, #9c27b0); color: #fff; padding: 8px 24px; border-radius: 30px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 12px rgba(106,27,154,0.25); }
+        .section-box { background: #fff; border-radius: 22px; padding: 32px 34px 34px; border: 1px solid #eaecf0; margin-bottom: 36px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: box-shadow 0.2s; }
+        .section-box h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 24px; display: flex; align-items: center; gap: 14px; color: #1a1a2e; }
+        .section-box h2 i { color: #6a1b9a; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #fff; border-radius: 18px; padding: 20px 22px; border: 1px solid #eaecf0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.25s, box-shadow 0.25s; position: relative; overflow: hidden; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 28px rgba(0,0,0,0.07); }
+        .stat-card .num { font-size: 2rem; font-weight: 800; color: #1a1a2e; display: block; line-height: 1.2; }
+        .stat-card .label { font-size: 0.7rem; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .stat-card .icon { position: absolute; right: 18px; top: 18px; font-size: 1.6rem; opacity: 0.12; color: #6a1b9a; }
+        .stat-card.primary .num { color: #6a1b9a; }
+        .stat-card.success .num { color: #2e7d32; }
+        .stat-card.warning .num { color: #ed6c02; }
+        .stat-card.danger .num { color: #d32f2f; }
+        .stat-card.info .num { color: #0288d1; }
+        .btn-custom { padding: 12px 28px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 10px; transition: all 0.25s; border: none; cursor: pointer; background: #e0e0e0; color: #1a1a2e; white-space: nowrap; }
+        .btn-custom:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        .btn-primary { background: #6a1b9a; color: #fff; }
+        .btn-primary:hover { background: #5a1480; }
+        .btn-success { background: #2e7d32; color: #fff; }
+        .btn-success:hover { background: #1b5e20; }
+        .btn-warning { background: #ed6c02; color: #fff; }
+        .btn-warning:hover { background: #c95a00; }
+        .btn-danger { background: #d32f2f; color: #fff; }
+        .btn-danger:hover { background: #b71c1c; }
+        .btn-info { background: #0288d1; color: #fff; }
+        .btn-info:hover { background: #0277bd; }
+        .btn-purple { background: #6a1b9a; color: #fff; }
+        .btn-purple:hover { background: #5a1480; }
+        .btn-secondary { background: #6c757d; color: #fff; }
+        .btn-secondary:hover { background: #5a6268; }
+        .badge-riesgo { font-size: 0.65rem; padding: 4px 16px; border-radius: 50px; font-weight: 700; display: inline-block; }
+        .badge-riesgo.alto { background: #fce4ec; color: #c62828; }
+        .badge-riesgo.medio { background: #fff3e0; color: #e65100; }
+        .badge-riesgo.bajo { background: #e8f5e9; color: #2e7d32; }
+        .table-container { background: #fff; border-radius: 18px; border: 1px solid #eaecf0; overflow: hidden; margin-top: 6px; }
+        .table-container .table-header { padding: 18px 26px; background: #f8f9fc; border-bottom: 1px solid #eaecf0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .table-container table { width: 100%; border-collapse: collapse; }
+        .table-container thead th { background: #f8f9fc; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: #555; padding: 14px 18px; border-bottom: 2px solid #eaecf0; }
+        .table-container tbody td { padding: 12px 18px; vertical-align: middle; font-size: 0.85rem; border-bottom: 1px solid #f1f3f5; }
+        .table-container tbody tr:hover { background: #f8f9fc; }
+        .pagination-container { display: flex; justify-content: space-between; align-items: center; padding: 16px 26px; border-top: 1px solid #eaecf0; flex-wrap: wrap; gap: 14px; background: #fafbfc; }
+        .pagination-controls button { padding: 6px 14px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s; color: #555; }
+        .pagination-controls button:hover:not(:disabled) { background: #6a1b9a; color: #fff; border-color: #6a1b9a; }
+        .pagination-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .filtro-estado { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filtro-estado .btn-filtro { padding: 6px 20px; border-radius: 30px; border: 1px solid #ddd; background: #fff; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .filtro-estado .btn-filtro:hover { border-color: #6a1b9a; color: #6a1b9a; }
+        .filtro-estado .btn-filtro.active { background: #6a1b9a; color: #fff; border-color: #6a1b9a; }
+        .filtro-estado .btn-filtro .count { background: rgba(0,0,0,0.08); padding: 0 8px; border-radius: 12px; font-size: 0.65rem; margin-left: 4px; }
+        .alert { padding: 18px 26px; border-radius: 18px; margin-top: 18px; font-size: 0.9rem; line-height: 1.6; }
+        .alert-success { background: #e8f5e9; border: 1px solid #c8e6c9; color: #1b5e20; }
+        .alert-danger { background: #fce4ec; border: 1px solid #f8bbd0; color: #b71c1c; }
+        .alert-info { background: #e3f2fd; border: 1px solid #bbdefb; color: #0d47a1; }
+        .alert-warning { background: #fff3e0; border: 1px solid #ffe0b2; color: #e65100; }
+        .matriz-confusion { display: grid; grid-template-columns: auto auto auto; gap: 4px; max-width: 340px; margin: 0 auto; }
+        .matriz-confusion .celda { padding: 14px 20px; text-align: center; font-weight: 700; background: #f8f9fc; border-radius: 8px; font-size: 0.95rem; }
+        .matriz-confusion .celda.header { background: transparent; font-weight: 600; color: #888; font-size: 0.75rem; }
+        .matriz-confusion .celda.vp { background: #e8f5e9; color: #1b5e20; }
+        .matriz-confusion .celda.fp { background: #fce4ec; color: #b71c1c; }
+        .matriz-confusion .celda.fn { background: #fff3e0; color: #e65100; }
+        .matriz-confusion .celda.vn { background: #e3f2fd; color: #0d47a1; }
+        .importancia-item { display: flex; align-items: center; gap: 14px; padding: 8px 0; font-size: 0.85rem; }
+        .importancia-item .barra { flex: 1; height: 10px; background: #e9ecef; border-radius: 12px; overflow: hidden; }
+        .importancia-item .barra .fill { height: 100%; background: linear-gradient(90deg, #6a1b9a, #ab47bc); border-radius: 12px; transition: width 0.8s; }
+        .importancia-item .valor { font-weight: 700; color: #6a1b9a; min-width: 48px; text-align: right; }
+        .table-responsive { max-height: 540px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #6a1b9a #f0f0f0; }
+        .table-responsive::-webkit-scrollbar { width: 6px; }
+        .table-responsive::-webkit-scrollbar-track { background: #f0f0f0; }
+        .table-responsive::-webkit-scrollbar-thumb { background: #6a1b9a; border-radius: 10px; }
+        .table-responsive thead { position: sticky; top: 0; z-index: 10; }
+        .table-responsive thead th { background: #f8f9fc; border-bottom: 2px solid #6a1b9a; }
+        @media (max-width: 768px) { .sidebar { width: 70px; } .sidebar .logo, .sidebar .panel-title, .sidebar a span, .sidebar .admin-profile .name, .sidebar .admin-profile .email, .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; } .sidebar a { padding: 15px; justify-content: center; } .sidebar a i { font-size: 1.3rem; margin: 0; } .sidebar .admin-profile .avatar { width: 40px; height: 40px; } .sidebar .admin-profile { padding: 12px 0; } .main { margin-left: 70px; padding: 24px 20px; } .stats-grid { grid-template-columns: 1fr 1fr; gap: 16px; } .pagination-container { flex-direction: column; align-items: stretch; text-align: center; } .pagination-controls { justify-content: center; flex-wrap: wrap; } .top-bar h1 { font-size: 1.4rem; } .section-box { padding: 22px 20px; margin-bottom: 28px; } .btn-custom { padding: 10px 20px; font-size: 0.75rem; } }
+        @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } .top-bar { flex-direction: column; align-items: flex-start; } .filtro-estado .btn-filtro { font-size: 0.65rem; padding: 4px 12px; } .matriz-confusion { max-width: 220px; } .matriz-confusion .celda { padding: 10px 12px; font-size: 0.75rem; } .section-box { padding: 18px 14px; } .btn-custom { padding: 8px 16px; font-size: 0.7rem; gap: 6px; } }
+        .text-muted { color: #888; }
+        .text-center { text-align: center; }
+        .text-danger { color: #d32f2f; }
+        .d-flex { display: flex; }
+        .flex-wrap { flex-wrap: wrap; }
+        .align-center { align-items: center; }
+        .gap-2 { gap: 8px; }
+        .mt-2 { margin-top: 8px; }
+        .mb-2 { margin-bottom: 8px; }
+        .tr-risco { animation: fadeInUp 0.3s ease forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .badge-estado { display: inline-flex; align-items: center; gap: 4px; padding: 4px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; }
+        .badge-estado.existe { background: #e8f5e9; color: #2e7d32; }
+        .badge-estado.no-existe { background: #fce4ec; color: #c62828; }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <!-- SIDEBAR (igual que antes, pero con enlace activo a esta sección) -->
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=6a1b9a&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+        <div class="logo">ORION<span>.</span></div>
+        <div class="menu-scroll">
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_empresas') }}"><i class="fas fa-building"></i> <span>Empresas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.clasificacion_binaria') }}" class="active"><i class="fas fa-toggle-on"></i> <span>Clasificación Binaria</span></a>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}"><i class="fas fa-brain"></i> <span>Análisis Supervisado</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="top-bar">
+            <h1><i class="fas fa-toggle-on"></i> Clasificación Binaria</h1>
+            <div class="tag"><i class="fas fa-robot"></i> Random Forest con GridSearch</div>
+        </header>
+
+        <div id="resultadoAccion" style="display: none;"></div>
+
+        <!-- ACCIONES -->
+        <div class="section-box">
+            <h2><i class="fas fa-cogs"></i> Entrenamiento y Acciones</h2>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <button onclick="entrenarModelo()" class="btn-custom btn-primary" id="btnEntrenar">
+                    <i class="fas fa-play"></i> Entrenar Modelo
+                </button>
+                <button onclick="predecirTodos()" class="btn-custom btn-success" id="btnPredecir">
+                    <i class="fas fa-users"></i> Predecir Todos
+                </button>
+                <button onclick="exportarCSV()" class="btn-custom btn-info">
+                    <i class="fas fa-download"></i> Exportar CSV
+                </button>
+                <button onclick="limpiarModelo()" class="btn-custom btn-secondary">
+                    <i class="fas fa-trash"></i> Limpiar Modelo
+                </button>
+            </div>
+            <div style="margin-top: 16px; font-size: 0.85rem; color: #666;">
+                <span id="estadoModelo" class="badge-estado no-existe">❌ No entrenado</span>
+                <span style="margin-left: 16px;">Última actualización: <span id="fechaActualizacion">-</span></span>
+            </div>
+        </div>
+
+        <!-- MÉTRICAS -->
+        <div class="stats-grid" id="metricasGrid">
+            <div class="stat-card primary"><i class="fas fa-arrow-up icon"></i><span class="num" id="accuracy">N/A</span><span class="label">Accuracy</span></div>
+            <div class="stat-card success"><i class="fas fa-bullseye icon"></i><span class="num" id="precision">N/A</span><span class="label">Precisión</span></div>
+            <div class="stat-card warning"><i class="fas fa-crosshairs icon"></i><span class="num" id="recall">N/A</span><span class="label">Recall</span></div>
+            <div class="stat-card danger"><i class="fas fa-balance-scale icon"></i><span class="num" id="f1">N/A</span><span class="label">F1-Score</span></div>
+            <div class="stat-card info"><i class="fas fa-chart-area icon"></i><span class="num" id="auc">N/A</span><span class="label">AUC</span></div>
+            <div class="stat-card primary"><i class="fas fa-percent icon"></i><span class="num" id="logloss">N/A</span><span class="label">Log Loss</span></div>
+            <div class="stat-card info"><i class="fas fa-sync icon"></i><span class="num" id="cv_mean">N/A</span><span class="label">CV (ROC-AUC)</span></div>
+            <div class="stat-card success"><i class="fas fa-database icon"></i><span class="num" id="n_muestras">0</span><span class="label">Muestras</span></div>
+        </div>
+
+        <!-- IMPORTANCIA -->
+        <div class="section-box">
+            <h2><i class="fas fa-list-ul" style="color:#6a1b9a;"></i> Importancia de Características</h2>
+            <div id="importanciaContainer"><p class="text-muted text-center" style="padding:20px;">Entrena el modelo para ver importancia.</p></div>
+        </div>
+
+        <!-- MATRIZ DE CONFUSIÓN -->
+        <div class="section-box">
+            <h2><i class="fas fa-th" style="color:#0288d1;"></i> Matriz de Confusión</h2>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
+                <div id="matrizContainer"><p class="text-muted text-center" style="padding:20px;">No hay datos.</p></div>
+                <div style="font-size:0.85rem; color:#666;">
+                    <div><span style="display:inline-block; width:16px; height:16px; background:#e8f5e9; border-radius:4px;"></span> VP (Verdadero Positivo)</div>
+                    <div><span style="display:inline-block; width:16px; height:16px; background:#fce4ec; border-radius:4px;"></span> FP (Falso Positivo)</div>
+                    <div><span style="display:inline-block; width:16px; height:16px; background:#fff3e0; border-radius:4px;"></span> FN (Falso Negativo)</div>
+                    <div><span style="display:inline-block; width:16px; height:16px; background:#e3f2fd; border-radius:4px;"></span> VN (Verdadero Negativo)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLA CLIENTES -->
+        <div class="section-box">
+            <h2><i class="fas fa-users" style="color:#d32f2f;"></i> Clientes con Riesgo de Abandono</h2>
+            <div class="filtro-estado">
+                <button class="btn-filtro active" data-filtro="todos" onclick="filtrarClientes('todos')">Todos <span class="count" id="count-todos">0</span></button>
+                <button class="btn-filtro" data-filtro="alto" onclick="filtrarClientes('alto')">🔴 Alto <span class="count" id="count-alto">0</span></button>
+                <button class="btn-filtro" data-filtro="medio" onclick="filtrarClientes('medio')">🟡 Medio <span class="count" id="count-medio">0</span></button>
+                <button class="btn-filtro" data-filtro="bajo" onclick="filtrarClientes('bajo')">🟢 Bajo <span class="count" id="count-bajo">0</span></button>
+            </div>
+            <div class="table-container">
+                <div class="table-header"><h5><i class="fas fa-list" style="color:#d32f2f;"></i> Lista de Clientes</h5><span class="text-muted" id="totalClientes">0 clientes</span></div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>#</th><th>Cliente</th><th>Email</th><th>Días sin comprar</th><th>Pedidos</th><th>Nivel</th><th>Probabilidad</th></tr></thead>
+                        <tbody id="tablaBody"><tr><td colspan="7" class="text-center text-muted">Carga de datos...</td></tr></tbody>
+                    </table>
+                </div>
+                <div class="pagination-container">
+                    <div class="info">Mostrando <strong id="paginacion-desde">0</strong> - <strong id="paginacion-hasta">0</strong> de <strong id="paginacion-total">0</strong></div>
+                    <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+                        <div class="per-page-selector">
+                            <span>Mostrar:</span>
+                            <select id="perPageSelect" onchange="cambiarPagina()">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="9999">Todos</option>
+                            </select>
+                        </div>
+                        <div class="pagination-controls">
+                            <button onclick="irPagina(1)" id="btnPrimera" disabled><i class="fas fa-angle-double-left"></i></button>
+                            <button onclick="irPagina(paginaActual-1)" id="btnAnterior" disabled><i class="fas fa-angle-left"></i></button>
+                            <span class="page-number" id="paginaInfo">1</span>
+                            <button onclick="irPagina(paginaActual+1)" id="btnSiguiente" disabled><i class="fas fa-angle-right"></i></button>
+                            <button onclick="irPagina(totalPaginas)" id="btnUltima" disabled><i class="fas fa-angle-double-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSTRUCCIONES -->
+        <div class="section-box" style="background:#f8f9fc; margin-bottom:0;">
+            <h2><i class="fas fa-info-circle" style="color:#0288d1;"></i> ¿Cómo funciona?</h2>
+            <p style="color:#666; font-size:0.95rem; line-height:1.8;">
+                <strong>1. Entrenamiento:</strong> Se usa Random Forest con GridSearchCV para optimizar hiperparámetros y validación cruzada (5 folds).<br>
+                <strong>2. Métricas:</strong> Accuracy, Precisión, Recall, F1, AUC, Log Loss y MCC.<br>
+                <strong>3. Predicción:</strong> Calcula la probabilidad de abandono para cada cliente y lo clasifica en Alto (≥0.7), Medio (≥0.4) o Bajo.<br>
+                <strong>4. Exportación:</strong> Descarga los resultados en formato CSV.
+            </p>
+        </div>
+    </main>
+</div>
+
+<script>
+    // ================================================================
+    // VARIABLES GLOBALES
+    // ================================================================
+    let clientes = [];
+    let clientesFiltrados = [];
+    let filtroActual = 'todos';
+    let paginaActual = 1;
+    let itemsPorPagina = 10;
+    let totalPaginas = 1;
+
+    // ================================================================
+    // UTILIDADES
+    // ================================================================
+    function mostrarResultado(mensaje, tipo='success') {
+        const div = document.getElementById('resultadoAccion');
+        div.style.display = 'block';
+        div.className = `alert alert-${tipo}`;
+        div.innerHTML = mensaje;
+        setTimeout(() => { div.style.display = 'none'; }, 8000);
+    }
+
+    function deshabilitarBoton(id, deshabilitar) {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.disabled = deshabilitar;
+            if (deshabilitar) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+        }
+    }
+
+    function restaurarBoton(id, texto, icono) {
+        const btn = document.getElementById(id);
+        if (btn) { btn.disabled = false; btn.innerHTML = `<i class="${icono}"></i> ${texto}`; }
+    }
+
+    // ================================================================
+    // ENTRENAR
+    // ================================================================
+    function entrenarModelo() {
+        deshabilitarBoton('btnEntrenar', true);
+        fetch('/api/clasificacion/entrenar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ solo_clientes: true, cv_folds: 5 })
+        })
+        .then(r => r.json())
+        .then(data => {
+            restaurarBoton('btnEntrenar', 'Entrenar Modelo', 'fas fa-play');
+            if (data.success) {
+                mostrarResultado(`✅ Modelo entrenado! Accuracy: ${data.accuracy.toFixed(3)} | AUC: ${data.auc.toFixed(3)}`, 'success');
+                cargarMetricas();
+                cargarImportancia();
+                cargarMatriz(data.matriz_confusion);
+                predecirTodos();
+                actualizarEstadoModelo(true);
+            } else {
+                mostrarResultado(`❌ ${data.message}`, 'danger');
+            }
+        })
+        .catch(e => {
+            restaurarBoton('btnEntrenar', 'Entrenar Modelo', 'fas fa-play');
+            mostrarResultado(`❌ Error: ${e.message}`, 'danger');
+        });
+    }
+
+    // ================================================================
+    // PREDECIR TODOS
+    // ================================================================
+    function predecirTodos() {
+        deshabilitarBoton('btnPredecir', true);
+        fetch('/api/clasificacion/predecir?solo_clientes=true')
+        .then(r => r.json())
+        .then(data => {
+            restaurarBoton('btnPredecir', 'Predecir Todos', 'fas fa-users');
+            if (data.success) {
+                clientes = data.clientes || [];
+                mostrarResultado(`👥 ${data.total_analizados} clientes analizados`, 'success');
+                aplicarFiltroYActualizar();
+            } else {
+                mostrarResultado(`❌ ${data.message}`, 'danger');
+            }
+        })
+        .catch(e => {
+            restaurarBoton('btnPredecir', 'Predecir Todos', 'fas fa-users');
+            mostrarResultado(`❌ Error: ${e.message}`, 'danger');
+        });
+    }
+
+    // ================================================================
+    // EXPORTAR CSV
+    // ================================================================
+    function exportarCSV() {
+        window.location.href = '/api/clasificacion/exportar';
+    }
+
+    // ================================================================
+    // LIMPIAR MODELO
+    // ================================================================
+    function limpiarModelo() {
+        if (!confirm('¿Eliminar el modelo entrenado?')) return;
+        fetch('/api/clasificacion/limpiar', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                mostrarResultado('🗑️ Modelo eliminado', 'warning');
+                actualizarEstadoModelo(false);
+                document.getElementById('metricasGrid').querySelectorAll('.num').forEach(el => el.textContent = 'N/A');
+                document.getElementById('importanciaContainer').innerHTML = '<p class="text-muted text-center" style="padding:20px;">Entrena el modelo para ver importancia.</p>';
+                document.getElementById('matrizContainer').innerHTML = '<p class="text-muted text-center" style="padding:20px;">No hay datos.</p>';
+                clientes = [];
+                aplicarFiltroYActualizar();
+            } else {
+                mostrarResultado(`❌ ${data.message}`, 'danger');
+            }
+        })
+        .catch(e => mostrarResultado(`❌ Error: ${e.message}`, 'danger'));
+    }
+
+    // ================================================================
+    // CARGAR MÉTRICAS
+    // ================================================================
+    function cargarMetricas() {
+        fetch('/api/clasificacion/metricas')
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.metricas) {
+                const m = data.metricas;
+                document.getElementById('accuracy').textContent = m.accuracy ? m.accuracy.toFixed(3) : 'N/A';
+                document.getElementById('precision').textContent = m.precision ? m.precision.toFixed(3) : 'N/A';
+                document.getElementById('recall').textContent = m.recall ? m.recall.toFixed(3) : 'N/A';
+                document.getElementById('f1').textContent = m.f1 ? m.f1.toFixed(3) : 'N/A';
+                document.getElementById('auc').textContent = m.auc ? m.auc.toFixed(3) : 'N/A';
+                document.getElementById('logloss').textContent = m.logloss ? m.logloss.toFixed(3) : 'N/A';
+                document.getElementById('cv_mean').textContent = m.cv_mean ? m.cv_mean.toFixed(3) : 'N/A';
+                document.getElementById('n_muestras').textContent = m.n_muestras || 0;
+                document.getElementById('fechaActualizacion').textContent = m.fecha_actualizacion ? new Date(m.fecha_actualizacion).toLocaleString() : '-';
+                actualizarEstadoModelo(true);
+                cargarImportancia();
+                cargarMatriz(m.matriz_confusion);
+            } else {
+                actualizarEstadoModelo(false);
+            }
+        })
+        .catch(e => console.error('Error cargando métricas:', e));
+    }
+
+    // ================================================================
+    // IMPORTANCIA
+    // ================================================================
+    function cargarImportancia() {
+        fetch('/api/clasificacion/metricas')
+        .then(r => r.json())
+        .then(data => {
+            const container = document.getElementById('importanciaContainer');
+            if (data.success && data.metricas && data.metricas.importancia) {
+                const items = Object.entries(data.metricas.importancia).sort((a,b) => b[1]-a[1]);
+                const max = items[0][1] || 1;
+                let html = '';
+                items.forEach(([key, val]) => {
+                    const pct = (val / max * 100).toFixed(1);
+                    html += `<div class="importancia-item">
+                        <span style="min-width:120px;font-weight:600;">${key}</span>
+                        <div class="barra"><div class="fill" style="width:${pct}%;"></div></div>
+                        <span class="valor">${(val*100).toFixed(1)}%</span>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p class="text-muted text-center" style="padding:20px;">No hay importancia disponible.</p>';
+            }
+        })
+        .catch(() => {});
+    }
+
+    // ================================================================
+    // MATRIZ
+    // ================================================================
+    function cargarMatriz(cm) {
+        const container = document.getElementById('matrizContainer');
+        if (!cm || cm.length !== 2) {
+            container.innerHTML = '<p class="text-muted text-center" style="padding:20px;">No hay matriz de confusión.</p>';
+            return;
+        }
+        const labels = ['No Abandona', 'Abandona'];
+        let html = `<div class="matriz-confusion">
+            <div class="celda header"></div><div class="celda header">${labels[0]}</div><div class="celda header">${labels[1]}</div>
+            <div class="celda header">${labels[0]}</div><div class="celda vp">${cm[0][0]}</div><div class="celda fp">${cm[0][1]}</div>
+            <div class="celda header">${labels[1]}</div><div class="celda fn">${cm[1][0]}</div><div class="celda vn">${cm[1][1]}</div>
+        </div>`;
+        container.innerHTML = html;
+    }
+
+    // ================================================================
+    // ESTADO DEL MODELO
+    // ================================================================
+    function actualizarEstadoModelo(existe) {
+        const span = document.getElementById('estadoModelo');
+        span.className = `badge-estado ${existe ? 'existe' : 'no-existe'}`;
+        span.textContent = existe ? '✅ Entrenado' : '❌ No entrenado';
+    }
+
+    // ================================================================
+    // FILTROS Y PAGINACIÓN
+    // ================================================================
+    function filtrarClientes(filtro) {
+        filtroActual = filtro;
+        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.toggle('active', b.dataset.filtro === filtro));
+        aplicarFiltroYActualizar();
+    }
+
+    function aplicarFiltroYActualizar() {
+        if (filtroActual === 'todos') clientesFiltrados = [...clientes];
+        else clientesFiltrados = clientes.filter(c => c.nivel.toLowerCase() === filtroActual);
+        paginaActual = 1;
+        actualizarContadores();
+        renderizarPagina();
+    }
+
+    function actualizarContadores() {
+        const counts = { todos: clientes.length, alto: 0, medio: 0, bajo: 0 };
+        clientes.forEach(c => { if (c.nivel.toLowerCase() in counts) counts[c.nivel.toLowerCase()]++; });
+        document.getElementById('count-todos').textContent = counts.todos;
+        document.getElementById('count-alto').textContent = counts.alto;
+        document.getElementById('count-medio').textContent = counts.medio;
+        document.getElementById('count-bajo').textContent = counts.bajo;
+        document.getElementById('totalClientes').textContent = counts.todos + ' clientes';
+    }
+
+    function cambiarPagina() {
+        itemsPorPagina = parseInt(document.getElementById('perPageSelect').value);
+        paginaActual = 1;
+        renderizarPagina();
+    }
+
+    function irPagina(pagina) {
+        if (pagina < 1 || pagina > totalPaginas) return;
+        paginaActual = pagina;
+        renderizarPagina();
+    }
+
+    function renderizarPagina() {
+        const total = clientesFiltrados.length;
+        totalPaginas = Math.ceil(total / itemsPorPagina) || 1;
+        if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+        if (paginaActual < 1) paginaActual = 1;
+
+        const inicio = (paginaActual-1) * itemsPorPagina;
+        const fin = Math.min(inicio + itemsPorPagina, total);
+        const paginaItems = clientesFiltrados.slice(inicio, fin);
+
+        const tbody = document.getElementById('tablaBody');
+        if (paginaItems.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No hay clientes</td></tr>`;
+        } else {
+            let html = '';
+            paginaItems.forEach((c, i) => {
+                const badge = c.nivel.toLowerCase();
+                const icon = badge === 'alto' ? '🔴' : badge === 'medio' ? '🟡' : '🟢';
+                html += `<tr class="tr-risco"><td><strong>${inicio+i+1}</strong></td>
+                    <td><strong>${c.nombre || 'Usuario'}</strong></td>
+                    <td>${c.email || 'N/A'}</td>
+                    <td>${c.dias_sin_comprar || 0}</td>
+                    <td>${c.total_pedidos || 0}</td>
+                    <td><span class="badge-riesgo ${badge}">${icon} ${c.nivel}</span></td>
+                    <td>${(c.riesgo * 100).toFixed(1)}%</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        document.getElementById('paginacion-desde').textContent = total > 0 ? inicio+1 : 0;
+        document.getElementById('paginacion-hasta').textContent = fin;
+        document.getElementById('paginacion-total').textContent = total;
+        document.getElementById('paginaInfo').textContent = `${paginaActual} / ${totalPaginas}`;
+
+        document.getElementById('btnPrimera').disabled = paginaActual <= 1;
+        document.getElementById('btnAnterior').disabled = paginaActual <= 1;
+        document.getElementById('btnSiguiente').disabled = paginaActual >= totalPaginas;
+        document.getElementById('btnUltima').disabled = paginaActual >= totalPaginas;
+    }
+
+    // ================================================================
+    // CARGA INICIAL
+    // ================================================================
+    window.onload = function() {
+        cargarMetricas();
+        predecirTodos();
+    };
+</script>
+</body>
+</html>

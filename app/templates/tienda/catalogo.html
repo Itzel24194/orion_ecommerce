@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION | Catálogo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --orion-primary: #e10098; 
+            --orion-primary-dark: #c00080;
+            --orion-ink: #1a1a1a;
+        }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #f5f5f5;
+            color: #2b2b2b;
+        }
+        
+        /* ====== NAVBAR ====== */
+        .main-navbar { 
+            background: #ffffff;
+            border-bottom: 2px solid #f0f0f0;
+            padding: 10px 0 !important;
+            transition: all 0.3s ease;
+        }
+        .brand-logo { 
+            font-weight: 900; 
+            font-size: 2.3rem; 
+            color: var(--orion-primary) !important; 
+            letter-spacing: -1.5px; 
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .brand-logo:hover { transform: scale(1.02); }
+        
+        .search-container {
+            border: 2px solid #eee !important;
+            transition: border-color 0.3s ease;
+        }
+        .search-container:focus-within { border-color: var(--orion-primary) !important; }
+
+        /* ====== SIDEBAR ====== */
+        .sidebar-box { 
+            background: #fff; 
+            padding: 16px 14px; 
+            border-radius: 8px; 
+            border: 1px solid #e0e0e0;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        .sidebar-box::-webkit-scrollbar { width: 4px; }
+        .sidebar-box::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+        /* ====== CATEGORÍAS CON COLLAPSE ====== */
+        .cat-section {
+            border-bottom: 1px solid #eee;
+            padding: 6px 0;
+        }
+        .cat-section:last-child { border-bottom: none; }
+
+        .cat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 4px 0;
+            user-select: none;
+        }
+        .cat-header .cat-title {
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #333;
+            margin: 0;
+        }
+        .cat-header i { color: #999; transition: 0.2s; font-size: 0.78rem; }
+        .cat-header.collapsed i { transform: rotate(-90deg); }
+
+        .cat-body {
+            padding-top: 6px;
+        }
+
+        .cat-link { 
+            text-decoration: none; 
+            color: #444; 
+            display: block; 
+            padding: 3px 0; 
+            font-size: 0.88rem; 
+        }
+        .sub-link { padding-left: 15px !important; font-size: 0.85rem !important; }
+        .nieto-link { padding-left: 30px !important; color: #777 !important; font-size: 0.82rem !important; }
+        .active-cat { color: var(--orion-primary) !important; font-weight: 700; }
+
+        /* ====== FILTROS ====== */
+        .filter-divider {
+            border-top: 2px solid #e0e0e0;
+            margin: 14px 0 10px 0;
+        }
+
+        .filter-section {
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+        }
+        .filter-section:last-child { border-bottom: none; }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 4px 0;
+            user-select: none;
+        }
+        .filter-header h6 {
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #333;
+            margin: 0;
+        }
+        .filter-header i { color: #999; transition: 0.2s; font-size: 0.78rem; }
+        .filter-header.collapsed i { transform: rotate(-90deg); }
+
+        .filter-body {
+            padding-top: 6px;
+            max-height: 170px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .filter-body::-webkit-scrollbar { width: 4px; }
+        .filter-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 0;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #444;
+            transition: 0.15s;
+        }
+        .filter-item:hover { color: var(--orion-primary); }
+        .filter-item input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            accent-color: var(--orion-primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .filter-item .badge-count {
+            margin-left: auto;
+            background: #f0f0f0;
+            color: #777;
+            font-size: 0.65rem;
+            padding: 1px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .filter-item .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .filter-ver-mas {
+            color: var(--orion-primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .filter-ver-mas:hover { text-decoration: underline; }
+        .filter-ver-menos { color: var(--orion-primary); font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-block; margin-top: 4px; }
+        .filter-ver-menos:hover { text-decoration: underline; }
+
+        .filter-price-inputs {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-price-inputs input {
+            width: 65px;
+            padding: 4px 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .filter-price-inputs span { color: #999; font-size: 0.8rem; }
+        .filter-price-inputs button {
+            background: var(--orion-primary);
+            color: #fff;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+        .filter-price-inputs button:hover { background: var(--orion-primary-dark); }
+
+        .filters-toggle-mobile {
+            display: none;
+            background: var(--orion-primary);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        .filters-toggle-mobile:hover { background: var(--orion-primary-dark); color: #fff; }
+
+        /* ====== BREADCRUMB ====== */
+        .breadcrumb-orion { margin-bottom: 0.8rem; }
+        .breadcrumb-orion .breadcrumb { background: transparent; padding: 0; margin: 0; }
+        .breadcrumb-orion a { color: #777; text-decoration: none; font-weight: 600; }
+        .breadcrumb-orion a:hover { color: var(--orion-primary); text-decoration: underline; }
+        .breadcrumb-orion .breadcrumb-item.active { color: #999; }
+        .breadcrumb-orion .breadcrumb-item + .breadcrumb-item::before { color: #ccc; }
+
+        /* ====== TARJETAS DE PRODUCTO ====== */
+        .card { 
+            transition: 0.3s; 
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .card:hover { 
+            border-color: var(--orion-primary); 
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
+        }
+        .card-img-top { 
+            height: 280px; 
+            object-fit: contain; 
+            padding: 16px; 
+            background: #fafafa;
+            width: 100%;
+        }
+        .price { 
+            font-weight: 700; 
+            color: var(--orion-primary); 
+            font-size: 1.1rem; 
+        }
+        .badge-status { 
+            font-size: 0.65rem; 
+            padding: 3px 10px; 
+            border-radius: 4px; 
+            text-transform: uppercase; 
+            font-weight: 700; 
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .card-body h6 {
+            font-size: 0.95rem !important;
+            min-height: 44px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-weight: 600;
+            color: #222;
+        }
+
+        /* ====== CONTENEDOR PRINCIPAL - SIN MUCHO ESPACIO LATERAL ====== */
+        .main-container {
+            padding-left: 20px;
+            padding-right: 20px;
+            max-width: 100%;
+        }
+
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 1199px) {
+            .product-grid { grid-template-columns: repeat(3, 1fr); }
+            .card-img-top { height: 240px; }
+        }
+
+        @media (max-width: 991px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); }
+            .card-img-top { height: 200px; }
+            .main-container { padding-left: 16px; padding-right: 16px; }
+        }
+
+        @media (max-width: 767px) {
+            .main-container { padding-left: 10px; padding-right: 10px; }
+            .sidebar-box { max-height: none; }
+            .filters-toggle-mobile { display: block; }
+            .filter-body { max-height: 130px; }
+            .filter-price-inputs input { width: 55px; }
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .card-img-top { height: 160px; padding: 10px; }
+            .brand-logo { font-size: 1.6rem; }
+            .card-body h6 { font-size: 0.8rem !important; min-height: 36px; }
+            .price { font-size: 0.95rem; }
+        }
+
+        @media (max-width: 480px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .card-img-top { height: 140px; padding: 8px; }
+            .card-body { padding: 10px; }
+            .card-body h6 { font-size: 0.75rem !important; min-height: 32px; }
+            .price { font-size: 0.85rem; }
+            .badge-status { font-size: 0.55rem; padding: 2px 6px; }
+        }
+    </style>
+</head>
+<body class="bg-light"
+    data-logueado="{{ '1' if session.get('user_id') else '0' }}"
+    data-carrito-url="{{ url_for('web.agregar_al_carrito') }}"
+    data-carrito-redir="{{ url_for('web.ver_carrito') }}">
+
+    <!-- ====== NAVBAR ====== -->
+    <nav class="navbar navbar-light main-navbar sticky-top shadow-sm">
+        <div class="main-container d-flex align-items-center justify-content-between" style="width:100%;">
+            <a class="navbar-brand brand-logo" href="/">ORION</a>
+            
+            <form class="d-flex flex-grow-1 mx-3" action="{{ url_for('web.catalogo') }}" method="GET">
+                <div class="input-group rounded-pill overflow-hidden bg-light search-container">
+                    <input class="form-control border-0 bg-light ps-4" type="search" name="q" placeholder="Buscar productos..." value="{{ request.args.get('q', '') }}">
+                    <button class="btn btn-light border-0 text-muted px-3" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+
+            <div class="d-flex align-items-center gap-3">
+                {% if session.get('nombre') %}
+                    <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                        {% if session.get('foto') %}
+                            <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}?t={{ range(1, 10000) | random }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit: cover;">
+                        {% endif %}
+                        Hola, {{ session['nombre'] }}
+                    </a>
+                {% else %}
+                    <a href="/login" class="text-dark fw-bold small text-uppercase text-decoration-none"><i class="bi bi-person fs-5 align-middle me-1"></i> Iniciar sesión</a>
+                {% endif %}
+                <a href="{{ url_for('web.ver_carrito') }}" class="text-dark"><i class="bi bi-bag fs-4"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ====== CONTENIDO PRINCIPAL ====== -->
+    <div class="main-container">
+
+        <!-- BREADCRUMB -->
+        <nav aria-label="breadcrumb" class="breadcrumb-orion mt-3">
+            <ol class="breadcrumb small">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Catálogo</li>
+                {% if cat_actual %}
+                    <li class="breadcrumb-item active">{{ cat_actual.nombre }}</li>
+                {% endif %}
+            </ol>
+        </nav>
+
+        <div class="row g-3">
+
+            <!-- ====== COLUMNA IZQUIERDA: Categorías + Filtros ====== -->
+            <div class="col-lg-3 col-md-4">
+                <button class="filters-toggle-mobile" id="filtersToggleMobile">
+                    <i class="bi bi-funnel"></i> Categorías y Filtros
+                </button>
+
+                <div class="sidebar-box shadow-sm" id="filtersLiverpool">
+                    
+                    <!-- ====== CATEGORÍAS CON COLLAPSE ====== -->
+                    <div class="cat-section">
+                        <div class="cat-header" data-target="#categoriasBody">
+                            <span class="cat-title"><i class="bi bi-tags me-1"></i>Categorías</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="collapse show cat-body" id="categoriasBody">
+                            {% if categoria_seleccionada %}
+                                <a href="{{ url_for('web.catalogo') }}" class="text-decoration-none text-primary mb-2 d-block small"><strong>« Ver todo</strong></a>
+                            {% endif %}
+
+                            {% for cat in categorias if not cat.padre_id %}
+                                {% if not categoria_seleccionada or cat._id|string in ids_visibles %}
+                                    <a href="{{ url_for('web.catalogo', categoria=cat._id) }}" class="cat-link {% if categoria_seleccionada == cat._id|string %}active-cat{% endif %}">
+                                        <strong>{{ cat.nombre }}</strong>
+                                    </a>
+                                    
+                                    {% for sub in categorias if sub.padre_id|string == cat._id|string %}
+                                        {% if not categoria_seleccionada or sub._id|string in ids_visibles or sub.padre_id|string == categoria_seleccionada %}
+                                            <a href="{{ url_for('web.catalogo', categoria=sub._id) }}" class="cat-link sub-link {% if categoria_seleccionada == sub._id|string %}active-cat{% endif %}">
+                                                ↳ {{ sub.nombre }}
+                                            </a>
+                                            
+                                            {% for nieto in categorias if nieto.padre_id|string == sub._id|string %}
+                                                <a href="{{ url_for('web.catalogo', categoria=nieto._id) }}" class="cat-link nieto-link {% if categoria_seleccionada == nieto._id|string %}active-cat{% endif %}">
+                                                    • {{ nieto.nombre }}
+                                                </a>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- ====== DIVISOR ====== -->
+                    <div class="filter-divider"></div>
+
+                    <!-- ====== FILTROS LIVERPOOL ====== -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0" style="font-size:0.85rem;"><i class="bi bi-funnel me-2"></i>Filtros</h6>
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill" id="clearFilters" style="font-size:0.65rem;padding:2px 12px;">Limpiar todo</button>
+                    </div>
+
+                    <!-- ====== 1. DESCUENTOS ====== -->
+                    <div class="filter-section">
+                        <div class="filter-header" data-target="#filterDescuentos">
+                            <h6>Descuentos</h6>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="collapse show filter-body" id="filterDescuentos">
+                            <label class="filter-item"><input type="checkbox" value="70"> 70.0 % o más <span class="badge-count">1</span></label>
+                            <label class="filter-item"><input type="checkbox" value="60"> 60.0 % o más <span class="badge-count">1</span></label>
+                            <label class="filter-item"><input type="checkbox" value="50"> 50.0 % o más <span class="badge-count">201</span></label>
+                            <label class="filter-item"><input type="checkbox" value="40"> 40.0 % o más <span class="badge-count">376</span></label>
+                            <label class="filter-item"><input type="checkbox" value="30"> 30.0 % o más <span class="badge-count">641</span></label>
+                            <label class="filter-item"><input type="checkbox" value="20"> 20.0 % o más <span class="badge-count">944</span></label>
+                            <label class="filter-item"><input type="checkbox" value="10"> 10.0 % o más <span class="badge-count">1096</span></label>
+                        </div>
+                    </div>
+
+                    <!-- ====== 2. MARCAS ====== -->
+                    <div class="filter-section">
+                        <div class="filter-header" data-target="#filterMarcas">
+                            <h6>Marcas</h6>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="collapse show filter-body" id="filterMarcas">
+                            <div class="mb-2"><input type="text" class="form-control form-control-sm" placeholder="Búsqueda rápida" style="border-radius:20px;font-size:0.75rem;"></div>
+                            <label class="filter-item"><input type="checkbox" value="20 HRS"> 20 HRS <span class="badge-count">1</span></label>
+                            <label class="filter-item"><input type="checkbox" value="BALTARINI"> BALTARINI <span class="badge-count">6</span></label>
+                            <label class="filter-item"><input type="checkbox" value="BARALDI"> BARALDI <span class="badge-count">17</span></label>
+                            <label class="filter-item"><input type="checkbox" value="BENISSIMO"> BENISSIMO <span class="badge-count">16</span></label>
+                            <label class="filter-item"><input type="checkbox" value="BIRKENSTOCK"> BIRKENSTOCK <span class="badge-count">4</span></label>
+                            <label class="filter-item"><input type="checkbox" value="BLACKMAN"> BLACKMAN <span class="badge-count">3</span></label>
+                            <label class="filter-item"><input type="checkbox" value="BMNY"> BMNY <span class="badge-count">179</span></label>
+                            <span class="filter-ver-mas" data-target="#filterMarcas">Ver más</span>
+                            <div class="extra-items" style="display:none;">
+                                <label class="filter-item"><input type="checkbox" value="CAMPER"> CAMPER <span class="badge-count">50</span></label>
+                                <label class="filter-item"><input type="checkbox" value="FLEXI"> FLEXI <span class="badge-count">82</span></label>
+                                <label class="filter-item"><input type="checkbox" value="FLORSHEIM"> FLORSHEIM <span class="badge-count">8</span></label>
+                                <label class="filter-item"><input type="checkbox" value="PRADA"> PRADA <span class="badge-count">70</span></label>
+                                <label class="filter-item"><input type="checkbox" value="REPÚBLICA BLANCA"> REPÚBLICA BLANCA <span class="badge-count">84</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ====== 3. TALLA ====== -->
+                    <div class="filter-section">
+                        <div class="filter-header" data-target="#filterTalla">
+                            <h6>Talla</h6>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="collapse show filter-body" id="filterTalla">
+                            <label class="filter-item"><input type="checkbox" value="22 cm"> 22 cm <span class="badge-count">9</span></label>
+                            <label class="filter-item"><input type="checkbox" value="22.5 cm"> 22.5 cm <span class="badge-count">5</span></label>
+                            <label class="filter-item"><input type="checkbox" value="23 cm"> 23 cm <span class="badge-count">14</span></label>
+                            <label class="filter-item"><input type="checkbox" value="23.5 cm"> 23.5 cm <span class="badge-count">5</span></label>
+                            <label class="filter-item"><input type="checkbox" value="24 cm"> 24 cm <span class="badge-count">20</span></label>
+                            <label class="filter-item"><input type="checkbox" value="24.5 cm"> 24.5 cm <span class="badge-count">7</span></label>
+                            <label class="filter-item"><input type="checkbox" value="25 cm"> 25 cm <span class="badge-count">845</span></label>
+                            <span class="filter-ver-mas" data-target="#filterTalla">Ver más</span>
+                            <div class="extra-items" style="display:none;">
+                                <label class="filter-item"><input type="checkbox" value="25.5 cm"> 25.5 cm <span class="badge-count">12</span></label>
+                                <label class="filter-item"><input type="checkbox" value="26 cm"> 26 cm <span class="badge-count">8</span></label>
+                                <label class="filter-item"><input type="checkbox" value="26.5 cm"> 26.5 cm <span class="badge-count">6</span></label>
+                                <label class="filter-item"><input type="checkbox" value="27 cm"> 27 cm <span class="badge-count">4</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ====== 4. COLOR ====== -->
+                    <div class="filter-section">
+                        <div class="filter-header" data-target="#filterColor">
+                            <h6>Color</h6>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="collapse show filter-body" id="filterColor">
+                            <label class="filter-item"><input type="checkbox" value="Negro"> <span class="color-dot" style="background:#1a1a1a;"></span> Negro <span class="badge-count">156</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Blanco"> <span class="color-dot" style="background:#ffffff;border-color:#ccc;"></span> Blanco <span class="badge-count">89</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Café"> <span class="color-dot" style="background:#6b4423;"></span> Café <span class="badge-count">234</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Negro/Café"> <span class="color-dot" style="background:linear-gradient(45deg,#1a1a1a 50%,#6b4423 50%);"></span> Negro/Café <span class="badge-count">67</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Rojo"> <span class="color-dot" style="background:#dc2626;"></span> Rojo <span class="badge-count">45</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Azul"> <span class="color-dot" style="background:#2563eb;"></span> Azul <span class="badge-count">78</span></label>
+                            <span class="filter-ver-mas" data-target="#filterColor">Ver más</span>
+                            <div class="extra-items" style="display:none;">
+                                <label class="filter-item"><input type="checkbox" value="Verde"> <span class="color-dot" style="background:#16a34a;"></span> Verde <span class="badge-count">34</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Gris"> <span class="color-dot" style="background:#9ca3af;"></span> Gris <span class="badge-count">56</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Beige"> <span class="color-dot" style="background:#f5f0dc;"></span> Beige <span class="badge-count">28</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ====== 5. PRECIOS ====== -->
+                    <div class="filter-section">
+                        <div class="filter-header" data-target="#filterPrecios">
+                            <h6>Precios</h6>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="collapse show filter-body" id="filterPrecios">
+                            <label class="filter-item"><input type="checkbox" value="menos-500"> Menos de $500.0 <span class="badge-count">7</span></label>
+                            <label class="filter-item"><input type="checkbox" value="500-1000"> $500.0 - $1000.0 <span class="badge-count">169</span></label>
+                            <label class="filter-item"><input type="checkbox" value="1000-2000"> $1000.0 - $2000.0 <span class="badge-count">755</span></label>
+                            <label class="filter-item"><input type="checkbox" value="2000-5000"> $2000.0 - $5000.0 <span class="badge-count">521</span></label>
+                            <label class="filter-item"><input type="checkbox" value="5000-10000"> $5000.0 - $10000.0 <span class="badge-count">53</span></label>
+                            <label class="filter-item"><input type="checkbox" value="mas-10000"> Mas de $10000.0 <span class="badge-count">3</span></label>
+                            <div class="filter-price-inputs mt-2">
+                                <input type="number" placeholder="Mín" id="priceMin" value="">
+                                <span>—</span>
+                                <input type="number" placeholder="Máx" id="priceMax" value="">
+                                <button id="applyPriceFilter">Aplicar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ====== 6. CALIFICACIÓN ====== -->
+                    <div class="filter-section">
+                        <div class="filter-header" data-target="#filterCalificacion">
+                            <h6>Calificación</h6>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="collapse show filter-body" id="filterCalificacion">
+                            <label class="filter-item"><input type="checkbox" value="4"> 4 estrellas o más <span class="badge-count">38</span></label>
+                        </div>
+                    </div>
+
+                    <!-- ====== 7. MATERIAL ====== -->
+                    <div class="filter-section">
+                        <div class="filter-header" data-target="#filterMaterial">
+                            <h6>Material</h6>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="collapse show filter-body" id="filterMaterial">
+                            <label class="filter-item"><input type="checkbox" value="Acero inoxidable"> Acero inoxidable <span class="badge-count">1</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Charol"> Charol <span class="badge-count">35</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Cuero"> Cuero <span class="badge-count">932</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Cuero sintético"> Cuero sintético <span class="badge-count">137</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Felpa"> Felpa <span class="badge-count">1</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Gamuza"> Gamuza <span class="badge-count">31</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Goma"> Goma <span class="badge-count">10</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Lona"> Lona <span class="badge-count">2</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Material reciclado"> Material reciclado <span class="badge-count">2</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Memory foam"> Memory foam <span class="badge-count">3</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Nubuck"> Nubuck <span class="badge-count">1</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Piel de becerro"> Piel de becerro <span class="badge-count">4</span></label>
+                            <span class="filter-ver-menos" data-target="#filterMaterial" style="display:none;">Ver menos</span>
+                        </div>
+                    </div>
+
+                    <!-- ====== 8. VENDIDO POR ====== -->
+                    <div class="filter-section">
+                        <div class="filter-header" data-target="#filterVendido">
+                            <h6>Vendido por</h6>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="collapse show filter-body" id="filterVendido">
+                            <label class="filter-item"><input type="checkbox" value="liverpool" checked> liverpool <span class="badge-count">384</span></label>
+                            <label class="filter-item"><input type="checkbox" value="suburbia"> suburbia <span class="badge-count">63</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Frio Extremo"> Frio Extremo <span class="badge-count">179</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Zapaterías Leon MX"> Zapaterías Leon MX <span class="badge-count">153</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Roma Zapaterías"> Roma Zapaterías <span class="badge-count">87</span></label>
+                            <label class="filter-item"><input type="checkbox" value="REPÚBLICA BLANCA"> REPÚBLICA BLANCA <span class="badge-count">84</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Flexi"> Flexi <span class="badge-count">82</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Zapaterias Pakar"> Zapaterias Pakar <span class="badge-count">78</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Prada Mx"> Prada Mx <span class="badge-count">70</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Camper"> Camper <span class="badge-count">50</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Zapaterías México"> Zapaterías México <span class="badge-count">41</span></label>
+                            <label class="filter-item"><input type="checkbox" value="yayashoesmx"> yayashoesmx <span class="badge-count">31</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Michel Domit"> Michel Domit <span class="badge-count">27</span></label>
+                            <label class="filter-item"><input type="checkbox" value="LOB FOOTWEAR"> LOB FOOTWEAR <span class="badge-count">24</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Trender"> Trender <span class="badge-count">22</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Dasalo"> Dasalo <span class="badge-count">21</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Luxomar"> Luxomar <span class="badge-count">18</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Calzado Baraldi"> Calzado Baraldi <span class="badge-count">17</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Calzado Evolución"> Calzado Evolución <span class="badge-count">16</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Estilo DH"> Estilo DH <span class="badge-count">16</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Randem"> Randem <span class="badge-count">15</span></label>
+                            <label class="filter-item"><input type="checkbox" value="BOND"> BOND <span class="badge-count">13</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Enco Footwear"> Enco Footwear <span class="badge-count">13</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Grupo Balia"> Grupo Balia <span class="badge-count">12</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Tres Reyes Zapaterias"> Tres Reyes Zapaterias <span class="badge-count">10</span></label>
+                            <label class="filter-item"><input type="checkbox" value="VF Corporation"> VF Corporation <span class="badge-count">9</span></label>
+                            <label class="filter-item"><input type="checkbox" value="CALZADO GROMO"> CALZADO GROMO <span class="badge-count">8</span></label>
+                            <label class="filter-item"><input type="checkbox" value="CALZAMARKET"> CALZAMARKET <span class="badge-count">8</span></label>
+                            <label class="filter-item"><input type="checkbox" value="Florsheim"> Florsheim <span class="badge-count">8</span></label>
+                            <label class="filter-item"><input type="checkbox" value="WORKLAND"> WORKLAND <span class="badge-count">8</span></label>
+                            <span class="filter-ver-mas" data-target="#filterVendido">Ver más</span>
+                            <div class="extra-items" style="display:none;">
+                                <label class="filter-item"><input type="checkbox" value="DIVERTICALZADOS"> DIVERTICALZADOS <span class="badge-count">6</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Hamilton Footwear"> Hamilton Footwear <span class="badge-count">5</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Paruno"> Paruno <span class="badge-count">5</span></label>
+                                <label class="filter-item"><input type="checkbox" value="TXINTERNET"> TXINTERNET <span class="badge-count">5</span></label>
+                                <label class="filter-item"><input type="checkbox" value="MOAD SHOES"> MOAD SHOES <span class="badge-count">4</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Massimo Gorka"> Massimo Gorka <span class="badge-count">4</span></label>
+                                <label class="filter-item"><input type="checkbox" value="PREMIUM BRANDS"> PREMIUM BRANDS <span class="badge-count">4</span></label>
+                                <label class="filter-item"><input type="checkbox" value="iKual"> iKual <span class="badge-count">4</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Blackman"> Blackman <span class="badge-count">3</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Brimont Store"> Brimont Store <span class="badge-count">3</span></label>
+                                <label class="filter-item"><input type="checkbox" value="FRANCO CUADRA"> FRANCO CUADRA <span class="badge-count">3</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Hörner"> Hörner <span class="badge-count">3</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Marcas y Tendencias"> Marcas y Tendencias <span class="badge-count">3</span></label>
+                                <label class="filter-item"><input type="checkbox" value="TREP MÉXICO"> TREP MÉXICO <span class="badge-count">3</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Exclusivas Marcel La Zapateria"> Exclusivas Marcel La Zapateria <span class="badge-count">2</span></label>
+                                <label class="filter-item"><input type="checkbox" value="FANTOCHE SNEAKERS"> FANTOCHE SNEAKERS <span class="badge-count">2</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Francisco de Jesús Escamilla Rangel"> Francisco de Jesús Escamilla Rangel <span class="badge-count">2</span></label>
+                                <label class="filter-item"><input type="checkbox" value="HARDBODY SPORT"> HARDBODY SPORT <span class="badge-count">2</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Lifestyle"> Lifestyle <span class="badge-count">2</span></label>
+                                <label class="filter-item"><input type="checkbox" value="SHOES STORE"> SHOES STORE <span class="badge-count">2</span></label>
+                                <label class="filter-item"><input type="checkbox" value="BLUMMX"> BLUMMX <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="COURT OFICIAL"> COURT OFICIAL <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="CR SOLUCIONES"> CR SOLUCIONES <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="DINI STORE"> DINI STORE <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="GRUPO MX HUCRY"> GRUPO MX HUCRY <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="HG E COMMERCE"> HG E COMMERCE <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="KM Footwear"> KM Footwear <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="MOVE MDX"> MOVE MDX <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Medizin Uniformes"> Medizin Uniformes <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="SFERA MEXICO"> SFERA MEXICO <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Sportlandmx"> Sportlandmx <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="TRESESENTA FOOTWEAR"> TRESESENTA FOOTWEAR <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Top Sailer"> Top Sailer <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Via Leon Market"> Via Leon Market <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="Workman"> Workman <span class="badge-count">1</span></label>
+                                <label class="filter-item"><input type="checkbox" value="ZAPATERÍA CABADAO"> ZAPATERÍA CABADAO <span class="badge-count">1</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ====== COLUMNA DERECHA: Productos ====== -->
+            <div class="col-lg-9 col-md-8">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h3 class="mb-0" style="font-size:1.4rem;">{{ cat_actual.nombre if cat_actual else "Catálogo General" }}</h3>
+                    <span class="text-muted small">{{ productos|length }} productos encontrados</span>
+                </div>
+
+                <!-- Orden -->
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <select class="form-select form-select-sm" style="width:auto;border-radius:50px;border-color:#ddd;font-size:0.85rem;">
+                            <option>Relevancia</option>
+                            <option>Precio: menor a mayor</option>
+                            <option>Precio: mayor a menor</option>
+                            <option>Más nuevos</option>
+                            <option>Más vendidos</option>
+                        </select>
+                        <select class="form-select form-select-sm" style="width:auto;border-radius:50px;border-color:#ddd;font-size:0.85rem;">
+                            <option>24 por página</option>
+                            <option>48 por página</option>
+                            <option>96 por página</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grid de productos -->
+                <div class="product-grid">
+                    {% for p in productos %}
+                    {% set p_precio = (p.variantes[0].precio if p.variantes else (p.precio or 0)) %}
+                    {% set p_stock = p.variantes|sum(attribute='stock') if p.variantes else (p.stock or 0) %}
+                    <a href="{{ url_for('web.ver_detalle_producto', id=p._id) }}" class="text-decoration-none text-dark">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <img src="{{ url_for('static', filename='uploads/productos/' + p.fotos[0]) if p.fotos else 'https://via.placeholder.com/300' }}" class="card-img-top" loading="lazy">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-1">{{ p.nombre }}</h6>
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <p class="price mb-0">$ {{ "%.2f"|format(p_precio) }}</p>
+                                    {% if p_stock > 0 %}
+                                        <span class="badge-status bg-success text-white">Disponible</span>
+                                    {% else %}
+                                        <span class="badge-status bg-danger text-white">Agotado</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <!-- Paginación -->
+                {% if paginacion and paginacion.pages > 1 %}
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if paginacion.has_prev %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('web.catalogo', page=paginacion.prev_num, **request.args) }}"><i class="bi bi-chevron-left"></i></a></li>
+                        {% endif %}
+                        {% for p in paginacion.iter_pages() %}
+                            {% if p %}
+                                <li class="page-item {{ 'active' if p == paginacion.page else '' }}">
+                                    <a class="page-link" href="{{ url_for('web.catalogo', page=p, **request.args) }}">{{ p }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if paginacion.has_next %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('web.catalogo', page=paginacion.next_num, **request.args) }}"><i class="bi bi-chevron-right"></i></a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // ── CATEGORÍAS: toggle collapse ──
+        document.querySelectorAll('.cat-header').forEach(function(header) {
+            header.addEventListener('click', function() {
+                var targetId = this.getAttribute('data-target');
+                var target = document.querySelector(targetId);
+                if (target) {
+                    target.classList.toggle('show');
+                    var icon = this.querySelector('i');
+                    if (icon) icon.classList.toggle('bi-chevron-down');
+                    if (icon) icon.classList.toggle('bi-chevron-up');
+                }
+            });
+        });
+
+        // ── FILTROS: toggle collapse ──
+        document.querySelectorAll('.filter-header').forEach(function(header) {
+            header.addEventListener('click', function() {
+                var targetId = this.getAttribute('data-target');
+                var target = document.querySelector(targetId);
+                if (target) {
+                    target.classList.toggle('show');
+                    var icon = this.querySelector('i');
+                    if (icon) icon.classList.toggle('bi-chevron-down');
+                    if (icon) icon.classList.toggle('bi-chevron-up');
+                }
+            });
+        });
+
+        // ── FILTROS: Ver más / Ver menos ──
+        document.querySelectorAll('.filter-ver-mas').forEach(function(el) {
+            el.addEventListener('click', function() {
+                var parent = this.closest('.filter-body');
+                var extra = parent.querySelector('.extra-items');
+                if (extra) {
+                    if (extra.style.display === 'none' || extra.style.display === '') {
+                        extra.style.display = 'block';
+                        this.textContent = 'Ver menos';
+                        this.className = 'filter-ver-menos';
+                    } else {
+                        extra.style.display = 'none';
+                        this.textContent = 'Ver más';
+                        this.className = 'filter-ver-mas';
+                    }
+                }
+            });
+        });
+
+        // ── FILTROS: Ver menos (para los que ya están expandidos por defecto) ──
+        document.querySelectorAll('.filter-ver-menos').forEach(function(el) {
+            el.addEventListener('click', function() {
+                var parent = this.closest('.filter-body');
+                var extra = parent.querySelector('.extra-items');
+                if (extra) {
+                    extra.style.display = 'none';
+                    this.textContent = 'Ver más';
+                    this.className = 'filter-ver-mas';
+                }
+            });
+        });
+
+        // ── FILTROS: Toggle móvil ──
+        var toggleBtn = document.getElementById('filtersToggleMobile');
+        var filtersPanel = document.getElementById('filtersLiverpool');
+        if (toggleBtn && filtersPanel) {
+            toggleBtn.addEventListener('click', function() {
+                filtersPanel.classList.toggle('mobile-open');
+                this.innerHTML = filtersPanel.classList.contains('mobile-open') 
+                    ? '<i class="bi bi-x-lg"></i> Cerrar'
+                    : '<i class="bi bi-funnel"></i> Categorías y Filtros';
+            });
+        }
+
+        // ── FILTROS: Aplicar precio ──
+        document.getElementById('applyPriceFilter')?.addEventListener('click', function() {
+            var min = document.getElementById('priceMin').value;
+            var max = document.getElementById('priceMax').value;
+            var params = new URLSearchParams(window.location.search);
+            if (min) params.set('precio_min', min);
+            else params.delete('precio_min');
+            if (max) params.set('precio_max', max);
+            else params.delete('precio_max');
+            params.set('page', '1');
+            window.location.search = params.toString();
+        });
+
+        // ── FILTROS: Limpiar todo ──
+        document.getElementById('clearFilters')?.addEventListener('click', function() {
+            document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(function(cb) {
+                cb.checked = false;
+            });
+            document.getElementById('priceMin').value = '';
+            document.getElementById('priceMax').value = '';
+            window.location.href = window.location.pathname;
+        });
+
+        // ── FILTROS: Checkbox automático ──
+        document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(function(cb) {
+            cb.addEventListener('change', function() {
+                var params = new URLSearchParams(window.location.search);
+                var name = this.value;
+                if (this.checked) {
+                    params.append('filtro', name);
+                } else {
+                    var valores = params.getAll('filtro');
+                    params.delete('filtro');
+                    valores.forEach(function(v) {
+                        if (v !== name) params.append('filtro', v);
+                    });
+                }
+                params.set('page', '1');
+                window.location.search = params.toString();
+            });
+        });
+
+        // ── FILTROS: Búsqueda rápida de marcas ──
+        document.querySelector('#filterMarcas input[type="text"]')?.addEventListener('input', function() {
+            var query = this.value.toLowerCase();
+            var items = this.closest('.filter-body').querySelectorAll('.filter-item');
+            items.forEach(function(item) {
+                var text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+        });
+
+    });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

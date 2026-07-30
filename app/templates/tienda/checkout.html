@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root { --orion-primary: #e10098; }
+        body { background: #f5f5f5; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .checkout-card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .btn-orion { background: var(--orion-primary); color: #fff; border: none; padding: 12px; font-weight: 700; border-radius: 8px; transition: 0.3s; }
+        .btn-orion:hover { background: #c00080; color: #fff; transform: translateY(-2px); }
+        .product-item { border-bottom: 1px solid #eee; padding: 12px 0; }
+        .product-item:last-child { border-bottom: none; }
+        .item-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+        
+        /* ===== CABECERA ===== */
+        .brand-logo { font-weight: 900; font-size: 2.3rem; color: var(--orion-primary) !important; letter-spacing: -1.5px; text-decoration: none; }
+        .top-nav { font-size: 0.85rem; background: #f8f9fa; border-bottom: 1px solid #eee; }
+        .user-avatar { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 2px solid var(--orion-primary); }
+        .dropdown-submenu { position: relative; }
+        .dropdown-submenu > .dropdown-menu { top: 0; left: 100%; margin-top: -6px; display: none; }
+        .dropdown-submenu:hover > .dropdown-menu { display: block; }
+        .dropdown-submenu > a::after { content: " ▶"; font-size: 0.6rem; float: right; margin-top: 5px; }
+
+        .badge-mayorista {
+            background: #ffc107;
+            color: #000;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+
+        .descuento-alert {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+
+        .envio-prioritario {
+            background: linear-gradient(135deg, #cce5ff 0%, #b8d4f0 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== CABECERA ===== -->
+    <div class="top-nav py-2 text-secondary d-none d-lg-block">
+        <div class="container d-flex justify-content-end gap-4">
+            <a href="#" class="text-secondary text-decoration-none">Encuentra tu tienda</a>
+            <a href="/servicios" class="text-secondary text-decoration-none">Servicios</a>
+            <a href="#" class="text-secondary text-decoration-none">Ayuda</a>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="/">ORION</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#orionNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="orionNavbar">
+                <div class="dropdown mx-lg-4">
+                    <button class="btn btn-white fw-bold text-dark dropdown-toggle border-0" data-bs-toggle="dropdown">Categorías</button>
+                    <ul class="dropdown-menu shadow border-0 py-2">
+                        {% if categorias %}
+                            {% for padre in categorias if not padre.padre_id %}
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item" href="/catalogo?categoria={{padre._id}}">{{ padre.nombre }}</a>
+                                <ul class="dropdown-menu shadow border-0">
+                                    {% for hijo in categorias if hijo.padre_id == padre._id %}
+                                    <li><a class="dropdown-item" href="/catalogo?categoria={{hijo._id}}">{{ hijo.nombre }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+                <form class="d-flex flex-grow-1" action="{{ url_for('web.catalogo') }}" method="GET">
+                    <input class="form-control rounded-pill bg-light" type="search" name="q" placeholder="Buscar productos...">
+                </form>
+                <div class="ms-3 d-flex align-items-center gap-3">
+                    {% if session.get('nombre') %}
+                        <a href="/perfil" class="text-dark fw-bold text-decoration-none d-flex align-items-center gap-2">
+                            {% if session.get('foto') %}
+                                <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}?t={{ range(1, 10000) | random }}" class="user-avatar" alt="Perfil">
+                            {% else %}
+                                <i class="bi bi-person-circle fs-3"></i>
+                            {% endif %}
+                            HOLAAA, {{ session['nombre'] }}
+                        </a>
+                    {% else %}
+                        <a href="/login" class="text-dark fw-bold">INICIAR SESIÓN</a>
+                    {% endif %}
+                    <a href="{{ url_for('web.ver_carrito') }}" class="text-dark">
+                        <i class="bi bi-bag fs-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== CONTENIDO ===== -->
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Cabecera -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold">Finalizar compra</h3>
+                    <a href="{{ url_for('web.ver_carrito') }}" class="text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Volver al carrito
+                    </a>
+                </div>
+
+                <form method="POST" id="checkoutForm">
+                    <!-- 1. DATOS DE ENVÍO -->
+                    <div class="checkout-card mb-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-truck me-2"></i>Datos de envío</h5>
+                        
+                        <div class="mb-3">
+                            <label class="fw-bold small">Tipo de entrega</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="tipo_envio" id="domicilio" value="domicilio" checked>
+                                    <label class="form-check-label" for="domicilio">
+                                        <i class="bi bi-house"></i> Envío a domicilio
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="tipo_envio" id="clickCollect" value="click_collect">
+                                    <label class="form-check-label" for="clickCollect">
+                                        <i class="bi bi-shop"></i> Click & Collect
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dirección de envío -->
+                        <div id="direccionEnvio">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="fw-bold small">Calle</label>
+                                    <input type="text" name="calle" class="form-control" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="fw-bold small">Número</label>
+                                    <input type="text" name="numero" class="form-control" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="fw-bold small">Código Postal</label>
+                                    <input type="text" name="cp" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold small">Colonia</label>
+                                    <input type="text" name="colonia" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold small">Ciudad</label>
+                                    <input type="text" name="ciudad" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold small">Estado</label>
+                                    <input type="text" name="estado" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold small">País</label>
+                                    <input type="text" name="pais" class="form-control" value="México">
+                                </div>
+                                <div class="col-12">
+                                    <label class="fw-bold small">Referencias (opcional)</label>
+                                    <input type="text" name="referencias" class="form-control" placeholder="Ej: Entre edificio, piso 3">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Click & Collect -->
+                        <div id="clickCollectDiv" style="display:none;">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="fw-bold small">Selecciona tu tienda</label>
+                                    <select name="tienda_recogida" class="form-select">
+                                        <option value="">Seleccionar...</option>
+                                        {% if tiendas %}
+                                            {% for tienda in tiendas %}
+                                                <option value="{{ tienda.nombre }}">{{ tienda.nombre }}</option>
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="Liverpool Polanco">Liverpool Polanco</option>
+                                            <option value="Liverpool Perisur">Liverpool Perisur</option>
+                                            <option value="Liverpool Insurgentes">Liverpool Insurgentes</option>
+                                            <option value="Liverpool Santa Fe">Liverpool Santa Fe</option>
+                                        {% endif %}
+                                    </select>
+                                    <small class="text-muted">Recibirás un código para recoger tu pedido en la tienda seleccionada</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. MÉTODO DE PAGO -->
+                    <div class="checkout-card mb-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-credit-card me-2"></i>Método de pago</h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-check border rounded p-3">
+                                    <input class="form-check-input" type="radio" name="metodo_pago" id="tarjeta" value="tarjeta" checked>
+                                    <label class="form-check-label w-100" for="tarjeta">
+                                        <i class="bi bi-credit-card fs-5 me-2"></i>
+                                        <strong>Tarjeta de crédito/débito</strong>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check border rounded p-3">
+                                    <input class="form-check-input" type="radio" name="metodo_pago" id="paypal" value="paypal">
+                                    <label class="form-check-label w-100" for="paypal">
+                                        <i class="bi bi-paypal fs-5 me-2"></i>
+                                        <strong>PayPal</strong>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. NOTAS -->
+                    <div class="checkout-card mb-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-pencil me-2"></i>Notas adicionales</h5>
+                        <textarea name="notas" class="form-control" rows="2" placeholder="Algún comentario sobre tu pedido..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-orion w-100">
+                        <i class="bi bi-check-circle"></i> Realizar pedido
+                    </button>
+                </form>
+            </div>
+
+            <!-- Resumen del pedido -->
+            <div class="col-lg-4">
+                <div class="checkout-card sticky-top" style="top:20px;">
+                    <h5 class="fw-bold mb-3">Resumen del pedido</h5>
+                    
+                    <!-- 🔥 ITERAR SOBRE carrito_items (NO carrito.items) -->
+                    {% for item in carrito_items %}
+                    <div class="product-item d-flex gap-3">
+                        <img src="{{ url_for('static', filename='uploads/productos/' + (item.imagen or 'default.jpg')) }}" class="item-img">
+                        <div class="flex-grow-1">
+                            <div class="fw-bold small">{{ item.nombre }}</div>
+                            <div class="text-muted small">Cantidad: {{ item.cantidad }}</div>
+                            {% if item.atributos %}
+                                <div class="text-muted small">
+                                    {% if item.atributos.color %}Color: {{ item.atributos.color }}{% endif %}
+                                    {% if item.atributos.tamano %} | Tamaño: {{ item.atributos.tamano }}{% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="fw-bold">${{ "%.2f"|format(item.precio * item.cantidad) }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <hr>
+
+                    <!-- 🔥 DESCUENTO POR VOLUMEN -->
+                    {% if descuento_volumen is defined and descuento_volumen > 0 %}
+                        <div class="descuento-alert mb-3">
+                            <i class="bi bi-gift"></i>
+                            <strong>Descuento por volumen ({{ porcentaje_descuento }}%)</strong>
+                            <small class="d-block text-success">- ${{ "%.2f"|format(descuento_volumen) }}</small>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between">
+                        <span>Subtotal</span>
+                        <span>${{ "%.2f"|format(subtotal) }}</span>
+                    </div>
+
+                    {% if descuento_volumen is defined and descuento_volumen > 0 %}
+                    <div class="d-flex justify-content-between text-success">
+                        <span>Descuento ({{ porcentaje_descuento }}%)</span>
+                        <span>-${{ "%.2f"|format(descuento_volumen) }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between">
+                        <span>IVA (16%)</span>
+                        <span>${{ "%.2f"|format(iva) }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between" id="envioDisplay">
+                        <span>Envío</span>
+                        <span>
+                            {% if tipo_envio == 'click_collect' %}
+                                <span class="text-success">Gratis</span>
+                            {% elif total_unidades is defined and total_unidades >= 50 %}
+                                <span>$199.00</span>
+                                <small class="d-block text-info">Envío prioritario</small>
+                            {% else %}
+                                <span>$99.00</span>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between fw-bold fs-5">
+                        <span>Total</span>
+                        <span style="color:var(--orion-primary);">${{ "%.2f"|format(total) }}</span>
+                    </div>
+
+                    <!-- 🔥 ENVÍO PRIORITARIO -->
+                    {% if total_unidades is defined and total_unidades >= 50 %}
+                        <div class="envio-prioritario mt-3">
+                            <i class="bi bi-clock"></i>
+                            <strong>Envío prioritario</strong>
+                            <small class="d-block">Entrega estimada en 1 día hábil</small>
+                        </div>
+                    {% endif %}
+
+                    <!-- 🔥 BADGE MAYORISTA -->
+                    {% if total_unidades is defined and total_unidades >= 50 %}
+                        <div class="mt-3">
+                            <span class="badge-mayorista">
+                                <i class="bi bi-truck"></i> Pedido mayorista
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle entre envío a domicilio y Click & Collect
+        const tipoEnvio = document.querySelectorAll('input[name="tipo_envio"]');
+        const direccionDiv = document.getElementById('direccionEnvio');
+        const clickCollectDiv = document.getElementById('clickCollectDiv');
+        const envioDisplay = document.getElementById('envioDisplay');
+
+        tipoEnvio.forEach(function(el) {
+            el.addEventListener('change', function() {
+                if (this.value === 'click_collect') {
+                    direccionDiv.style.display = 'none';
+                    clickCollectDiv.style.display = 'block';
+                    envioDisplay.innerHTML = '<span>Envío</span><span class="text-success">Gratis</span>';
+                } else {
+                    direccionDiv.style.display = 'block';
+                    clickCollectDiv.style.display = 'none';
+                    // Mostrar envío según cantidad
+                    {% if total_unidades is defined and total_unidades >= 50 %}
+                        envioDisplay.innerHTML = '<span>Envío</span><span>$199.00 <small class="d-block text-info">Envío prioritario</small></span>';
+                    {% else %}
+                        envioDisplay.innerHTML = '<span>Envío</span><span>$99.00</span>';
+                    {% endif %}
+                }
+            });
+        });
+    });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

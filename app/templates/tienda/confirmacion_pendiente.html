@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación - ORION SYSTEM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-pink: #ff007f; --neon-blue: #00d4ff; --bg-deep: #020202; }
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-deep); font-family: 'Outfit', sans-serif; color: white; overflow: hidden; }
+
+        .ultra-bg { position: fixed; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 50%, #1a001a, #000); z-index: 0; }
+        
+        .card { width: 450px; padding: 3rem; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(50px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; text-align: center; z-index: 10; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        
+        h2 { font-weight: 900; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 2px; color: var(--neon-blue); }
+        p { color: rgba(255,255,255,0.7); margin-bottom: 2rem; line-height: 1.6; }
+        
+        .email-display { display: block; font-weight: 900; color: var(--neon-pink); margin-top: 10px; }
+
+        .btn-orion { display: block; width: 100%; padding: 18px; margin-bottom: 1rem; background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue)); color: white; border: none; border-radius: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; text-decoration: none; transition: 0.3s; }
+        .btn-link { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); margin-top: 10px; font-size: 0.8rem; letter-spacing: 1px; }
+        .btn-orion:hover { transform: scale(1.02); filter: brightness(1.2); }
+
+        /* Estilo para los mensajes Flash */
+        .flash-msg { margin-bottom: 20px; padding: 10px; border-radius: 10px; font-size: 0.9rem; }
+        .alert-info { background: rgba(0, 212, 255, 0.1); border: 1px solid var(--neon-blue); color: var(--neon-blue); }
+    </style>
+</head>
+<body>
+    <div class="ultra-bg"></div>
+
+    <div class="card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-msg alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h2>¡CASI LISTO!</h2>
+        <p>Hemos enviado un enlace de activación a:<br>
+           <span class="email-display">{{ email }}</span>
+        </p>
+        <p>Por favor, revisa tu bandeja de entrada para confirmar tu cuenta.</p>
+        
+        <form action="{{ url_for('web.reenviar_confirmacion') }}" method="POST">
+            <input type="hidden" name="email" value="{{ email }}">
+            <button type="submit" class="btn-orion btn-link">¿No recibiste el correo? Reenviar confirmación</button>
+        </form>
+
+        <a href="{{ url_for('web.login') }}" class="btn-orion">VOLVER AL LOGIN</a>
+    </div>
+</body>
+</html>

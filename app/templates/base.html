@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ORION SYSTEM{% endblock %}</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Estilos base -->
+    <style>
+        :root {
+            --primary: #ff007f;
+            --secondary: #00d4ff;
+            --dark: #020202;
+            --dark-light: #1a1a1a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* ===== NAVBAR ===== */
+        .navbar-orion {
+            background: var(--dark-light);
+            border-bottom: 2px solid var(--primary);
+            padding: 10px 0;
+            box-shadow: 0 4px 20px rgba(255, 0, 127, 0.3);
+        }
+        
+        .navbar-orion .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+        }
+        
+        .navbar-orion .nav-link {
+            color: #ffffff !important;
+            font-weight: 500;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .navbar-orion .nav-link:hover {
+            background: rgba(255, 0, 127, 0.2);
+            color: var(--secondary) !important;
+        }
+        
+        .navbar-orion .nav-link.active {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: #ffffff !important;
+        }
+        
+        /* ===== AVATAR ===== */
+        .avatar-nav {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--secondary);
+            margin-right: 8px;
+        }
+        
+        /* ===== BADGE ROL ===== */
+        .badge-rol {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .badge-admin {
+            background: var(--primary);
+            color: #fff;
+        }
+        
+        .badge-cliente {
+            background: var(--secondary);
+            color: #000;
+        }
+        
+        /* ===== DROPDOWN ===== */
+        .dropdown-menu-orion {
+            background: var(--dark-light);
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            padding: 8px 0;
+            min-width: 220px;
+        }
+        
+        .dropdown-menu-orion .dropdown-item {
+            color: #ffffff;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-menu-orion .dropdown-item:hover {
+            background: rgba(255, 0, 127, 0.2);
+            color: var(--secondary);
+        }
+        
+        .dropdown-menu-orion .dropdown-divider {
+            border-color: #333;
+        }
+        
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .main-content {
+            flex: 1;
+            padding: 30px 0;
+        }
+        
+        /* ===== FLASH MESSAGES ===== */
+        .alert-custom {
+            border-radius: 12px;
+            border: none;
+            padding: 15px 20px;
+        }
+        
+        .alert-success {
+            background: rgba(0, 255, 127, 0.15);
+            border-left: 4px solid #00ff7f;
+            color: #00ff7f;
+        }
+        
+        .alert-danger {
+            background: rgba(255, 0, 0, 0.15);
+            border-left: 4px solid #ff0000;
+            color: #ff4444;
+        }
+        
+        .alert-warning {
+            background: rgba(255, 165, 0, 0.15);
+            border-left: 4px solid #ffa500;
+            color: #ffa500;
+        }
+        
+        .alert-info {
+            background: rgba(0, 212, 255, 0.15);
+            border-left: 4px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        /* ===== FOOTER ===== */
+        .footer-orion {
+            background: var(--dark-light);
+            border-top: 2px solid var(--primary);
+            padding: 30px 0;
+            margin-top: auto;
+        }
+        
+        .footer-orion a {
+            color: var(--secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-orion a:hover {
+            color: var(--primary);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991px) {
+            .navbar-orion .navbar-brand {
+                font-size: 1.4rem;
+            }
+            
+            .navbar-orion .nav-link {
+                padding: 6px 12px;
+            }
+        }
+        
+        /* ===== ANIMACIONES ===== */
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(255, 0, 127, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 0, 127, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(255, 0, 127, 0.5); }
+        }
+        
+        .glow-border {
+            animation: glow 2s infinite;
+        }
+        
+        /* ===== BOTONES ===== */
+        .btn-orion-primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            padding: 10px 25px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-orion-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+            color: #fff;
+        }
+        
+        /* ===== CARDS ===== */
+        .card-orion {
+            background: var(--dark-light);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .card-orion:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.2);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- ============================================================ -->
+    <!-- NAVBAR -->
+    <!-- ============================================================ -->
+    <nav class="navbar navbar-expand-lg navbar-orion">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('web.raiz_tienda') }}">
+                <i class="fas fa-star"></i> ORION
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <!-- ===== ENLACES PÚBLICOS ===== -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('web.raiz_tienda') }}">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('web.catalogo') }}">
+                            <i class="fas fa-th-list"></i> Catálogo
+                        </a>
+                    </li>
+                    
+                    <!-- ===== ENLACES SEGÚN ROL ===== -->
+                    {% if session.get('user_id') %}
+                        {% if session.get('rol') == 'admin' %}
+                            <!-- ===== MENÚ ADMINISTRADOR ===== -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-cogs"></i> Panel Admin
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-orion">
+                                    <li><a class="dropdown-item" href="{{ url_for('web.dashboard') }}">
+                                        <i class="fas fa-chart-pie"></i> Dashboard
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('web.lista_usuarios') }}">
+                                        <i class="fas fa-users"></i> Usuarios
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('web.lista_productos') }}">
+                                        <i class="fas fa-box"></i> Productos
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('web.lista_categorias') }}">
+                                        <i class="fas fa-tags"></i> Categorías
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('web.lista_empresas') }}">
+                                        <i class="fas fa-building"></i> Empresas
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('web.reportes') }}">
+                                        <i class="fas fa-file-alt"></i> Reportes
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('web.configuracion') }}">
+                                        <i class="fas fa-cog"></i> Configuración
+                                    </a></li>
+                                </ul>
+                            </li>
+                            
+                        {% else %}
+                            <!-- ===== MENÚ CLIENTE ===== -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('web.ver_carrito') }}">
+                                    <i class="fas fa-shopping-cart"></i> Carrito
+                                    <span class="badge bg-danger ms-1" id="cart-count">0</span>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('web.mis_pedidos') }}">
+                                    <i class="fas fa-truck"></i> Mis Pedidos
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('web.lista_favoritos') }}">
+                                    <i class="fas fa-heart"></i> Favoritos
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                
+                <!-- ===== MENÚ DERECHO (Usuario/Login) ===== -->
+                <ul class="navbar-nav ms-auto">
+                    {% if session.get('user_id') %}
+                        <!-- ===== USUARIO AUTENTICADO ===== -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                {% if session.get('foto') %}
+                                    <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" 
+                                         class="avatar-nav" alt="Avatar">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='img/default-avatar.png') }}" 
+                                         class="avatar-nav" alt="Avatar">
+                                {% endif %}
+                                <span>{{ session.get('nombre', 'Usuario') }}</span>
+                                
+                                    <span class="badge-rol badge-cliente ms-2">Cliente</span>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-orion dropdown-menu-end">
+                                {% if session.get('rol') == 'admin' %}
+                                    <li><a class="dropdown-item" href="{{ url_for('web.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% else %}
+                                    <li><a class="dropdown-item" href="{{ url_for('web.perfil') }}">
+                                        <i class="fas fa-user"></i> Mi Perfil
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('web.mis_pedidos') }}">
+                                        <i class="fas fa-truck"></i> Mis Pedidos
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('web.lista_favoritos') }}">
+                                        <i class="fas fa-heart"></i> Favoritos
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('web.logout') }}">
+                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </a></li>
+                            </ul>
+                        </li>
+                        
+                    {% else %}
+                        <!-- ===== USUARIO NO AUTENTICADO ===== -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('web.login') }}">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-primary text-white" href="{{ url_for('web.register') }}">
+                                <i class="fas fa-user-plus"></i> Registrarse
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- ============================================================ -->
+    <!-- FLASH MESSAGES -->
+    <!-- ============================================================ -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-custom alert-{{ category }} d-flex align-items-center fade show" role="alert">
+                        <i class="fas 
+                            {% if category == 'success' %}fa-check-circle
+                            {% elif category == 'danger' %}fa-exclamation-circle
+                            {% elif category == 'warning' %}fa-exclamation-triangle
+                            {% else %}fa-info-circle{% endif %} 
+                            me-2 fs-5">
+                        </i>
+                        <div>{{ message }}</div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <!-- ============================================================ -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <!-- ============================================================ -->
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <!-- ============================================================ -->
+    <!-- FOOTER -->
+    <!-- ============================================================ -->
+    <footer class="footer-orion">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-uppercase" style="color: var(--primary);">
+                        <i class="fas fa-star"></i> ORION SYSTEM
+                    </h5>
+                    <p class="text-muted small">
+                        Tu tienda de confianza con la mejor tecnología y seguridad.
+                    </p>
+                    <div class="mt-3">
+                        <a href="#" class="me-3"><i class="fab fa-facebook fa-lg" style="color: var(--secondary);"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter fa-lg" style="color: var(--secondary);"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram fa-lg" style="color: var(--secondary);"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-youtube fa-lg" style="color: var(--secondary);"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-uppercase" style="color: var(--secondary);">Enlaces Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('web.raiz_tienda') }}">Inicio</a></li>
+                        <li><a href="{{ url_for('web.catalogo') }}">Catálogo</a></li>
+                        <li><a href="{{ url_for('web.contacto') }}">Contacto</a></li>
+                        <li><a href="{{ url_for('web.nosotros') }}">Nosotros</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-uppercase" style="color: var(--secondary);">Contacto</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-envelope me-2" style="color: var(--primary);"></i> contacto@orionsystem.com</li>
+                        <li><i class="fas fa-phone me-2" style="color: var(--primary);"></i> +52 55 1234 5678</li>
+                        <li><i class="fas fa-map-marker-alt me-2" style="color: var(--primary);"></i> CDMX, México</li>
+                    </ul>
+                </div>
+            </div>
+            <hr style="border-color: #333;">
+            <div class="text-center text-muted small">
+                &copy; 2026 ORION SYSTEM. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+    
+    <!-- ============================================================ -->
+    <!-- SCRIPTS -->
+    <!-- ============================================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Actualizar contador del carrito (solo para clientes)
+            {% if session.get('user_id') and session.get('rol') != 'admin' %}
+                function actualizarContadorCarrito() {
+                    $.ajax({
+                        url: '/api/v1/carrito',
+                        method: 'GET',
+                        success: function(data) {
+                            if (data && data.items) {
+                                const total = data.items.reduce((sum, item) => sum + item.cantidad, 0);
+                                $('#cart-count').text(total);
+                            }
+                        }
+                    });
+                }
+                actualizarContadorCarrito();
+            {% endif %}
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ORION | Inventario Profesional</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #6366f1; --dark: #0f172a; --bg: #f1f5f9; }
+        body { background-color: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; color: #334155; }
+        
+        .brand-header { 
+            background: var(--dark); 
+            color: white; 
+            padding: 1.5rem 2rem; 
+            border-radius: 20px; 
+            margin-bottom: 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+        }
+        
+        .card { border: none; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); background: #ffffff; overflow: hidden; margin-bottom: 2rem; }
+        .table-container { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        .table thead { background-color: #f8fafc; color: #1e293b; border-bottom: 2px solid #e2e8f0; }
+        .preview-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; border: 2px solid #e2e8f0; }
+        .modal-img { width: 100px; height: 100px; object-fit: cover; border-radius: 12px; }
+        
+        .btn-primary { background-color: var(--primary); border: none; border-radius: 10px; padding: 10px 20px; transition: 0.3s; }
+        .btn-primary:hover { background-color: #4f46e5; transform: translateY(-2px); }
+        
+        .form-control, .form-select { border-radius: 10px; border: 1px solid #cbd5e1; padding: 10px 15px; }
+        .form-control.is-invalid, .form-select.is-invalid { border-color: #dc3545; }
+        .invalid-feedback { font-size: 0.75rem; color: #dc3545; display: none; }
+        .is-invalid ~ .invalid-feedback { display: block; }
+        
+        .status-pill { border-radius: 50px; padding: 5px 12px; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+        
+        .section-title { font-weight: 800; color: var(--dark); border-left: 4px solid var(--primary); padding-left: 15px; margin-bottom: 1.5rem; }
+        
+        .color-group {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .color-group:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1); }
+        .color-group .btn-remove-group { position: absolute; top: 10px; right: 10px; opacity: 0.6; z-index: 1; }
+        .color-group .btn-remove-group:hover { opacity: 1; }
+        
+        .size-badge {
+            background: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1e293b;
+            display: inline-block;
+            margin: 2px;
+        }
+        
+        .variant-group-title {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .color-name-display { font-size: 1.1rem; font-weight: 600; color: var(--dark); }
+        
+        .empty-colors-message {
+            text-align: center;
+            color: #94a3b8;
+            padding: 40px 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 2px dashed #cbd5e1;
+        }
+        .empty-colors-message i { font-size: 3rem; display: block; margin-bottom: 15px; color: #cbd5e1; }
+        
+        .variant-row {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        .variant-row:hover { border-color: var(--primary); background: #f8fafc; }
+
+        .categoria-badge { font-size: 0.7rem; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+        .categoria-badge.nivel-1 { background: #6366f1; color: white; }
+        .categoria-badge.nivel-2 { background: #8b5cf6; color: white; }
+        .categoria-badge.nivel-3 { background: #a78bfa; color: white; }
+
+        .categoria-tree-select option { padding: 6px 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .categoria-tree-select option.nivel-1 { font-weight: 700; color: #4f46e5; background-color: #eef2ff; }
+        .categoria-tree-select option.nivel-2 { font-weight: 600; color: #7c3aed; background-color: #f5f3ff; padding-left: 30px !important; }
+        .categoria-tree-select option.nivel-3 { font-weight: 500; color: #8b5cf6; background-color: #faf5ff; padding-left: 55px !important; }
+
+        .categoria-tree-display { display: flex; flex-direction: column; gap: 3px; padding: 5px 0; }
+        .categoria-tree-display .tree-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .categoria-tree-display .tree-item.nivel-1 { background: #eef2ff; color: #4f46e5; font-weight: 700; }
+        .categoria-tree-display .tree-item.nivel-2 { background: #f5f3ff; color: #7c3aed; font-weight: 600; }
+        .categoria-tree-display .tree-item.nivel-3 { background: #faf5ff; color: #8b5cf6; font-weight: 600; }
+        .categoria-tree-display .tree-arrow { color: #94a3b8; font-size: 0.9rem; font-weight: 700; margin: 0 2px; }
+
+        .categoria-selector-visual {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 15px;
+            background: #f8fafc;
+            min-height: 45px;
+        }
+        .categoria-selector-visual .selected-path { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .categoria-selector-visual .path-item { padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; }
+        .categoria-selector-visual .path-item.nivel-1 { background: #6366f1; color: white; }
+        .categoria-selector-visual .path-item.nivel-2 { background: #8b5cf6; color: white; }
+        .categoria-selector-visual .path-item.nivel-3 { background: #a78bfa; color: white; }
+        .categoria-selector-visual .path-arrow { color: #94a3b8; font-size: 1.2rem; font-weight: 700; }
+        .categoria-selector-visual .empty-selection { color: #94a3b8; font-style: italic; }
+
+        .leyenda-niveles { display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.75rem; margin-top: 8px; }
+        .leyenda-niveles .leyenda-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        
+        .fotos-counter { font-size: 0.8rem; color: #6366f1; font-weight: 600; margin-top: 5px; }
+        .fotos-counter.completo { color: #10b981; }
+
+        /* ===================== PAGINACIÓN ===================== */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pagination-info { font-size: 0.85rem; color: #64748b; }
+        .pagination-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .page-size-selector { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #64748b; }
+        .page-size-selector select { width: auto; padding: 5px 10px; font-size: 0.85rem; border-radius: 8px; }
+        .btn-page {
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #334155;
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-page:hover:not(:disabled) { background: #6366f1; color: white; border-color: #6366f1; }
+        .btn-page.active { background: #6366f1; color: white; border-color: #6366f1; font-weight: 700; }
+        .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ===================== MODAL MEJORADO ===================== */
+        .modal-product-header {
+            background: var(--dark);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .modal-product-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
+        }
+        .modal-product-avatar-placeholder {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.8rem;
+        }
+        .modal-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .modal-info-card {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+        }
+        .modal-info-card .label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+        .modal-info-card .value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .modal-section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin: 16px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .modal-fotos-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .modal-foto-item {
+            position: relative;
+        }
+        .modal-foto-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            cursor: zoom-in;
+            transition: transform 0.2s;
+        }
+        .modal-foto-item img:hover { transform: scale(1.05); border-color: #6366f1; }
+        .modal-foto-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            background: #6366f1;
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 8px;
+        }
+
+        /* Variantes por color en el modal */
+        .modal-color-block {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+        }
+        .modal-color-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 8px 14px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-color-table { width: 100%; font-size: 0.82rem; margin: 0; }
+        .modal-color-table th { background: #f8fafc; padding: 6px 12px; font-weight: 700; color: #475569; font-size: 0.75rem; text-transform: uppercase; }
+        .modal-color-table td { padding: 7px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+        .modal-color-table tr:last-child td { border-bottom: none; }
+        .modal-color-table tr:hover td { background: #f8fafc; }
+
+        .stock-badge-modal { border-radius: 20px; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; }
+
+        /* Resumen numérico en modal */
+        .modal-stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .modal-stat {
+            text-align: center;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .modal-stat .num { font-size: 1.4rem; font-weight: 800; color: #6366f1; }
+        .modal-stat .lbl { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 600; }
+
+        /* Lightbox simple */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        #lightbox.open { display: flex; }
+        #lightbox img { max-width: 90vw; max-height: 85vh; border-radius: 12px; object-fit: contain; }
+        #lightbox .close-lb { position: absolute; top: 20px; right: 25px; color: white; font-size: 2rem; cursor: pointer; background: none; border: none; }
+    </style>
+</head>
+<body class="bg-light p-4">
+
+<!-- Lightbox simple -->
+<div id="lightbox">
+    <button class="close-lb" onclick="document.getElementById('lightbox').classList.remove('open')">×</button>
+    <img id="lightbox-img" src="" alt="Foto ampliada">
+</div>
+
+<div class="container-fluid" style="max-width: 1400px;">
+    
+    <div class="mb-3">
+        <a href="{{ url_for('web.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver al Dashboard
+        </a>
+        <a href="{{ url_for('web.lista_categorias') }}" class="btn btn-outline-primary btn-sm ms-2">
+            <i class="bi bi-tags"></i> Gestionar Categorías
+        </a>
+    </div>
+
+    <div class="brand-header">
+        <div>
+            <h2 class="mb-0 fw-bolder"><i class="bi bi-box-seam"></i> ORION Inventory</h2>
+            <p class="mb-0 opacity-75">Panel de Gestión Profesional de Productos</p>
+        </div>
+        <div class="text-end">
+            <h3 class="mb-0 fw-bold">{{ productos|length }}</h3>
+            <small class="text-uppercase fw-bold opacity-50">Registros Activos</small>
+        </div>
+    </div>
+
+    <!-- FORMULARIO DE PRODUCTO -->
+    <div class="card p-4">
+        <h5 class="section-title">{{ 'Editar Producto' if producto_seleccionado else 'Nuevo Registro de Producto' }}</h5>
+        <form id="producto-form" action="{{ url_for('web.editar_producto', id=producto_seleccionado._id) if producto_seleccionado else url_for('web.agregar_producto') }}" method="POST" enctype="multipart/form-data" onsubmit="return validarFormulario()">
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold">Nombre del Producto *</label>
+                    <input type="text" name="nombre" id="nombre" class="form-control" value="{{ producto_seleccionado.nombre or '' }}" required maxlength="200">
+                    <div class="invalid-feedback">El nombre es requerido (máx 200 caracteres)</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold">Categoría (Árbol Completo) *</label>
+                    <select name="categoria_id" id="categoriaSelect" class="form-select categoria-tree-select" required onchange="actualizarVistaPreviaCategoria()">
+                        <option value="">Seleccionar categoría...</option>
+                        {% for cat in categorias %}
+                            {% if cat.nivel == 1 %}
+                                <option value="{{ cat._id }}" {{ 'selected' if producto_seleccionado and producto_seleccionado.categoria_id|string == cat._id|string }} class="nivel-1" data-nivel="1" data-nombre="{{ cat.nombre }}" data-padre-id="" data-padre-nombre="">{{ cat.nombre }} [Nivel 1 - Raíz]</option>
+                                {% for cat2 in categorias %}
+                                    {% if cat2.nivel == 2 and cat2.padre_id|string == cat._id|string %}
+                                        <option value="{{ cat2._id }}" {{ 'selected' if producto_seleccionado and producto_seleccionado.categoria_id|string == cat2._id|string }} class="nivel-2" data-nivel="2" data-nombre="{{ cat2.nombre }}" data-padre-id="{{ cat._id }}" data-padre-nombre="{{ cat.nombre }}">├─ {{ cat2.nombre }} [Nivel 2 - Hijo de {{ cat.nombre }}]</option>
+                                        {% for cat3 in categorias %}
+                                            {% if cat3.nivel == 3 and cat3.padre_id|string == cat2._id|string %}
+                                                <option value="{{ cat3._id }}" {{ 'selected' if producto_seleccionado and producto_seleccionado.categoria_id|string == cat3._id|string }} class="nivel-3" data-nivel="3" data-nombre="{{ cat3.nombre }}" data-padre-id="{{ cat2._id }}" data-padre-nombre="{{ cat2.nombre }}">└─ {{ cat3.nombre }} [Nivel 3 - Nieto]</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">Debes seleccionar una categoría</div>
+                    <div class="mt-2 categoria-selector-visual" id="categoriaPreview">
+                        <div class="selected-path" id="selectedPath">
+                            <span class="empty-selection"><i class="bi bi-info-circle"></i> Selecciona una categoría para ver su jerarquía completa</span>
+                        </div>
+                    </div>
+                    <div class="leyenda-niveles">
+                        <span class="leyenda-item"><span class="leyenda-dot" style="background:#6366f1;"></span><strong>Nivel 1:</strong> Principal</span>
+                        <span class="leyenda-item"><span class="leyenda-dot" style="background:#8b5cf6;"></span><strong>Nivel 2:</strong> Subcategoría</span>
+                        <span class="leyenda-item"><span class="leyenda-dot" style="background:#a78bfa;"></span><strong>Nivel 3:</strong> Sub-subcategoría</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Empresa *</label>
+                    <select name="empresa_id" id="empresa_id" class="form-select" required>
+                        <option value="">Seleccionar...</option>
+                        {% for emp in empresas %}
+                            <option value="{{ emp._id }}" {{ 'selected' if producto_seleccionado and producto_seleccionado.empresa_id|string == emp._id|string }}>{{ emp.nombre_comercial }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">Debes seleccionar una empresa</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="activo" {{ 'selected' if producto_seleccionado and producto_seleccionado.estado == 'activo' }}>Activo</option>
+                        <option value="inactivo" {{ 'selected' if producto_seleccionado and producto_seleccionado.estado == 'inactivo' }}>Inactivo</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label small fw-bold">Descripción</label>
+                    <textarea name="descripcion" class="form-control" rows="2" maxlength="1000">{{ producto_seleccionado.descripcion or '' }}</textarea>
+                    <small class="text-muted">Máximo 1000 caracteres</small>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <label class="form-label small fw-bold">Cargar Fotos (Máx 6)</label>
+                <input type="file" name="fotos[]" id="input-fotos" class="form-control" multiple accept="image/*">
+                <div class="fotos-counter" id="fotosCounter">0/6 fotos</div>
+                <div id="preview-fotos" class="d-flex flex-wrap gap-3 mt-3">
+                    {% if producto_seleccionado and producto_seleccionado.fotos %}
+                        {% for foto in producto_seleccionado.fotos %}
+                        <div class="position-relative d-inline-block item-foto">
+                            <input type="hidden" name="fotos_existentes[]" value="{{ foto }}">
+                            <img src="{{ url_for('static', filename='uploads/productos/' + foto) }}" class="preview-img">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute" style="top:-8px; right:-8px; border-radius: 50%;" onclick="this.parentElement.remove();actualizarContadorFotos();">×</button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Variantes del Producto -->
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h6 class="fw-bold mb-0"><i class="bi bi-grid-3x3-gap-fill"></i> Variantes del Producto</h6>
+                        <small class="text-muted">Agrega colores y tallas. Cada combinación tiene su propio SKU, precio y stock.</small>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="abrirModalColor()">
+                        <i class="bi bi-plus-lg"></i> Agregar Color
+                    </button>
+                </div>
+                
+                <div id="grupos-colores">
+                    {% if producto_seleccionado and producto_seleccionado.variables %}
+                        {% set colores_dict = {} %}
+                        {% for v in producto_seleccionado.variables %}
+                            {% if v.color not in colores_dict %}
+                                {% set _ = colores_dict.update({v.color: []}) %}
+                            {% endif %}
+                            {% set _ = colores_dict[v.color].append(v) %}
+                        {% endfor %}
+                        {% for color, variantes in colores_dict.items() %}
+                        <div class="color-group" data-color="{{ color }}">
+                            <button type="button" class="btn btn-danger btn-sm btn-remove-group" onclick="eliminarGrupoColor(this)"><i class="bi bi-trash"></i></button>
+                            <div class="variant-group-title">
+                                <span class="color-name-display">{{ color }}</span>
+                                <span class="badge bg-secondary contador-tallas">{{ variantes|length }} talla{{ 's' if variantes|length != 1 }}</span>
+                            </div>
+                            <div class="variantes-container">
+                                {% for v in variantes %}
+                                <div class="variant-row">
+                                    <div class="row g-2 align-items-center">
+                                        <div class="col-md-3"><label class="form-label small fw-bold mb-0">SKU</label><input type="text" name="sku[]" class="form-control form-control-sm" value="{{ v.sku or '' }}" required></div>
+                                        <div class="col-md-2"><label class="form-label small fw-bold mb-0">Talla</label><input type="text" name="tamano[]" class="form-control form-control-sm" value="{{ v.tamano or '' }}" required></div>
+                                        <div class="col-md-2"><label class="form-label small fw-bold mb-0">Precio ($)</label><input type="number" name="precio[]" class="form-control form-control-sm" value="{{ v.precio or 0 }}" step="0.01" min="0" required></div>
+                                        <div class="col-md-2"><label class="form-label small fw-bold mb-0">Stock</label><input type="number" name="stock[]" class="form-control form-control-sm" value="{{ v.stock or 0 }}" min="0" required></div>
+                                        <div class="col-md-2"><label class="form-label small fw-bold mb-0">&nbsp;</label><button type="button" class="btn btn-outline-danger btn-sm w-100 btn-remove-variant" onclick="this.closest('.variant-row').remove();actualizarContadorTallas();"><i class="bi bi-x-lg"></i> Eliminar</button></div>
+                                    </div>
+                                    <input type="hidden" name="color[]" value="{{ color }}">
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="agregarTalla(this, '{{ color }}')"><i class="bi bi-plus-lg"></i> Agregar Talla a {{ color }}</button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-colors-message" id="emptyColorsMessage">
+                            <i class="bi bi-palette"></i>
+                            <p class="mb-0">No hay colores agregados</p>
+                            <small class="text-muted">Haz clic en "Agregar Color" para añadir variantes</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold mt-4">
+                <i class="bi bi-save"></i> {{ 'ACTUALIZAR PRODUCTO' if producto_seleccionado else 'GUARDAR PRODUCTO' }}
+            </button>
+            {% if producto_seleccionado %}
+            <a href="{{ url_for('web.lista_productos') }}" class="btn btn-outline-secondary w-100 mt-2"><i class="bi bi-x-circle"></i> Cancelar Edición</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- TABLA DE INVENTARIO -->
+    <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="section-title mb-0">Inventario Actual</h5>
+            <div class="d-flex gap-2 align-items-center">
+                <div class="page-size-selector">
+                    <label class="mb-0">Mostrar:</label>
+                    <select class="form-select form-select-sm" id="pageSizeSelect" onchange="cambiarTamanoPagina()">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="0">Todos</option>
+                    </select>
+                </div>
+                <input type="text" id="busqueda" class="form-control" style="width:220px;" placeholder="🔍 Buscar productos...">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Img</th>
+                        <th>Producto</th>
+                        <th>Árbol de Categorías</th>
+                        <th>Empresa</th>
+                        <th>Variantes</th>
+                        <th>Stock Total</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-productos">
+                    {% for p in productos %}
+                    {% set variables = p.variables if p.variables else [] %}
+                    {% set total_stock = variables|map(attribute='stock')|sum %}
+                    <tr class="fila-producto" data-search="{{ p.nombre }} {{ p.descripcion or '' }} {% for emp in empresas %}{% if emp._id|string == p.empresa_id|string %}{{ emp.nombre_comercial }}{% endif %}{% endfor %}">
+                        <td>
+                            {% if p.fotos %}
+                                <img src="{{ url_for('static', filename='uploads/productos/' + p.fotos[0]) }}" class="preview-img">
+                            {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:60px; height:60px;"><i class="bi bi-image text-muted"></i></div>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">{{ p.nombre }}</td>
+                        <td>
+                            {% if p.categoria_id %}
+                                <div class="categoria-tree-display">
+                                    {% set ns = namespace(encontrada=false) %}
+                                    {% for cat in categorias %}
+                                        {% if cat._id|string == p.categoria_id|string %}
+                                            {% set ns.encontrada = true %}
+                                            <div>
+                                                {% if cat.padre_nombre and cat.padre_nombre != 'Raíz' %}
+                                                    {% for cat_padre in categorias %}
+                                                        {% if cat_padre._id|string == cat.padre_id|string %}
+                                                            {% if cat_padre.padre_nombre and cat_padre.padre_nombre != 'Raíz' %}
+                                                                {% for cat_abuelo in categorias %}
+                                                                    {% if cat_abuelo._id|string == cat_padre.padre_id|string %}
+                                                                        <span class="tree-item nivel-1">{{ cat_abuelo.nombre }}</span>
+                                                                        <span class="tree-arrow">→</span>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            <span class="tree-item nivel-{{ cat_padre.nivel }}">{{ cat_padre.nombre }}</span>
+                                                            <span class="tree-arrow">→</span>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                                <span class="tree-item nivel-{{ cat.nivel }}">{{ cat.nombre }}</span>
+                                                <span class="categoria-badge nivel-{{ cat.nivel }}">Nv.{{ cat.nivel }}</span>
+                                            </div>
+                                            {% if not cat.padre_nombre or cat.padre_nombre == 'Raíz' %}
+                                                <small style="color:#94a3b8;font-size:0.7rem;font-style:italic;">Categoría raíz</small>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if not ns.encontrada %}<span class="text-muted">Categoría no encontrada</span>{% endif %}
+                                </div>
+                            {% else %}
+                                <span class="text-muted fst-italic">Sin categoría asignada</span>
+                            {% endif %}
+                        </td>
+                        <td>{% for emp in empresas %}{% if emp._id|string == p.empresa_id|string %}{{ emp.nombre_comercial }}{% endif %}{% endfor %}</td>
+                        <td>
+                            {% if variables %}
+                                {% set colores = variables|map(attribute='color')|unique|list %}
+                                <div style="max-height:100px;overflow-y:auto;">
+                                {% for color in colores %}
+                                <div class="d-flex align-items-start mb-1">
+                                    <span class="fw-bold me-2" style="font-size:0.75rem;min-width:55px;">{{ color }}:</span>
+                                    <div>
+                                        {% set tallas = variables|selectattr('color','equalto',color)|list %}
+                                        {% for v in tallas %}
+                                        <span class="size-badge" title="SKU:{{ v.sku }} | Stock:{{ v.stock }} | ${{ v.precio }}">{{ v.tamano }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                </div>
+                            {% else %}<span class="text-muted fst-italic">Sin variantes</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if total_stock > 10 %}<span class="badge bg-success status-pill">{{ total_stock }} uds</span>
+                            {% elif total_stock > 0 %}<span class="badge bg-warning text-dark status-pill">{{ total_stock }} uds</span>
+                            {% else %}<span class="badge bg-danger status-pill">Agotado</span>{% endif %}
+                        </td>
+                        <td><span class="badge {{ 'bg-primary' if p.estado == 'activo' else 'bg-secondary' }} status-pill">{{ p.estado }}</span></td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-info text-white btn-ver-producto" data-id="{{ p._id }}" data-bs-toggle="modal" data-bs-target="#verProductoModal"><i class="bi bi-eye"></i></button>
+                                <a href="{{ url_for('web.ver_producto', id=p._id) }}" class="btn btn-warning text-white"><i class="bi bi-pencil"></i></a>
+                                <button type="button" class="btn btn-danger" onclick="confirmarEliminar('{{ p._id }}', '{{ p.nombre }}')"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if productos|length == 0 %}
+                    <tr id="fila-sin-productos">
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox" style="font-size:3rem;display:block;"></i>
+                            <p class="mt-2">No hay productos registrados</p>
+                            <small>Utiliza el formulario superior para agregar tu primer producto</small>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINACIÓN -->
+        <div class="pagination-wrapper" id="paginationWrapper">
+            <div class="pagination-info" id="paginationInfo">Mostrando 0 de 0 productos</div>
+            <div class="pagination-controls" id="paginationControls"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ====================================================
+     MODAL MEJORADO VER PRODUCTO
+     ==================================================== -->
+<div class="modal fade" id="verProductoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;">
+
+            <!-- Header dinámico con imagen + nombre -->
+            <div class="modal-product-header" id="modal-header-container">
+                <div id="modal-header-img-wrap">
+                    <div class="modal-product-avatar-placeholder">
+                        <i class="bi bi-box-seam text-white opacity-50"></i>
+                    </div>
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <h5 class="mb-1 fw-bold" id="modal-producto-nombre" style="color:white;">Producto</h5>
+                    <div id="modal-header-badges" class="d-flex gap-2 flex-wrap"></div>
+                </div>
+                <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+
+                <!-- Stats rápidos -->
+                <div class="modal-stats-row" id="modal-stats-row">
+                    <div class="modal-stat">
+                        <div class="num" id="stat-colores">0</div>
+                        <div class="lbl">Colores</div>
+                    </div>
+                    <div class="modal-stat">
+                        <div class="num" id="stat-variantes">0</div>
+                        <div class="lbl">Variantes</div>
+                    </div>
+                    <div class="modal-stat">
+                        <div class="num" id="stat-stock">0</div>
+                        <div class="lbl">Stock total</div>
+                    </div>
+                </div>
+
+                <!-- Info general en grid -->
+                <div class="modal-info-grid" id="modal-info-grid">
+                    <div class="modal-info-card">
+                        <div class="label"><i class="bi bi-building me-1"></i>Empresa</div>
+                        <div class="value" id="modal-empresa">—</div>
+                    </div>
+                    <div class="modal-info-card">
+                        <div class="label"><i class="bi bi-toggle-on me-1"></i>Estado</div>
+                        <div id="modal-estado"></div>
+                    </div>
+                    <div class="modal-info-card" style="grid-column: span 2;">
+                        <div class="label"><i class="bi bi-tags me-1"></i>Categoría</div>
+                        <div id="modal-categoria-info">Sin categoría</div>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="modal-section-title"><i class="bi bi-card-text"></i> Descripción</div>
+                <p id="modal-descripcion" style="color:#334155;font-size:0.9rem;background:#f8fafc;padding:12px 15px;border-radius:10px;border:1px solid #e2e8f0;min-height:50px;margin-bottom:0;">Sin descripción disponible</p>
+
+                <!-- Fotos -->
+                <div class="modal-section-title mt-3"><i class="bi bi-images"></i> Fotos del Producto <span id="modal-foto-count" style="font-size:0.75rem;color:#94a3b8;"></span></div>
+                <div class="modal-fotos-grid" id="modal-fotos">
+                    <span class="text-muted fst-italic" style="font-size:0.85rem;">Sin fotos disponibles</span>
+                </div>
+
+                <!-- Variantes agrupadas por color -->
+                <div class="modal-section-title mt-3"><i class="bi bi-grid-3x3-gap-fill"></i> Variantes por Color</div>
+                <div id="modal-variantes-colores">
+                    <p class="text-muted fst-italic text-center py-3" style="font-size:0.85rem;">Sin variantes registradas</p>
+                </div>
+
+            </div>
+
+            <div class="modal-footer" style="border-top:2px solid #f1f5f9;padding:1rem 1.5rem;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Cerrar</button>
+                <a href="#" id="btn-editar-desde-modal" class="btn btn-warning"><i class="bi bi-pencil me-1"></i> Editar Producto</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA AGREGAR COLOR -->
+<div class="modal fade" id="modalAgregarColor" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;border:none;">
+            <div class="modal-header" style="border-bottom:1px solid #e2e8f0;">
+                <h5 class="modal-title fw-bold"><i class="bi bi-palette me-2"></i>Agregar Color</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label fw-bold">Nombre del Color</label>
+                <input type="text" class="form-control" id="inputNuevoColor" placeholder="Escribe el nombre del color..." maxlength="50">
+                <small class="text-muted mt-2 d-block">Escribe el nombre del color que deseas agregar</small>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid #e2e8f0;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnAgregarColor"><i class="bi bi-plus-lg"></i> Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FORMULARIO OCULTO PARA ELIMINAR -->
+<form id="form-eliminar" action="" method="POST" style="display:none;"></form>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const MAX_FOTOS = 6;
+    let modalColor;
+
+    /* ===================== DATOS DESDE SERVIDOR ===================== */
+    const productosData = {};
+    {% for p in productos %}
+    productosData['{{ p._id }}'] = {
+        nombre: {{ p.nombre | tojson }},
+        descripcion: {{ (p.descripcion or '') | tojson }},
+        categoria_id: '{{ p.categoria_id or "" }}',
+        empresa_id: '{{ p.empresa_id or "" }}',
+        estado: '{{ p.estado }}',
+        fotos: [{% if p.fotos %}{% for foto in p.fotos %}{{ url_for("static", filename="uploads/productos/" + foto) | tojson }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}],
+        variables: {{ p.variables | tojson if p.variables else [] }}
+    };
+    {% endfor %}
+
+    const categoriasData = {};
+    {% for cat in categorias %}
+    categoriasData['{{ cat._id }}'] = {
+        nombre: {{ cat.nombre | tojson }},
+        nivel: {{ cat.nivel }},
+        padre_id: '{{ cat.padre_id or "" }}',
+        padre_nombre: {{ (cat.padre_nombre or '') | tojson }}
+    };
+    {% endfor %}
+
+    const empresasData = {};
+    {% for emp in empresas %}
+    empresasData['{{ emp._id }}'] = {{ emp.nombre_comercial | tojson }};
+    {% endfor %}
+
+    /* ===================== VALIDACIONES ===================== */
+    function validarFormulario() {
+        let valido = true;
+        const nombre = document.getElementById('nombre');
+        if (!nombre.value.trim()) { nombre.classList.add('is-invalid'); valido = false; }
+        else { nombre.classList.remove('is-invalid'); }
+
+        const categoria = document.getElementById('categoriaSelect');
+        if (!categoria.value) { categoria.classList.add('is-invalid'); valido = false; }
+        else { categoria.classList.remove('is-invalid'); }
+
+        const empresa = document.getElementById('empresa_id');
+        if (!empresa.value) { empresa.classList.add('is-invalid'); valido = false; }
+        else { empresa.classList.remove('is-invalid'); }
+
+        const grupos = document.querySelectorAll('#grupos-colores .color-group');
+        if (grupos.length === 0) {
+            alert('⚠️ Debes agregar al menos un color con sus tallas.');
+            valido = false;
+        } else {
+            let variantesValidas = true;
+            grupos.forEach(grupo => {
+                grupo.querySelectorAll('.variant-row').forEach(fila => {
+                    const sku = fila.querySelector('input[name="sku[]"]');
+                    const talla = fila.querySelector('input[name="tamano[]"]');
+                    const precio = fila.querySelector('input[name="precio[]"]');
+                    const stock = fila.querySelector('input[name="stock[]"]');
+                    if (!sku.value.trim() || !talla.value.trim() || precio.value === '' || stock.value === '') variantesValidas = false;
+                });
+            });
+            if (!variantesValidas) { alert('⚠️ Completa todos los campos de las variantes (SKU, Talla, Precio, Stock).'); valido = false; }
+        }
+        if (!valido) window.scrollTo({ top: 0, behavior: 'smooth' });
+        return valido;
+    }
+
+    document.getElementById('nombre').addEventListener('input', function() { this.classList.remove('is-invalid'); });
+    document.getElementById('categoriaSelect').addEventListener('change', function() { this.classList.remove('is-invalid'); });
+    document.getElementById('empresa_id').addEventListener('change', function() { this.classList.remove('is-invalid'); });
+
+    /* ===================== ELIMINAR ===================== */
+    function confirmarEliminar(id, nombre) {
+        if (confirm('¿Estás seguro de eliminar el producto "' + nombre + '"?\n\nEsta acción no se puede deshacer.')) {
+            const form = document.getElementById('form-eliminar');
+            form.action = '/admin/productos/borrar/' + id;
+            form.submit();
+        }
+    }
+
+    /* ===================== FOTOS ===================== */
+    function actualizarContadorFotos() {
+        const count = document.querySelectorAll('#preview-fotos .item-foto').length;
+        const c = document.getElementById('fotosCounter');
+        c.textContent = count + '/6 fotos';
+        c.className = 'fotos-counter' + (count >= MAX_FOTOS ? ' completo' : '');
+        document.getElementById('input-fotos').disabled = count >= MAX_FOTOS;
+    }
+
+    document.getElementById('input-fotos').addEventListener('change', function(e) {
+        const container = document.getElementById('preview-fotos');
+        const existentes = container.querySelectorAll('.item-foto').length;
+        const files = Array.from(e.target.files);
+        if (existentes + files.length > MAX_FOTOS) {
+            alert('⚠️ Máximo 6 fotos. Ya tienes ' + existentes + '. Solo puedes agregar ' + (MAX_FOTOS - existentes) + ' más.');
+            this.value = ''; return;
+        }
+        let agregadas = 0;
+        files.forEach(file => {
+            if (existentes + agregadas >= MAX_FOTOS) return;
+            if (!file.type.startsWith('image/')) { alert('⚠️ Solo se permiten archivos de imagen.'); return; }
+            if (file.size > 5 * 1024 * 1024) { alert('⚠️ La imagen "' + file.name + '" supera los 5MB.'); return; }
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const div = document.createElement('div');
+                div.className = 'position-relative d-inline-block item-foto';
+                div.innerHTML = '<img src="' + ev.target.result + '" class="preview-img"><button type="button" class="btn btn-danger btn-sm position-absolute" style="top:-8px;right:-8px;border-radius:50%;" onclick="this.parentElement.remove();actualizarContadorFotos();">×</button>';
+                container.appendChild(div);
+                actualizarContadorFotos();
+            };
+            reader.readAsDataURL(file);
+            agregadas++;
+        });
+        this.value = '';
+    });
+
+    /* ===================== CATEGORÍAS ===================== */
+    function actualizarVistaPreviaCategoria() {
+        const sel = document.getElementById('categoriaSelect');
+        const opt = sel.options[sel.selectedIndex];
+        const prev = document.getElementById('selectedPath');
+        if (!opt || !opt.value) {
+            prev.innerHTML = '<span class="empty-selection"><i class="bi bi-info-circle"></i> Selecciona una categoría para ver su jerarquía completa</span>';
+            return;
+        }
+        const nivel = parseInt(opt.dataset.nivel) || 1;
+        const nombre = opt.dataset.nombre || '';
+        const padre = opt.dataset.padreNombre || '';
+        const padreId = opt.dataset.padreId || '';
+        let html = '';
+        if (padre && padre !== 'Raíz' && padreId) {
+            if (categoriasData[padreId] && categoriasData[padreId].padre_nombre && categoriasData[padreId].padre_nombre !== 'Raíz') {
+                html += '<span class="path-item nivel-1">' + escHtml(categoriasData[padreId].padre_nombre) + '</span><span class="path-arrow">→</span>';
+            }
+            html += '<span class="path-item nivel-' + (nivel-1) + '">' + escHtml(padre) + '</span><span class="path-arrow">→</span>';
+        }
+        html += '<span class="path-item nivel-' + nivel + '">' + escHtml(nombre) + '</span>';
+        html += '<span class="badge bg-secondary ms-2" style="font-size:0.7rem;">Nivel ' + nivel + '</span>';
+        prev.innerHTML = html;
+    }
+
+    function obtenerArbolCategoria(categoriaId) {
+        if (!categoriaId || !categoriasData[categoriaId]) return '<span class="text-muted fst-italic">Sin categoría asignada</span>';
+        const cat = categoriasData[categoriaId];
+        let html = '<div class="categoria-tree-display"><div>';
+        if (cat.padre_nombre && cat.padre_nombre !== 'Raíz' && cat.padre_id) {
+            const catPadre = categoriasData[cat.padre_id];
+            if (catPadre && catPadre.padre_nombre && catPadre.padre_nombre !== 'Raíz') {
+                html += '<span class="tree-item nivel-1">' + escHtml(catPadre.padre_nombre) + '</span><span class="tree-arrow">→</span>';
+            }
+            html += '<span class="tree-item nivel-' + (catPadre ? catPadre.nivel : 2) + '">' + escHtml(cat.padre_nombre) + '</span><span class="tree-arrow">→</span>';
+        }
+        html += '<span class="tree-item nivel-' + cat.nivel + '">' + escHtml(cat.nombre) + '</span>';
+        html += '<span class="categoria-badge nivel-' + cat.nivel + '">Nv.' + cat.nivel + '</span></div>';
+        if (!cat.padre_nombre || cat.padre_nombre === 'Raíz') html += '<small style="color:#94a3b8;font-size:0.7rem;font-style:italic;">Categoría raíz</small>';
+        html += '</div>';
+        return html;
+    }
+
+    function escHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ===================== MODAL VER PRODUCTO (COMPLETO) ===================== */
+    document.querySelectorAll('.btn-ver-producto').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const data = productosData[id];
+            if (!data) { alert('Producto no encontrado'); return; }
+
+            /* --- Nombre --- */
+            document.getElementById('modal-producto-nombre').textContent = data.nombre || 'Sin nombre';
+
+            /* --- Badges en header --- */
+            const badgesEl = document.getElementById('modal-header-badges');
+            const estadoBadge = data.estado === 'activo'
+                ? '<span class="badge bg-success status-pill">Activo</span>'
+                : '<span class="badge bg-secondary status-pill">Inactivo</span>';
+            const fotosCount = data.fotos ? data.fotos.length : 0;
+            badgesEl.innerHTML = estadoBadge +
+                '<span class="badge" style="background:rgba(255,255,255,0.2);"><i class="bi bi-images me-1"></i>' + fotosCount + ' foto' + (fotosCount !== 1 ? 's' : '') + '</span>';
+
+            /* --- Imagen en header --- */
+            const imgWrap = document.getElementById('modal-header-img-wrap');
+            if (data.fotos && data.fotos.length > 0) {
+                imgWrap.innerHTML = '<img src="' + escHtml(data.fotos[0]) + '" class="modal-product-avatar" alt="foto principal">';
+            } else {
+                imgWrap.innerHTML = '<div class="modal-product-avatar-placeholder"><i class="bi bi-box-seam" style="color:rgba(255,255,255,0.5);font-size:1.8rem;"></i></div>';
+            }
+
+            /* --- Stats rápidos --- */
+            const vars = data.variables || [];
+            const coloresUnicos = [...new Set(vars.map(v => v.color).filter(Boolean))];
+            const totalStock = vars.reduce((s, v) => s + (parseInt(v.stock) || 0), 0);
+            document.getElementById('stat-colores').textContent = coloresUnicos.length;
+            document.getElementById('stat-variantes').textContent = vars.length;
+            document.getElementById('stat-stock').textContent = totalStock;
+
+            /* --- Empresa --- */
+            document.getElementById('modal-empresa').textContent = empresasData[data.empresa_id] || 'Sin empresa asignada';
+
+            /* --- Estado --- */
+            const est = document.getElementById('modal-estado');
+            est.innerHTML = data.estado === 'activo'
+                ? '<span class="badge bg-success status-pill">✓ Activo</span>'
+                : '<span class="badge bg-secondary status-pill">✕ Inactivo</span>';
+
+            /* --- Categoría --- */
+            document.getElementById('modal-categoria-info').innerHTML = obtenerArbolCategoria(data.categoria_id);
+
+            /* --- Descripción --- */
+            const descEl = document.getElementById('modal-descripcion');
+            descEl.textContent = data.descripcion && data.descripcion.trim()
+                ? data.descripcion
+                : 'Sin descripción disponible';
+
+            /* --- Fotos --- */
+            const fotosC = document.getElementById('modal-fotos');
+            const fotoCountEl = document.getElementById('modal-foto-count');
+            if (data.fotos && data.fotos.length > 0) {
+                fotoCountEl.textContent = '(' + data.fotos.length + ' de 6)';
+                fotosC.innerHTML = data.fotos.map(function(f, i) {
+                    return '<div class="modal-foto-item">' +
+                        '<img src="' + escHtml(f) + '" alt="Foto ' + (i+1) + '" onclick="abrirLightbox(\'' + escHtml(f) + '\')" title="Click para ampliar">' +
+                        (i === 0 ? '<span class="modal-foto-badge">Principal</span>' : '') +
+                    '</div>';
+                }).join('');
+            } else {
+                fotoCountEl.textContent = '';
+                fotosC.innerHTML = '<span class="text-muted fst-italic" style="font-size:0.85rem;">Sin fotos disponibles</span>';
+            }
+
+            /* --- Variantes agrupadas por color --- */
+            const variantesC = document.getElementById('modal-variantes-colores');
+            if (vars.length > 0) {
+                let html = '';
+                coloresUnicos.forEach(function(color) {
+                    const tallas = vars.filter(v => v.color === color);
+                    const stockColor = tallas.reduce((s, v) => s + (parseInt(v.stock) || 0), 0);
+                    const precioMin = Math.min(...tallas.map(v => parseFloat(v.precio) || 0));
+                    const precioMax = Math.max(...tallas.map(v => parseFloat(v.precio) || 0));
+
+                    html += '<div class="modal-color-block">';
+                    html += '<div class="modal-color-header">';
+                    html += '<i class="bi bi-palette2"></i>';
+                    html += '<span>' + escHtml(color) + '</span>';
+                    html += '<span class="ms-auto badge" style="background:rgba(255,255,255,0.2);font-size:0.75rem;">' + tallas.length + ' talla' + (tallas.length !== 1 ? 's' : '') + ' · Stock: ' + stockColor + '</span>';
+                    if (precioMin !== precioMax) {
+                        html += '<span class="ms-2 badge" style="background:rgba(255,255,255,0.15);font-size:0.72rem;">$' + precioMin.toFixed(2) + ' – $' + precioMax.toFixed(2) + '</span>';
+                    } else {
+                        html += '<span class="ms-2 badge" style="background:rgba(255,255,255,0.15);font-size:0.72rem;">$' + precioMin.toFixed(2) + '</span>';
+                    }
+                    html += '</div>';
+                    html += '<table class="modal-color-table">';
+                    html += '<thead><tr><th>Talla</th><th>SKU</th><th>Precio</th><th>Stock</th></tr></thead>';
+                    html += '<tbody>';
+                    tallas.forEach(function(v) {
+                        const st = parseInt(v.stock) || 0;
+                        let stockClass = 'bg-success';
+                        if (st === 0) stockClass = 'bg-danger';
+                        else if (st <= 10) stockClass = 'bg-warning text-dark';
+                        html += '<tr>';
+                        html += '<td><strong>' + escHtml(v.tamano || '—') + '</strong></td>';
+                        html += '<td><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:0.8rem;">' + escHtml(v.sku || '—') + '</code></td>';
+                        html += '<td><strong style="color:#6366f1;">$' + parseFloat(v.precio || 0).toFixed(2) + '</strong></td>';
+                        html += '<td><span class="badge stock-badge-modal ' + stockClass + '">' + st + ' uds</span></td>';
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                });
+                variantesC.innerHTML = html;
+            } else {
+                variantesC.innerHTML = '<p class="text-muted fst-italic text-center py-3" style="font-size:0.85rem;"><i class="bi bi-exclamation-circle me-1"></i>Sin variantes registradas para este producto</p>';
+            }
+
+            /* --- Botón editar --- */
+            document.getElementById('btn-editar-desde-modal').href = '/admin/productos/ver/' + id;
+        });
+    });
+
+    /* Lightbox */
+    function abrirLightbox(src) {
+        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox').classList.add('open');
+    }
+    document.getElementById('lightbox').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('open');
+    });
+
+    /* ===================== MODAL AGREGAR COLOR ===================== */
+    function abrirModalColor() {
+        document.getElementById('inputNuevoColor').value = '';
+        if (!modalColor) modalColor = new bootstrap.Modal(document.getElementById('modalAgregarColor'));
+        modalColor.show();
+        setTimeout(function() { document.getElementById('inputNuevoColor').focus(); }, 500);
+    }
+
+    function agregarColor() {
+        const input = document.getElementById('inputNuevoColor');
+        const nombre = input.value.trim();
+        if (!nombre) { alert('⚠️ Escribe un nombre para el color.'); input.focus(); return; }
+        if (nombre.length > 50) { alert('⚠️ El nombre del color no puede superar los 50 caracteres.'); input.focus(); return; }
+        const grupos = document.querySelectorAll('#grupos-colores .color-group');
+        for (let g of grupos) {
+            if (g.querySelector('.color-name-display').textContent.trim().toLowerCase() === nombre.toLowerCase()) {
+                alert('⚠️ El color "' + nombre + '" ya existe.'); input.focus(); return;
+            }
+        }
+        const empty = document.getElementById('emptyColorsMessage');
+        if (empty) empty.remove();
+        const nombreEsc = nombre.replace(/'/g, "\\'");
+        const div = document.createElement('div');
+        div.className = 'color-group';
+        div.setAttribute('data-color', nombre);
+        div.innerHTML =
+            '<button type="button" class="btn btn-danger btn-sm btn-remove-group" onclick="eliminarGrupoColor(this)"><i class="bi bi-trash"></i></button>' +
+            '<div class="variant-group-title"><span class="color-name-display">' + escHtml(nombre) + '</span><span class="badge bg-secondary contador-tallas">1 talla</span></div>' +
+            '<div class="variantes-container">' +
+                '<div class="variant-row">' +
+                    '<div class="row g-2 align-items-center">' +
+                        '<div class="col-md-3"><label class="form-label small fw-bold mb-0">SKU</label><input type="text" name="sku[]" class="form-control form-control-sm" placeholder="Ej: PROD-M" required></div>' +
+                        '<div class="col-md-2"><label class="form-label small fw-bold mb-0">Talla</label><input type="text" name="tamano[]" class="form-control form-control-sm" placeholder="Ej: M" required></div>' +
+                        '<div class="col-md-2"><label class="form-label small fw-bold mb-0">Precio ($)</label><input type="number" name="precio[]" class="form-control form-control-sm" placeholder="0.00" step="0.01" min="0" required></div>' +
+                        '<div class="col-md-2"><label class="form-label small fw-bold mb-0">Stock</label><input type="number" name="stock[]" class="form-control form-control-sm" placeholder="0" min="0" required></div>' +
+                        '<div class="col-md-2"><label class="form-label small fw-bold mb-0">&nbsp;</label><button type="button" class="btn btn-outline-danger btn-sm w-100 btn-remove-variant" onclick="this.closest(\'.variant-row\').remove();actualizarContadorTallas();"><i class="bi bi-x-lg"></i> Eliminar</button></div>' +
+                    '</div>' +
+                    '<input type="hidden" name="color[]" value="' + escHtml(nombre) + '">' +
+                '</div>' +
+            '</div>' +
+            '<button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="agregarTalla(this, \'' + nombreEsc + '\')"><i class="bi bi-plus-lg"></i> Agregar Talla a ' + escHtml(nombre) + '</button>';
+        document.getElementById('grupos-colores').appendChild(div);
+        modalColor.hide();
+        input.value = '';
+        actualizarContadorTallas();
+        div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function eliminarGrupoColor(btn) {
+        if (!confirm('¿Estás seguro de eliminar este color y todas sus tallas?')) return;
+        btn.closest('.color-group').remove();
+        if (document.querySelectorAll('#grupos-colores .color-group').length === 0) {
+            document.getElementById('grupos-colores').innerHTML =
+                '<div class="empty-colors-message" id="emptyColorsMessage"><i class="bi bi-palette"></i><p class="mb-0">No hay colores agregados</p><small class="text-muted">Haz clic en "Agregar Color" para añadir variantes</small></div>';
+        }
+    }
+
+    function agregarTalla(btn, colorName) {
+        const container = btn.closest('.color-group').querySelector('.variantes-container');
+        const div = document.createElement('div');
+        div.className = 'variant-row';
+        div.innerHTML =
+            '<div class="row g-2 align-items-center">' +
+                '<div class="col-md-3"><label class="form-label small fw-bold mb-0">SKU</label><input type="text" name="sku[]" class="form-control form-control-sm" placeholder="Ej: PROD-XL" required></div>' +
+                '<div class="col-md-2"><label class="form-label small fw-bold mb-0">Talla</label><input type="text" name="tamano[]" class="form-control form-control-sm" placeholder="Ej: XL" required></div>' +
+                '<div class="col-md-2"><label class="form-label small fw-bold mb-0">Precio ($)</label><input type="number" name="precio[]" class="form-control form-control-sm" placeholder="0.00" step="0.01" min="0" required></div>' +
+                '<div class="col-md-2"><label class="form-label small fw-bold mb-0">Stock</label><input type="number" name="stock[]" class="form-control form-control-sm" placeholder="0" min="0" required></div>' +
+                '<div class="col-md-2"><label class="form-label small fw-bold mb-0">&nbsp;</label><button type="button" class="btn btn-outline-danger btn-sm w-100 btn-remove-variant" onclick="this.closest(\'.variant-row\').remove();actualizarContadorTallas();"><i class="bi bi-x-lg"></i> Eliminar</button></div>' +
+            '</div>' +
+            '<input type="hidden" name="color[]" value="' + escHtml(colorName) + '">';
+        container.appendChild(div);
+        actualizarContadorTallas();
+        div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function actualizarContadorTallas() {
+        document.querySelectorAll('.color-group').forEach(group => {
+            const count = group.querySelectorAll('.variant-row').length;
+            const badge = group.querySelector('.contador-tallas');
+            if (badge) badge.textContent = count + ' talla' + (count !== 1 ? 's' : '');
+        });
+    }
+
+    /* ===================== PAGINACIÓN DINÁMICA ===================== */
+    let paginaActual = 1;
+    let filasVisibles = [];   // filas que pasan el filtro de búsqueda
+    let tamPagina = 25;       // default
+
+    function getAllFilas() {
+        return Array.from(document.querySelectorAll('#tbody-productos .fila-producto'));
+    }
+
+    function filtrarFilas(q) {
+        filasVisibles = getAllFilas().filter(f => {
+            const txt = (f.getAttribute('data-search') || '').toLowerCase();
+            return q === '' || txt.includes(q.toLowerCase());
+        });
+    }
+
+    function renderPagina() {
+        const todas = getAllFilas();
+        todas.forEach(f => { f.style.display = 'none'; });
+
+        const totalFiltradas = filasVisibles.length;
+        const tp = tamPagina === 0 ? totalFiltradas : tamPagina;
+        const totalPags = tp > 0 ? Math.ceil(totalFiltradas / tp) : 1;
+        if (paginaActual > totalPags) paginaActual = Math.max(1, totalPags);
+
+        const inicio = tp > 0 ? (paginaActual - 1) * tp : 0;
+        const fin = tp > 0 ? Math.min(inicio + tp, totalFiltradas) : totalFiltradas;
+
+        filasVisibles.slice(inicio, fin).forEach(f => { f.style.display = ''; });
+
+        // Info
+        const infoEl = document.getElementById('paginationInfo');
+        if (totalFiltradas === 0) {
+            infoEl.textContent = 'No se encontraron productos';
+        } else if (tamPagina === 0) {
+            infoEl.textContent = 'Mostrando todos los ' + totalFiltradas + ' producto' + (totalFiltradas !== 1 ? 's' : '');
+        } else {
+            infoEl.textContent = 'Mostrando ' + (inicio + 1) + '–' + fin + ' de ' + totalFiltradas + ' producto' + (totalFiltradas !== 1 ? 's' : '');
+        }
+
+        // Controles
+        const ctrl = document.getElementById('paginationControls');
+        if (tamPagina === 0 || totalPags <= 1) { ctrl.innerHTML = ''; return; }
+
+        let btns = '';
+        btns += '<button class="btn-page" onclick="irPagina(' + (paginaActual-1) + ')" ' + (paginaActual === 1 ? 'disabled' : '') + '>‹ Anterior</button>';
+
+        // Rango inteligente: siempre muestra primera, última y ventana de ±2 alrededor de actual
+        const rango = new Set();
+        rango.add(1); rango.add(totalPags);
+        for (let i = Math.max(1, paginaActual - 2); i <= Math.min(totalPags, paginaActual + 2); i++) rango.add(i);
+        const paginas = Array.from(rango).sort((a, b) => a - b);
+
+        let prev = 0;
+        paginas.forEach(p => {
+            if (p - prev > 1) btns += '<span style="padding:5px 4px;color:#94a3b8;">…</span>';
+            btns += '<button class="btn-page' + (p === paginaActual ? ' active' : '') + '" onclick="irPagina(' + p + ')">' + p + '</button>';
+            prev = p;
+        });
+
+        btns += '<button class="btn-page" onclick="irPagina(' + (paginaActual+1) + ')" ' + (paginaActual === totalPags ? 'disabled' : '') + '>Siguiente ›</button>';
+        ctrl.innerHTML = btns;
+    }
+
+    function irPagina(p) {
+        const tp = tamPagina === 0 ? filasVisibles.length : tamPagina;
+        const totalPags = tp > 0 ? Math.ceil(filasVisibles.length / tp) : 1;
+        paginaActual = Math.max(1, Math.min(p, totalPags));
+        renderPagina();
+        document.getElementById('tbody-productos').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cambiarTamanoPagina() {
+        const sel = document.getElementById('pageSizeSelect');
+        tamPagina = parseInt(sel.value);
+        paginaActual = 1;
+        renderPagina();
+    }
+
+    document.getElementById('busqueda').addEventListener('keyup', function() {
+        filtrarFilas(this.value);
+        paginaActual = 1;
+        renderPagina();
+    });
+
+    /* ===================== INICIALIZAR ===================== */
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarContadorFotos();
+        actualizarContadorTallas();
+
+        document.getElementById('btnAgregarColor').addEventListener('click', agregarColor);
+        document.getElementById('inputNuevoColor').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); agregarColor(); }
+        });
+
+        if (document.getElementById('categoriaSelect').value) actualizarVistaPreviaCategoria();
+
+        // Inicializar paginación
+        filtrarFilas('');
+        renderPagina();
+    });
+</script>
+</body>
+</html>
