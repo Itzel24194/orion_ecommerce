@@ -8,45 +8,43 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --orion-primary: #e10098; 
+        :root {
+            --orion-primary: #e10098;
             --orion-primary-dark: #c00080;
             --orion-ink: #1a1a1a;
         }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background: #f5f5f5;
             color: #2b2b2b;
         }
-        
-        /* ====== NAVBAR ====== */
-        .main-navbar { 
+
+        .main-navbar {
             background: #ffffff;
             border-bottom: 2px solid #f0f0f0;
             padding: 10px 0 !important;
             transition: all 0.3s ease;
         }
-        .brand-logo { 
-            font-weight: 900; 
-            font-size: 2.3rem; 
-            color: var(--orion-primary) !important; 
-            letter-spacing: -1.5px; 
+        .brand-logo {
+            font-weight: 900;
+            font-size: 2.3rem;
+            color: var(--orion-primary) !important;
+            letter-spacing: -1.5px;
             text-decoration: none;
             transition: transform 0.2s;
         }
         .brand-logo:hover { transform: scale(1.02); }
-        
+
         .search-container {
             border: 2px solid #eee !important;
             transition: border-color 0.3s ease;
         }
         .search-container:focus-within { border-color: var(--orion-primary) !important; }
 
-        /* ====== SIDEBAR ====== */
-        .sidebar-box { 
-            background: #fff; 
-            padding: 16px 14px; 
-            border-radius: 8px; 
+        .sidebar-box {
+            background: #fff;
+            padding: 16px 14px;
+            border-radius: 8px;
             border: 1px solid #e0e0e0;
             max-height: calc(100vh - 120px);
             overflow-y: auto;
@@ -54,7 +52,6 @@
         .sidebar-box::-webkit-scrollbar { width: 4px; }
         .sidebar-box::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
-        /* ====== CATEGORÍAS CON COLLAPSE ====== */
         .cat-section {
             border-bottom: 1px solid #eee;
             padding: 6px 0;
@@ -79,23 +76,19 @@
         }
         .cat-header i { color: #999; transition: 0.2s; font-size: 0.78rem; }
         .cat-header.collapsed i { transform: rotate(-90deg); }
+        .cat-body { padding-top: 6px; }
 
-        .cat-body {
-            padding-top: 6px;
-        }
-
-        .cat-link { 
-            text-decoration: none; 
-            color: #444; 
-            display: block; 
-            padding: 3px 0; 
-            font-size: 0.88rem; 
+        .cat-link {
+            text-decoration: none;
+            color: #444;
+            display: block;
+            padding: 3px 0;
+            font-size: 0.88rem;
         }
         .sub-link { padding-left: 15px !important; font-size: 0.85rem !important; }
         .nieto-link { padding-left: 30px !important; color: #777 !important; font-size: 0.82rem !important; }
         .active-cat { color: var(--orion-primary) !important; font-weight: 700; }
 
-        /* ====== FILTROS ====== */
         .filter-divider {
             border-top: 2px solid #e0e0e0;
             margin: 14px 0 10px 0;
@@ -134,6 +127,7 @@
         }
         .filter-body::-webkit-scrollbar { width: 4px; }
         .filter-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+        .filter-body .extra-items { display: none; }
 
         .filter-item {
             display: flex;
@@ -170,7 +164,7 @@
             flex-shrink: 0;
         }
 
-        .filter-ver-mas {
+        .filter-ver-mas, .filter-ver-menos {
             color: var(--orion-primary);
             font-size: 0.75rem;
             font-weight: 700;
@@ -178,9 +172,7 @@
             display: inline-block;
             margin-top: 4px;
         }
-        .filter-ver-mas:hover { text-decoration: underline; }
-        .filter-ver-menos { color: var(--orion-primary); font-size: 0.75rem; font-weight: 700; cursor: pointer; display: inline-block; margin-top: 4px; }
-        .filter-ver-menos:hover { text-decoration: underline; }
+        .filter-ver-mas:hover, .filter-ver-menos:hover { text-decoration: underline; }
 
         .filter-price-inputs {
             display: flex;
@@ -221,7 +213,6 @@
         }
         .filters-toggle-mobile:hover { background: var(--orion-primary-dark); color: #fff; }
 
-        /* ====== BREADCRUMB ====== */
         .breadcrumb-orion { margin-bottom: 0.8rem; }
         .breadcrumb-orion .breadcrumb { background: transparent; padding: 0; margin: 0; }
         .breadcrumb-orion a { color: #777; text-decoration: none; font-weight: 600; }
@@ -229,37 +220,36 @@
         .breadcrumb-orion .breadcrumb-item.active { color: #999; }
         .breadcrumb-orion .breadcrumb-item + .breadcrumb-item::before { color: #ccc; }
 
-        /* ====== TARJETAS DE PRODUCTO ====== */
-        .card { 
-            transition: 0.3s; 
+        .card {
+            transition: 0.3s;
             border: 1px solid #e8e8e8;
             border-radius: 12px;
             overflow: hidden;
             background: #fff;
         }
-        .card:hover { 
-            border-color: var(--orion-primary); 
-            transform: translateY(-5px); 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
+        .card:hover {
+            border-color: var(--orion-primary);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
         }
-        .card-img-top { 
-            height: 280px; 
-            object-fit: contain; 
-            padding: 16px; 
+        .card-img-top {
+            height: 280px;
+            object-fit: contain;
+            padding: 16px;
             background: #fafafa;
             width: 100%;
         }
-        .price { 
-            font-weight: 700; 
-            color: var(--orion-primary); 
-            font-size: 1.1rem; 
+        .price {
+            font-weight: 700;
+            color: var(--orion-primary);
+            font-size: 1.1rem;
         }
-        .badge-status { 
-            font-size: 0.65rem; 
-            padding: 3px 10px; 
-            border-radius: 4px; 
-            text-transform: uppercase; 
-            font-weight: 700; 
+        .badge-status {
+            font-size: 0.65rem;
+            padding: 3px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
         }
 
         .product-grid {
@@ -267,7 +257,6 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 18px;
         }
-
         .card-body h6 {
             font-size: 0.95rem !important;
             min-height: 44px;
@@ -279,25 +268,21 @@
             color: #222;
         }
 
-        /* ====== CONTENEDOR PRINCIPAL - SIN MUCHO ESPACIO LATERAL ====== */
         .main-container {
             padding-left: 20px;
             padding-right: 20px;
             max-width: 100%;
         }
 
-        /* ====== RESPONSIVE ====== */
         @media (max-width: 1199px) {
             .product-grid { grid-template-columns: repeat(3, 1fr); }
             .card-img-top { height: 240px; }
         }
-
         @media (max-width: 991px) {
             .product-grid { grid-template-columns: repeat(2, 1fr); }
             .card-img-top { height: 200px; }
             .main-container { padding-left: 16px; padding-right: 16px; }
         }
-
         @media (max-width: 767px) {
             .main-container { padding-left: 10px; padding-right: 10px; }
             .sidebar-box { max-height: none; }
@@ -310,7 +295,6 @@
             .card-body h6 { font-size: 0.8rem !important; min-height: 36px; }
             .price { font-size: 0.95rem; }
         }
-
         @media (max-width: 480px) {
             .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .card-img-top { height: 140px; padding: 8px; }
@@ -318,6 +302,11 @@
             .card-body h6 { font-size: 0.75rem !important; min-height: 32px; }
             .price { font-size: 0.85rem; }
             .badge-status { font-size: 0.55rem; padding: 2px 6px; }
+        }
+
+        /* Ocultar productos que no coinciden */
+        .product-card.hidden-product {
+            display: none !important;
         }
     </style>
 </head>
@@ -330,7 +319,7 @@
     <nav class="navbar navbar-light main-navbar sticky-top shadow-sm">
         <div class="main-container d-flex align-items-center justify-content-between" style="width:100%;">
             <a class="navbar-brand brand-logo" href="/">ORION</a>
-            
+
             <form class="d-flex flex-grow-1 mx-3" action="{{ url_for('web.catalogo') }}" method="GET">
                 <div class="input-group rounded-pill overflow-hidden bg-light search-container">
                     <input class="form-control border-0 bg-light ps-4" type="search" name="q" placeholder="Buscar productos..." value="{{ request.args.get('q', '') }}">
@@ -377,7 +366,7 @@
                 </button>
 
                 <div class="sidebar-box shadow-sm" id="filtersLiverpool">
-                    
+
                     <!-- ====== CATEGORÍAS CON COLLAPSE ====== -->
                     <div class="cat-section">
                         <div class="cat-header" data-target="#categoriasBody">
@@ -394,13 +383,13 @@
                                     <a href="{{ url_for('web.catalogo', categoria=cat._id) }}" class="cat-link {% if categoria_seleccionada == cat._id|string %}active-cat{% endif %}">
                                         <strong>{{ cat.nombre }}</strong>
                                     </a>
-                                    
+
                                     {% for sub in categorias if sub.padre_id|string == cat._id|string %}
                                         {% if not categoria_seleccionada or sub._id|string in ids_visibles or sub.padre_id|string == categoria_seleccionada %}
                                             <a href="{{ url_for('web.catalogo', categoria=sub._id) }}" class="cat-link sub-link {% if categoria_seleccionada == sub._id|string %}active-cat{% endif %}">
                                                 ↳ {{ sub.nombre }}
                                             </a>
-                                            
+
                                             {% for nieto in categorias if nieto.padre_id|string == sub._id|string %}
                                                 <a href="{{ url_for('web.catalogo', categoria=nieto._id) }}" class="cat-link nieto-link {% if categoria_seleccionada == nieto._id|string %}active-cat{% endif %}">
                                                     • {{ nieto.nombre }}
@@ -416,114 +405,83 @@
                     <!-- ====== DIVISOR ====== -->
                     <div class="filter-divider"></div>
 
-                    <!-- ====== FILTROS LIVERPOOL ====== -->
+                    <!-- ====== FILTROS ====== -->
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="fw-bold mb-0" style="font-size:0.85rem;"><i class="bi bi-funnel me-2"></i>Filtros</h6>
                         <button class="btn btn-sm btn-outline-secondary rounded-pill" id="clearFilters" style="font-size:0.65rem;padding:2px 12px;">Limpiar todo</button>
                     </div>
 
                     <!-- ====== 1. DESCUENTOS ====== -->
-                    <div class="filter-section">
+                    <div class="filter-section" data-filter-group="descuento">
                         <div class="filter-header" data-target="#filterDescuentos">
                             <h6>Descuentos</h6>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="collapse show filter-body" id="filterDescuentos">
-                            <label class="filter-item"><input type="checkbox" value="70"> 70.0 % o más <span class="badge-count">1</span></label>
-                            <label class="filter-item"><input type="checkbox" value="60"> 60.0 % o más <span class="badge-count">1</span></label>
-                            <label class="filter-item"><input type="checkbox" value="50"> 50.0 % o más <span class="badge-count">201</span></label>
-                            <label class="filter-item"><input type="checkbox" value="40"> 40.0 % o más <span class="badge-count">376</span></label>
-                            <label class="filter-item"><input type="checkbox" value="30"> 30.0 % o más <span class="badge-count">641</span></label>
-                            <label class="filter-item"><input type="checkbox" value="20"> 20.0 % o más <span class="badge-count">944</span></label>
-                            <label class="filter-item"><input type="checkbox" value="10"> 10.0 % o más <span class="badge-count">1096</span></label>
+                            <label class="filter-item"><input type="checkbox" value="70" data-filter-type="descuento"> 70.0 % o más <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="60" data-filter-type="descuento"> 60.0 % o más <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="50" data-filter-type="descuento"> 50.0 % o más <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="40" data-filter-type="descuento"> 40.0 % o más <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="30" data-filter-type="descuento"> 30.0 % o más <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="20" data-filter-type="descuento"> 20.0 % o más <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="10" data-filter-type="descuento"> 10.0 % o más <span class="badge-count"></span></label>
                         </div>
                     </div>
 
                     <!-- ====== 2. MARCAS ====== -->
-                    <div class="filter-section">
+                    <div class="filter-section" data-filter-group="marca">
                         <div class="filter-header" data-target="#filterMarcas">
                             <h6>Marcas</h6>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="collapse show filter-body" id="filterMarcas">
                             <div class="mb-2"><input type="text" class="form-control form-control-sm" placeholder="Búsqueda rápida" style="border-radius:20px;font-size:0.75rem;"></div>
-                            <label class="filter-item"><input type="checkbox" value="20 HRS"> 20 HRS <span class="badge-count">1</span></label>
-                            <label class="filter-item"><input type="checkbox" value="BALTARINI"> BALTARINI <span class="badge-count">6</span></label>
-                            <label class="filter-item"><input type="checkbox" value="BARALDI"> BARALDI <span class="badge-count">17</span></label>
-                            <label class="filter-item"><input type="checkbox" value="BENISSIMO"> BENISSIMO <span class="badge-count">16</span></label>
-                            <label class="filter-item"><input type="checkbox" value="BIRKENSTOCK"> BIRKENSTOCK <span class="badge-count">4</span></label>
-                            <label class="filter-item"><input type="checkbox" value="BLACKMAN"> BLACKMAN <span class="badge-count">3</span></label>
-                            <label class="filter-item"><input type="checkbox" value="BMNY"> BMNY <span class="badge-count">179</span></label>
+                            <!-- Los items se generarán dinámicamente con JS -->
+                            <div id="marca-items"></div>
                             <span class="filter-ver-mas" data-target="#filterMarcas">Ver más</span>
-                            <div class="extra-items" style="display:none;">
-                                <label class="filter-item"><input type="checkbox" value="CAMPER"> CAMPER <span class="badge-count">50</span></label>
-                                <label class="filter-item"><input type="checkbox" value="FLEXI"> FLEXI <span class="badge-count">82</span></label>
-                                <label class="filter-item"><input type="checkbox" value="FLORSHEIM"> FLORSHEIM <span class="badge-count">8</span></label>
-                                <label class="filter-item"><input type="checkbox" value="PRADA"> PRADA <span class="badge-count">70</span></label>
-                                <label class="filter-item"><input type="checkbox" value="REPÚBLICA BLANCA"> REPÚBLICA BLANCA <span class="badge-count">84</span></label>
-                            </div>
+                            <div class="extra-items" id="marca-extra" style="display:none;"></div>
                         </div>
                     </div>
 
                     <!-- ====== 3. TALLA ====== -->
-                    <div class="filter-section">
+                    <div class="filter-section" data-filter-group="talla">
                         <div class="filter-header" data-target="#filterTalla">
                             <h6>Talla</h6>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="collapse show filter-body" id="filterTalla">
-                            <label class="filter-item"><input type="checkbox" value="22 cm"> 22 cm <span class="badge-count">9</span></label>
-                            <label class="filter-item"><input type="checkbox" value="22.5 cm"> 22.5 cm <span class="badge-count">5</span></label>
-                            <label class="filter-item"><input type="checkbox" value="23 cm"> 23 cm <span class="badge-count">14</span></label>
-                            <label class="filter-item"><input type="checkbox" value="23.5 cm"> 23.5 cm <span class="badge-count">5</span></label>
-                            <label class="filter-item"><input type="checkbox" value="24 cm"> 24 cm <span class="badge-count">20</span></label>
-                            <label class="filter-item"><input type="checkbox" value="24.5 cm"> 24.5 cm <span class="badge-count">7</span></label>
-                            <label class="filter-item"><input type="checkbox" value="25 cm"> 25 cm <span class="badge-count">845</span></label>
+                            <div id="talla-items"></div>
                             <span class="filter-ver-mas" data-target="#filterTalla">Ver más</span>
-                            <div class="extra-items" style="display:none;">
-                                <label class="filter-item"><input type="checkbox" value="25.5 cm"> 25.5 cm <span class="badge-count">12</span></label>
-                                <label class="filter-item"><input type="checkbox" value="26 cm"> 26 cm <span class="badge-count">8</span></label>
-                                <label class="filter-item"><input type="checkbox" value="26.5 cm"> 26.5 cm <span class="badge-count">6</span></label>
-                                <label class="filter-item"><input type="checkbox" value="27 cm"> 27 cm <span class="badge-count">4</span></label>
-                            </div>
+                            <div class="extra-items" id="talla-extra" style="display:none;"></div>
                         </div>
                     </div>
 
                     <!-- ====== 4. COLOR ====== -->
-                    <div class="filter-section">
+                    <div class="filter-section" data-filter-group="color">
                         <div class="filter-header" data-target="#filterColor">
                             <h6>Color</h6>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="collapse show filter-body" id="filterColor">
-                            <label class="filter-item"><input type="checkbox" value="Negro"> <span class="color-dot" style="background:#1a1a1a;"></span> Negro <span class="badge-count">156</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Blanco"> <span class="color-dot" style="background:#ffffff;border-color:#ccc;"></span> Blanco <span class="badge-count">89</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Café"> <span class="color-dot" style="background:#6b4423;"></span> Café <span class="badge-count">234</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Negro/Café"> <span class="color-dot" style="background:linear-gradient(45deg,#1a1a1a 50%,#6b4423 50%);"></span> Negro/Café <span class="badge-count">67</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Rojo"> <span class="color-dot" style="background:#dc2626;"></span> Rojo <span class="badge-count">45</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Azul"> <span class="color-dot" style="background:#2563eb;"></span> Azul <span class="badge-count">78</span></label>
+                            <div id="color-items"></div>
                             <span class="filter-ver-mas" data-target="#filterColor">Ver más</span>
-                            <div class="extra-items" style="display:none;">
-                                <label class="filter-item"><input type="checkbox" value="Verde"> <span class="color-dot" style="background:#16a34a;"></span> Verde <span class="badge-count">34</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Gris"> <span class="color-dot" style="background:#9ca3af;"></span> Gris <span class="badge-count">56</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Beige"> <span class="color-dot" style="background:#f5f0dc;"></span> Beige <span class="badge-count">28</span></label>
-                            </div>
+                            <div class="extra-items" id="color-extra" style="display:none;"></div>
                         </div>
                     </div>
 
                     <!-- ====== 5. PRECIOS ====== -->
-                    <div class="filter-section">
+                    <div class="filter-section" data-filter-group="precio">
                         <div class="filter-header" data-target="#filterPrecios">
                             <h6>Precios</h6>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="collapse show filter-body" id="filterPrecios">
-                            <label class="filter-item"><input type="checkbox" value="menos-500"> Menos de $500.0 <span class="badge-count">7</span></label>
-                            <label class="filter-item"><input type="checkbox" value="500-1000"> $500.0 - $1000.0 <span class="badge-count">169</span></label>
-                            <label class="filter-item"><input type="checkbox" value="1000-2000"> $1000.0 - $2000.0 <span class="badge-count">755</span></label>
-                            <label class="filter-item"><input type="checkbox" value="2000-5000"> $2000.0 - $5000.0 <span class="badge-count">521</span></label>
-                            <label class="filter-item"><input type="checkbox" value="5000-10000"> $5000.0 - $10000.0 <span class="badge-count">53</span></label>
-                            <label class="filter-item"><input type="checkbox" value="mas-10000"> Mas de $10000.0 <span class="badge-count">3</span></label>
+                            <label class="filter-item"><input type="checkbox" value="menos-500" data-filter-type="precio"> Menos de $500.0 <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="500-1000" data-filter-type="precio"> $500.0 - $1000.0 <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="1000-2000" data-filter-type="precio"> $1000.0 - $2000.0 <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="2000-5000" data-filter-type="precio"> $2000.0 - $5000.0 <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="5000-10000" data-filter-type="precio"> $5000.0 - $10000.0 <span class="badge-count"></span></label>
+                            <label class="filter-item"><input type="checkbox" value="mas-10000" data-filter-type="precio"> Mas de $10000.0 <span class="badge-count"></span></label>
                             <div class="filter-price-inputs mt-2">
                                 <input type="number" placeholder="Mín" id="priceMin" value="">
                                 <span>—</span>
@@ -533,116 +491,40 @@
                         </div>
                     </div>
 
-                    <!-- ====== 6. CALIFICACIÓN ====== -->
-                    <div class="filter-section">
+                    <!-- ====== 6. CALIFICACIÓN (sin datos reales, se omite funcionalidad) ====== -->
+                    <div class="filter-section" data-filter-group="calificacion">
                         <div class="filter-header" data-target="#filterCalificacion">
                             <h6>Calificación</h6>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="collapse show filter-body" id="filterCalificacion">
-                            <label class="filter-item"><input type="checkbox" value="4"> 4 estrellas o más <span class="badge-count">38</span></label>
+                            <label class="filter-item"><input type="checkbox" value="4" data-filter-type="calificacion"> 4 estrellas o más <span class="badge-count"></span></label>
                         </div>
                     </div>
 
                     <!-- ====== 7. MATERIAL ====== -->
-                    <div class="filter-section">
+                    <div class="filter-section" data-filter-group="material">
                         <div class="filter-header" data-target="#filterMaterial">
                             <h6>Material</h6>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="collapse show filter-body" id="filterMaterial">
-                            <label class="filter-item"><input type="checkbox" value="Acero inoxidable"> Acero inoxidable <span class="badge-count">1</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Charol"> Charol <span class="badge-count">35</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Cuero"> Cuero <span class="badge-count">932</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Cuero sintético"> Cuero sintético <span class="badge-count">137</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Felpa"> Felpa <span class="badge-count">1</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Gamuza"> Gamuza <span class="badge-count">31</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Goma"> Goma <span class="badge-count">10</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Lona"> Lona <span class="badge-count">2</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Material reciclado"> Material reciclado <span class="badge-count">2</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Memory foam"> Memory foam <span class="badge-count">3</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Nubuck"> Nubuck <span class="badge-count">1</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Piel de becerro"> Piel de becerro <span class="badge-count">4</span></label>
-                            <span class="filter-ver-menos" data-target="#filterMaterial" style="display:none;">Ver menos</span>
+                            <div id="material-items"></div>
+                            <span class="filter-ver-mas" data-target="#filterMaterial">Ver más</span>
+                            <div class="extra-items" id="material-extra" style="display:none;"></div>
                         </div>
                     </div>
 
                     <!-- ====== 8. VENDIDO POR ====== -->
-                    <div class="filter-section">
+                    <div class="filter-section" data-filter-group="vendido">
                         <div class="filter-header" data-target="#filterVendido">
                             <h6>Vendido por</h6>
                             <i class="bi bi-chevron-down"></i>
                         </div>
                         <div class="collapse show filter-body" id="filterVendido">
-                            <label class="filter-item"><input type="checkbox" value="liverpool" checked> liverpool <span class="badge-count">384</span></label>
-                            <label class="filter-item"><input type="checkbox" value="suburbia"> suburbia <span class="badge-count">63</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Frio Extremo"> Frio Extremo <span class="badge-count">179</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Zapaterías Leon MX"> Zapaterías Leon MX <span class="badge-count">153</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Roma Zapaterías"> Roma Zapaterías <span class="badge-count">87</span></label>
-                            <label class="filter-item"><input type="checkbox" value="REPÚBLICA BLANCA"> REPÚBLICA BLANCA <span class="badge-count">84</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Flexi"> Flexi <span class="badge-count">82</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Zapaterias Pakar"> Zapaterias Pakar <span class="badge-count">78</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Prada Mx"> Prada Mx <span class="badge-count">70</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Camper"> Camper <span class="badge-count">50</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Zapaterías México"> Zapaterías México <span class="badge-count">41</span></label>
-                            <label class="filter-item"><input type="checkbox" value="yayashoesmx"> yayashoesmx <span class="badge-count">31</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Michel Domit"> Michel Domit <span class="badge-count">27</span></label>
-                            <label class="filter-item"><input type="checkbox" value="LOB FOOTWEAR"> LOB FOOTWEAR <span class="badge-count">24</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Trender"> Trender <span class="badge-count">22</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Dasalo"> Dasalo <span class="badge-count">21</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Luxomar"> Luxomar <span class="badge-count">18</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Calzado Baraldi"> Calzado Baraldi <span class="badge-count">17</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Calzado Evolución"> Calzado Evolución <span class="badge-count">16</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Estilo DH"> Estilo DH <span class="badge-count">16</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Randem"> Randem <span class="badge-count">15</span></label>
-                            <label class="filter-item"><input type="checkbox" value="BOND"> BOND <span class="badge-count">13</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Enco Footwear"> Enco Footwear <span class="badge-count">13</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Grupo Balia"> Grupo Balia <span class="badge-count">12</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Tres Reyes Zapaterias"> Tres Reyes Zapaterias <span class="badge-count">10</span></label>
-                            <label class="filter-item"><input type="checkbox" value="VF Corporation"> VF Corporation <span class="badge-count">9</span></label>
-                            <label class="filter-item"><input type="checkbox" value="CALZADO GROMO"> CALZADO GROMO <span class="badge-count">8</span></label>
-                            <label class="filter-item"><input type="checkbox" value="CALZAMARKET"> CALZAMARKET <span class="badge-count">8</span></label>
-                            <label class="filter-item"><input type="checkbox" value="Florsheim"> Florsheim <span class="badge-count">8</span></label>
-                            <label class="filter-item"><input type="checkbox" value="WORKLAND"> WORKLAND <span class="badge-count">8</span></label>
+                            <div id="vendido-items"></div>
                             <span class="filter-ver-mas" data-target="#filterVendido">Ver más</span>
-                            <div class="extra-items" style="display:none;">
-                                <label class="filter-item"><input type="checkbox" value="DIVERTICALZADOS"> DIVERTICALZADOS <span class="badge-count">6</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Hamilton Footwear"> Hamilton Footwear <span class="badge-count">5</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Paruno"> Paruno <span class="badge-count">5</span></label>
-                                <label class="filter-item"><input type="checkbox" value="TXINTERNET"> TXINTERNET <span class="badge-count">5</span></label>
-                                <label class="filter-item"><input type="checkbox" value="MOAD SHOES"> MOAD SHOES <span class="badge-count">4</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Massimo Gorka"> Massimo Gorka <span class="badge-count">4</span></label>
-                                <label class="filter-item"><input type="checkbox" value="PREMIUM BRANDS"> PREMIUM BRANDS <span class="badge-count">4</span></label>
-                                <label class="filter-item"><input type="checkbox" value="iKual"> iKual <span class="badge-count">4</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Blackman"> Blackman <span class="badge-count">3</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Brimont Store"> Brimont Store <span class="badge-count">3</span></label>
-                                <label class="filter-item"><input type="checkbox" value="FRANCO CUADRA"> FRANCO CUADRA <span class="badge-count">3</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Hörner"> Hörner <span class="badge-count">3</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Marcas y Tendencias"> Marcas y Tendencias <span class="badge-count">3</span></label>
-                                <label class="filter-item"><input type="checkbox" value="TREP MÉXICO"> TREP MÉXICO <span class="badge-count">3</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Exclusivas Marcel La Zapateria"> Exclusivas Marcel La Zapateria <span class="badge-count">2</span></label>
-                                <label class="filter-item"><input type="checkbox" value="FANTOCHE SNEAKERS"> FANTOCHE SNEAKERS <span class="badge-count">2</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Francisco de Jesús Escamilla Rangel"> Francisco de Jesús Escamilla Rangel <span class="badge-count">2</span></label>
-                                <label class="filter-item"><input type="checkbox" value="HARDBODY SPORT"> HARDBODY SPORT <span class="badge-count">2</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Lifestyle"> Lifestyle <span class="badge-count">2</span></label>
-                                <label class="filter-item"><input type="checkbox" value="SHOES STORE"> SHOES STORE <span class="badge-count">2</span></label>
-                                <label class="filter-item"><input type="checkbox" value="BLUMMX"> BLUMMX <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="COURT OFICIAL"> COURT OFICIAL <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="CR SOLUCIONES"> CR SOLUCIONES <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="DINI STORE"> DINI STORE <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="GRUPO MX HUCRY"> GRUPO MX HUCRY <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="HG E COMMERCE"> HG E COMMERCE <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="KM Footwear"> KM Footwear <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="MOVE MDX"> MOVE MDX <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Medizin Uniformes"> Medizin Uniformes <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="SFERA MEXICO"> SFERA MEXICO <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Sportlandmx"> Sportlandmx <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="TRESESENTA FOOTWEAR"> TRESESENTA FOOTWEAR <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Top Sailer"> Top Sailer <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Via Leon Market"> Via Leon Market <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="Workman"> Workman <span class="badge-count">1</span></label>
-                                <label class="filter-item"><input type="checkbox" value="ZAPATERÍA CABADAO"> ZAPATERÍA CABADAO <span class="badge-count">1</span></label>
-                            </div>
+                            <div class="extra-items" id="vendido-extra" style="display:none;"></div>
                         </div>
                     </div>
 
@@ -653,7 +535,7 @@
             <div class="col-lg-9 col-md-8">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <h3 class="mb-0" style="font-size:1.4rem;">{{ cat_actual.nombre if cat_actual else "Catálogo General" }}</h3>
-                    <span class="text-muted small">{{ productos|length }} productos encontrados</span>
+                    <span class="text-muted small" id="productCount">{{ productos|length }} productos encontrados</span>
                 </div>
 
                 <!-- Orden -->
@@ -675,11 +557,27 @@
                 </div>
 
                 <!-- Grid de productos -->
-                <div class="product-grid">
+                <div class="product-grid" id="productGrid">
                     {% for p in productos %}
                     {% set p_precio = (p.variantes[0].precio if p.variantes else (p.precio or 0)) %}
                     {% set p_stock = p.variantes|sum(attribute='stock') if p.variantes else (p.stock or 0) %}
-                    <a href="{{ url_for('web.ver_detalle_producto', id=p._id) }}" class="text-decoration-none text-dark">
+                    {% set p_marca = p.marca or '' %}
+                    {% set p_talla = p.talla or '' %}
+                    {% set p_color = p.color or '' %}
+                    {% set p_material = p.material or '' %}
+                    {% set p_vendido = p.vendido or '' %}
+                    {% set p_precio_original = p.precio_original or p_precio %}
+                    {% set p_descuento = ((1 - (p_precio / p_precio_original)) * 100) if p_precio_original and p_precio_original > 0 else 0 %}
+                    <a href="{{ url_for('web.ver_detalle_producto', id=p._id) }}" class="text-decoration-none text-dark product-card"
+                       data-precio="{{ p_precio }}"
+                       data-stock="{{ p_stock }}"
+                       data-marca="{{ p_marca }}"
+                       data-talla="{{ p_talla }}"
+                       data-color="{{ p_color }}"
+                       data-material="{{ p_material }}"
+                       data-vendido="{{ p_vendido }}"
+                       data-descuento="{{ p_descuento }}"
+                       data-calificacion="0">
                         <div class="card h-100 border-0 shadow-sm">
                             <img src="{{ url_for('static', filename='uploads/productos/' + p.fotos[0]) if p.fotos else 'https://via.placeholder.com/300' }}" class="card-img-top" loading="lazy">
                             <div class="card-body">
@@ -727,36 +625,28 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        // ── CATEGORÍAS: toggle collapse ──
-        document.querySelectorAll('.cat-header').forEach(function(header) {
-            header.addEventListener('click', function() {
+        // ====================================================================
+        // 1. TOGGLES DE CATEGORÍAS Y FILTROS (collapse)
+        // ====================================================================
+        document.querySelectorAll('.cat-header, .filter-header').forEach(function(header) {
+            header.addEventListener('click', function(e) {
                 var targetId = this.getAttribute('data-target');
                 var target = document.querySelector(targetId);
                 if (target) {
                     target.classList.toggle('show');
                     var icon = this.querySelector('i');
-                    if (icon) icon.classList.toggle('bi-chevron-down');
-                    if (icon) icon.classList.toggle('bi-chevron-up');
+                    if (icon) {
+                        icon.classList.toggle('bi-chevron-down');
+                        icon.classList.toggle('bi-chevron-up');
+                    }
                 }
             });
         });
 
-        // ── FILTROS: toggle collapse ──
-        document.querySelectorAll('.filter-header').forEach(function(header) {
-            header.addEventListener('click', function() {
-                var targetId = this.getAttribute('data-target');
-                var target = document.querySelector(targetId);
-                if (target) {
-                    target.classList.toggle('show');
-                    var icon = this.querySelector('i');
-                    if (icon) icon.classList.toggle('bi-chevron-down');
-                    if (icon) icon.classList.toggle('bi-chevron-up');
-                }
-            });
-        });
-
-        // ── FILTROS: Ver más / Ver menos ──
-        document.querySelectorAll('.filter-ver-mas').forEach(function(el) {
+        // ====================================================================
+        // 2. "VER MÁS / VER MENOS"
+        // ====================================================================
+        document.querySelectorAll('.filter-ver-mas, .filter-ver-menos').forEach(function(el) {
             el.addEventListener('click', function() {
                 var parent = this.closest('.filter-body');
                 var extra = parent.querySelector('.extra-items');
@@ -774,82 +664,310 @@
             });
         });
 
-        // ── FILTROS: Ver menos (para los que ya están expandidos por defecto) ──
-        document.querySelectorAll('.filter-ver-menos').forEach(function(el) {
-            el.addEventListener('click', function() {
-                var parent = this.closest('.filter-body');
-                var extra = parent.querySelector('.extra-items');
+        // ====================================================================
+        // 3. BÚSQUEDA RÁPIDA EN MARCAS
+        // ====================================================================
+        var marcaSearch = document.querySelector('#filterMarcas input[type="text"]');
+        if (marcaSearch) {
+            marcaSearch.addEventListener('input', function() {
+                var query = this.value.toLowerCase();
+                var container = document.getElementById('marca-items');
+                var items = container.querySelectorAll('.filter-item');
+                items.forEach(function(item) {
+                    var text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(query) ? 'flex' : 'none';
+                });
+                // también en extra
+                var extra = document.getElementById('marca-extra');
                 if (extra) {
-                    extra.style.display = 'none';
-                    this.textContent = 'Ver más';
-                    this.className = 'filter-ver-mas';
+                    var extraItems = extra.querySelectorAll('.filter-item');
+                    extraItems.forEach(function(item) {
+                        var text = item.textContent.toLowerCase();
+                        item.style.display = text.includes(query) ? 'flex' : 'none';
+                    });
                 }
             });
+        }
+
+        // ====================================================================
+        // 4. GENERAR OPCIONES DE FILTRO DINÁMICAMENTE (marcas, tallas, colores, materiales, vendedores)
+        // ====================================================================
+        function getUniqueValues(attr) {
+            var cards = document.querySelectorAll('.product-card');
+            var values = new Set();
+            cards.forEach(function(card) {
+                var val = card.getAttribute('data-' + attr);
+                if (val && val.trim() !== '') {
+                    values.add(val.trim());
+                }
+            });
+            return Array.from(values).sort();
+        }
+
+        function buildFilterItems(containerId, extraId, attr, labelPrefix) {
+            var container = document.getElementById(containerId);
+            var extra = document.getElementById(extraId);
+            if (!container) return;
+            var values = getUniqueValues(attr);
+            // Mostrar primeros 6, el resto en extra
+            var showFirst = 6;
+            var itemsHtml = '';
+            values.forEach(function(val, index) {
+                var item = '<label class="filter-item"><input type="checkbox" value="' + val + '" data-filter-type="' + attr + '"> ' + (labelPrefix ? labelPrefix + ' ' : '') + val + ' <span class="badge-count"></span></label>';
+                if (index < showFirst) {
+                    itemsHtml += item;
+                } else {
+                    if (extra) extra.innerHTML += item;
+                }
+            });
+            container.innerHTML = itemsHtml;
+            // Si no hay extra, ocultar el botón "Ver más"
+            if (extra && extra.children.length === 0) {
+                var verMas = container.closest('.filter-body').querySelector('.filter-ver-mas, .filter-ver-menos');
+                if (verMas) verMas.style.display = 'none';
+            }
+            // Si hay extra, asegurar que se muestre el botón
+            if (extra && extra.children.length > 0) {
+                var verMas = container.closest('.filter-body').querySelector('.filter-ver-mas');
+                if (verMas) verMas.style.display = 'inline-block';
+            }
+            // Refrescar eventos de los nuevos checkboxes
+            attachFilterEvents();
+        }
+
+        // Construir filtros dinámicos
+        buildFilterItems('marca-items', 'marca-extra', 'marca');
+        buildFilterItems('talla-items', 'talla-extra', 'talla');
+        buildFilterItems('color-items', 'color-extra', 'color');
+        buildFilterItems('material-items', 'material-extra', 'material');
+        buildFilterItems('vendido-items', 'vendido-extra', 'vendido');
+
+        // ====================================================================
+        // 5. SISTEMA DE FILTRADO PRINCIPAL
+        // ====================================================================
+        var productCards = document.querySelectorAll('.product-card');
+        var productGrid = document.getElementById('productGrid');
+        var productCountSpan = document.getElementById('productCount');
+
+        // Función para obtener todos los filtros activos
+        function getActiveFilters() {
+            var filters = {
+                descuento: [],
+                marca: [],
+                talla: [],
+                color: [],
+                precio: [],
+                calificacion: [],
+                material: [],
+                vendido: []
+            };
+            // Checkboxes con data-filter-type
+            var checkboxes = document.querySelectorAll('.filter-item input[type="checkbox"]:checked');
+            checkboxes.forEach(function(cb) {
+                var type = cb.getAttribute('data-filter-type');
+                if (type && filters.hasOwnProperty(type)) {
+                    filters[type].push(cb.value);
+                }
+            });
+            return filters;
+        }
+
+        // Aplicar filtros
+        function applyFilters() {
+            var active = getActiveFilters();
+            var minPrice = parseFloat(document.getElementById('priceMin').value) || null;
+            var maxPrice = parseFloat(document.getElementById('priceMax').value) || null;
+            var visibleCount = 0;
+
+            productCards.forEach(function(card) {
+                var show = true;
+
+                // ----- DESCUENTO -----
+                if (active.descuento.length > 0) {
+                    var desc = parseFloat(card.getAttribute('data-descuento')) || 0;
+                    var matchDescuento = active.descuento.some(function(val) {
+                        return desc >= parseFloat(val);
+                    });
+                    if (!matchDescuento) show = false;
+                }
+
+                // ----- MARCA -----
+                if (show && active.marca.length > 0) {
+                    var marcaVal = card.getAttribute('data-marca') || '';
+                    if (!active.marca.includes(marcaVal)) show = false;
+                }
+
+                // ----- TALLA -----
+                if (show && active.talla.length > 0) {
+                    var tallaVal = card.getAttribute('data-talla') || '';
+                    if (!active.talla.includes(tallaVal)) show = false;
+                }
+
+                // ----- COLOR -----
+                if (show && active.color.length > 0) {
+                    var colorVal = card.getAttribute('data-color') || '';
+                    if (!active.color.includes(colorVal)) show = false;
+                }
+
+                // ----- MATERIAL -----
+                if (show && active.material.length > 0) {
+                    var materialVal = card.getAttribute('data-material') || '';
+                    if (!active.material.includes(materialVal)) show = false;
+                }
+
+                // ----- VENDIDO -----
+                if (show && active.vendido.length > 0) {
+                    var vendidoVal = card.getAttribute('data-vendido') || '';
+                    if (!active.vendido.includes(vendidoVal)) show = false;
+                }
+
+                // ----- CALIFICACIÓN (solo ejemplo, no hay datos reales) -----
+                if (show && active.calificacion.length > 0) {
+                    // Simulamos que todos tienen calificación 0, así que no pasan
+                    var calif = parseFloat(card.getAttribute('data-calificacion')) || 0;
+                    var matchCalif = active.calificacion.some(function(val) {
+                        return calif >= parseFloat(val);
+                    });
+                    if (!matchCalif) show = false;
+                }
+
+                // ----- PRECIO (rangos predefinidos) -----
+                if (show && active.precio.length > 0) {
+                    var precio = parseFloat(card.getAttribute('data-precio')) || 0;
+                    var matchPrecio = active.precio.some(function(val) {
+                        if (val === 'menos-500') return precio < 500;
+                        if (val === '500-1000') return precio >= 500 && precio <= 1000;
+                        if (val === '1000-2000') return precio >= 1000 && precio <= 2000;
+                        if (val === '2000-5000') return precio >= 2000 && precio <= 5000;
+                        if (val === '5000-10000') return precio >= 5000 && precio <= 10000;
+                        if (val === 'mas-10000') return precio > 10000;
+                        return false;
+                    });
+                    if (!matchPrecio) show = false;
+                }
+
+                // ----- PRECIO (rango personalizado) -----
+                if (show && (minPrice !== null || maxPrice !== null)) {
+                    var precio = parseFloat(card.getAttribute('data-precio')) || 0;
+                    if (minPrice !== null && precio < minPrice) show = false;
+                    if (maxPrice !== null && precio > maxPrice) show = false;
+                }
+
+                // Aplicar clase hidden
+                if (show) {
+                    card.classList.remove('hidden-product');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden-product');
+                }
+            });
+
+            // Actualizar contador
+            if (productCountSpan) {
+                productCountSpan.textContent = visibleCount + ' productos encontrados';
+            }
+
+            // Actualizar badges (contadores)
+            updateBadgeCounts();
+        }
+
+        // ====================================================================
+        // 6. ACTUALIZAR BADGE COUNTS
+        // ====================================================================
+        function updateBadgeCounts() {
+            // Para cada grupo, contar cuántos productos visibles tienen el valor
+            var groups = ['descuento', 'marca', 'talla', 'color', 'precio', 'calificacion', 'material', 'vendido'];
+            groups.forEach(function(group) {
+                var checkboxes = document.querySelectorAll('.filter-item input[data-filter-type="' + group + '"]');
+                checkboxes.forEach(function(cb) {
+                    var value = cb.value;
+                    var count = 0;
+                    var visibleCards = document.querySelectorAll('.product-card:not(.hidden-product)');
+                    visibleCards.forEach(function(card) {
+                        if (group === 'descuento') {
+                            var desc = parseFloat(card.getAttribute('data-descuento')) || 0;
+                            if (desc >= parseFloat(value)) count++;
+                        } else if (group === 'precio') {
+                            var precio = parseFloat(card.getAttribute('data-precio')) || 0;
+                            var match = false;
+                            if (value === 'menos-500') match = precio < 500;
+                            else if (value === '500-1000') match = precio >= 500 && precio <= 1000;
+                            else if (value === '1000-2000') match = precio >= 1000 && precio <= 2000;
+                            else if (value === '2000-5000') match = precio >= 2000 && precio <= 5000;
+                            else if (value === '5000-10000') match = precio >= 5000 && precio <= 10000;
+                            else if (value === 'mas-10000') match = precio > 10000;
+                            if (match) count++;
+                        } else if (group === 'calificacion') {
+                            // no tenemos datos reales
+                            var calif = parseFloat(card.getAttribute('data-calificacion')) || 0;
+                            if (calif >= parseFloat(value)) count++;
+                        } else {
+                            var attrVal = card.getAttribute('data-' + group) || '';
+                            if (attrVal === value) count++;
+                        }
+                    });
+                    var badge = cb.closest('.filter-item').querySelector('.badge-count');
+                    if (badge) {
+                        badge.textContent = count;
+                    }
+                });
+            });
+        }
+
+        // ====================================================================
+        // 7. EVENTOS DE FILTROS
+        // ====================================================================
+        function attachFilterEvents() {
+            // Checkboxes
+            document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(function(cb) {
+                cb.removeEventListener('change', applyFilters);
+                cb.addEventListener('change', applyFilters);
+            });
+        }
+
+        // Inicializar eventos
+        attachFilterEvents();
+
+        // Botón "Limpiar todo"
+        document.getElementById('clearFilters').addEventListener('click', function() {
+            document.querySelectorAll('.filter-item input[type="checkbox"]:checked').forEach(function(cb) {
+                cb.checked = false;
+            });
+            document.getElementById('priceMin').value = '';
+            document.getElementById('priceMax').value = '';
+            applyFilters();
         });
 
-        // ── FILTROS: Toggle móvil ──
+        // Botón "Aplicar" para rango de precio
+        document.getElementById('applyPriceFilter').addEventListener('click', function() {
+            applyFilters();
+        });
+
+        // También aplicar al cambiar inputs de precio (opcional)
+        document.getElementById('priceMin').addEventListener('change', applyFilters);
+        document.getElementById('priceMax').addEventListener('change', applyFilters);
+
+        // ====================================================================
+        // 8. TOGGLE MÓVIL
+        // ====================================================================
         var toggleBtn = document.getElementById('filtersToggleMobile');
         var filtersPanel = document.getElementById('filtersLiverpool');
         if (toggleBtn && filtersPanel) {
             toggleBtn.addEventListener('click', function() {
                 filtersPanel.classList.toggle('mobile-open');
-                this.innerHTML = filtersPanel.classList.contains('mobile-open') 
+                this.innerHTML = filtersPanel.classList.contains('mobile-open')
                     ? '<i class="bi bi-x-lg"></i> Cerrar'
                     : '<i class="bi bi-funnel"></i> Categorías y Filtros';
             });
         }
 
-        // ── FILTROS: Aplicar precio ──
-        document.getElementById('applyPriceFilter')?.addEventListener('click', function() {
-            var min = document.getElementById('priceMin').value;
-            var max = document.getElementById('priceMax').value;
-            var params = new URLSearchParams(window.location.search);
-            if (min) params.set('precio_min', min);
-            else params.delete('precio_min');
-            if (max) params.set('precio_max', max);
-            else params.delete('precio_max');
-            params.set('page', '1');
-            window.location.search = params.toString();
-        });
+        // ====================================================================
+        // 9. INICIALIZAR: aplicar filtros por defecto y contar badges
+        // ====================================================================
+        applyFilters();
 
-        // ── FILTROS: Limpiar todo ──
-        document.getElementById('clearFilters')?.addEventListener('click', function() {
-            document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(function(cb) {
-                cb.checked = false;
-            });
-            document.getElementById('priceMin').value = '';
-            document.getElementById('priceMax').value = '';
-            window.location.href = window.location.pathname;
-        });
-
-        // ── FILTROS: Checkbox automático ──
-        document.querySelectorAll('.filter-item input[type="checkbox"]').forEach(function(cb) {
-            cb.addEventListener('change', function() {
-                var params = new URLSearchParams(window.location.search);
-                var name = this.value;
-                if (this.checked) {
-                    params.append('filtro', name);
-                } else {
-                    var valores = params.getAll('filtro');
-                    params.delete('filtro');
-                    valores.forEach(function(v) {
-                        if (v !== name) params.append('filtro', v);
-                    });
-                }
-                params.set('page', '1');
-                window.location.search = params.toString();
-            });
-        });
-
-        // ── FILTROS: Búsqueda rápida de marcas ──
-        document.querySelector('#filterMarcas input[type="text"]')?.addEventListener('input', function() {
-            var query = this.value.toLowerCase();
-            var items = this.closest('.filter-body').querySelectorAll('.filter-item');
-            items.forEach(function(item) {
-                var text = item.textContent.toLowerCase();
-                item.style.display = text.includes(query) ? 'flex' : 'none';
-            });
-        });
+        // Re-aplicar cuando se carguen imágenes (por si hay cambios)
+        // No es necesario
 
     });
     </script>

@@ -7,29 +7,18 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         /* ===== ESTILOS BASE ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
         body {
             font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
             background: #f5f6f8;
             color: #1a1a2e;
         }
-
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
+        .layout { display: flex; min-height: 100vh; }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
@@ -48,8 +37,6 @@
             display: flex;
             flex-direction: column;
         }
-
-        /* ===== PERFIL ADMIN EN SIDEBAR ===== */
         .sidebar .admin-profile {
             padding: 25px 20px 20px;
             text-align: center;
@@ -58,7 +45,6 @@
             margin-bottom: 10px;
             flex-shrink: 0;
         }
-
         .sidebar .admin-profile .avatar {
             width: 80px;
             height: 80px;
@@ -67,19 +53,16 @@
             border: 4px solid #fff;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
         .sidebar .admin-profile .name {
             font-weight: 700;
             font-size: 1.1rem;
             color: #fff;
             margin-top: 10px;
         }
-
         .sidebar .admin-profile .email {
             font-size: 0.75rem;
             color: rgba(255,255,255,0.8);
         }
-
         .sidebar .admin-profile .rol {
             font-size: 0.65rem;
             color: #fff;
@@ -91,7 +74,6 @@
             display: inline-block;
             margin-top: 5px;
         }
-
         .sidebar .logo {
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 1.8rem;
@@ -102,29 +84,15 @@
             letter-spacing: -1px;
             flex-shrink: 0;
         }
-
-        .sidebar .logo span {
-            color: #1a1a2e;
-        }
-
-        /* ===== SCROLLABLE MENU ===== */
+        .sidebar .logo span { color: #1a1a2e; }
         .sidebar .menu-scroll {
             flex: 1;
             overflow-y: auto;
             padding-bottom: 10px;
         }
-
-        .sidebar .menu-scroll::-webkit-scrollbar {
-            width: 3px;
-        }
-        .sidebar .menu-scroll::-webkit-scrollbar-track {
-            background: #f5f6f8;
-        }
-        .sidebar .menu-scroll::-webkit-scrollbar-thumb {
-            background: #e10098;
-            border-radius: 4px;
-        }
-
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
         .sidebar .panel-title {
             font-size: 0.65rem;
             text-transform: uppercase;
@@ -133,7 +101,6 @@
             letter-spacing: 2px;
             font-weight: 700;
         }
-
         .sidebar a {
             display: flex;
             align-items: center;
@@ -146,40 +113,11 @@
             font-size: 0.85rem;
             font-weight: 500;
         }
-
-        .sidebar a i {
-            width: 20px;
-            font-size: 1rem;
-            color: #888;
-        }
-
-        .sidebar a:hover {
-            background: #f8f0f5;
-            color: #e10098;
-            border-left-color: #e10098;
-        }
-
-        .sidebar a:hover i {
-            color: #e10098;
-        }
-
-        .sidebar a.active {
-            background: #f8f0f5;
-            color: #e10098;
-            border-left-color: #e10098;
-        }
-
-        .sidebar a.active i {
-            color: #e10098;
-        }
-
-        .sidebar .divider {
-            height: 1px;
-            background: #e8e8e8;
-            margin: 10px 25px;
-        }
-
-        /* ===== BOTÓN CERRAR SESIÓN ===== */
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
         .sidebar .logout-btn {
             display: flex;
             align-items: center;
@@ -197,22 +135,8 @@
             width: 100%;
             text-align: left;
         }
-
-        .sidebar .logout-btn i {
-            width: 20px;
-            font-size: 1rem;
-            color: #dc3545;
-        }
-
-        .sidebar .logout-btn:hover {
-            background: #fdf0f0;
-            border-left-color: #dc3545;
-            color: #dc3545;
-        }
-
-        .sidebar .logout-btn:hover i {
-            color: #dc3545;
-        }
+        .sidebar .logout-btn i { color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
 
         /* ===== MAIN CONTENT ===== */
         .main {
@@ -223,8 +147,6 @@
             display: flex;
             flex-direction: column;
         }
-
-        /* ===== TOP BAR ===== */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -236,7 +158,6 @@
             gap: 15px;
             flex-shrink: 0;
         }
-
         .top-bar h1 {
             font-size: 1.6rem;
             font-weight: 800;
@@ -245,11 +166,7 @@
             align-items: center;
             gap: 10px;
         }
-
-        .top-bar h1 i {
-            color: #e10098;
-        }
-
+        .top-bar h1 i { color: #e10098; }
         .top-bar .tag {
             background: #e10098;
             color: #fff;
@@ -262,8 +179,6 @@
             align-items: center;
             gap: 6px;
         }
-
-        /* ===== CONTENT WRAPPER ===== */
         .content-wrapper {
             flex: 1;
             display: flex;
@@ -280,29 +195,20 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             flex-shrink: 0;
         }
-
         .hero h2 {
             color: #1a1a2e;
             margin-bottom: 8px;
             font-weight: 800;
             font-size: 1.3rem;
         }
-
-        .hero h2 i {
-            color: #e10098;
-        }
-
+        .hero h2 i { color: #e10098; }
         .hero p {
             color: #666;
             margin-bottom: 15px;
             font-size: 0.95rem;
             line-height: 1.6;
         }
-
-        .hero strong {
-            color: #e10098;
-        }
-
+        .hero strong { color: #e10098; }
         .hero .hero-stats {
             display: flex;
             align-items: center;
@@ -310,7 +216,6 @@
             flex-wrap: wrap;
             margin-top: 10px;
         }
-
         .hero .hero-stats .stat-item {
             display: flex;
             align-items: center;
@@ -322,57 +227,8 @@
             padding: 6px 16px;
             border-radius: 50px;
         }
-
-        .hero .hero-stats .stat-item i {
-            color: #e10098;
-        }
-
-        .hero .hero-stats .stat-item .number {
-            color: #e10098;
-            font-weight: 800;
-        }
-
-        .btn-primary-custom {
-            background: #e10098;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary-custom:hover {
-            background: #c00080;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
-        }
-
-        .btn-secondary-custom {
-            background: #00d4ff;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-secondary-custom:hover {
-            background: #00b8e0;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
-        }
+        .hero .hero-stats .stat-item i { color: #e10098; }
+        .hero .hero-stats .stat-item .number { color: #e10098; font-weight: 800; }
 
         /* ===== STATS ===== */
         .stats-grid {
@@ -382,7 +238,6 @@
             margin-bottom: 25px;
             flex-shrink: 0;
         }
-
         .stat-card {
             background: #ffffff;
             padding: 20px 25px;
@@ -393,7 +248,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .stat-card::before {
             content: '';
             position: absolute;
@@ -405,57 +259,19 @@
             opacity: 1;
             transition: opacity 0.3s ease;
         }
-
-        .stat-card:hover::before {
-            opacity: 1;
-            height: 4px;
-        }
-
-        .stat-card:hover {
-            border-color: #e10098;
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(225, 0, 152, 0.1);
-        }
-
-        .stat-card .number {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #1a1a2e;
-        }
-
-        .stat-card .number span {
-            color: #e10098;
-        }
-
-        .stat-card .label {
-            color: #888;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin-top: 3px;
-        }
-
-        .stat-card .icon {
-            font-size: 1.8rem;
-            color: #e10098;
-            opacity: 0.3;
-            float: right;
-            margin-top: -5px;
-        }
-
+        .stat-card:hover { border-color: #e10098; transform: translateY(-5px); box-shadow: 0 8px 30px rgba(225,0,152,0.1); }
+        .stat-card .number { font-size: 2.2rem; font-weight: 900; color: #1a1a2e; }
+        .stat-card .number span { color: #e10098; }
+        .stat-card .label { color: #888; font-size: 0.8rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-top: 3px; }
+        .stat-card .icon { font-size: 1.8rem; color: #e10098; opacity: 0.3; float: right; margin-top: -5px; }
         .stat-card.vip-stat .number span { color: #f9a825; }
         .stat-card.vip-stat::before { background: #f9a825; }
-
         .stat-card.frecuente-stat .number span { color: #1565c0; }
         .stat-card.frecuente-stat::before { background: #1565c0; }
-
         .stat-card.impulsivo-stat .number span { color: #2e7d32; }
         .stat-card.impulsivo-stat::before { background: #2e7d32; }
-
         .stat-card.inactivo-stat .number span { color: #c62828; }
         .stat-card.inactivo-stat::before { background: #c62828; }
-
         .stat-card.total-stat .number span { color: #e10098; }
         .stat-card.total-stat::before { background: #e10098; }
 
@@ -466,7 +282,12 @@
             gap: 20px;
             margin-bottom: 25px;
         }
-
+        .charts-row-single {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
         .chart-card {
             background: #ffffff;
             border-radius: 16px;
@@ -474,7 +295,6 @@
             border: 1px solid #e8e8e8;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-
         .chart-card .chart-title {
             font-size: 0.95rem;
             font-weight: 700;
@@ -484,12 +304,16 @@
             align-items: center;
             gap: 8px;
         }
-
-        .chart-card .chart-title i {
-            color: #e10098;
+        .chart-card .chart-title i { color: #e10098; }
+        .chart-card .chart-container {
+            position: relative;
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Donut Chart */
+        /* Donut */
         .donut-container {
             display: flex;
             align-items: center;
@@ -497,7 +321,6 @@
             gap: 30px;
             flex-wrap: wrap;
         }
-
         .donut {
             width: 150px;
             height: 150px;
@@ -510,7 +333,6 @@
                 #c62828 {{ ((datos.vip + datos.frecuentes + datos.impulsivos) / (datos.total or 1) * 100) }}% 100%
             );
         }
-
         .donut-center {
             position: absolute;
             top: 50%;
@@ -526,88 +348,23 @@
             justify-content: center;
             text-align: center;
         }
-
-        .donut-center .number {
-            font-size: 1.2rem;
-            font-weight: 900;
-            color: #1a1a2e;
-            line-height: 1;
-        }
-
-        .donut-center .label {
-            font-size: 0.55rem;
-            color: #888;
-            text-transform: uppercase;
-        }
-
-        .donut-legend {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .donut-legend .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            color: #555;
-        }
-
-        .donut-legend .legend-color {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
-
+        .donut-center .number { font-size: 1.2rem; font-weight: 900; color: #1a1a2e; line-height: 1; }
+        .donut-center .label { font-size: 0.55rem; color: #888; text-transform: uppercase; }
+        .donut-legend { display: flex; flex-direction: column; gap: 6px; }
+        .donut-legend .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #555; }
+        .donut-legend .legend-color { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
         .legend-vip { background: #f9a825; }
         .legend-frecuente { background: #1565c0; }
         .legend-impulsivo { background: #2e7d32; }
         .legend-inactivo { background: #c62828; }
 
         /* Barras horizontales */
-        .bar-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .bar-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .bar-item .bar-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #555;
-            min-width: 80px;
-        }
-
-        .bar-item .bar-track {
-            flex: 1;
-            height: 8px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .bar-item .bar-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 1s ease;
-        }
-
-        .bar-item .bar-value {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #1a1a2e;
-            min-width: 40px;
-            text-align: right;
-        }
-
+        .bar-list { display: flex; flex-direction: column; gap: 12px; }
+        .bar-item { display: flex; align-items: center; gap: 12px; }
+        .bar-item .bar-label { font-size: 0.8rem; font-weight: 600; color: #555; min-width: 80px; }
+        .bar-item .bar-track { flex: 1; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+        .bar-item .bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        .bar-item .bar-value { font-size: 0.8rem; font-weight: 700; color: #1a1a2e; min-width: 40px; text-align: right; }
         .bar-fill.vip-fill { background: #f9a825; }
         .bar-fill.frecuente-fill { background: #1565c0; }
         .bar-fill.impulsivo-fill { background: #2e7d32; }
@@ -621,13 +378,11 @@
             margin-bottom: 20px;
             align-items: center;
         }
-
         .filters-row .search-box {
             flex: 1;
             min-width: 200px;
             position: relative;
         }
-
         .filters-row .search-box input {
             width: 100%;
             padding: 10px 16px 10px 40px;
@@ -638,13 +393,11 @@
             background: white;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-
         .filters-row .search-box input:focus {
             border-color: #e10098;
             box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.1);
             outline: none;
         }
-
         .filters-row .search-box i {
             position: absolute;
             left: 14px;
@@ -652,13 +405,7 @@
             transform: translateY(-50%);
             color: #999;
         }
-
-        .filters-row .filter-buttons {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
+        .filters-row .filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
         .filter-btn {
             border: 2px solid #e0e0e0;
             background: #fff;
@@ -671,20 +418,8 @@
             cursor: pointer;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-
-        .filter-btn:hover {
-            border-color: #e10098;
-            color: #e10098;
-            background: rgba(225, 0, 152, 0.05);
-        }
-
-        .filter-btn.active {
-            background: #e10098;
-            color: #fff;
-            border-color: #e10098;
-            box-shadow: 0 4px 15px rgba(225, 0, 152, 0.3);
-        }
-
+        .filter-btn:hover { border-color: #e10098; color: #e10098; background: rgba(225,0,152,0.05); }
+        .filter-btn.active { background: #e10098; color: #fff; border-color: #e10098; box-shadow: 0 4px 15px rgba(225,0,152,0.3); }
         .filter-btn .badge-count {
             background: rgba(0,0,0,0.1);
             border-radius: 50px;
@@ -692,13 +427,9 @@
             font-size: 0.6rem;
             margin-left: 4px;
         }
+        .filter-btn.active .badge-count { background: rgba(255,255,255,0.2); color: #fff; }
 
-        .filter-btn.active .badge-count {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-        }
-
-        /* ===== TABLA DE CLIENTES ===== */
+        /* ===== TABLA ===== */
         .table-container {
             background: #ffffff;
             border-radius: 16px;
@@ -706,7 +437,6 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-
         .table-container .table-header {
             padding: 16px 24px;
             background: #fafafa;
@@ -717,7 +447,6 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .table-container .table-header h5 {
             font-weight: 700;
             font-size: 1rem;
@@ -726,20 +455,9 @@
             align-items: center;
             gap: 8px;
         }
-
-        .table-container .table-header h5 i {
-            color: #e10098;
-        }
-
-        .table-container .table-header .total-clientes {
-            font-size: 0.85rem;
-            color: #888;
-        }
-
-        .table-container table {
-            margin-bottom: 0;
-        }
-
+        .table-container .table-header h5 i { color: #e10098; }
+        .table-container .table-header .total-clientes { font-size: 0.85rem; color: #888; }
+        .table-container table { margin-bottom: 0; }
         .table-container thead th {
             background: #f8f9fa;
             font-weight: 600;
@@ -750,26 +468,15 @@
             padding: 12px 20px;
             border-bottom: 2px solid #f0f0f0;
         }
-
         .table-container tbody td {
             padding: 12px 20px;
             vertical-align: middle;
             border-bottom: 1px solid #f5f5f5;
             font-size: 0.9rem;
         }
-
-        .table-container tbody tr:hover {
-            background: #fafafa;
-        }
-
-        .table-container tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .table-container tbody tr.hidden-row {
-            display: none;
-        }
-
+        .table-container tbody tr:hover { background: #fafafa; }
+        .table-container tbody tr:last-child td { border-bottom: none; }
+        .table-container tbody tr.hidden-row { display: none; }
         .avatar-mini {
             width: 36px;
             height: 36px;
@@ -777,7 +484,6 @@
             object-fit: cover;
             border: 2px solid #e0e0e0;
         }
-
         .segment-badge {
             font-size: 0.65rem;
             padding: 4px 14px;
@@ -787,7 +493,6 @@
             letter-spacing: 0.3px;
             display: inline-block;
         }
-
         .segment-vip { background: #fff8e1; color: #f9a825; }
         .segment-frecuente { background: #e3f2fd; color: #1565c0; }
         .segment-impulsivo { background: #e8f5e9; color: #2e7d32; }
@@ -803,28 +508,13 @@
             font-size: 0.9rem;
             cursor: pointer;
         }
-
-        .btn-action:hover {
-            background: rgba(225, 0, 152, 0.08);
-            color: #e10098;
-        }
-
+        .btn-action:hover { background: rgba(225,0,152,0.08); color: #e10098; }
         .btn-action.email:hover { color: #1565c0; }
         .btn-action.view:hover { color: #2e7d32; }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #888;
-        }
+        .empty-state { text-align: center; padding: 40px 20px; color: #888; }
+        .empty-state i { font-size: 3rem; color: #ddd; margin-bottom: 10px; }
 
-        .empty-state i {
-            font-size: 3rem;
-            color: #ddd;
-            margin-bottom: 10px;
-        }
-
-        /* ===== FOOTER INFO FIJO ABAJO ===== */
         .footer-info {
             background: #ffffff;
             padding: 15px 25px;
@@ -835,7 +525,6 @@
             flex-shrink: 0;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
         }
-
         .footer-info p {
             color: #888;
             font-size: 0.75rem;
@@ -846,175 +535,58 @@
             gap: 15px;
             flex-wrap: wrap;
         }
-
-        .footer-info p .separator {
-            color: #ddd;
-        }
-
-        .footer-info i {
-            color: #e10098;
-        }
-
-        .footer-info .heart {
-            color: #e10098;
-            animation: heartbeat 1.5s infinite;
-        }
-
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
+        .footer-info p .separator { color: #ddd; }
+        .footer-info i { color: #e10098; }
+        .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
-            .sidebar {
-                width: 70px;
-            }
-            .sidebar .logo,
-            .sidebar .panel-title,
-            .sidebar a span,
-            .sidebar .admin-profile .name,
-            .sidebar .admin-profile .email,
-            .sidebar .admin-profile .rol,
-            .sidebar .logout-btn span {
-                display: none;
-            }
-            .sidebar a {
-                padding: 15px;
-                justify-content: center;
-            }
-            .sidebar a i {
-                font-size: 1.3rem;
-                margin: 0;
-            }
-            .sidebar .admin-profile .avatar {
-                width: 40px;
-                height: 40px;
-            }
-            .sidebar .admin-profile {
-                padding: 10px;
-            }
-            .sidebar .logout-btn {
-                padding: 15px;
-                justify-content: center;
-            }
-            .sidebar .logout-btn i {
-                font-size: 1.3rem;
-                margin: 0;
-            }
-            .main {
-                margin-left: 70px;
-                padding: 15px;
-            }
-            .charts-row {
-                grid-template-columns: 1fr;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .footer-info p {
-                font-size: 0.65rem;
-                gap: 8px;
-            }
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .sidebar .logout-btn i { font-size: 1.3rem; margin: 0; }
+            .main { margin-left: 70px; padding: 15px; }
+            .charts-row { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-info p { font-size: 0.65rem; gap: 8px; }
         }
-
         @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-            .stat-card .number {
-                font-size: 1.6rem;
-            }
-            .top-bar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .top-bar h1 {
-                font-size: 1.2rem;
-            }
-            .hero {
-                padding: 20px;
-            }
-            .hero h2 {
-                font-size: 1.1rem;
-            }
-            .hero p {
-                font-size: 0.85rem;
-            }
-            .table-container .table-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .table-container thead th,
-            .table-container tbody td {
-                padding: 10px 14px;
-                font-size: 0.8rem;
-            }
-            .donut-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            .filters-row {
-                flex-direction: column;
-            }
-            .filters-row .search-box {
-                width: 100%;
-            }
-            .filters-row .filter-buttons {
-                width: 100%;
-                justify-content: center;
-            }
-            .hero .hero-stats .stat-item {
-                font-size: 0.75rem;
-                padding: 4px 12px;
-            }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .stat-card .number { font-size: 1.6rem; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .top-bar h1 { font-size: 1.2rem; }
+            .hero { padding: 20px; }
+            .hero h2 { font-size: 1.1rem; }
+            .hero p { font-size: 0.85rem; }
+            .table-container .table-header { flex-direction: column; align-items: flex-start; }
+            .table-container thead th, .table-container tbody td { padding: 10px 14px; font-size: 0.8rem; }
+            .donut-container { flex-direction: column; align-items: center; }
+            .filters-row { flex-direction: column; }
+            .filters-row .search-box { width: 100%; }
+            .filters-row .filter-buttons { width: 100%; justify-content: center; }
+            .hero .hero-stats .stat-item { font-size: 0.75rem; padding: 4px 12px; }
+            .charts-row-single { grid-template-columns: 1fr; }
         }
-
         @media (max-width: 576px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            .main {
-                padding: 12px;
-            }
-            .filter-btn {
-                font-size: 0.65rem;
-                padding: 6px 12px;
-            }
-            .table-container thead th,
-            .table-container tbody td {
-                padding: 8px 10px;
-                font-size: 0.7rem;
-            }
-            .segment-badge {
-                font-size: 0.55rem;
-                padding: 3px 10px;
-            }
-            .table-container tbody td .d-flex {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 4px;
-            }
-            .donut {
-                width: 120px;
-                height: 120px;
-            }
-            .donut-center {
-                width: 60px;
-                height: 60px;
-            }
-            .donut-center .number {
-                font-size: 1rem;
-            }
-            .donut-center .label {
-                font-size: 0.5rem;
-            }
-            .footer-info p {
-                flex-direction: column;
-                gap: 5px;
-            }
+            .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+            .main { padding: 12px; }
+            .filter-btn { font-size: 0.65rem; padding: 6px 12px; }
+            .table-container thead th, .table-container tbody td { padding: 8px 10px; font-size: 0.7rem; }
+            .segment-badge { font-size: 0.55rem; padding: 3px 10px; }
+            .table-container tbody td .d-flex { flex-direction: column; align-items: flex-start !important; gap: 4px; }
+            .donut { width: 120px; height: 120px; }
+            .donut-center { width: 60px; height: 60px; }
+            .donut-center .number { font-size: 1rem; }
+            .donut-center .label { font-size: 0.5rem; }
+            .footer-info p { flex-direction: column; gap: 5px; }
+            .chart-card .chart-container { height: 180px; }
         }
     </style>
 </head>
@@ -1026,7 +598,6 @@
     <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar">
 
-        <!-- ===== PERFIL ADMIN ===== -->
         <div class="admin-profile">
             {% if session.get('foto') %}
                 <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
@@ -1038,20 +609,14 @@
             <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
         </div>
 
-        <!-- ===== LOGO ===== -->
         <div class="logo">ORION<span>.</span></div>
 
-        <!-- ===== MENÚ SCROLLABLE ===== -->
         <div class="menu-scroll">
 
             <div class="panel-title">MENÚ PRINCIPAL</div>
-
-            <!-- DASHBOARD -->
             <a href="{{ url_for('web.dashboard') }}">
                 <i class="fas fa-home"></i> <span>Dashboard</span>
             </a>
-            
-            <!-- GESTIÓN -->
             <a href="{{ url_for('web.lista_usuarios') }}">
                 <i class="fas fa-users"></i> <span>Usuarios</span>
             </a>
@@ -1070,7 +635,7 @@
 
             <div class="divider"></div>
             <div class="panel-title">REPORTES</div>
-            <a href="{{ url_for('web.admin_reporte_ventas') }}" class="active">
+            <a href="{{ url_for('web.admin_reporte_ventas') }}">
                 <i class="fas fa-chart-line"></i> <span>Ventas</span>
             </a>
             
@@ -1085,7 +650,6 @@
             <a href="{{ url_for('web.admin_analisis_supervisado') }}">
                 <i class="fas fa-brain" style="color: #6f42c1;"></i> <span>Análisis Supervisado</span>
             </a>
-            <!-- IA -->
             <a href="{{ url_for('web.segmentacion_clientes') }}" class="active">
                 <i class="fas fa-pie-chart"></i> <span>Segmentación</span>
             </a>
@@ -1099,14 +663,12 @@
             <div class="divider"></div>
 
             <div class="panel-title">CONFIGURACIÓN</div>
-
             <a href="{{ url_for('web.configuracion') }}">
                 <i class="fas fa-cog"></i> <span>Configuración</span>
             </a>
 
             <div class="divider"></div>
 
-            <!-- ===== CERRAR SESIÓN ===== -->
             <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
                 <button type="submit" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
@@ -1120,7 +682,6 @@
     <!-- ===== CONTENIDO ===== -->
     <main class="main">
 
-        <!-- ===== TOP BAR ===== -->
         <header class="top-bar">
             <h1>
                 <i class="fas fa-pie-chart"></i> Segmentación de Clientes
@@ -1130,7 +691,6 @@
             </div>
         </header>
 
-        <!-- ===== CONTENT WRAPPER ===== -->
         <div class="content-wrapper">
 
             <!-- ===== HERO ===== -->
@@ -1258,6 +818,26 @@
                 </div>
             </div>
 
+            <!-- ===== GRÁFICO DE GÉNERO (DONUT + BARRAS) ===== -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <i class="fas fa-venus-mars"></i> Distribución por Género (Donut)
+                    </div>
+                    <div class="chart-container" id="genero-container">
+                        <canvas id="chartGenero"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-bar"></i> Distribución por Género (Barras)
+                    </div>
+                    <div class="chart-container" id="genero-barras-container">
+                        <canvas id="chartGeneroBarras"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <!-- ===== FILTROS Y BÚSQUEDA ===== -->
             <div class="filters-row">
                 <div class="search-box">
@@ -1283,7 +863,7 @@
                 </div>
             </div>
 
-            <!-- ===== TABLA DE CLIENTES ===== -->
+            <!-- ===== TABLA ===== -->
             <div class="table-container">
                 <div class="table-header">
                     <h5><i class="fas fa-list-ul"></i> Lista de Clientes</h5>
@@ -1350,7 +930,7 @@
                 {% endif %}
             </div>
 
-            <!-- ===== FOOTER INFO FIJO ABAJO ===== -->
+            <!-- ===== FOOTER ===== -->
             <div class="footer-info">
                 <p>
                     <i class="fas fa-clock"></i> 
@@ -1371,11 +951,10 @@
 </div>
 
 <script>
-    // Marcar el enlace activo en el sidebar
+    // Marcar enlace activo en sidebar
     document.addEventListener('DOMContentLoaded', function() {
         const currentPath = window.location.pathname;
         const links = document.querySelectorAll('.sidebar a');
-        
         links.forEach(link => {
             const href = link.getAttribute('href');
             if (href === currentPath) {
@@ -1425,7 +1004,6 @@
         document.getElementById('clientes-mostrados').textContent = visibles;
     }
 
-    // Acciones de cliente
     function enviarCorreo(email) {
         alert('📧 Enviar correo a: ' + email);
     }
@@ -1433,6 +1011,138 @@
     function verPerfil(email) {
         alert('👤 Ver perfil de: ' + email);
     }
+
+    // ===== GRÁFICO DE GÉNERO (DONUT) =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const generos = {{ generos|tojson }};
+        const labels = Object.keys(generos);
+        const values = Object.values(generos);
+        const total = values.reduce((a, b) => a + b, 0);
+
+        // --- Donut ---
+        const container = document.getElementById('genero-container');
+        if (total === 0) {
+            container.innerHTML = `
+                <div style="text-align:center; color:#888; padding:20px;">
+                    <i class="fas fa-venus-mars" style="font-size:2rem; display:block; margin-bottom:10px; opacity:0.5;"></i>
+                    <p style="font-weight:600;">No hay información de género para los clientes</p>
+                    <p style="font-size:0.85rem;">Los clientes no tienen género especificado en su perfil.</p>
+                </div>
+            `;
+        } else {
+            const filteredData = labels.map((label, i) => ({ label, value: values[i] }))
+                .filter(item => item.value > 0);
+
+            const ctx = document.getElementById('chartGenero').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: filteredData.map(item => item.label),
+                    datasets: [{
+                        data: filteredData.map(item => item.value),
+                        backgroundColor: ['#2196F3', '#E91E63', '#9E9E9E'],
+                        borderColor: '#fff',
+                        borderWidth: 3,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 12, weight: '600' },
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribución de clientes por género',
+                            font: { size: 12, weight: '600' },
+                            color: '#1a1a2e'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        // --- Gráfico de barras ---
+        const containerBarras = document.getElementById('genero-barras-container');
+        if (total === 0) {
+            containerBarras.innerHTML = `
+                <div style="text-align:center; color:#888; padding:20px;">
+                    <i class="fas fa-venus-mars" style="font-size:2rem; display:block; margin-bottom:10px; opacity:0.5;"></i>
+                    <p style="font-weight:600;">No hay datos de género</p>
+                </div>
+            `;
+        } else {
+            const filteredData = labels.map((label, i) => ({ label, value: values[i] }))
+                .filter(item => item.value > 0);
+
+            const ctxBarras = document.getElementById('chartGeneroBarras').getContext('2d');
+            new Chart(ctxBarras, {
+                type: 'bar',
+                data: {
+                    labels: filteredData.map(item => item.label),
+                    datasets: [{
+                        label: 'Clientes',
+                        data: filteredData.map(item => item.value),
+                        backgroundColor: ['#2196F3', '#E91E63', '#9E9E9E'],
+                        borderColor: ['#1565C0', '#AD1457', '#616161'],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Cantidad de clientes por género',
+                            font: { size: 12, weight: '600' },
+                            color: '#1a1a2e'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Género',
+                                font: { weight: '600', size: 10 },
+                                color: '#666'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Número de clientes',
+                                font: { weight: '600', size: 10 },
+                                color: '#666'
+                            },
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+    });
 </script>
 
 </body>

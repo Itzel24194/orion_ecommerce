@@ -288,7 +288,7 @@
             <i class="fas fa-box"></i> <span>Productos</span>
         </a>
 
-        <!-- ===== PEDIDOS - NUEVA SECCIÓN DESTACADA ===== -->
+        <!-- ===== PEDIDOS ===== -->
         <a href="{{ url_for('web.admin_listar_pedidos') }}" 
            class="{% if request.endpoint == 'web.admin_listar_pedidos' or request.endpoint == 'web.admin_ver_pedido' %}active{% endif %}"
            style="background: rgba(225, 0, 152, 0.05);">
@@ -299,6 +299,11 @@
 
         <a href="{{ url_for('web.lista_atributos') }}" class="{% if request.endpoint == 'web.lista_atributos' %}active{% endif %}">
             <i class="fas fa-list-ul"></i> <span>Atributos</span>
+        </a>
+
+        <!-- ===== CHAT EN VIVO (NUEVO) ===== -->
+        <a href="{{ url_for('web.admin_chat_panel') }}" class="{% if request.endpoint == 'web.admin_chat_panel' %}active{% endif %}">
+            <i class="fas fa-comment-dots" style="color: #00d4ff;"></i> <span>Chat en vivo</span>
         </a>
 
         <div class="divider"></div>
@@ -348,6 +353,7 @@
         <a href="{{ url_for('web.raiz_tienda') }}" class="exit">
             <i class="fas fa-sign-out-alt"></i> <span>Salir al sitio</span>
         </a>
+
 
         <!-- ===== USER INFO ===== -->
         <div class="user-info">

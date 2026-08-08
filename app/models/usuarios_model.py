@@ -1,3 +1,4 @@
+# app/models/usuarios_model.py
 import pandas as pd
 from bson.objectid import ObjectId
 from app.config.database_config import usuarios_col
@@ -6,6 +7,19 @@ from datetime import datetime
 from flask import current_app
 
 bcrypt = Bcrypt()
+
+
+def normalizar_genero(valor):
+    """Función auxiliar para normalizar género (también usada en el modelo)"""
+    if not valor:
+        return 'Indefinido'
+    v = valor.strip().lower()
+    if v in ['masculino', 'hombre', 'm', 'male', 'man']:
+        return 'Masculino'
+    if v in ['femenino', 'mujer', 'f', 'female', 'woman']:
+        return 'Femenino'
+    return 'Indefinido'
+
 
 class Usuario:
     @staticmethod
@@ -59,6 +73,12 @@ class Usuario:
         data['apellido_materno'] = Usuario._limpiar_valor(data.get('apellido_materno'))
         data['telefono'] = Usuario._limpiar_valor(data.get('telefono'))
         
+        # Normalizar género (por si acaso)
+        if 'sexo' in data:
+            data['sexo'] = normalizar_genero(data['sexo'])
+        if 'genero' in data:
+            data['genero'] = normalizar_genero(data['genero'])  # por compatibilidad
+        
         # Encriptar contraseña si existe
         if data.get('password'):
             data['password'] = bcrypt.generate_password_hash(data['password']).decode('utf-8')
@@ -103,6 +123,12 @@ class Usuario:
         elif 'password' in data:
             del data['password']
         
+        # Normalizar género si se envía
+        if 'sexo' in data:
+            data['sexo'] = normalizar_genero(data['sexo'])
+        if 'genero' in data:
+            data['genero'] = normalizar_genero(data['genero'])
+        
         data['updated_at'] = datetime.utcnow()
         return usuarios_col.update_one({"email": email}, {"$set": data})
 
@@ -128,6 +154,12 @@ class Usuario:
         if 'telefono' in update_fields:
             update_fields['telefono'] = Usuario._limpiar_valor(update_fields.get('telefono'))
         
+        # Normalizar género
+        if 'sexo' in update_fields:
+            update_fields['sexo'] = normalizar_genero(update_fields['sexo'])
+        if 'genero' in update_fields:
+            update_fields['genero'] = normalizar_genero(update_fields['genero'])
+        
         # Manejar contraseña
         if 'password' in update_fields:
             pwd = update_fields['password']
@@ -146,7 +178,7 @@ class Usuario:
         return usuarios_col.delete_one({"_id": ObjectId(id)})
 
     # ============================================================
-    # 🔥 NUEVO: MÉTODOS PARA SEGMENTACIÓN
+    # 🔥 MÉTODOS PARA SEGMENTACIÓN
     # ============================================================
 
     @staticmethod
@@ -180,11 +212,9 @@ class Usuario:
         if not usuario:
             return "Inactivo"
         
-        # Si el usuario ya tiene segmento guardado, usarlo
         if usuario.get("segmento"):
             return usuario.get("segmento")
         
-        # Si no, calcularlo y guardarlo
         segmento = Usuario.calcular_segmento(usuario_id)
         Usuario.actualizar_usuario(usuario_id, {"segmento": segmento})
         return segmento

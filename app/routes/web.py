@@ -16,7 +16,6 @@ import app.controllers.promociones_controller as promo_c
 import app.controllers.clasificacion_controller as clasificacion_c
 import app.controllers.combo_controller as combo_c
 
-
 mc = MarketingController()
 web = Blueprint('web', __name__)
 
@@ -25,30 +24,33 @@ web = Blueprint('web', __name__)
 # ================================================================
 @web.route('/')
 def raiz_tienda():
-    # ✅ Si es ADMIN, redirigir al dashboard
     if session.get('rol') == 'admin':
         flash('Los administradores no pueden acceder a la tienda.', 'warning')
         return redirect(url_for('web.dashboard'))
-    
+
     db = current_app.db
     categorias = list(db.categorias.find({}))
     productos = list(db.productos.find({}).limit(8))
-    
-    # Sugerencias y promociones para cliente autenticado
+
     sugerencias = []
-    promociones_home = []  # <--- ESTO DEBE ESTAR AQUÍ, FUERA DEL if
-    
+    promociones_home = []
+
     if session.get('user_id') and session.get('rol') != 'admin':
         sugerencias = list(db.productos.find({}).limit(4))
         promociones_home = promo_c.obtener_promociones_destacadas(session.get('user_id'))
-    
-    return render_template('tienda/pagina.html', 
-                         categorias=categorias, 
+
+    return render_template('tienda/pagina.html',
+                         categorias=categorias,
                          productos=productos,
                          sugerencias=sugerencias,
                          promociones_home=promociones_home)
-
-
+                    
+@web.route('/servicios')
+def servicios():
+    """Página de servicios exclusivos de ORION"""
+    db = current_app.db
+    categorias = list(db.categorias.find({}))
+    return render_template('tienda/servicios.html', categorias=categorias)
 
 # ================================================================
 # 2. CATÁLOGO Y PRODUCTOS (PÚBLICOS)
@@ -80,7 +82,6 @@ def productos_por_categoria_api(categoria_id):
 @web.route('/api/productos/buscar')
 def buscar_productos():
     return pc.buscar_productos()
-
 
 # ================================================================
 # 3. CARRITO (SOLO CLIENTES)
@@ -123,26 +124,21 @@ def descargar_factura():
 # ================================================================
 # 4. PEDIDOS
 # ================================================================
-
-# ---- PROCESO CHECKOUT (CLIENTE) ----
 @web.route('/procesar-checkout', methods=['POST'])
 @cliente_required
 def procesar_checkout():
     return pedido_c.procesar_checkout()
 
-# ---- MIS PEDIDOS (CLIENTE) ----
 @web.route('/mis-pedidos')
 @cliente_required
 def mis_pedidos_clientes():
     return pedido_c.mis_pedidos_clientes()
 
-# ---- DETALLE DE PEDIDO (CLIENTE) ----
 @web.route('/pedido/<id>')
 @cliente_required
 def ver_pedido(id):
     return pedido_c.ver_pedido(id)
 
-# ---- API PEDIDOS (CLIENTE) ----
 @web.route('/api/pedido/cancelar/<id>', methods=['POST'])
 @cliente_required
 def cancelar_pedido(id):
@@ -158,12 +154,10 @@ def generar_codigo_recogida(id):
 def confirmar_pedido(id):
     return pedido_c.confirmar_pedido(id)
 
-# ---- RASTREAR PEDIDO (PÚBLICO) ----
 @web.route('/rastrear-pedido', methods=['GET', 'POST'])
 def rastrear_pedido():
     return pedido_c.rastrear_pedido()
 
-# ---- ADMIN PEDIDOS ----
 @web.route('/admin/pedidos')
 @admin_required
 def admin_listar_pedidos():
@@ -187,8 +181,6 @@ def admin_eliminar_pedido(id):
 # ================================================================
 # 5. AUTENTICACIÓN Y USUARIO
 # ================================================================
-
-# ---- PÚBLICOS ----
 @web.route('/login', methods=['GET', 'POST'])
 def login():
     return ac.login()
@@ -209,11 +201,15 @@ def recuperar_password():
 def confirmar_email(token):
     return ac.confirmar_email(token)
 
+# ===== ✅ RUTA CORREGIDA: ahora apunta a `ac.reenviar_confirmacion` =====
+@web.route('/reenviar-confirmacion', methods=['POST'])
+def reenviar_confirmacion():
+    return ac.reenviar_confirmacion()  # ← Cambiado de uc a ac
+
 @web.route('/resetear-password/<token>', methods=['GET', 'POST'])
 def resetear_password(token):
     return ac.resetear_password(token)
 
-# ---- SOLO CLIENTES ----
 @web.route('/logout', methods=['GET'])
 @login_required
 def logout():
@@ -234,7 +230,7 @@ def actualizar():
 def cambiar_password():
     return ac.cambiar_password()
 
-# ---- FAVORITOS (SOLO CLIENTES) ----
+# ---- FAVORITOS ----
 @web.route('/favoritos', methods=['GET'])
 @cliente_required
 def lista_favoritos():
@@ -250,7 +246,7 @@ def agregar_favorito(producto_id):
 def eliminar_favorito(producto_id):
     return uc.eliminar_favorito(producto_id)
 
-# ---- OPINIONES (SOLO CLIENTES) ----
+# ---- OPINIONES ----
 @web.route('/opinion/agregar', methods=['POST'])
 @cliente_required
 def agregar_opinion():
@@ -276,12 +272,9 @@ def marcar_util():
 def reportar_opinion():
     return uc.reportar_opinion()
 
-
 # ================================================================
 # 6. ADMIN - USUARIOS
 # ================================================================
-
-# ===== CRUD BÁSICO =====
 @web.route('/admin/usuarios', methods=['GET'])
 @admin_required
 def lista_usuarios():
@@ -307,8 +300,7 @@ def editar_usuario(id):
 def borrar_usuario(id):
     return uc.borrar_usuario(id)
 
-
-# ===== CRUD DIRECCIONES =====
+# ---- DIRECCIONES ----
 @web.route('/admin/usuarios/direccion/agregar/<usuario_id>', methods=['POST'])
 @admin_required
 def agregar_direccion(usuario_id):
@@ -329,8 +321,6 @@ def establecer_predeterminada(usuario_id, direccion_id):
 def borrar_direccion(usuario_id, direccion_id):
     return uc.borrar_direccion(usuario_id, direccion_id)
 
-
-# ===== API DIRECCIONES =====
 @web.route('/api/admin/usuarios/<usuario_id>/direcciones', methods=['GET'])
 @admin_required
 def obtener_direcciones_usuario(usuario_id):
@@ -341,8 +331,7 @@ def obtener_direcciones_usuario(usuario_id):
 def obtener_direccion_predeterminada(usuario_id):
     return uc.obtener_direccion_predeterminada(usuario_id)
 
-
-# ===== API ADMIN USUARIOS =====
+# ---- API ADMIN USUARIOS ----
 @web.route('/api/admin/usuarios/editar/<id>', methods=['POST', 'PUT'])
 @admin_required
 def editar_usuario_admin(id):
@@ -411,7 +400,6 @@ def eliminar_imagen_producto(id, index):
 def exportar_productos():
     return pc.exportar_productos()
 
-
 # ================================================================
 # 8. ADMIN - CATEGORÍAS
 # ================================================================
@@ -440,7 +428,6 @@ def borrar_categoria(id):
 def reordenar_categorias():
     return cc.reordenar_categorias()
 
-
 # ================================================================
 # 9. ADMIN - ATRIBUTOS
 # ================================================================
@@ -468,7 +455,6 @@ def borrar_atributo(id):
 @admin_required
 def asignar_atributos_categoria(categoria_id):
     return atrc.asignar_atributos_categoria(categoria_id)
-
 
 # ================================================================
 # 10. ADMIN - EMPRESAS
@@ -518,7 +504,6 @@ def ver_empresa(id):
 def toggle_empresa(id):
     return ec.toggle_empresa(id)
 
-
 # ================================================================
 # 12. ADMIN - DASHBOARD Y ANALÍTICA
 # ================================================================
@@ -557,9 +542,6 @@ def prediccion_ventas():
 def deteccion_fraude():
     return uc.deteccion_fraude()
 
-
-
-# Reportes
 @web.route('/admin/reportes', methods=['GET'])
 @admin_required
 def reportes():
@@ -580,14 +562,9 @@ def reporte_usuarios():
 def reporte_productos():
     return uc.reporte_productos()
 
-    
-    
-
-
 # ================================================================
-# RUTAS PARA CUPONES (ADMIN)
+# RUTAS PARA CUPONES
 # ================================================================
-
 @web.route('/admin/cupones', methods=['GET'])
 @admin_required
 def admin_listar_cupones():
@@ -612,10 +589,6 @@ def admin_eliminar_cupon(id):
 @admin_required
 def admin_cupon_estadisticas(id):
     return cupon_controller.admin_cupon_estadisticas(id)
-
-# ================================================================
-# RUTAS PARA CUPONES (CLIENTE)
-# ================================================================
 
 @web.route('/mis-cupones', methods=['GET'])
 @cliente_required
@@ -643,13 +616,12 @@ def cupon_info():
     return cupon_controller.cliente_cupon_info()
 
 # ================================================================
-# 16. PROMOCIONES - ADMIN (ESTILO LIVERPOOL)
+# 16. PROMOCIONES - ADMIN
 # ================================================================
-
 @web.route('/admin/promociones')
 @admin_required
 def admin_listar_promociones():
-    return promo_c.admin_listar_promociones()  # Cambiar pc por promo_c
+    return promo_c.admin_listar_promociones()
 
 @web.route('/admin/promociones/crear', methods=['GET', 'POST'])
 @admin_required
@@ -696,20 +668,18 @@ def admin_promociones_exportar_pdf():
 def admin_promociones_api():
     return promo_c.admin_promociones_api()
 
-
 # ================================================================
-# 17. PROMOCIONES - CLIENTE (TIENDA)
+# 17. PROMOCIONES - CLIENTE
 # ================================================================
-
 @web.route('/promociones')
 @login_required
 def listar_promociones_cliente():
-    return promo_c.listar_promociones_cliente()  # ✅ Corregido: usar promo_c
+    return promo_c.listar_promociones_cliente()
 
 @web.route('/api/promociones/aplicar', methods=['POST'])
 @login_required
 def aplicar_promocion():
-    return promo_c.aplicar_promocion()  # ✅ Corregido: usar promo_c
+    return promo_c.aplicar_promocion()
 
 @web.route('/api/promociones/quitar', methods=['POST'])
 @login_required
@@ -731,55 +701,43 @@ def promociones_carrito():
 def promociones_disponibles_api():
     return promo_c.promociones_disponibles_api()
 
-
-
 # ================================================================
-# 13. ADMIN - REPORTE DE VENTAS (ESTILO LIVERPOOL)  ← AGREGAR AQUÍ
+# 13. ADMIN - REPORTE DE VENTAS
 # ================================================================
-
 @web.route('/admin/reporte-ventas', methods=['GET'])
 @admin_required
 def admin_reporte_ventas():
-    """Panel de Reporte de Ventas - Estilo Liverpool"""
     return vc.admin_reporte_ventas()
 
 @web.route('/admin/reporte-ventas/exportar-csv', methods=['GET'])
 @admin_required
 def admin_exportar_ventas_csv():
-    """Exportar ventas a CSV"""
     return vc.admin_exportar_ventas_csv()
 
 @web.route('/admin/reporte-ventas/exportar-pdf', methods=['GET'])
 @admin_required
 def admin_exportar_ventas_pdf():
-    """Exportar ventas a PDF"""
     return vc.admin_exportar_ventas_pdf()
 
 @web.route('/api/admin/ventas', methods=['GET'])
 @admin_required
 def admin_ventas_api():
-    """API para datos de ventas (gráficos en tiempo real)"""
     return vc.admin_ventas_api()
 
 @web.route('/api/admin/ventas/resumen', methods=['GET'])
 @admin_required
 def admin_ventas_resumen_api():
-    """API para resumen de ventas (KPIs)"""
     return vc.admin_ventas_resumen_api()
 
-
-    # ================================================================
-# 15. ADMIN - ANÁLISIS SUPERVISADO (MACHINE LEARNING)
 # ================================================================
-
-# Página principal de IA
+# 15. ADMIN - ANÁLISIS SUPERVISADO (ML)
+# ================================================================
 @web.route('/admin/analisis-supervisado', methods=['GET'])
 @admin_required
 def admin_analisis_supervisado():
     from app.controllers.ml_controller import admin_analisis_supervisado
     return admin_analisis_supervisado()
 
-# Entrenar modelos
 @web.route('/api/ml/entrenar/ventas', methods=['POST'])
 @admin_required
 def api_ml_entrenar_ventas():
@@ -792,7 +750,6 @@ def api_ml_entrenar_abandono():
     from app.controllers.ml_controller import admin_entrenar_modelo_abandono
     return admin_entrenar_modelo_abandono()
 
-# Predicciones
 @web.route('/api/ml/predecir/ventas', methods=['GET'])
 @admin_required
 def api_ml_predecir_ventas():
@@ -805,7 +762,6 @@ def api_ml_predecir_abandono():
     from app.controllers.ml_controller import admin_predecir_abandono
     return admin_predecir_abandono()
 
-# Métricas y diagnóstico
 @web.route('/api/ml/metricas', methods=['GET'])
 @admin_required
 def api_ml_metricas():
@@ -830,7 +786,6 @@ def api_ml_diagnosticar_abandono():
     from app.controllers.ml_controller import admin_diagnosticar_abandono
     return admin_diagnosticar_abandono()
 
-# Gestión de modelos
 @web.route('/api/ml/limpiar-modelos', methods=['POST'])
 @admin_required
 def api_ml_limpiar_modelos():
@@ -843,7 +798,6 @@ def api_ml_verificar_modelos():
     from app.controllers.ml_controller import admin_verificar_modelos
     return admin_verificar_modelos()
 
-# Umbrales
 @web.route('/api/ml/umbrales', methods=['GET'])
 @admin_required
 def api_ml_get_umbrales():
@@ -856,25 +810,19 @@ def api_ml_ajustar_umbral():
     from app.controllers.ml_controller import admin_ajustar_umbral
     return admin_ajustar_umbral()
 
-# Dashboard resumen
 @web.route('/api/ml/dashboard', methods=['GET'])
 @admin_required
 def api_ml_dashboard():
     from app.controllers.ml_controller import admin_dashboard_ml
     return admin_dashboard_ml()
 
-# Importancia de características
 @web.route('/api/ml/importancia', methods=['GET'])
 @admin_required
 def api_ml_importancia():
     from app.controllers.ml_controller import admin_importancia_caracteristicas
     return admin_importancia_caracteristicas()
 
-
-# ================================================================
-# MODELO DE SEGMENTACIÓN (K-MEANS)
-# ================================================================
-
+# ===== SEGMENTACIÓN K-MEANS =====
 @web.route('/api/ml/entrenar/segmentacion', methods=['POST'])
 @admin_required
 def api_ml_entrenar_segmentacion():
@@ -893,11 +841,7 @@ def api_ml_segmentacion_cluster_stats():
     from app.controllers.ml_controller import admin_obtener_cluster_stats
     return admin_obtener_cluster_stats()
 
-
-# ================================================================
-# REGRESIÓN LOGÍSTICA
-# ================================================================
-
+# ===== REGRESIÓN LOGÍSTICA =====
 @web.route('/api/ml/entrenar/logistico', methods=['POST'])
 @admin_required
 def api_ml_entrenar_logistico():
@@ -934,38 +878,23 @@ def api_ml_importancia_logistico():
     from app.controllers.ml_controller import admin_importancia_logistico
     return admin_importancia_logistico()
 
-
-# ================================================================
-# CURVA ROC PARA REGRESIÓN LOGÍSTICA
-# ================================================================
 @web.route('/api/ml/logistico/curva-roc', methods=['GET'])
 @admin_required
 def api_logistico_curva_roc():
     from app.controllers.ml_controller import admin_curva_roc_logistico
     return admin_curva_roc_logistico()
 
-# ================================================================
-# EVALUACIÓN DE K PARA SEGMENTACIÓN (CODO + SILUETA)
-# ================================================================
 @web.route('/api/ml/segmentacion/codo-silueta', methods=['GET'])
 @admin_required
 def api_segmentacion_codo_silueta():
     from app.controllers.ml_controller import admin_segmentacion_codo_silueta
     return admin_segmentacion_codo_silueta()
 
-# ================================================================
-# PCA PARA SEGMENTACIÓN
-# ================================================================
 @web.route('/api/ml/segmentacion/pca', methods=['GET'])
 @admin_required
 def api_segmentacion_pca():
     from app.controllers.ml_controller import admin_segmentacion_pca
     return admin_segmentacion_pca()
-
-
-# ================================================================
-# SEGMENTACIÓN - DATOS PARA SCATTER
-# ================================================================
 
 @web.route('/api/ml/segmentacion/datos', methods=['GET'])
 @admin_required
@@ -973,48 +902,39 @@ def api_ml_segmentacion_datos():
     from app.controllers.ml_controller import admin_obtener_datos_segmentacion
     return admin_obtener_datos_segmentacion()
 
-
-
 # ================================================================
-# CLASIFICACIÓN BINARIA (ABANDONO) - Random Forest con GridSearch
+# CLASIFICACIÓN BINARIA (ABANDONO)
 # ================================================================
-
-# Vista principal
 @web.route('/admin/clasificacion-binaria', methods=['GET'])
 @admin_required
 def clasificacion_binaria():
     from app.controllers.clasificacion_controller import clasificacion_binaria_view
     return clasificacion_binaria_view()
 
-# Entrenar modelo
 @web.route('/api/clasificacion/entrenar', methods=['POST'])
 @admin_required
 def api_clasificacion_entrenar():
     from app.controllers.clasificacion_controller import api_entrenar
     return api_entrenar()
 
-# Predecir todos o un usuario específico
 @web.route('/api/clasificacion/predecir', methods=['GET'])
 @admin_required
 def api_clasificacion_predecir():
     from app.controllers.clasificacion_controller import api_predecir
     return api_predecir()
 
-# Obtener métricas guardadas
 @web.route('/api/clasificacion/metricas', methods=['GET'])
 @admin_required
 def api_clasificacion_metricas():
     from app.controllers.clasificacion_controller import api_metricas
     return api_metricas()
 
-# Exportar resultados a CSV
 @web.route('/api/clasificacion/exportar', methods=['GET'])
 @admin_required
 def api_clasificacion_exportar():
     from app.controllers.clasificacion_controller import api_exportar
     return api_exportar()
 
-# Eliminar modelo (limpiar)
 @web.route('/api/clasificacion/limpiar', methods=['POST'])
 @admin_required
 def api_clasificacion_limpiar():
@@ -1049,10 +969,8 @@ def configuracion_impuestos():
 def configuracion_tiendas():
     return uc.configuracion_tiendas()
 
-
-
 # ================================================================
-# 15. WEBHOOKS Y NOTIFICACIONES (PÚBLICOS)
+# 15. WEBHOOKS Y NOTIFICACIONES
 # ================================================================
 @web.route('/webhook/pago', methods=['POST'])
 def webhook_pago():
@@ -1066,9 +984,8 @@ def webhook_envio():
 def webhook_seguimiento():
     return vc.webhook_seguimiento()
 
-
 # ================================================================
-# 16. PÁGINAS ESTÁTICAS (PÚBLICAS)
+# 16. PÁGINAS ESTÁTICAS
 # ================================================================
 @web.route('/contacto', methods=['GET', 'POST'])
 def contacto():
@@ -1094,11 +1011,9 @@ def devoluciones():
 def nosotros():
     return uc.nosotros()
 
-
 # ================================================================
 # 17. API PARA MÓVIL Y FRONTEND
 # ================================================================
-# API de productos (pública)
 @web.route('/api/v1/productos', methods=['GET'])
 def api_productos():
     return pc.api_productos()
@@ -1107,17 +1022,14 @@ def api_productos():
 def api_producto(id):
     return pc.api_producto(id)
 
-# API de categorías (pública)
 @web.route('/api/v1/categorias', methods=['GET'])
 def api_categorias():
     return cc.api_categorias()
 
-# API de autenticación (pública)
 @web.route('/api/auth/verificar', methods=['GET'])
 def verificar_autenticacion():
     return uc.verificar_autenticacion()
 
-# API de usuario actual (requiere autenticación)
 @web.route('/api/v1/usuario/actual', methods=['GET'])
 @login_required
 def obtener_usuario_actual():
@@ -1128,13 +1040,11 @@ def obtener_usuario_actual():
 def api_usuario():
     return uc.api_usuario()
 
-# API de carrito (solo clientes)
 @web.route('/api/v1/carrito', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @cliente_required
 def api_carrito():
     return carrito_c.api_carrito()
 
-# API de pedidos (solo clientes)
 @web.route('/api/v1/pedidos', methods=['GET'])
 @cliente_required
 def api_pedidos():
@@ -1145,7 +1055,6 @@ def api_pedidos():
 def api_pedido(id):
     return pedido_c.api_pedido(id)
 
-# API Newsletter (pública)
 @web.route('/api/newsletter/suscribir', methods=['POST'])
 def suscribir_newsletter():
     return mc.suscribir_newsletter()
@@ -1153,7 +1062,6 @@ def suscribir_newsletter():
 @web.route('/api/newsletter/cancelar', methods=['POST'])
 def cancelar_newsletter():
     return mc.cancelar_newsletter()
-
 
 # ================================================================
 # 18. MANTENIMIENTO Y PRUEBAS
@@ -1182,11 +1090,9 @@ def registrar_admin():
 def enviar_notificacion():
     return uc.enviar_notificacion()
 
-
 # ================================================================
 # COMBOS
 # ================================================================
-
 @web.route('/admin/combos', methods=['GET'])
 @admin_required
 def admin_combos():
@@ -1226,7 +1132,6 @@ def api_combo_eliminar(id):
 # ================================================================
 # RESEÑAS
 # ================================================================
-
 @web.route('/admin/resenas', methods=['GET'])
 @admin_required
 def admin_resenas():
@@ -1269,6 +1174,54 @@ def api_resena_obtener(id):
     from app.controllers.resenas_controller import api_resena_obtener
     return api_resena_obtener(id)
 
+# ================================================================
+# CHAT EN VIVO - WIDGET Y ADMIN
+# ================================================================
+from app.controllers import chat_controller as chat_c
+
+# --- Rutas para el widget del cliente ---
+@web.route('/api/chat/iniciar', methods=['POST'])
+def chat_iniciar():
+    return chat_c.iniciar_conversacion()
+
+@web.route('/api/chat/obtener', methods=['GET'])
+def chat_obtener():
+    return chat_c.obtener_conversacion()
+
+@web.route('/api/chat/enviar', methods=['POST'])
+def chat_enviar_widget():
+    return chat_c.enviar_mensaje_widget()
+
+# --- Rutas para el panel de administración ---
+@web.route('/admin/chat')
+@admin_required
+def admin_chat_panel():
+    return chat_c.admin_chat_panel()
+
+@web.route('/api/admin/chat/enviar', methods=['POST'])
+@admin_required
+def admin_chat_enviar():
+    return chat_c.admin_enviar_mensaje()
+
+@web.route('/api/admin/chat/sesiones', methods=['GET'])
+@admin_required
+def admin_chat_sesiones():
+    return chat_c.admin_obtener_sesiones()
+
+@web.route('/api/admin/chat/mensajes', methods=['GET'])
+@admin_required
+def admin_chat_mensajes_sesion():
+    return chat_c.admin_obtener_mensajes_sesion()
+
+@web.route('/api/admin/chat/cerrar', methods=['POST'])
+@admin_required
+def admin_chat_cerrar():
+    return chat_c.admin_cerrar_sesion()
+
+# (Opcional) Ruta para el widget HTML embebido (si usas include)
+@web.route('/widget_chat')
+def widget_chat():
+    return chat_c.widget_chat()
 
 # ================================================================
 # 20. ERRORES

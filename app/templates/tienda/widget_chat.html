@@ -1,0 +1,245 @@
+<!-- Widget de Chat flotante -->
+<div id="chatWidget" style="position:fixed; bottom:20px; right:20px; z-index:9999; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <!-- Botón de abrir/cerrar -->
+    <button id="chatToggle" style="background:#e10098; border:none; border-radius:50%; width:60px; height:60px; box-shadow:0 4px 20px rgba(225,0,152,0.4); color:white; font-size:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.3s;">
+        <i class="bi bi-chat-dots"></i>
+    </button>
+    <!-- Ventana de chat -->
+    <div id="chatWindow" style="display:none; position:absolute; bottom:70px; right:0; width:360px; max-width:90vw; height:500px; background:white; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.2); overflow:hidden; display:none; flex-direction:column; border:1px solid #eee;">
+        <!-- Cabecera -->
+        <div style="background:linear-gradient(135deg, #e10098, #c00080); color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <strong style="font-size:1.1rem;">ORION Chat</strong>
+                <div style="font-size:0.7rem; opacity:0.8;">Atención al cliente</div>
+            </div>
+            <button id="chatClose" style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;">&times;</button>
+        </div>
+        <!-- Mensajes -->
+        <div id="chatMessages" style="flex:1; padding:15px; overflow-y:auto; background:#f9f9f9; display:flex; flex-direction:column; gap:8px;">
+            <div class="mensaje-sistema" style="text-align:center; color:#999; font-size:0.8rem;">Conectando...</div>
+        </div>
+        <!-- Formulario de identificación (si no autenticado) -->
+        <div id="chatLogin" style="padding:15px; border-top:1px solid #eee; background:white;">
+            <input type="text" id="chatNombre" placeholder="Tu nombre *" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; margin-bottom:8px; font-size:0.9rem;">
+            <input type="email" id="chatEmail" placeholder="Tu email (opcional)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; margin-bottom:8px; font-size:0.9rem;">
+            <button id="chatStartBtn" style="background:#e10098; color:white; border:none; border-radius:50px; padding:10px; width:100%; font-weight:bold; cursor:pointer;">Iniciar conversación</button>
+        </div>
+        <!-- Área de mensaje (visible después de iniciar) -->
+        <div id="chatInputArea" style="display:none; padding:10px 15px; border-top:1px solid #eee; background:white; display:flex; gap:10px;">
+            <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:20px; font-size:0.9rem;">
+            <button id="chatSendBtn" style="background:#e10098; border:none; border-radius:50%; width:40px; height:40px; color:white; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                <i class="bi bi-send"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos CSS inline para el widget -->
+<style>
+    #chatMessages .mensaje-cliente {
+        align-self: flex-end;
+        background: #e10098;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 18px 18px 4px 18px;
+        max-width: 80%;
+        word-wrap: break-word;
+        font-size: 0.9rem;
+    }
+    #chatMessages .mensaje-admin {
+        align-self: flex-start;
+        background: #f0f0f0;
+        color: #333;
+        padding: 8px 14px;
+        border-radius: 18px 18px 18px 4px;
+        max-width: 80%;
+        word-wrap: break-word;
+        font-size: 0.9rem;
+    }
+    #chatMessages .mensaje-sistema {
+        text-align: center;
+        color: #999;
+        font-size: 0.7rem;
+        margin: 4px 0;
+    }
+    #chatMessages .mensaje-fecha {
+        font-size: 0.6rem;
+        color: #999;
+        margin-top: 2px;
+    }
+    #chatMessages .mensaje-cliente .mensaje-fecha { color: rgba(255,255,255,0.7); }
+    #chatMessages .mensaje-admin .mensaje-fecha { color: #999; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('chatToggle');
+    const chatWindow = document.getElementById('chatWindow');
+    const closeBtn = document.getElementById('chatClose');
+    const messagesDiv = document.getElementById('chatMessages');
+    const loginDiv = document.getElementById('chatLogin');
+    const inputArea = document.getElementById('chatInputArea');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('chatSendBtn');
+    const startBtn = document.getElementById('chatStartBtn');
+    const nombreInput = document.getElementById('chatNombre');
+    const emailInput = document.getElementById('chatEmail');
+
+    let conversacionId = null;
+    let pollingInterval = null;
+    let isOpen = false;
+
+    // Cargar estado desde localStorage
+    const storedConv = localStorage.getItem('chatConversacionId');
+    if (storedConv) {
+        conversacionId = storedConv;
+        // Verificar si la conversación sigue activa
+        fetch(`/api/chat/obtener?conversacion_id=${conversacionId}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.mensajes && data.mensajes.length > 0) {
+                    // La conversación existe, mostrar la interfaz de chat
+                    loginDiv.style.display = 'none';
+                    inputArea.style.display = 'flex';
+                    renderMessages(data.mensajes);
+                    startPolling();
+                } else {
+                    // No válida, limpiar
+                    localStorage.removeItem('chatConversacionId');
+                    conversacionId = null;
+                }
+            })
+            .catch(() => {
+                localStorage.removeItem('chatConversacionId');
+                conversacionId = null;
+            });
+    }
+
+    // Abrir/cerrar ventana
+    toggleBtn.addEventListener('click', function() {
+        if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+            chatWindow.style.display = 'flex';
+            if (conversacionId) {
+                // Si ya hay conversación, cargar mensajes
+                cargarMensajes();
+            }
+        } else {
+            chatWindow.style.display = 'none';
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        }
+    });
+
+    closeBtn.addEventListener('click', function() {
+        chatWindow.style.display = 'none';
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+        }
+    });
+
+    // Iniciar conversación
+    startBtn.addEventListener('click', function() {
+        const nombre = nombreInput.value.trim();
+        const email = emailInput.value.trim();
+        if (!nombre) {
+            alert('Por favor ingresa tu nombre.');
+            return;
+        }
+        fetch('/api/chat/iniciar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre: nombre, email: email })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.conversacion_id) {
+                conversacionId = data.conversacion_id;
+                localStorage.setItem('chatConversacionId', conversacionId);
+                loginDiv.style.display = 'none';
+                inputArea.style.display = 'flex';
+                // Cargar mensajes iniciales (el de bienvenida)
+                cargarMensajes();
+                startPolling();
+            } else {
+                alert('Error al iniciar conversación.');
+            }
+        })
+        .catch(err => alert('Error de conexión.'));
+    });
+
+    // Enviar mensaje
+    function enviarMensaje() {
+        const texto = chatInput.value.trim();
+        if (!texto || !conversacionId) return;
+        chatInput.value = '';
+        fetch('/api/chat/enviar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ conversacion_id: conversacionId, mensaje: texto })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                cargarMensajes(); // refrescar
+            } else {
+                alert('Error al enviar mensaje.');
+            }
+        });
+    }
+
+    sendBtn.addEventListener('click', enviarMensaje);
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') enviarMensaje();
+    });
+
+    // Cargar mensajes
+    function cargarMensajes() {
+        if (!conversacionId) return;
+        fetch(`/api/chat/obtener?conversacion_id=${conversacionId}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.mensajes) {
+                    renderMessages(data.mensajes);
+                    // Si la conversación fue cerrada por el admin, deshabilitar input
+                    if (data.estado === 'cerrado') {
+                        chatInput.disabled = true;
+                        sendBtn.disabled = true;
+                        // Mostrar mensaje de cerrado
+                        if (pollingInterval) clearInterval(pollingInterval);
+                    } else {
+                        chatInput.disabled = false;
+                        sendBtn.disabled = false;
+                    }
+                }
+            });
+    }
+
+    function renderMessages(mensajes) {
+        messagesDiv.innerHTML = '';
+        mensajes.forEach(m => {
+            const div = document.createElement('div');
+            div.classList.add(m.es_admin ? 'mensaje-admin' : 'mensaje-cliente');
+            const fecha = new Date(m.fecha);
+            const timeStr = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+            div.innerHTML = `
+                <div>${m.mensaje}</div>
+                <div class="mensaje-fecha">${m.nombre_remitente} • ${timeStr}</div>
+            `;
+            messagesDiv.appendChild(div);
+        });
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function startPolling() {
+        if (pollingInterval) clearInterval(pollingInterval);
+        pollingInterval = setInterval(() => {
+            if (conversacionId) cargarMensajes();
+        }, 3000); // cada 3 segundos
+    }
+
+    // Si el cliente cierra la página, no hacemos nada especial
+});
+</script>

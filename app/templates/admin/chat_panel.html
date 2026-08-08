@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION Admin · Chat en vivo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== VARIABLES ===== */
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-secondary: #00d4ff;
+            --orion-dark: #1a1a2e;
+            --orion-gray: #f5f6f8;
+            --orion-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            --orion-radius: 16px;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            background: #f0f2f5;
+        }
+
+        /* ===== LAYOUT ===== */
+        .chat-layout {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .chat-sidebar {
+            width: 320px;
+            background: #ffffff;
+            border-right: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.04);
+        }
+
+        .chat-sidebar .sidebar-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafafa;
+        }
+
+        .chat-sidebar .sidebar-header h5 {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-sidebar .sidebar-header h5 i {
+            color: var(--orion-primary);
+        }
+
+        .chat-sidebar .sidebar-header .badge-total {
+            background: var(--orion-primary);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-weight: 700;
+        }
+
+        .chat-sidebar .sidebar-header .btn-dashboard {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #555;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .chat-sidebar .sidebar-header .btn-dashboard:hover {
+            background: #e0e0e0;
+            color: #1a1a2e;
+        }
+
+        /* Lista de sesiones */
+        .chat-sidebar .session-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 12px;
+        }
+
+        .chat-sidebar .session-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-sidebar .session-list::-webkit-scrollbar-track {
+            background: #f5f6f8;
+        }
+        .chat-sidebar .session-list::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 4px;
+        }
+
+        .session-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-bottom: 4px;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .session-item:hover {
+            background: #f8f0f5;
+            border-color: #f0e0e8;
+        }
+
+        .session-item.active {
+            background: #f8f0f5;
+            border-color: var(--orion-primary);
+            box-shadow: 0 0 0 1px var(--orion-primary);
+        }
+
+        .session-item .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .session-item .info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .session-item .info .nombre {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1a1a2e;
+        }
+
+        .session-item .info .ultimo-msg {
+            font-size: 0.72rem;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .session-item .info .fecha {
+            font-size: 0.6rem;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .session-item .badge-unread {
+            background: #dc3545;
+            color: white;
+            font-size: 0.55rem;
+            padding: 2px 8px;
+            border-radius: 50px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .session-item .estado {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #28a745;
+            flex-shrink: 0;
+        }
+
+        .session-item .estado.inactivo {
+            background: #dc3545;
+            box-shadow: 0 0 0 2px #dc3545;
+        }
+
+        .session-item .estado.ausente {
+            background: #ffc107;
+            box-shadow: 0 0 0 2px #ffc107;
+        }
+
+        /* ===== ÁREA DE CHAT ===== */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .chat-main .chat-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            flex-shrink: 0;
+        }
+
+        .chat-main .chat-header .usuario-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-main .chat-header .usuario-info .avatar-grande {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .chat-main .chat-header .usuario-info .nombre-usuario {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1a1a2e;
+        }
+
+        .chat-main .chat-header .usuario-info .estado-usuario {
+            font-size: 0.7rem;
+            color: #28a745;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chat-main .chat-header .usuario-info .estado-usuario i {
+            font-size: 0.4rem;
+        }
+
+        .chat-main .chat-header .acciones {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-main .chat-header .acciones .btn-cerrar {
+            background: transparent;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .chat-main .chat-header .acciones .btn-cerrar:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .chat-main .chat-header .acciones .btn-volver {
+            background: #f0f0f0;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #555;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .chat-main .chat-header .acciones .btn-volver:hover {
+            background: #e0e0e0;
+            color: #1a1a2e;
+        }
+
+        /* ===== MENSAJES ===== */
+        .chat-main .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #f8f9fa;
+        }
+
+        .chat-main .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-main .chat-messages::-webkit-scrollbar-track {
+            background: #f5f6f8;
+        }
+        .chat-main .chat-messages::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 4px;
+        }
+
+        .chat-message {
+            max-width: 72%;
+            padding: 10px 16px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+            animation: fadeIn 0.25s ease;
+            position: relative;
+        }
+
+        .chat-message.cliente {
+            align-self: flex-start;
+            background: #ffffff;
+            border: 1px solid #e8e8e8;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .chat-message.admin {
+            align-self: flex-end;
+            background: var(--orion-primary);
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 8px rgba(225,0,152,0.15);
+        }
+
+        .chat-message .hora {
+            font-size: 0.6rem;
+            opacity: 0.6;
+            margin-left: 8px;
+            display: inline-block;
+        }
+
+        .chat-message.cliente .hora {
+            color: #999;
+        }
+
+        .chat-message.admin .hora {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .chat-message .remitente {
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .chat-message.cliente .remitente {
+            color: var(--orion-primary);
+        }
+
+        .chat-message.admin .remitente {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .chat-empty {
+            color: #bbb;
+            text-align: center;
+            padding: 40px 0;
+            font-size: 0.9rem;
+        }
+
+        /* ===== FOOTER CHAT ===== */
+        .chat-main .chat-footer {
+            padding: 12px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 12px;
+            background: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .chat-main .chat-footer input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            outline: none;
+            transition: 0.3s;
+            background: #f8f9fa;
+        }
+
+        .chat-main .chat-footer input:focus {
+            border-color: var(--orion-primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(225,0,152,0.05);
+        }
+
+        .chat-main .chat-footer input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .chat-main .chat-footer button {
+            background: var(--orion-primary);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-main .chat-footer button:hover {
+            background: var(--orion-primary-dark);
+            transform: scale(1.05);
+        }
+
+        .chat-main .chat-footer button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .chat-sidebar {
+                width: 100%;
+                height: 40vh;
+                border-right: none;
+                border-bottom: 1px solid #e8e8e8;
+            }
+            .chat-layout {
+                flex-direction: column;
+            }
+            .chat-main {
+                height: 60vh;
+            }
+            .chat-message {
+                max-width: 85%;
+            }
+            .chat-main .chat-header {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .chat-main .chat-messages {
+                padding: 12px 16px;
+            }
+            .chat-main .chat-footer {
+                padding: 8px 16px;
+            }
+            .chat-sidebar .session-list {
+                max-height: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .session-item {
+                padding: 8px 10px;
+            }
+            .session-item .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+            .chat-message {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+            .chat-main .chat-header .usuario-info .nombre-usuario {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ===== ANIMACIONES ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== SCROLLBAR PERSONALIZADA ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f6f8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== CONTENEDOR PRINCIPAL ===== -->
+    <div class="chat-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="chat-sidebar" id="chatSidebar">
+            <!-- Header del sidebar -->
+            <div class="sidebar-header d-flex justify-content-between align-items-center">
+                <h5>
+                    <i class="bi bi-chat-dots"></i> Conversaciones
+                    <span class="badge-total ms-2" id="totalSesiones">{{ sesiones|length }}</span>
+                </h5>
+                <a href="{{ url_for('web.dashboard') }}" class="btn-dashboard">
+                    <i class="bi bi-grid"></i> Dashboard
+                </a>
+            </div>
+
+            <!-- Lista de sesiones -->
+            <div class="session-list" id="sesionesList">
+                {% for ses in sesiones %}
+                <div class="session-item" data-session="{{ ses._id_str }}" onclick="abrirSesion('{{ ses._id_str }}')">
+                    <div class="avatar">
+                        {{ ses.nombre_usuario[0]|upper if ses.nombre_usuario else '?' }}
+                    </div>
+                    <div class="info">
+                        <div class="nombre">{{ ses.nombre_usuario }}</div>
+                        <div class="ultimo-msg">{{ ses.ultimo_mensaje.texto if ses.ultimo_mensaje else 'Sin mensajes' }}</div>
+                        <div class="fecha">{{ ses.updated_at.strftime('%H:%M · %d/%m') if ses.updated_at else '' }}</div>
+                    </div>
+                    {% if ses.no_leidos > 0 %}
+                        <span class="badge-unread">{{ ses.no_leidos }}</span>
+                    {% endif %}
+                    <span class="estado"></span>
+                </div>
+                {% else %}
+                <div class="session-item" style="justify-content:center; color:#999; font-size:0.85rem; cursor:default;">
+                    No hay conversaciones activas
+                </div>
+                {% endfor %}
+            </div>
+        </aside>
+
+        <!-- ===== ÁREA PRINCIPAL DE CHAT ===== -->
+        <main class="chat-main" id="chatMain">
+
+            <!-- ===== HEADER ===== -->
+            <header class="chat-header">
+                <div class="usuario-info">
+                    <div class="avatar-grande" id="chatAvatar">?</div>
+                    <div>
+                        <div class="nombre-usuario" id="chatUsuario">Selecciona una conversación</div>
+                        <div class="estado-usuario" id="chatEstado">
+                            <i class="bi bi-circle-fill"></i> Desconectado
+                        </div>
+                    </div>
+                </div>
+                <div class="acciones">
+                    <button class="btn-cerrar" id="btnCerrarSesion" style="display:none;" onclick="cerrarSesion()">
+                        <i class="bi bi-x-circle"></i> Cerrar
+                    </button>
+                    <a href="{{ url_for('web.dashboard') }}" class="btn-volver">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </header>
+
+            <!-- ===== MENSAJES ===== -->
+            <div class="chat-messages" id="chatMessagesAdmin">
+                <div class="chat-empty">Selecciona una conversación para comenzar</div>
+            </div>
+
+            <!-- ===== FOOTER ===== -->
+            <div class="chat-footer">
+                <input type="text" id="chatInputAdmin" placeholder="Escribe un mensaje..." disabled>
+                <button id="btnEnviarAdmin" disabled><i class="bi bi-send"></i></button>
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function() {
+            var sesionActual = null;
+            var adminIntervalo = null;
+            var adminUltimoMensaje = null;
+
+            // ===== ABRIR SESIÓN =====
+            window.abrirSesion = function(sessionId) {
+                sesionActual = sessionId;
+                // Resaltar en sidebar
+                document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'));
+                var item = document.querySelector(`.session-item[data-session="${sessionId}"]`);
+                if (item) item.classList.add('active');
+
+                // Habilitar input
+                document.getElementById('chatInputAdmin').disabled = false;
+                document.getElementById('btnEnviarAdmin').disabled = false;
+                document.getElementById('btnCerrarSesion').style.display = 'inline-block';
+
+                // Cargar mensajes
+                cargarMensajesAdmin(true);
+
+                // Iniciar polling
+                if (adminIntervalo) clearInterval(adminIntervalo);
+                adminIntervalo = setInterval(function() {
+                    cargarMensajesAdmin(false);
+                }, 3000);
+
+                // Actualizar header
+                var nombre = item ? item.querySelector('.nombre')?.textContent || 'Usuario' : 'Usuario';
+                document.getElementById('chatUsuario').textContent = nombre;
+                document.getElementById('chatEstado').innerHTML = '<i class="bi bi-circle-fill" style="color:#28a745;"></i> En línea';
+                document.getElementById('chatAvatar').textContent = nombre.charAt(0).toUpperCase();
+            };
+
+            // ===== CARGAR MENSAJES =====
+            function cargarMensajesAdmin(force = false) {
+                if (!sesionActual) return;
+                var url = "{{ url_for('web.admin_chat_mensajes_sesion') }}?session_id=" + sesionActual;
+                if (adminUltimoMensaje && !force) {
+                    url += "&ultimo=" + encodeURIComponent(adminUltimoMensaje);
+                }
+                fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.mensajes) {
+                        var container = document.getElementById('chatMessagesAdmin');
+                        if (force || !adminUltimoMensaje) {
+                            container.innerHTML = '';
+                            data.mensajes.forEach(function(m) {
+                                agregarMensajeAdminDOM(m);
+                            });
+                        } else {
+                            data.mensajes.forEach(function(m) {
+                                if (m.fecha !== adminUltimoMensaje) {
+                                    agregarMensajeAdminDOM(m);
+                                }
+                            });
+                        }
+                        if (data.mensajes.length > 0) {
+                            adminUltimoMensaje = data.mensajes[data.mensajes.length-1].fecha;
+                        }
+                        container.scrollTop = container.scrollHeight;
+                    }
+                })
+                .catch(err => console.warn('Error cargando mensajes:', err));
+            }
+
+            function agregarMensajeAdminDOM(mensaje) {
+                var container = document.getElementById('chatMessagesAdmin');
+                var empty = container.querySelector('.chat-empty');
+                if (empty) empty.remove();
+
+                var div = document.createElement('div');
+                div.className = 'chat-message ' + (mensaje.es_admin ? 'admin' : 'cliente');
+                var hora = new Date(mensaje.fecha);
+                var horaStr = hora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+
+                var remitente = mensaje.es_admin ? 'Tú' : 'Cliente';
+                var html = '<span class="remitente">' + remitente + '</span>';
+                html += mensaje.texto;
+                html += ' <span class="hora">' + horaStr + '</span>';
+                div.innerHTML = html;
+                container.appendChild(div);
+            }
+
+            // ===== ENVIAR MENSAJE ADMIN =====
+            window.adminEnviarMensaje = function() {
+                var input = document.getElementById('chatInputAdmin');
+                var texto = input.value.trim();
+                if (!texto || !sesionActual) return;
+
+                fetch("{{ url_for('web.admin_chat_enviar') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sesionActual, mensaje: texto })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        input.value = '';
+                        cargarMensajesAdmin(true);
+                    } else {
+                        alert('Error: ' + (data.error || ''));
+                    }
+                })
+                .catch(err => console.error(err));
+            };
+
+            // ===== CERRAR SESIÓN =====
+            window.cerrarSesion = function() {
+                if (!sesionActual || !confirm('¿Cerrar esta conversación?')) return;
+                fetch("{{ url_for('web.admin_chat_cerrar') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sesionActual })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Sesión cerrada');
+                        location.reload();
+                    }
+                })
+                .catch(err => console.error(err));
+            };
+
+            // ===== EVENTOS =====
+            document.addEventListener('DOMContentLoaded', function() {
+                var input = document.getElementById('chatInputAdmin');
+                var btn = document.getElementById('btnEnviarAdmin');
+
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') window.adminEnviarMensaje();
+                });
+                btn.addEventListener('click', window.adminEnviarMensaje);
+
+                // Abrir primera sesión automáticamente
+                var first = document.querySelector('.session-item[data-session]');
+                if (first) {
+                    var sessionId = first.dataset.session;
+                    window.abrirSesion(sessionId);
+                }
+
+                // Polling para actualizar lista de sesiones (cada 5s)
+                setInterval(function() {
+                    fetch("{{ url_for('web.admin_chat_sesiones') }}")
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            var list = document.getElementById('sesionesList');
+                            var currentActive = document.querySelector('.session-item.active');
+                            var activeId = currentActive ? currentActive.dataset.session : null;
+
+                            list.innerHTML = '';
+                            data.sesiones.forEach(function(s) {
+                                var div = document.createElement('div');
+                                div.className = 'session-item' + (s._id === activeId ? ' active' : '');
+                                div.dataset.session = s._id;
+                                div.onclick = function() { window.abrirSesion(s._id); };
+
+                                var badge = s.no_leidos > 0 ? '<span class="badge-unread">'+s.no_leidos+'</span>' : '';
+                                div.innerHTML = `
+                                    <div class="avatar">${s.nombre_usuario.charAt(0).toUpperCase()}</div>
+                                    <div class="info">
+                                        <div class="nombre">${s.nombre_usuario}</div>
+                                        <div class="ultimo-msg">${s.ultimo_mensaje || 'Sin mensajes'}</div>
+                                        <div class="fecha">${s.fecha_ultimo ? new Date(s.fecha_ultimo).toLocaleString('es-MX', { hour: '2-digit', minute: '2-digit' }) : ''}</div>
+                                    </div>
+                                    ${badge}
+                                    <span class="estado"></span>
+                                `;
+                                list.appendChild(div);
+                            });
+
+                            // Actualizar total
+                            document.getElementById('totalSesiones').textContent = data.sesiones.length;
+
+                            // Si no hay sesiones, mostrar mensaje
+                            if (data.sesiones.length === 0) {
+                                list.innerHTML = '<div class="session-item" style="justify-content:center; color:#999; font-size:0.85rem; cursor:default;">No hay conversaciones activas</div>';
+                            }
+                        }
+                    })
+                    .catch(err => console.warn(err));
+                }, 5000);
+            });
+        })();
+    </script>
+
+</body>
+</html>

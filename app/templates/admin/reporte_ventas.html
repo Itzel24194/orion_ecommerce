@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plugin de zoom/pan para Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <!-- Plugin para mapa de calor (matrix) -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -298,6 +302,60 @@
             gap: 20px;
             margin-bottom: 25px;
         }
+        .charts-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        /* ===== HEATMAP MEJORADO ===== */
+        .heatmap-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            margin-bottom: 25px;
+        }
+        .heatmap-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .heatmap-card .card-header h5 {
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 0;
+        }
+        .heatmap-card .card-header h5 i {
+            color: #e10098;
+            margin-right: 10px;
+        }
+        .heatmap-card .legend-gradient {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.7rem;
+            color: #888;
+        }
+        .heatmap-card .legend-gradient .gradient-bar {
+            width: 120px;
+            height: 10px;
+            border-radius: 6px;
+            background: linear-gradient(to right, #0d47a1, #1565c0, #1e88e5, #42a5f5, #64b5f6, #90caf9, #ffcc80, #ffa726, #ff7043, #e53935, #c62828);
+        }
+        .heatmap-card .chart-container {
+            position: relative;
+            height: 340px;
+        }
+        .heatmap-card .zoom-hint {
+            font-size: 0.75rem;
+            color: #aaa;
+            text-align: center;
+            margin-top: 12px;
+        }
 
         /* ===== REGRESIÓN LINEAL ===== */
         .regresion-card {
@@ -311,6 +369,7 @@
         .regresion-card .chart-container {
             position: relative;
             height: 280px;
+            overflow: hidden;
         }
         .regresion-stats {
             display: flex;
@@ -333,6 +392,12 @@
         .regresion-stats .stat-item .valor {
             font-weight: 700;
             color: #1a1a2e;
+        }
+        .zoom-hint {
+            font-size: 0.75rem;
+            color: #888;
+            text-align: center;
+            margin-top: 8px;
         }
 
         /* ===== TOP PRODUCTOS ===== */
@@ -483,6 +548,7 @@
             .main { margin-left: 70px; padding: 15px; }
             .charts-grid { grid-template-columns: 1fr; }
             .charts-grid-2 { grid-template-columns: 1fr; }
+            .charts-grid-3 { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .regresion-stats { flex-direction: column; gap: 10px; }
             .pagination-wrapper { flex-direction: column; align-items: stretch; }
@@ -596,7 +662,7 @@
             </div>
         </div>
 
-        <!-- ===== GRÁFICOS ===== -->
+        <!-- ===== GRÁFICOS EXISTENTES ===== -->
         <div class="charts-grid">
             <div class="chart-card">
                 <h5><i class="fas fa-chart-line me-2" style="color:#e10098;"></i> Ventas Diarias</h5>
@@ -627,11 +693,48 @@
             </div>
         </div>
 
-        <!-- ===== REGRESIÓN LINEAL ===== -->
+        <!-- ===== NUEVOS GRÁFICOS: HISTOGRAMA Y DISPERSIÓN ===== -->
+        <div class="charts-grid-3">
+            <div class="chart-card">
+                <h5><i class="fas fa-chart-histogram me-2" style="color:#e10098;"></i> Distribución de Montos (Histograma)</h5>
+                <div class="chart-container">
+                    <canvas id="chartHistograma"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h5><i class="fas fa-chart-scatter me-2" style="color:#e10098;"></i> Total vs Unidades (Dispersión)</h5>
+                <div class="chart-container">
+                    <canvas id="chartScatter"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MAPA DE CALOR MEJORADO ===== -->
+        <div class="heatmap-card">
+            <div class="card-header">
+                <h5><i class="fas fa-fire me-2"></i> Mapa de Calor de Ventas por Día y Hora</h5>
+                <div class="legend-gradient">
+                    <span>Bajo</span>
+                    <div class="gradient-bar"></div>
+                    <span>Alto</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartHeatmap"></canvas>
+            </div>
+            <div class="zoom-hint">
+                <i class="fas fa-info-circle"></i> Intensidad de color = monto total de ventas en esa hora y día.
+            </div>
+        </div>
+
+        <!-- ===== REGRESIÓN LINEAL CON ZOOM ===== -->
         <div class="regresion-card">
             <h5><i class="fas fa-chart-simple me-2" style="color:#e10098;"></i> Regresión Lineal – Pronóstico de Ventas</h5>
             <div class="chart-container">
                 <canvas id="chartRegresionLineal"></canvas>
+            </div>
+            <div class="zoom-hint">
+                <i class="fas fa-mouse-pointer"></i> Usa la rueda del mouse para hacer zoom, arrastra para desplazarte.
             </div>
             <div class="regresion-stats">
                 <div class="stat-item">
@@ -757,7 +860,6 @@
     </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // ===== GRÁFICO: Ventas Diarias =====
@@ -795,17 +897,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 legend: {
                     position: 'top',
                     labels: { font: { size: 10 } }
+                },
+                title: {
+                    display: true,
+                    text: 'Ventas diarias y número de pedidos',
+                    font: { size: 12, weight: '600' },
+                    color: '#1a1a2e'
                 }
             },
             scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Fecha',
+                        font: { weight: '600', size: 10 },
+                        color: '#666'
+                    }
+                },
                 y: {
                     beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Monto ($)',
+                        font: { weight: '600', size: 10 },
+                        color: '#666'
+                    },
                     ticks: { callback: function(value) { return '$' + value; } }
                 },
                 y1: {
                     beginAtZero: true,
                     position: 'right',
                     grid: { drawOnChartArea: false },
+                    title: {
+                        display: true,
+                        text: 'N° Pedidos',
+                        font: { weight: '600', size: 10 },
+                        color: '#666'
+                    },
                     ticks: { stepSize: 1 }
                 }
             }
@@ -832,6 +960,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 legend: {
                     position: 'right',
                     labels: { font: { size: 9 } }
+                },
+                title: {
+                    display: true,
+                    text: 'Ventas por categoría',
+                    font: { size: 12, weight: '600' },
+                    color: '#1a1a2e'
                 }
             }
         }
@@ -857,6 +991,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 legend: {
                     position: 'right',
                     labels: { font: { size: 9 } }
+                },
+                title: {
+                    display: true,
+                    text: 'Distribución por método de pago',
+                    font: { size: 12, weight: '600' },
+                    color: '#1a1a2e'
                 }
             }
         }
@@ -883,15 +1023,372 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             indexAxis: 'y',
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Top 10 productos más vendidos',
+                    font: { size: 12, weight: '600' },
+                    color: '#1a1a2e'
+                }
             },
             scales: {
-                x: { beginAtZero: true, ticks: { stepSize: 1 } }
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Unidades vendidas',
+                        font: { weight: '600', size: 10 },
+                        color: '#666'
+                    },
+                    ticks: { stepSize: 1 }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Producto',
+                        font: { weight: '600', size: 10 },
+                        color: '#666'
+                    }
+                }
             }
         }
     });
 
-    // ===== GRÁFICO: REGRESIÓN LINEAL =====
+    // ===== HISTOGRAMA (Distribución de montos) =====
+    const ventasTotales = {{ ventas|tojson }};
+    const montos = ventasTotales.map(v => v.total || 0).filter(v => v > 0);
+    
+    const ctxHist = document.getElementById('chartHistograma').getContext('2d');
+    if (montos.length > 0) {
+        const maxMonto = Math.max(...montos);
+        const numBins = 10;
+        const binWidth = Math.ceil((maxMonto + 1) / numBins);
+        const histogram = Array(numBins).fill(0);
+        montos.forEach(m => {
+            const idx = Math.min(Math.floor(m / binWidth), numBins - 1);
+            histogram[idx]++;
+        });
+        const binLabels = Array.from({length: numBins}, (_, i) => {
+            const start = i * binWidth;
+            const end = (i + 1) * binWidth - 1;
+            return `$${start} - $${end}`;
+        });
+        new Chart(ctxHist, {
+            type: 'bar',
+            data: {
+                labels: binLabels,
+                datasets: [{
+                    label: 'Pedidos',
+                    data: histogram,
+                    backgroundColor: 'rgba(225, 0, 152, 0.6)',
+                    borderColor: '#e10098',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Frecuencia de montos de venta',
+                        font: { size: 12, weight: '600' },
+                        color: '#1a1a2e'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Rango de monto',
+                            font: { weight: '600', size: 10 },
+                            color: '#666'
+                        },
+                        ticks: { maxRotation: 30 }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 },
+                        title: {
+                            display: true,
+                            text: 'Número de pedidos',
+                            font: { weight: '600', size: 10 },
+                            color: '#666'
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        new Chart(ctxHist, {
+            type: 'bar',
+            data: { labels: ['Sin datos'], datasets: [{ data: [0], backgroundColor: '#ccc' }] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { title: { display: true, text: 'Sin datos' } },
+                    y: { title: { display: true, text: 'Número de pedidos' } }
+                }
+            }
+        });
+    }
+
+    // ===== DISPERSIÓN (Total vs Unidades) =====
+    const ctxScatter = document.getElementById('chartScatter').getContext('2d');
+    const scatterData = ventasTotales.map(v => ({
+        x: v.total_unidades || 0,
+        y: v.total || 0,
+        metodo: v.metodo_pago || 'No especificado'
+    })).filter(d => d.x > 0 && d.y > 0);
+
+    if (scatterData.length > 0) {
+        const metodosUnicos = [...new Set(scatterData.map(d => d.metodo))];
+        const coloresMetodo = ['#e10098', '#00d4ff', '#ffc107', '#28a745', '#dc3545', '#6f42c1', '#fd7e14', '#20c997'];
+        const datasetsScatter = metodosUnicos.map((metodo, index) => ({
+            label: metodo,
+            data: scatterData.filter(d => d.metodo === metodo).map(d => ({ x: d.x, y: d.y })),
+            backgroundColor: coloresMetodo[index % coloresMetodo.length],
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            showLine: false
+        }));
+
+        new Chart(ctxScatter, {
+            type: 'scatter',
+            data: { datasets: datasetsScatter },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { size: 9 } }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Relación total vs unidades por pedido',
+                        font: { size: 12, weight: '600' },
+                        color: '#1a1a2e'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const raw = context.raw;
+                                return label + ': ' + raw.x + ' unidades, $' + raw.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Unidades por pedido',
+                            font: { weight: '600', size: 10 },
+                            color: '#666'
+                        },
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Total ($)',
+                            font: { weight: '600', size: 10 },
+                            color: '#666'
+                        },
+                        beginAtZero: true,
+                        ticks: { callback: function(value) { return '$' + value; } }
+                    }
+                }
+            }
+        });
+    } else {
+        new Chart(ctxScatter, {
+            type: 'scatter',
+            data: { datasets: [{ label: 'Sin datos', data: [{x:0,y:0}], backgroundColor: '#ccc' }] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { title: { display: true, text: 'Unidades' } },
+                    y: { title: { display: true, text: 'Total ($)' } }
+                }
+            }
+        });
+    }
+
+    // ===== MAPA DE CALOR MEJORADO  =====
+    const ctxHeat = document.getElementById('chartHeatmap').getContext('2d');
+
+    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const horas = Array.from({length: 24}, (_, i) => i);
+
+    // Inicializar matriz
+    const matrixData = {};
+    diasSemana.forEach(d => {
+        matrixData[d] = {};
+        horas.forEach(h => {
+            matrixData[d][h] = 0;
+        });
+    });
+
+    // Acumular montos por día y hora
+    ventasTotales.forEach(v => {
+        if (v.created_at) {
+            const fecha = new Date(v.created_at);
+            const diaSemana = fecha.getDay();
+            const diaNombre = diasSemana[(diaSemana + 6) % 7];
+            const hora = fecha.getHours();
+            const monto = v.total || 0;
+            if (diaNombre && hora !== undefined) {
+                matrixData[diaNombre][hora] = (matrixData[diaNombre][hora] || 0) + monto;
+            }
+        }
+    });
+
+    // Construir datos para el heatmap
+    const heatData = [];
+    diasSemana.forEach((dia, idxDia) => {
+        horas.forEach((hora, idxHora) => {
+            const value = matrixData[dia][hora] || 0;
+            if (value > 0) {
+                heatData.push({
+                    x: hora,
+                    y: idxDia,
+                    v: value
+                });
+            }
+        });
+    });
+
+    // Escala de colores tipo Liverpool (azul → rojo intenso)
+    const colorScale = (value, max) => {
+        const intensity = max > 0 ? Math.min(value / max, 1) : 0;
+        // Interpolación lineal entre colores definidos
+        const colors = [
+            [13, 71, 161],   // #0d47a1 (azul oscuro)
+            [21, 101, 192],  // #1565c0
+            [30, 136, 229],  // #1e88e5
+            [66, 165, 245],  // #42a5f5
+            [100, 181, 246], // #64b5f6
+            [144, 202, 249], // #90caf9
+            [255, 204, 128], // #ffcc80
+            [255, 167, 38],  // #ffa726
+            [255, 112, 67],  // #ff7043
+            [229, 57, 53],   // #e53935
+            [198, 40, 40]    // #c62828 (rojo intenso)
+        ];
+        const totalSteps = colors.length - 1;
+        const scaled = intensity * totalSteps;
+        const idx = Math.min(Math.floor(scaled), totalSteps - 1);
+        const frac = scaled - idx;
+        const c1 = colors[idx];
+        const c2 = colors[Math.min(idx + 1, totalSteps)];
+        const r = Math.round(c1[0] + (c2[0] - c1[0]) * frac);
+        const g = Math.round(c1[1] + (c2[1] - c1[1]) * frac);
+        const b = Math.round(c1[2] + (c2[2] - c1[2]) * frac);
+        return `rgba(${r}, ${g}, ${b}, 0.9)`;
+    };
+
+    // Configurar el gráfico matrix con la nueva paleta
+    const maxValue = heatData.length > 0 ? Math.max(...heatData.map(d => d.v)) : 0;
+
+    new Chart(ctxHeat, {
+        type: 'matrix',
+        data: {
+            datasets: [{
+                label: 'Monto de ventas',
+                data: heatData,
+                backgroundColor: function(context) {
+                    const value = context.dataset.data[context.dataIndex].v;
+                    return colorScale(value, maxValue);
+                },
+                borderColor: '#ffffff',
+                borderWidth: 1,
+                width: function(context) {
+                    const chart = context.chart;
+                    const xScale = chart.scales.x;
+                    return xScale.width / (xScale.ticks.length || 1);
+                },
+                height: function(context) {
+                    const chart = context.chart;
+                    const yScale = chart.scales.y;
+                    return yScale.height / (yScale.ticks.length || 1);
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Intensidad de ventas por día y hora',
+                    font: { size: 12, weight: '600' },
+                    color: '#1a1a2e'
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const data = context[0].raw;
+                            return `Día: ${diasSemana[data.y]}, Hora: ${data.x}:00`;
+                        },
+                        label: function(context) {
+                            const data = context.raw;
+                            const percentage = maxValue > 0 ? ((data.v / maxValue) * 100).toFixed(1) : 0;
+                            return `Ventas: $${data.v.toFixed(2)} (${percentage}% del máximo)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    min: -0.5,
+                    max: 23.5,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            return value + ':00';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Hora del día',
+                        color: '#666',
+                        font: { size: 10, weight: '600' }
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    min: -0.5,
+                    max: 6.5,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            return diasSemana[value] || '';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Día de la semana',
+                        color: '#666',
+                        font: { size: 10, weight: '600' }
+                    }
+                }
+            }
+        }
+    });
+
+    // ===== REGRESIÓN LINEAL con títulos de ejes =====
     const ctxReg = document.getElementById('chartRegresionLineal').getContext('2d');
 
     const fechasReg = {{ regresion.fechas|tojson }};
@@ -902,7 +1399,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const allLabels = fechasReg.concat(futurosFechas);
     const allPredichos = predichosReg.concat(futurosPredichos);
-    const realesConNull = realesReg.concat(new Array(futurosFechas.length).fill(null));
 
     new Chart(ctxReg, {
         type: 'scatter',
@@ -949,6 +1445,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     position: 'top',
                     labels: { font: { size: 10 } }
                 },
+                title: {
+                    display: true,
+                    text: 'Regresión lineal de ventas diarias y proyección',
+                    font: { size: 12, weight: '600' },
+                    color: '#1a1a2e'
+                },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
@@ -959,21 +1461,53 @@ document.addEventListener('DOMContentLoaded', function() {
                             return label;
                         }
                     }
+                },
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                        modifierKey: 'shift',
+                    },
+                    zoom: {
+                        enabled: true,
+                        mode: 'x',
+                        drag: true,
+                        wheel: {
+                            enabled: true,
+                            speed: 0.05,
+                        },
+                        limits: {
+                            x: { minRange: 5 }
+                        }
+                    }
                 }
             },
             scales: {
                 x: {
                     type: 'category',
                     labels: allLabels,
-                    ticks: { maxRotation: 45, autoSkip: true, maxTicksLimit: 20 }
+                    ticks: { maxRotation: 45, autoSkip: true, maxTicksLimit: 30 },
+                    title: {
+                        display: true,
+                        text: 'Fecha',
+                        font: { weight: '600', size: 10 },
+                        color: '#666'
+                    }
                 },
                 y: {
                     beginAtZero: true,
-                    ticks: { callback: function(value) { return '$' + value; } }
+                    ticks: { callback: function(value) { return '$' + value; } },
+                    title: {
+                        display: true,
+                        text: 'Monto de ventas ($)',
+                        font: { weight: '600', size: 10 },
+                        color: '#666'
+                    }
                 }
             }
         }
     });
+
 });
 </script>
 

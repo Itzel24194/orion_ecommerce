@@ -19,6 +19,7 @@ cupones_col = db["cupones"]
 cupones_usuarios_col = db["cupones_usuarios"]
 promociones_col = db["promociones"]
 combos_col = db["combos"]  # <--- NUEVA COLECCIÓN
+chats_col = db["chats"]  # <--- NUEVA COLECCIÓN
 
 # 3. Configuración de índices
 def crear_indices():
