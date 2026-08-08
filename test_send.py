@@ -17,7 +17,7 @@ password = os.getenv('MAIL_PASSWORD')
 sender = os.getenv('MAIL_DEFAULT_SENDER', username)
 
 # 3. IMPORTANTE: Cambia esto por TU correo personal para recibir la prueba
-recipient = "al222311518@gmail.com"  # <-- ¡CÁMBIALO!
+recipient = "recipient"  # <-- ¡CÁMBIALO!
 
 # 4. Verificar credenciales
 print(f"🔍 Servidor: {smtp_server}")
