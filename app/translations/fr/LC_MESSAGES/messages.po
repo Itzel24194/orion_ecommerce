@@ -1,0 +1,184 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ORION\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mi Perfil"
+msgstr "Mon Profil"
+
+msgid "Seguridad"
+msgstr "Sécurité"
+
+msgid "Mis Pedidos"
+msgstr "Mes Commandes"
+
+msgid "Direcciones"
+msgstr "Adresses"
+
+msgid "Favoritos"
+msgstr "Favoris"
+
+msgid "Comunicaciones"
+msgstr "Communications"
+
+msgid "Privacidad"
+msgstr "Confidentialité"
+
+msgid "Facturación"
+msgstr "Facturation"
+
+msgid "Métodos de Pago"
+msgstr "Moyens de Paiement"
+
+msgid "Idioma"
+msgstr "Langue"
+
+msgid "Cerrar Sesión"
+msgstr "Se Déconnecter"
+
+msgid "Información Personal"
+msgstr "Informations Personnelles"
+
+msgid "Nombre(s)"
+msgstr "Prénom(s)"
+
+msgid "Apellido Paterno"
+msgstr "Nom de Famille"
+
+msgid "Apellido Materno"
+msgstr "Deuxième Nom"
+
+msgid "Teléfono"
+msgstr "Téléphone"
+
+msgid "Fecha de Nacimiento"
+msgstr "Date de Naissance"
+
+msgid "Género"
+msgstr "Genre"
+
+msgid "Guardar Cambios"
+msgstr "Enregistrer les Modifications"
+
+msgid "Seguridad de la Cuenta"
+msgstr "Sécurité du Compte"
+
+msgid "Verificación en dos pasos"
+msgstr "Authentification à deux facteurs"
+
+msgid "Cambiar contraseña"
+msgstr "Changer le mot de passe"
+
+msgid "Contraseña actual"
+msgstr "Mot de passe actuel"
+
+msgid "Nueva contraseña"
+msgstr "Nouveau mot de passe"
+
+msgid "Confirmar nueva contraseña"
+msgstr "Confirmer le nouveau mot de passe"
+
+msgid "Actualizar contraseña"
+msgstr "Mettre à jour le mot de passe"
+
+msgid "Ver todos"
+msgstr "Voir tout"
+
+msgid "Todos"
+msgstr "Tous"
+
+msgid "Pendientes"
+msgstr "En Attente"
+
+msgid "Confirmados"
+msgstr "Confirmés"
+
+msgid "Enviados"
+msgstr "Expédiés"
+
+msgid "Entregados"
+msgstr "Livrés"
+
+msgid "Cancelados"
+msgstr "Annulés"
+
+msgid "Ver detalle"
+msgstr "Voir les détails"
+
+msgid "No tienes pedidos realizados"
+msgstr "Vous n'avez aucune commande"
+
+msgid "Mis Direcciones"
+msgstr "Mes Adresses"
+
+msgid "Editar"
+msgstr "Modifier"
+
+msgid "Eliminar"
+msgstr "Supprimer"
+
+msgid "Agregar dirección"
+msgstr "Ajouter une adresse"
+
+msgid "Nueva Dirección"
+msgstr "Nouvelle Adresse"
+
+msgid "Calle"
+msgstr "Rue"
+
+msgid "Colonia"
+msgstr "Quartier"
+
+msgid "Ciudad"
+msgstr "Ville"
+
+msgid "Estado"
+msgstr "État"
+
+msgid "Guardar dirección"
+msgstr "Enregistrer l'adresse"
+
+msgid "Mis Favoritos"
+msgstr "Mes Favoris"
+
+msgid "Ver producto"
+msgstr "Voir le produit"
+
+msgid "Explorar productos"
+msgstr "Explorer les produits"
+
+msgid "Preferencias de Comunicación"
+msgstr "Préférences de Communication"
+
+msgid "Guardar preferencias"
+msgstr "Enregistrer les préférences"
+
+msgid "Privacidad y Datos"
+msgstr "Confidentialité et Données"
+
+msgid "Eliminar mi cuenta"
+msgstr "Supprimer mon compte"
+
+msgid "Datos fiscales"
+msgstr "Informations Fiscales"
+
+msgid "Historial de facturas"
+msgstr "Historique des Factures"
+
+msgid "Idioma y Región"
+msgstr "Langue et Région"
+
+msgid "Moneda"
+msgstr "Devise"
+
+msgid "Región / País"
+msgstr "Région / Pays"
+
+msgid "Vista previa"
+msgstr "Aperçu"
+
+msgid "Guardar cambios"
+msgstr "Enregistrer les modifications"

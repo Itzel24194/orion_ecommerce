@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Mesas de Regalos | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-primary-soft: #fff0f8;
+            --orion-primary-soft2: #ffe0f2;
+            --orion-dark: #1a1a2e;
+            --orion-gray: #64748b;
+            --orion-border: #ececf1;
+            --orion-success: #10b981;
+            --orion-danger: #ef4444;
+        }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { background: #ffffff; color: var(--orion-dark); min-height: 100vh; padding-bottom: 60px; }
+
+        .top-nav { background: #ffffff; font-size: .75rem; padding: 6px 0; border-bottom: 1px solid #eee; }
+        .top-nav a { color: #666; text-decoration: none; }
+        .top-nav a:hover { color: var(--orion-primary); }
+        .top-nav i { color: var(--orion-primary); }
+        .main-navbar { background: #ffffff; border-bottom: 2px solid #f0f0f0; padding: 12px 0; }
+        .brand-logo { font-weight: 900; font-size: 2.3rem; letter-spacing: -1.5px; color: var(--orion-primary) !important; text-decoration: none; }
+        .brand-border { height: 4px; background: linear-gradient(90deg, var(--orion-primary), var(--orion-primary-dark)); width: 100%; }
+
+        /* ⭐ Flecha de regresar */
+        .back-bar {
+            background: #ffffff;
+            padding: 14px 0 0;
+        }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            color: var(--orion-dark);
+            border: 2px solid var(--orion-border);
+            padding: 10px 20px 10px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: .82rem;
+            text-decoration: none;
+            transition: all .2s;
+        }
+        .btn-back i {
+            font-size: 1rem;
+            color: var(--orion-primary);
+            transition: transform .2s;
+        }
+        .btn-back:hover {
+            border-color: var(--orion-primary);
+            color: var(--orion-primary);
+            background: var(--orion-primary-soft);
+        }
+        .btn-back:hover i { transform: translateX(-4px); }
+
+        .hero-mis-mesas { background: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary-dark) 100%) !important; color: #fff; padding: 48px 0 56px; position: relative; overflow: hidden; margin-top: 20px; }
+        .hero-mis-mesas::before { content: ''; position: absolute; top: -60%; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%); }
+        .hero-mis-mesas h1 { font-weight: 900; font-size: 2rem; display: flex; align-items: center; gap: 12px; color: #fff; margin-bottom: 8px; }
+        .hero-mis-mesas h1 i { color: #FFD700; }
+        .hero-mis-mesas p { color: rgba(255,255,255,.95); margin: 0; }
+
+        .btn-nueva { background: #FFD700; color: var(--orion-dark); border: none; padding: 12px 24px; border-radius: 50px; font-weight: 800; font-size: .85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; }
+        .btn-nueva:hover { background: #ffed4e; color: var(--orion-dark); transform: translateY(-2px); }
+
+        .mesa-card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,.06); border: 1px solid rgba(236,236,241,.7); margin-bottom: 20px; transition: all .2s; }
+        .mesa-card:hover { box-shadow: 0 8px 28px rgba(225,0,152,.1); transform: translateY(-2px); }
+        .mesa-emoji { width: 64px; height: 64px; background: var(--orion-primary-soft); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
+        .mesa-titulo { font-weight: 800; font-size: 1.15rem; color: var(--orion-dark); margin-bottom: 4px; }
+        .mesa-meta { font-size: .8rem; color: var(--orion-gray); margin-bottom: 12px; }
+        .mesa-meta i { color: var(--orion-primary); margin-right: 4px; }
+        .mesa-stats { display: flex; gap: 20px; margin-top: 12px; flex-wrap: wrap; }
+        .mesa-stat { font-size: .8rem; color: var(--orion-gray); }
+        .mesa-stat strong { color: var(--orion-dark); font-weight: 800; font-size: .95rem; }
+        .mesa-badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: .68rem; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; }
+        .badge-activa { background: #d1fae5; color: #065f46; }
+        .badge-cerrada { background: #f3f4f6; color: #4b5563; }
+
+        .mesa-acciones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f5f5f8; }
+        .btn-accion { padding: 8px 16px; border-radius: 50px; font-size: .78rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: none; cursor: pointer; }
+        .btn-ver { background: var(--orion-primary); color: #fff; }
+        .btn-ver:hover { background: var(--orion-primary-dark); color: #fff; }
+        .btn-copiar { background: #f3f4f6; color: var(--orion-dark); }
+        .btn-copiar:hover { background: #e5e7eb; }
+        .btn-eliminar { background: transparent; color: var(--orion-danger); border: 1.5px solid #fecaca; }
+        .btn-eliminar:hover { background: var(--orion-danger); color: #fff; }
+
+        .empty-state { text-align: center; padding: 80px 20px; }
+        .empty-state i { font-size: 5rem; color: #ddd; margin-bottom: 16px; }
+        .empty-state h3 { font-weight: 800; color: var(--orion-dark); margin-bottom: 8px; }
+        .empty-state p { color: var(--orion-gray); max-width: 400px; margin: 0 auto 24px; }
+
+        footer { background: linear-gradient(135deg, #e10098 0%, #c00080 100%) !important; color: #ffffff !important; padding: 30px 0 !important; text-align: center !important; font-size: .8rem !important; margin-top: 60px !important; }
+        footer p { margin: 0 !important; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; color: #ffffff !important; }
+        footer i { color: #FFD700 !important; }
+
+        @media (max-width: 768px) {
+            .btn-back { font-size: .78rem; padding: 9px 16px 9px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <div class="container d-flex justify-content-end gap-4">
+            <a href="/servicios"><i class="bi bi-truck"></i> Servicios</a>
+            <a href="#"><i class="bi bi-question-circle"></i> Ayuda</a>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light main-navbar">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
+            <a href="{{ url_for('web.crear_mesa_regalos') }}" style="text-decoration:none; color:var(--orion-gray); font-size:.8rem; font-weight:600;">
+                <i class="bi bi-plus-circle"></i> Nueva mesa
+            </a>
+        </div>
+    </nav>
+    <div class="brand-border"></div>
+
+    <!-- ⭐ FLECHA DE REGRESAR -->
+    <div class="back-bar">
+        <div class="container">
+            <a href="{{ url_for('web.raiz_tienda') }}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Volver a la tienda
+            </a>
+        </div>
+    </div>
+
+    <section class="hero-mis-mesas">
+        <div class="container">
+            <h1><i class="bi bi-gift-fill"></i> Mis Mesas de Regalos</h1>
+            <p>Administra tus listas, revisa los regalos reservados y comparte el link con tus invitados.</p>
+            <a href="{{ url_for('web.crear_mesa_regalos') }}" class="btn-nueva">
+                <i class="bi bi-plus-circle-fill"></i> Crear nueva mesa
+            </a>
+        </div>
+    </section>
+
+    <div class="container" style="margin-top: 40px;">
+        {% if mesas %}
+            {% for m in mesas %}
+            <div class="mesa-card">
+                <div style="display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+                    <div class="mesa-emoji">{{ m.emoji }}</div>
+                    <div style="flex:1; min-width: 200px;">
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px;">
+                            <div class="mesa-titulo">{{ m.event_name }}</div>
+                            {% if m.activa %}
+                                <span class="mesa-badge badge-activa">Activa</span>
+                            {% else %}
+                                <span class="mesa-badge badge-cerrada">Cerrada</span>
+                            {% endif %}
+                        </div>
+                        <div class="mesa-meta">
+                            <i class="bi bi-calendar3"></i> {{ m.event_date_formatted }}
+                            &nbsp;·&nbsp;
+                            <i class="bi bi-person-fill"></i> {{ m.honoree_name }}
+                            &nbsp;·&nbsp;
+                            <i class="bi bi-tag"></i> {{ m.tipo_nombre }}
+                        </div>
+                        <div class="mesa-stats">
+                            <div class="mesa-stat">
+                                <i class="bi bi-gift-fill" style="color:var(--orion-primary);"></i>
+                                <strong>{{ m.gifts_claimed }}/{{ m.gifts_total }}</strong> regalos
+                            </div>
+                            <div class="mesa-stat">
+                                <i class="bi bi-wallet2" style="color:var(--orion-primary);"></i>
+                                Fondo: <strong>${{ "%.2f"|format(m.fund_raised) }}</strong> / ${{ "%.2f"|format(m.fund_goal) }}
+                            </div>
+                            <div class="mesa-stat">
+                                <i class="bi bi-percent" style="color:var(--orion-primary);"></i>
+                                Bonificación: <strong>${{ "%.2f"|format(m.bonificacion_estimada) }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mesa-acciones">
+                    <a href="{{ url_for('web.ver_mesa_regalos', slug=m.slug) }}" class="btn-accion btn-ver">
+                        <i class="bi bi-eye"></i> Ver mesa
+                    </a>
+                    <button class="btn-accion btn-copiar" onclick="copiarLink('{{ url_for('web.ver_mesa_regalos', slug=m.slug, _external=True) }}', this)">
+                        <i class="bi bi-clipboard"></i> Copiar link
+                    </button>
+                    <button class="btn-accion btn-eliminar" onclick="eliminarMesa('{{ m._id }}')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-gift"></i>
+                <h3>Aún no tienes mesas de regalos</h3>
+                <p>Crea tu primera mesa para bodas, baby showers, XV años y más. Recibe regalos y 10% de bonificación.</p>
+                <a href="{{ url_for('web.crear_mesa_regalos') }}" class="btn-nueva" style="color:var(--orion-dark);">
+                    <i class="bi bi-plus-circle-fill"></i> Crear mi primera mesa
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <div class="container">
+            <p><i class="bi bi-gift-fill"></i> ORION Mesa de Regalos · © 2026 · Todos los derechos reservados <i class="bi bi-heart-fill" style="color:#FFD700;"></i></p>
+        </div>
+    </footer>
+
+    <script>
+        function copiarLink(url, btn) {
+            navigator.clipboard.writeText(url).then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Copiado';
+                setTimeout(() => btn.innerHTML = orig, 1500);
+            });
+        }
+
+        async function eliminarMesa(id) {
+            if (!confirm('¿Eliminar esta mesa de regalos? Esta acción no se puede deshacer.')) return;
+            try {
+                const r = await fetch(`/api/mesa-regalos/${id}/eliminar`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin'
+                });
+                const data = await r.json();
+                if (data.success) {
+                    alert('Mesa eliminada correctamente');
+                    location.reload();
+                } else {
+                    alert(data.error || 'Error al eliminar');
+                }
+            } catch (e) {
+                alert('Error de conexión');
+            }
+        }
+    </script>
+</body>
+</html>

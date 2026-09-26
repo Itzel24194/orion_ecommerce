@@ -7,756 +7,216 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/carrito.css') }}">
+
     <style>
-        :root {
-            --orion-primary: #e10098;
-            --orion-primary-dark: #c00080;
-            --orion-success: #28a745;
-            --orion-warning: #ffc107;
-            --orion-danger: #dc3545;
-            --orion-gray: #6c757d;
-            --orion-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            --orion-shadow-hover: 0 6px 24px rgba(225,0,152,0.12);
-            --orion-radius: 10px;
+        .msi-opcion-checkout {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border: 2px solid #e2e8f0;
+            border-radius: 12px; background: #fff; cursor: pointer;
+            transition: all 0.2s; margin: 0;
         }
+        .msi-opcion-checkout:hover { border-color: #0284c7; background: #f8fbff; }
+        .msi-opcion-checkout.seleccionada { border-color: #0284c7; background: #f0f9ff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.08); }
+        .msi-radio-circulo { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cbd5e1; flex-shrink: 0; position: relative; transition: all 0.2s; }
+        .msi-opcion-checkout.seleccionada .msi-radio-circulo { border-color: #0284c7; }
+        .msi-opcion-checkout.seleccionada .msi-radio-circulo::after { content: ''; position: absolute; inset: 4px; border-radius: 50%; background: #0284c7; }
+        .msi-opcion-checkout .badge-si { background: #10b981; color: #fff; font-size: 0.55rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
+        .msi-opcion-checkout .badge-ci { background: #f59e0b; color: #fff; font-size: 0.55rem; font-weight: 800; padding: 2px 6px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
 
-        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .tarjeta-section { display: none; }
+        .tarjeta-section.activa { display: block; }
+        .card-field-wrap { display: flex; align-items: center; border: 2px solid #e9ecef; border-radius: 8px; padding: 6px 12px; background: #fff; transition: 0.2s; }
+        .card-field-wrap:focus-within { border-color: var(--orion-primary); box-shadow: 0 0 0 3px rgba(225,0,152,0.08); }
+        .card-field-wrap input { border: none; outline: none; flex: 1; padding: 4px; font-size: 0.85rem; font-family: inherit; }
+        .card-field-wrap i { color: #999; font-size: 1rem; }
+        .card-field-wrap .card-brand-icon { color: #0284c7; font-size: 1.3rem; }
 
-        html, body {
-            height: 100%;
-            margin: 0;
-            background: #f0f2f5;
+        .pm-saved-list { display: flex; flex-direction: column; gap: 8px; }
+        .pm-saved-card {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border: 2px solid #e2e8f0;
+            border-radius: 12px; background: #fff; cursor: pointer;
+            transition: all 0.2s;
         }
+        .pm-saved-card:hover { border-color: #0284c7; background: #f8fbff; }
+        .pm-saved-card.seleccionada { border-color: #0284c7; background: #f0f9ff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.08); }
+        .pm-saved-card .pm-brand { width: 42px; height: 28px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 6px; font-size: 1.2rem; color: #475569; flex-shrink: 0; }
+        .pm-saved-card.seleccionada .pm-brand { background: #0284c7; color: #fff; }
+        .pm-saved-card .pm-info { flex: 1; }
+        .pm-saved-card .pm-titulo { font-size: 0.85rem; font-weight: 700; color: #1a1a2e; }
+        .pm-saved-card .pm-detalle { font-size: 0.7rem; color: #64748b; }
+        .pm-saved-card .pm-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cbd5e1; position: relative; flex-shrink: 0; }
+        .pm-saved-card.seleccionada .pm-check { border-color: #0284c7; }
+        .pm-saved-card.seleccionada .pm-check::after { content: ''; position: absolute; inset: 4px; border-radius: 50%; background: #0284c7; }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .main-content { flex: 1 0 auto; }
-
-        /* ===== TOP NAV ===== */
-        .top-nav {
-            font-size: 0.6rem;
-            background: #fff;
-            border-bottom: 1px solid #e5e5e5;
-            padding: 4px 0;
-        }
-        .top-nav a {
-            color: #666;
-            text-decoration: none;
-            margin: 0 8px;
-        }
-        .top-nav a:hover { color: var(--orion-primary); }
-
-        /* ===== NAVBAR ===== */
-        .navbar-main {
-            background: #fff;
-            border-bottom: 2px solid #f0f0f0;
-            padding: 8px 0;
-        }
-        .brand-logo {
-            font-weight: 900;
-            font-size: 1.6rem;
-            color: var(--orion-primary) !important;
-            letter-spacing: -1px;
-            text-decoration: none;
-        }
-        .brand-logo:hover { color: var(--orion-primary-dark) !important; }
-
-        .search-bar {
-            border: 2px solid #e5e5e5 !important;
-            border-radius: 50px !important;
-            padding: 6px 16px !important;
-            font-size: 0.8rem;
-            transition: 0.3s;
-        }
-        .search-bar:focus {
-            border-color: var(--orion-primary) !important;
-            box-shadow: none !important;
-        }
-
-        .user-avatar {
-            width: 30px;
-            height: 30px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid var(--orion-primary);
-        }
-
-        .nav-icon {
-            color: #333;
-            font-size: 1.1rem;
-            text-decoration: none;
-            position: relative;
-        }
-        .nav-icon:hover { color: var(--orion-primary); }
-        .nav-icon .badge-cart {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: var(--orion-primary);
-            color: #fff;
-            font-size: 0.5rem;
-            padding: 2px 5px;
-            border-radius: 50%;
-            font-weight: 700;
-        }
-
-        /* ===== BREADCRUMB ===== */
-        .breadcrumb-custom {
-            background: transparent;
-            padding: 12px 0 0 0;
-            margin-bottom: 0;
-        }
-        .breadcrumb-custom .breadcrumb-item a {
-            color: #777;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.7rem;
-        }
-        .breadcrumb-custom .breadcrumb-item a:hover { color: var(--orion-primary); }
-        .breadcrumb-custom .breadcrumb-item.active {
-            color: var(--orion-primary);
-            font-weight: 700;
-            font-size: 0.7rem;
-        }
-
-        /* ===== TÍTULO ===== */
-        .page-title {
-            font-weight: 900;
-            font-size: 1.3rem;
-            color: #222;
-            padding: 12px 0 0 0;
-        }
-        .page-title i { color: var(--orion-primary); }
-
-        /* ===== PRODUCTOS ===== */
-        .cart-product {
-            background: #fff;
-            border-radius: var(--orion-radius);
+        .direccion-guardada-box {
+            background: #f0f9ff;
+            border: 2px solid #bae6fd;
+            border-radius: 12px;
             padding: 12px 14px;
-            margin-bottom: 8px;
-            box-shadow: var(--orion-shadow);
-            transition: 0.3s;
-        }
-        .cart-product:hover {
-            box-shadow: var(--orion-shadow-hover);
-        }
-        .cart-product-img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-        .cart-product-title {
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #222;
-        }
-        .cart-product-attr {
-            font-size: 0.65rem;
-            color: #777;
-        }
-        .cart-product-price {
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--orion-primary);
-        }
-
-        .qty-control {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-            width: fit-content;
-        }
-        .qty-btn {
-            width: 26px;
-            height: 26px;
-            border: none;
-            background: #f8f8f8;
-            font-size: 0.8rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .qty-btn:hover { background: #eee; }
-        .qty-input {
-            width: 34px;
-            height: 26px;
-            border: none;
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            text-align: center;
-            font-weight: 700;
-            font-size: 0.75rem;
-        }
-
-        .badge-mayorista {
-            background: var(--orion-warning);
-            color: #000;
-            font-weight: 700;
-            padding: 1px 6px;
-            border-radius: 20px;
-            font-size: 0.5rem;
-            display: inline-block;
-        }
-        .badge-volumen {
-            background: #17a2b8;
-            color: #fff;
-            font-weight: 700;
-            padding: 1px 6px;
-            border-radius: 20px;
-            font-size: 0.5rem;
-            display: inline-block;
-        }
-
-        .stock-bajo { color: var(--orion-danger); }
-        .stock-medio { color: var(--orion-warning); }
-        .stock-alto { color: var(--orion-success); }
-
-        /* ===== CUPÓN APLICADO ===== */
-        .cupon-aplicado-box {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            border-radius: 8px;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            border: 1px solid #b7d7c0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .cupon-aplicado-box .cupon-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .cupon-aplicado-box .cupon-info .badge-cupon {
-            background: var(--orion-primary);
-            color: #fff;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 700;
-        }
-        .cupon-aplicado-box .cupon-info .cupon-code {
-            font-family: monospace;
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: #155724;
-        }
-        .cupon-aplicado-box .cupon-info .cupon-desc {
-            font-size: 0.65rem;
-            color: #155724;
-        }
-        .cupon-aplicado-box .btn-quitar-cupon {
-            background: transparent;
-            border: 1px solid #dc3545;
-            color: #dc3545;
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            text-decoration: none;
-        }
-        .cupon-aplicado-box .btn-quitar-cupon:hover {
-            background: #dc3545;
-            color: #fff;
-        }
-        .cupon-aplicado-box .descuento-cupon {
-            font-weight: 700;
-            color: #155724;
-            font-size: 0.9rem;
-        }
-
-        /* ===== PROMOCIÓN APLICADA (NUEVO) ===== */
-        .promocion-aplicado-box {
-            background: linear-gradient(135deg, #cce5ff 0%, #b8d4f0 100%);
-            border-radius: 8px;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            border: 1px solid #a8c8e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .promocion-aplicado-box .promocion-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .promocion-aplicado-box .promocion-info .badge-promo {
-            background: #007bff;
-            color: #fff;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 700;
-        }
-        .promocion-aplicado-box .promocion-info .promo-name {
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: #004085;
-        }
-        .promocion-aplicado-box .promocion-info .promo-desc {
-            font-size: 0.65rem;
-            color: #004085;
-        }
-        .promocion-aplicado-box .btn-quitar-promo {
-            background: transparent;
-            border: 1px solid #dc3545;
-            color: #dc3545;
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            text-decoration: none;
-        }
-        .promocion-aplicado-box .btn-quitar-promo:hover {
-            background: #dc3545;
-            color: #fff;
-        }
-        .promocion-aplicado-box .descuento-promo {
-            font-weight: 700;
-            color: #004085;
-            font-size: 0.9rem;
-        }
-
-        /* ===== RESUMEN ===== */
-        .summary-card {
-            background: #fff;
-            border-radius: var(--orion-radius);
-            padding: 16px 18px;
-            box-shadow: var(--orion-shadow);
-            position: sticky;
-            top: 20px;
-        }
-        .summary-title {
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: #222;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 8px;
-        }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            font-size: 0.8rem;
-        }
-        .summary-row.total {
-            font-weight: 700;
-            font-size: 1rem;
-            border-top: 2px solid #f0f0f0;
-            padding-top: 8px;
-            margin-top: 6px;
-        }
-        .summary-row.total .price { color: var(--orion-primary); }
-        .summary-row.descuento-cupon-row {
-            color: var(--orion-success);
-            font-weight: 600;
-            background: #f0fff4;
-            padding: 4px 8px;
-            border-radius: 6px;
-            margin: 2px 0;
-        }
-        .summary-row.descuento-promo-row {
-            color: #004085;
-            font-weight: 600;
-            background: #e3f2fd;
-            padding: 4px 8px;
-            border-radius: 6px;
-            margin: 2px 0;
-        }
-
-        .summary-item {
-            display: flex;
-            gap: 6px;
-            padding: 4px 0;
-            border-bottom: 1px solid #f5f5f5;
-            align-items: center;
-        }
-        .summary-item:last-child { border-bottom: none; }
-        .summary-item-img {
-            width: 28px;
-            height: 28px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        .summary-item-name {
-            font-size: 0.7rem;
-            font-weight: 600;
-            flex: 1;
-        }
-        .summary-item-qty {
-            font-size: 0.6rem;
-            color: #999;
-        }
-        .summary-item-price {
-            font-weight: 700;
-            font-size: 0.7rem;
-        }
-
-        .descuento-box {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            border-radius: 5px;
-            padding: 6px 10px;
-            margin-bottom: 8px;
-            font-size: 0.7rem;
-        }
-        .envio-box {
-            background: linear-gradient(135deg, #cce5ff 0%, #b8d4f0 100%);
-            border-radius: 5px;
-            padding: 6px 10px;
-            margin-bottom: 8px;
-            font-size: 0.7rem;
-        }
-
-        /* ===== BOTONES ===== */
-        .btn-pagar {
-            background: var(--orion-primary);
-            color: #fff;
-            border: none;
-            padding: 10px;
-            font-weight: 700;
-            border-radius: var(--orion-radius);
-            transition: 0.3s;
-            font-size: 0.85rem;
-            width: 100%;
-        }
-        .btn-pagar:hover {
-            background: var(--orion-primary-dark);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(225,0,152,0.3);
-        }
-        .btn-pagar i { margin-right: 6px; }
-
-        .btn-continuar {
-            background: #e5e5e5;
-            color: #555;
-            border: none;
-            padding: 10px;
-            font-weight: 600;
-            border-radius: var(--orion-radius);
-            transition: 0.3s;
-            font-size: 0.8rem;
-            width: 100%;
-        }
-        .btn-continuar:hover {
-            background: #d5d5d5;
-            color: #333;
-        }
-
-        /* ===== MODAL CHECKOUT ===== */
-        .modal-checkout .modal-content {
-            border-radius: var(--orion-radius);
-            border: none;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-height: 92vh;
-            overflow-y: auto;
-        }
-        .modal-checkout .modal-content::-webkit-scrollbar {
-            width: 3px;
-        }
-        .modal-checkout .modal-content::-webkit-scrollbar-thumb {
-            background: var(--orion-primary);
-            border-radius: 10px;
-        }
-        .modal-checkout .modal-header {
-            border-bottom: 2px solid #f0f0f0;
-            padding: 14px 20px;
-            background: #fff;
-            border-radius: var(--orion-radius) var(--orion-radius) 0 0;
-        }
-        .modal-checkout .modal-header h5 {
-            font-weight: 800;
-            color: var(--orion-dark);
-            font-size: 1rem;
-        }
-        .modal-checkout .modal-header h5 i {
-            color: var(--orion-primary);
-        }
-        .modal-checkout .modal-body {
-            padding: 16px 18px;
-            background: #f8f9fa;
-        }
-        .modal-checkout .modal-footer {
-            border-top: 2px solid #f0f0f0;
-            padding: 12px 20px;
-            background: #fff;
-            border-radius: 0 0 var(--orion-radius) var(--orion-radius);
-        }
-
-        .modal-progress-steps {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 14px;
-            padding: 8px 0;
-            background: #fff;
-            border-radius: 8px;
-            border: 1px solid #f0f0f0;
-        }
-        .modal-step-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #999;
-            font-size: 0.6rem;
-            font-weight: 600;
-        }
-        .modal-step-item .step-circle {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: #e5e5e5;
-            color: #999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.5rem;
-            transition: 0.3s;
-        }
-        .modal-step-item.active .step-circle {
-            background: var(--orion-primary);
-            color: #fff;
-            box-shadow: 0 3px 10px rgba(225,0,152,0.3);
-        }
-        .modal-step-item.active { color: #333; }
-        .modal-step-item.done .step-circle {
-            background: var(--orion-success);
-            color: #fff;
-        }
-        .modal-step-item.done { color: var(--orion-success); }
-        .modal-step-line {
-            width: 20px;
-            height: 2px;
-            background: #e5e5e5;
-            margin: 0 2px;
-        }
-        .modal-step-line.done { background: var(--orion-success); }
-
-        .modal-section {
             margin-bottom: 12px;
-            background: #fff;
-            padding: 12px 14px;
-            border-radius: 8px;
-            border: 1px solid #f0f0f0;
         }
-        .modal-section-title {
-            font-weight: 700;
-            font-size: 0.75rem;
-            color: #222;
-            margin-bottom: 8px;
+        .direccion-guardada-box label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #0369a1;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        .modal-section-title i {
-            color: var(--orion-primary);
-            font-size: 0.85rem;
-        }
-
-        .form-label-modal {
+        .direccion-guardada-box select {
+            border: 2px solid #bae6fd !important;
+            font-size: 0.82rem;
             font-weight: 600;
-            font-size: 0.6rem;
-            color: #555;
-            margin-bottom: 2px;
-        }
-        .form-control-modal {
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            padding: 5px 10px;
-            font-size: 0.75rem;
-            transition: 0.3s;
             background: #fff;
         }
-        .form-control-modal:focus {
-            border-color: var(--orion-primary);
-            box-shadow: 0 0 0 3px rgba(225,0,152,0.08);
+        .direccion-guardada-box select:focus {
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
         }
-        .form-control-modal::placeholder {
-            color: #adb5bd;
-            font-size: 0.7rem;
-        }
-
-        .radio-card-modal {
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            padding: 6px 10px;
-            cursor: pointer;
-            transition: 0.3s;
-            height: 100%;
-            background: #fff;
-        }
-        .radio-card-modal:hover { 
-            border-color: #ccc;
-            background: #fafafa;
-        }
-        .radio-card-modal.active {
-            border-color: var(--orion-primary);
-            background: rgba(225,0,152,0.04);
-            box-shadow: 0 0 0 2px rgba(225,0,152,0.08);
-        }
-        .radio-card-modal input[type="radio"] { 
-            accent-color: var(--orion-primary);
-            margin-right: 6px;
-            width: 12px;
-            height: 12px;
-            flex-shrink: 0;
-        }
-        .radio-card-modal .radio-label {
+        .direccion-guardada-box .link-admin {
+            font-size: 0.65rem;
+            color: #0369a1;
+            text-decoration: none;
             font-weight: 700;
+        }
+        .direccion-guardada-box .link-admin:hover { text-decoration: underline; }
+        .direccion-guardada-box .nota {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .tarjeta-guardada-compacta {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 14px;
+            padding: 18px 22px;
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .tarjeta-guardada-compacta::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -50%;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+            pointer-events: none;
+        }
+        .tarjeta-guardada-compacta .tc-marca {
             font-size: 0.7rem;
-            color: #222;
-        }
-        .radio-card-modal .radio-desc {
-            font-size: 0.55rem;
-            color: #777;
-            margin-top: 1px;
-        }
-
-        .btn-modal-submit {
-            background: var(--orion-primary);
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.7;
+            margin-bottom: 6px;
             font-weight: 700;
-            border-radius: var(--orion-radius);
-            transition: 0.3s;
-            font-size: 0.85rem;
-            width: 100%;
         }
-        .btn-modal-submit:hover {
-            background: var(--orion-primary-dark);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(225,0,152,0.3);
+        .tarjeta-guardada-compacta .tc-numero {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 4px;
         }
-        .btn-modal-submit i { margin-right: 6px; }
-
-        .btn-modal-close {
-            background: #e5e5e5;
-            color: #555;
-            border: none;
-            padding: 8px 16px;
-            font-weight: 600;
-            border-radius: var(--orion-radius);
-            transition: 0.3s;
+        .tarjeta-guardada-compacta .tc-titular {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .tarjeta-guardada-compacta .tc-icon {
+            font-size: 2.2rem;
+            opacity: 0.25;
+        }
+        .tarjeta-guardada-links {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+        .tarjeta-guardada-links a {
             font-size: 0.75rem;
-        }
-        .btn-modal-close:hover {
-            background: #d5d5d5;
-            color: #333;
-        }
-
-        .btn-close-custom {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: #999;
+            color: #0284c7;
             cursor: pointer;
-            padding: 0 4px;
-            transition: 0.3s;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        .btn-close-custom:hover { color: #333; }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .container { padding-left: 15px !important; padding-right: 15px !important; }
-        }
-
-        @media (max-width: 500px) {
-            .cart-product {
-                flex-direction: column !important;
-                text-align: center;
-            }
-            .cart-product-img {
-                width: 80px;
-                height: 80px;
-                margin: 0 auto 8px;
-            }
-            .cart-product .text-end {
-                text-align: center !important;
-                margin-top: 8px;
-            }
-            .summary-card {
-                position: relative;
-                top: 0;
-                margin-top: 12px;
-            }
-            .qty-control { margin: 0 auto; }
-            .page-title { font-size: 1.1rem; }
-            .modal-checkout .modal-body { padding: 12px; }
-            .modal-section { padding: 10px 12px; }
-            .modal-step-item { font-size: 0.5rem; gap: 3px; }
-            .modal-step-item .step-circle { width: 18px; height: 18px; font-size: 0.4rem; }
-            .modal-step-line { width: 12px; }
-            .radio-card-modal { padding: 5px 8px; }
-            .radio-card-modal .radio-label { font-size: 0.65rem; }
-            .radio-card-modal .radio-desc { font-size: 0.5rem; }
-            .cupon-aplicado-box, .promocion-aplicado-box {
-                flex-direction: column;
-                align-items: stretch;
-                text-align: center;
-            }
-        }
-
-        .container {
-            max-width: 80% !important;
-            padding-left: 30px;
-            padding-right: 30px;
-        }
-
-        @media (min-width: 1400px) {
-            .container {
-                max-width: 1600px;
-                padding-left: 40px;
-                padding-right: 40px;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .container {
-                max-width: 100% !important;
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .cart-product {
-            animation: fadeIn 0.4s ease;
-        }
-
-        .modal.fade .modal-dialog {
-            transform: scale(0.95);
-            transition: transform 0.25s ease;
-        }
-        .modal.show .modal-dialog {
-            transform: scale(1);
-        }
+        .tarjeta-guardada-links a:hover { text-decoration: underline; }
+        .tarjeta-guardada-links a.danger { color: #dc3545; }
     </style>
+
+    <!-- ⭐ POLYFILL DE STORAGE -->
+    <script>
+    (function() {
+        function makeMemoryStorage() {
+            var data = {};
+            return {
+                getItem: function(k) { return Object.prototype.hasOwnProperty.call(data, k) ? data[k] : null; },
+                setItem: function(k, v) { data[k] = String(v); },
+                removeItem: function(k) { delete data[k]; },
+                clear: function() { data = {}; },
+                key: function(i) { return Object.keys(data)[i] || null; },
+                get length() { return Object.keys(data).length; }
+            };
+        }
+        function safeInstall(type) {
+            try {
+                var s = window[type];
+                s.setItem('__test__', '1');
+                s.removeItem('__test__');
+                return s;
+            } catch (e) {
+                var mem = makeMemoryStorage();
+                try {
+                    Object.defineProperty(window, type, {
+                        value: mem,
+                        configurable: true,
+                        writable: false
+                    });
+                } catch (_) {}
+                return mem;
+            }
+        }
+        safeInstall('sessionStorage');
+        safeInstall('localStorage');
+    })();
+    </script>
+
+    <!-- ⭐ Direcciones guardadas del usuario -->
+    <script>
+    window.ORION_DIRECCIONES = [
+        {% for d in (usuario.direcciones or []) %}
+        {
+            nombre: {{ (d.nombre or '')|tojson }},
+            calle: {{ (d.calle or '')|tojson }},
+            numero: {{ (d.numero or '')|tojson }},
+            cp: {{ (d.cp or '')|tojson }},
+            colonia: {{ (d.colonia or '')|tojson }},
+            ciudad: {{ (d.ciudad or '')|tojson }},
+            estado: {{ (d.estado or '')|tojson }},
+            referencias: {{ (d.referencias or '')|tojson }},
+            predeterminada: {{ 'true' if d.predeterminada else 'false' }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    </script>
+
+    <script src="https://cdn.conekta.io/js/latest/conekta.js"></script>
 </head>
 <body>
 
-    <!-- ===== TOP NAV ===== -->
     <div class="top-nav">
         <div class="container">
             <div class="d-flex justify-content-end">
@@ -767,17 +227,38 @@
         </div>
     </div>
 
-    <!-- ===== NAVBAR ===== -->
     <nav class="navbar-main">
         <div class="container">
             <div class="d-flex align-items-center justify-content-between">
                 <a class="brand-logo" href="/">ORION</a>
 
-                <form class="d-flex flex-grow-1 mx-3" action="{{ url_for('web.catalogo') }}" method="GET">
-                    <div class="input-group">
-                        <input class="form-control search-bar" type="search" name="q" placeholder="Buscar productos...">
+                <div class="search-wrapper flex-grow-1 mx-3">
+                    <form action="{{ url_for('web.catalogo') }}" method="GET" autocomplete="off" id="searchForm">
+                        <div class="input-group search-container">
+                            <input class="form-control border-0 bg-light ps-4"
+                                   type="search" name="q" id="searchInput"
+                                   placeholder="Buscar productos..." autocomplete="off">
+                            <button class="btn btn-light border-0 text-muted px-3" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="autocompleteResults" class="autocomplete-dropdown" style="display:none;">
+                        <div id="autocompleteLoading" class="autocomplete-loading" style="display:none;">
+                            <i class="bi bi-hourglass-split"></i> Buscando...
+                        </div>
+                        <div id="autocompleteList"></div>
+                        <div id="autocompleteFooter" class="autocomplete-footer" style="display:none;">
+                            <a href="#" id="autocompleteVerTodos">
+                                Ver todos los resultados <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div id="autocompleteEmpty" class="autocomplete-empty" style="display:none;">
+                            <i class="bi bi-search"></i> No encontramos productos
+                        </div>
                     </div>
-                </form>
+                </div>
 
                 <div class="d-flex align-items-center gap-2">
                     {% if session.get('nombre') %}
@@ -806,7 +287,6 @@
         </div>
     </nav>
 
-    <!-- ===== BREADCRUMB ===== -->
     <div class="container">
         <nav aria-label="breadcrumb" class="breadcrumb-custom">
             <ol class="breadcrumb">
@@ -816,7 +296,6 @@
         </nav>
     </div>
 
-    <!-- ===== CONTENIDO ===== -->
     <div class="main-content">
         <div class="container pb-4">
 
@@ -832,8 +311,6 @@
             </div>
 
             {% if carrito_items|length == 0 %}
-
-            <!-- ===== CARRITO VACÍO ===== -->
             <div class="text-center py-4 mt-3 bg-white rounded-4 shadow-sm">
                 <i class="bi bi-cart-x display-4 text-secondary"></i>
                 <h5 class="mt-2 fw-bold">Tu carrito está vacío</h5>
@@ -842,15 +319,10 @@
                     <i class="bi bi-arrow-left me-2"></i> Seguir comprando
                 </a>
             </div>
-
             {% else %}
 
             <div class="row g-3 mt-1">
-
-                <!-- ===== COLUMNA IZQUIERDA ===== -->
                 <div class="col-lg-8">
-
-                    <!-- ===== PRODUCTOS ===== -->
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted small" style="font-size:0.7rem;">{{ carrito_items|length }} productos</span>
                     </div>
@@ -859,7 +331,6 @@
                     <div class="cart-product d-flex align-items-center">
                         <img src="{{ url_for('static', filename='uploads/productos/' + (item.imagen or 'default.jpg')) }}"
                              class="cart-product-img me-2" alt="{{ item.nombre }}">
-
                         <div class="flex-grow-1">
                             <div class="cart-product-title">{{ item.nombre }}</div>
                             {% if item.atributos %}
@@ -868,7 +339,6 @@
                                     {% if item.atributos.tamano %} | Talla: {{ item.atributos.tamano }}{% endif %}
                                 </div>
                             {% endif %}
-
                             <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
                                 <div class="qty-control">
                                     <button type="button" class="qty-btn" onclick="cambiarCantidad('{{ item.id }}', -1)">−</button>
@@ -879,7 +349,6 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
-
                             <div class="mt-1">
                                 <span class="stock-indicator small" style="font-size:0.6rem;">
                                     <span class="text-muted">Stock:</span>
@@ -901,7 +370,6 @@
                                 {% endif %}
                             </div>
                         </div>
-
                         <div class="text-end">
                             <div class="cart-product-price">${{ "%.2f"|format(item.precio|float * item.cantidad|int) }}</div>
                             <div class="small text-muted" style="font-size:0.6rem;">${{ "%.2f"|format(item.precio|float) }} c/u</div>
@@ -914,19 +382,14 @@
                             <i class="bi bi-arrow-left me-1"></i> Seguir comprando
                         </a>
                     </div>
-
                 </div>
 
-                <!-- ===== COLUMNA DERECHA: RESUMEN ===== -->
                 <div class="col-lg-4">
-
                     <div class="summary-card">
-
                         <div class="summary-title">
                             <i class="bi bi-receipt me-2"></i> Resumen
                         </div>
 
-                        <!-- 🔥 CUPÓN APLICADO -->
                         {% if cupon_aplicado and descuento_cupon > 0 %}
                         <div class="cupon-aplicado-box">
                             <div class="cupon-info">
@@ -943,7 +406,6 @@
                         </div>
                         {% endif %}
 
-                        <!-- 🔥 PROMOCIÓN APLICADA (CORREGIDO) -->
                         {% if promocion_aplicada %}
                         <div class="promocion-aplicado-box">
                             <div class="promocion-info">
@@ -970,40 +432,20 @@
                         </div>
                         {% endif %}
 
-                        <!-- DESCUENTOS POR VOLUMEN -->
                         {% if total_unidades >= 200 %}
-                            <div class="descuento-box">
-                                <i class="bi bi-gift me-1"></i>
-                                <strong>25%</strong> por 200+ unidades
-                            </div>
+                            <div class="descuento-box"><i class="bi bi-gift me-1"></i><strong>25%</strong> por 200+ unidades</div>
                         {% elif total_unidades >= 150 %}
-                            <div class="descuento-box">
-                                <i class="bi bi-gift me-1"></i>
-                                <strong>20%</strong> por 150+ unidades
-                            </div>
+                            <div class="descuento-box"><i class="bi bi-gift me-1"></i><strong>20%</strong> por 150+ unidades</div>
                         {% elif total_unidades >= 100 %}
-                            <div class="descuento-box">
-                                <i class="bi bi-gift me-1"></i>
-                                <strong>15%</strong> por 100+ unidades
-                            </div>
+                            <div class="descuento-box"><i class="bi bi-gift me-1"></i><strong>15%</strong> por 100+ unidades</div>
                         {% elif total_unidades >= 50 %}
-                            <div class="descuento-box">
-                                <i class="bi bi-gift me-1"></i>
-                                <strong>10%</strong> por 50+ unidades
-                            </div>
+                            <div class="descuento-box"><i class="bi bi-gift me-1"></i><strong>10%</strong> por 50+ unidades</div>
                         {% elif total_unidades >= 25 %}
-                            <div class="descuento-box">
-                                <i class="bi bi-gift me-1"></i>
-                                <strong>7%</strong> por 25+ unidades
-                            </div>
+                            <div class="descuento-box"><i class="bi bi-gift me-1"></i><strong>7%</strong> por 25+ unidades</div>
                         {% elif total_unidades >= 10 %}
-                            <div class="descuento-box">
-                                <i class="bi bi-gift me-1"></i>
-                                <strong>5%</strong> por 10+ unidades
-                            </div>
+                            <div class="descuento-box"><i class="bi bi-gift me-1"></i><strong>5%</strong> por 10+ unidades</div>
                         {% endif %}
 
-                        <!-- ITEMS RESUMEN -->
                         {% for item in carrito_items %}
                         <div class="summary-item">
                             <img src="{{ url_for('static', filename='uploads/productos/' + (item.imagen or 'default.jpg')) }}" class="summary-item-img">
@@ -1029,24 +471,16 @@
                         </div>
                         {% endif %}
 
-                        <!-- 🔥 DESCUENTO CUPÓN -->
                         {% if descuento_cupon > 0 %}
                         <div class="summary-row descuento-cupon-row" style="font-size:0.8rem;">
-                            <span>
-                                <i class="bi bi-ticket-perforated me-1"></i>
-                                Cupón {{ cupon_aplicado.codigo }}
-                            </span>
+                            <span><i class="bi bi-ticket-perforated me-1"></i>Cupón {{ cupon_aplicado.codigo }}</span>
                             <span>-${{ "%.2f"|format(descuento_cupon) }}</span>
                         </div>
                         {% endif %}
 
-                        <!-- 🔥 DESCUENTO PROMOCIÓN (NUEVO) -->
                         {% if descuento_promocion > 0 %}
                         <div class="summary-row descuento-promo-row" style="font-size:0.8rem;">
-                            <span>
-                                <i class="bi bi-gift me-1"></i>
-                                Promoción {{ promocion_aplicada.nombre }}
-                            </span>
+                            <span><i class="bi bi-gift me-1"></i>Promoción {{ promocion_aplicada.nombre }}</span>
                             <span>-${{ "%.2f"|format(descuento_promocion) }}</span>
                         </div>
                         {% endif %}
@@ -1072,7 +506,16 @@
                             <span class="price">${{ "%.2f"|format(total_carrito) }}</span>
                         </div>
 
-                        <!-- ===== BOTÓN PAGAR ===== -->
+                        {% if total_carrito and total_carrito >= 300 %}
+                        <div class="msi-box-compacto" id="msiBoxCarrito" data-precio="{{ total_carrito }}">
+                            <i class="bi bi-credit-card-2-front"></i>
+                            <span id="msiCarritoTexto">
+                                Paga a <b>12 MSI</b> de <span class="monto">${{ "%.2f"|format(total_carrito / 12) }}</span>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                        {% endif %}
+
                         <button class="btn-pagar mt-2" data-bs-toggle="modal" data-bs-target="#checkoutModal" style="padding:8px;">
                             <i class="bi bi-credit-card"></i> Pagar ${{ "%.2f"|format(total_carrito) }}
                         </button>
@@ -1091,38 +534,26 @@
                                 <span class="badge-mayorista"><i class="bi bi-truck"></i> Mayorista</span>
                             </div>
                         {% endif %}
-
                     </div>
-
                 </div>
-
             </div>
 
             {% endif %}
-
         </div>
     </div>
 
-    <!-- ===== MODAL CHECKOUT ===== -->
     <div class="modal fade modal-checkout" id="checkoutModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                
-                <!-- HEADER -->
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        <i class="bi bi-credit-card me-2"></i>
-                        Finalizar compra
+                        <i class="bi bi-credit-card me-2"></i> Finalizar compra
                     </h5>
                     <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Cerrar">
                         <i class="bi bi-x"></i>
                     </button>
                 </div>
-                
-                <!-- BODY -->
                 <div class="modal-body">
-                    
-                    <!-- PROGRESS STEPS -->
                     <div class="modal-progress-steps">
                         <div class="modal-step-item done">
                             <span class="step-circle"><i class="bi bi-check"></i></span>
@@ -1145,13 +576,10 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ url_for('web.procesar_checkout') }}" id="checkoutForm">
+                    <form method="POST" action="{{ url_for('web.procesar_checkout') }}" id="checkoutForm" onsubmit="return procesarPagoConMSI(event);">
 
-                        <!-- ===== DATOS DE ENVÍO ===== -->
                         <div class="modal-section">
-                            <div class="modal-section-title">
-                                <i class="bi bi-truck"></i> Datos de envío
-                            </div>
+                            <div class="modal-section-title"><i class="bi bi-truck"></i> Datos de envío</div>
 
                             <div class="row g-1 mb-2">
                                 <div class="col-md-6">
@@ -1159,9 +587,7 @@
                                         <div class="d-flex align-items-center">
                                             <input class="form-check-input" type="radio" name="tipo_envio" id="domicilioModal" value="domicilio" checked>
                                             <div>
-                                                <div class="radio-label">
-                                                    <i class="bi bi-house"></i> Domicilio
-                                                </div>
+                                                <div class="radio-label"><i class="bi bi-house"></i> Domicilio</div>
                                                 <div class="radio-desc">Recibe en tu casa</div>
                                             </div>
                                         </div>
@@ -1172,9 +598,7 @@
                                         <div class="d-flex align-items-center">
                                             <input class="form-check-input" type="radio" name="tipo_envio" id="clickCollectModal" value="click_collect">
                                             <div>
-                                                <div class="radio-label">
-                                                    <i class="bi bi-shop"></i> Click & Collect
-                                                </div>
+                                                <div class="radio-label"><i class="bi bi-shop"></i> Click & Collect</div>
                                                 <div class="radio-desc">Recoge en tienda</div>
                                             </div>
                                         </div>
@@ -1182,8 +606,25 @@
                                 </div>
                             </div>
 
-                            <!-- Dirección de envío -->
                             <div id="direccionEnvioModal">
+
+                                <div id="direccionGuardadaWrapper" class="direccion-guardada-box" style="display:none;">
+                                    <label for="selectDireccionGuardada">
+                                        <i class="bi bi-bookmark-check-fill"></i>
+                                        Usar dirección guardada
+                                    </label>
+                                    <select id="selectDireccionGuardada" class="form-select form-control-modal">
+                                        <option value="">— Escribir una nueva dirección —</option>
+                                    </select>
+                                    <span class="nota">
+                                        <i class="bi bi-info-circle"></i>
+                                        Ya cargamos tus datos. Cambia lo que necesites abajo o
+                                        <a href="/mi-cuenta#tab-direcciones" target="_blank" class="link-admin">
+                                            administra tus direcciones
+                                        </a>.
+                                    </span>
+                                </div>
+
                                 <div class="row g-1">
                                     <div class="col-12">
                                         <label class="form-label-modal">Calle y número *</label>
@@ -1216,7 +657,6 @@
                                 </div>
                             </div>
 
-                            <!-- Click & Collect -->
                             <div id="clickCollectDivModal" style="display:none;">
                                 <div class="row g-1">
                                     <div class="col-12">
@@ -1234,26 +674,20 @@
                                                 <option value="Liverpool Santa Fe">Liverpool Santa Fe</option>
                                             {% endif %}
                                         </select>
-                                        <small class="text-muted" style="font-size:0.55rem;"><i class="bi bi-info-circle"></i> Recibirás código de confirmación</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ===== MÉTODO DE PAGO ===== -->
                         <div class="modal-section">
-                            <div class="modal-section-title">
-                                <i class="bi bi-credit-card"></i> Método de pago
-                            </div>
+                            <div class="modal-section-title"><i class="bi bi-credit-card"></i> Método de pago</div>
                             <div class="row g-1">
                                 <div class="col-md-6">
                                     <div class="radio-card-modal active" onclick="seleccionarPagoModal('tarjeta')">
                                         <div class="d-flex align-items-center">
                                             <input class="form-check-input" type="radio" name="metodo_pago" id="tarjetaModal" value="tarjeta" checked>
                                             <div>
-                                                <div class="radio-label">
-                                                    <i class="bi bi-credit-card"></i> Tarjeta
-                                                </div>
+                                                <div class="radio-label"><i class="bi bi-credit-card"></i> Tarjeta</div>
                                                 <div class="radio-desc">Visa, Mastercard, AMEX</div>
                                             </div>
                                         </div>
@@ -1264,9 +698,7 @@
                                         <div class="d-flex align-items-center">
                                             <input class="form-check-input" type="radio" name="metodo_pago" id="paypalModal" value="paypal">
                                             <div>
-                                                <div class="radio-label">
-                                                    <i class="bi bi-paypal"></i> PayPal
-                                                </div>
+                                                <div class="radio-label"><i class="bi bi-paypal"></i> PayPal</div>
                                                 <div class="radio-desc">Pago seguro con PayPal</div>
                                             </div>
                                         </div>
@@ -1275,35 +707,143 @@
                             </div>
                         </div>
 
-                        <!-- ===== NOTAS ===== -->
-                        <div class="modal-section">
+                        <div class="modal-section tarjeta-section activa" id="pmGuardadasSection" style="display:none;">
                             <div class="modal-section-title">
-                                <i class="bi bi-pencil"></i> Notas adicionales
+                                <i class="bi bi-wallet2"></i> Mis tarjetas guardadas
                             </div>
+                            <div class="pm-saved-list" id="pmGuardadasList"></div>
+                            <small class="text-muted d-block mt-2" style="font-size:0.65rem;">
+                                <i class="bi bi-info-circle"></i>
+                                Selecciona una tarjeta para usarla. Se cobrará de forma segura.
+                            </small>
+                        </div>
+
+                        <div class="modal-section tarjeta-section activa" id="tarjetaSection">
+                            <div class="modal-section-title">
+                                <i class="bi bi-credit-card-2-front"></i>
+                                <span id="tarjetaSectionTitle">Datos de la tarjeta</span>
+                            </div>
+
+                            <!-- VISTA A: Tarjeta guardada seleccionada (sin CVC) -->
+                            <div id="tarjetaGuardadaVista" style="display:none;">
+                                <div class="tarjeta-guardada-compacta">
+                                    <div>
+                                        <div class="tc-marca" id="tcMarca">VISA</div>
+                                        <div class="tc-numero" id="tcNumero">•••• •••• •••• ••••</div>
+                                        <div class="tc-titular" id="tcTitular">NOMBRE DEL TITULAR</div>
+                                    </div>
+                                    <div class="tc-icon"><i class="bi bi-credit-card-2-front"></i></div>
+                                </div>
+
+                                <div class="tarjeta-guardada-links">
+                                    <a onclick="pmUsarOtraTarjeta()">
+                                        <i class="bi bi-plus-circle"></i> Usar otra tarjeta
+                                    </a>
+                                </div>
+
+                                <div class="alert alert-info small mb-0" style="font-size:0.75rem; border-radius:10px;">
+                                    <i class="bi bi-shield-check"></i>
+                                    Tu tarjeta está guardada de forma segura. Se cobrará directamente sin pedirte el CVC.
+                                </div>
+
+                                <input type="hidden" name="tarjeta_guardada_id" id="tarjetaGuardadaId" value="">
+                                <input type="hidden" id="tarjetaPaymentSourceId" value="">
+                                <input type="hidden" id="tarjetaCustomerId" value="">
+                            </div>
+
+                            <!-- VISTA B: Nueva tarjeta -->
+                            <div id="tarjetaCompleta">
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="form-label-modal">Número de tarjeta *</label>
+                                        <div class="card-field-wrap">
+                                            <i class="bi bi-credit-card me-2"></i>
+                                            <input type="text" name="card_number" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" inputmode="numeric" autocomplete="cc-number">
+                                            <i class="bi bi-credit-card-2-front card-brand-icon" id="cardBrandIcon"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label-modal">Nombre del titular *</label>
+                                        <div class="card-field-wrap">
+                                            <i class="bi bi-person me-2"></i>
+                                            <input type="text" name="card_name" id="cardName" placeholder="Como aparece en la tarjeta" autocomplete="cc-name">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label-modal">Fecha de expiración *</label>
+                                        <div class="d-flex gap-2">
+                                            <div class="card-field-wrap flex-grow-1">
+                                                <input type="text" name="card_exp_month" id="cardExpMonth" placeholder="MM" maxlength="2" inputmode="numeric" autocomplete="cc-exp-month">
+                                            </div>
+                                            <div class="card-field-wrap flex-grow-1">
+                                                <input type="text" name="card_exp_year" id="cardExpYear" placeholder="AA" maxlength="2" inputmode="numeric" autocomplete="cc-exp-year">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label-modal">CVC *</label>
+                                        <div class="card-field-wrap">
+                                            <i class="bi bi-lock me-2"></i>
+                                            <input type="text" name="card_cvc" id="cardCvc" placeholder="123" maxlength="4" inputmode="numeric" autocomplete="cc-csc">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-check mt-3" id="wrapperGuardarTarjeta">
+                                    <input class="form-check-input" type="checkbox" id="guardarTarjetaCheck" name="guardar_tarjeta" value="1">
+                                    <label class="form-check-label small" for="guardarTarjetaCheck">
+                                        <i class="bi bi-bookmark-plus"></i>
+                                        Guardar esta tarjeta para futuras compras
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-section" id="msiSelectorSection" style="display:none;">
+                            <div class="modal-section-title">
+                                <i class="bi bi-credit-card-2-front"></i> Meses Sin Intereses
+                            </div>
+                            <div id="msiOpciones" class="d-flex flex-column gap-2"></div>
+                            <input type="hidden" name="meses_msi" id="mesesMsiInput" value="0">
+                        </div>
+
+                        <div class="modal-section">
+                            <div class="modal-section-title"><i class="bi bi-pencil"></i> Notas adicionales</div>
                             <textarea name="notas" class="form-control form-control-modal" rows="1" placeholder="Comentarios sobre tu pedido..."></textarea>
                         </div>
 
-                        <!-- ===== BOTÓN REALIZAR PEDIDO ===== -->
-                        <button type="submit" class="btn-modal-submit">
+                        <button type="submit" class="btn-modal-submit" id="btnSubmitCheckout">
                             <i class="bi bi-check-circle"></i> Realizar pedido
                         </button>
-
                     </form>
-
                 </div>
-                
-                <!-- FOOTER -->
                 <div class="modal-footer">
                     <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
                         <i class="bi bi-x me-1"></i> Cancelar
                     </button>
                 </div>
-                
             </div>
         </div>
     </div>
 
-    <!-- ===== FOOTER ===== -->
+    <div class="modal fade" id="modalMSI" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header-msi">
+                    <h5><i class="bi bi-credit-card-2-front"></i> Meses Sin Intereses</h5>
+                    <button type="button" class="btn-close-msi" data-bs-dismiss="modal" aria-label="Cerrar">&times;</button>
+                </div>
+                <div class="modal-body-msi">
+                    <div class="msi-modal-precio">
+                        <span class="label">Precio del producto</span>
+                        <span class="valor" id="msiPrecioActual">$0.00</span>
+                    </div>
+                    <div id="msiContenido"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="bg-dark text-white py-3 mt-3">
         <div class="container text-center">
             <p class="mb-0" style="font-size:0.75rem;">© 2026 ORION System - Todos los derechos reservados</p>
@@ -1315,8 +855,20 @@
         </div>
     </footer>
 
-    <!-- ===== SCRIPTS ===== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    (function() {
+        var KEY_FROM_CONFIG = "{{ config.CONEKTA_PUBLIC_KEY if config else '' }}";
+        var KEY_FROM_CTX    = "{{ CONEKTA_PUBLIC_KEY if CONEKTA_PUBLIC_KEY is defined else '' }}";
+        var CONEKTA_KEY = (KEY_FROM_CONFIG || KEY_FROM_CTX || '').trim();
+
+        if (typeof Conekta !== 'undefined' && CONEKTA_KEY && CONEKTA_KEY.length >= 20) {
+            Conekta.setPublicKey(CONEKTA_KEY);
+            Conekta.setLanguage("es");
+        }
+    })();
+    </script>
 
     <script>
     function cambiarCantidad(id, delta) {
@@ -1344,10 +896,8 @@
         }
     }
 
-    // ===== FUNCIONES MODAL =====
     function seleccionarEnvioModal(tipo) {
         document.querySelectorAll('#checkoutModal .radio-card-modal').forEach(el => el.classList.remove('active'));
-        
         if (tipo === 'domicilio') {
             document.querySelector('#domicilioModal').closest('.radio-card-modal').classList.add('active');
             document.getElementById('domicilioModal').checked = true;
@@ -1360,13 +910,27 @@
     }
 
     function seleccionarPagoModal(tipo) {
-        document.querySelectorAll('#checkoutModal .radio-card-modal').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('#checkoutModal input[name="metodo_pago"]').forEach(el => {
+            el.closest('.radio-card-modal').classList.remove('active');
+        });
+        const tarjetaSec = document.getElementById('tarjetaSection');
+        const pmGuardadasSec = document.getElementById('pmGuardadasSection');
+        const msiSec = document.getElementById('msiSelectorSection');
+
         if (tipo === 'tarjeta') {
             document.querySelector('#tarjetaModal').closest('.radio-card-modal').classList.add('active');
             document.getElementById('tarjetaModal').checked = true;
+            if (tarjetaSec) tarjetaSec.classList.add('activa');
+            if (pmGuardadasSec && pmGuardadasSec.dataset.tieneTarjetas === '1') {
+                pmGuardadasSec.style.display = 'block';
+            }
+            if (typeof cargarMSIEnCheckout === 'function') cargarMSIEnCheckout();
         } else {
             document.querySelector('#paypalModal').closest('.radio-card-modal').classList.add('active');
             document.getElementById('paypalModal').checked = true;
+            if (tarjetaSec) tarjetaSec.classList.remove('activa');
+            if (pmGuardadasSec) pmGuardadasSec.style.display = 'none';
+            if (msiSec) msiSec.style.display = 'none';
         }
     }
 
@@ -1386,7 +950,936 @@
                 }
             });
         });
+
+        const cardNumber = document.getElementById('cardNumber');
+        const brandIcon = document.getElementById('cardBrandIcon');
+        if (cardNumber && brandIcon) {
+            cardNumber.addEventListener('input', function () {
+                this.value = this.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+                const n = this.value.replace(/\s/g, '');
+                let icon = 'bi-credit-card-2-front';
+                brandIcon.className = 'bi ' + icon + ' card-brand-icon';
+            });
+        }
+
+        const expMonth = document.getElementById('cardExpMonth');
+        const expYear = document.getElementById('cardExpYear');
+        if (expMonth) expMonth.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 2);
+            if (this.value.length === 2 && expYear) expYear.focus();
+        });
+        if (expYear) expYear.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 2);
+        });
+
+        const cvc = document.getElementById('cardCvc');
+        if (cvc) cvc.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 4);
+        });
     });
+
+    /* ⭐ Precarga de direcciones guardadas */
+    (function () {
+        var DIRECCIONES = window.ORION_DIRECCIONES || [];
+
+        function ready(fn) {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', fn);
+            } else {
+                fn();
+            }
+        }
+
+        ready(function () {
+            var wrapper = document.getElementById('direccionGuardadaWrapper');
+            var select  = document.getElementById('selectDireccionGuardada');
+            if (!wrapper || !select) return;
+            if (!DIRECCIONES.length) return;
+
+            wrapper.style.display = 'block';
+
+            DIRECCIONES.forEach(function (d, i) {
+                var opt = document.createElement('option');
+                opt.value = String(i);
+                var partes = [];
+                if (d.nombre) partes.push(d.nombre);
+                if (d.calle)  partes.push(d.calle + (d.numero ? ' #' + d.numero : ''));
+                if (d.colonia) partes.push(d.colonia);
+                var label = partes.join(' · ') || ('Dirección ' + (i + 1));
+                if (d.predeterminada) label += '  ✓ Predeterminada';
+                opt.textContent = label;
+                select.appendChild(opt);
+            });
+
+            function setField(name, val) {
+                var el = document.querySelector('#checkoutForm input[name="' + name + '"]');
+                if (el) el.value = val || '';
+            }
+
+            function fillForm(d) {
+                if (!d) {
+                    ['calle', 'numero', 'cp', 'colonia', 'ciudad', 'estado', 'referencias'].forEach(function (n) {
+                        setField(n, '');
+                    });
+                    return;
+                }
+                setField('calle', d.calle);
+                setField('numero', d.numero);
+                setField('cp', d.cp);
+                setField('colonia', d.colonia);
+                setField('ciudad', d.ciudad);
+                setField('estado', d.estado);
+                setField('referencias', d.referencias);
+            }
+
+            select.addEventListener('change', function () {
+                if (this.value === '') {
+                    fillForm(null);
+                    return;
+                }
+                var idx = parseInt(this.value, 10);
+                if (!isNaN(idx) && DIRECCIONES[idx]) {
+                    fillForm(DIRECCIONES[idx]);
+                }
+            });
+
+            var idxPred = DIRECCIONES.findIndex(function (d) { return d.predeterminada; });
+            if (idxPred < 0 && DIRECCIONES.length > 0) idxPred = 0;
+
+            if (idxPred >= 0) {
+                select.value = String(idxPred);
+                fillForm(DIRECCIONES[idxPred]);
+            }
+        });
+    })();
+
+    /* ⭐ Tarjetas guardadas: carga, selección y vista compacta */
+    (function () {
+
+        window.__tarjetaGuardadaSeleccionada = null;
+
+        function limpiarTarjetaSeleccionada() {
+            const inputId = document.getElementById('tarjetaGuardadaId');
+            if (inputId) inputId.value = '';
+
+            const psInput = document.getElementById('tarjetaPaymentSourceId');
+            if (psInput) psInput.value = '';
+            const cusInput = document.getElementById('tarjetaCustomerId');
+            if (cusInput) cusInput.value = '';
+
+            window.__tarjetaGuardadaSeleccionada = null;
+            document.querySelectorAll('#pmGuardadasList .pm-saved-card')
+                .forEach(c => c.classList.remove('seleccionada'));
+        }
+
+        window.pmCargarGuardadas = async function () {
+            const seccion = document.getElementById('pmGuardadasSection');
+            const lista = document.getElementById('pmGuardadasList');
+
+            if (!seccion || !lista) return;
+
+            limpiarTarjetaSeleccionada();
+
+            try {
+                const r = await fetch('/mi-cuenta/metodos-pago?_=' + Date.now(), {
+                    cache: 'no-store',
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                const data = await r.json();
+
+                const todas = (data.metodos || []).filter(m => m.tipo === 'tarjeta');
+                const cobrables = todas.filter(m =>
+                    m.conekta_customer_id && m.conekta_payment_source_id
+                );
+
+                console.log('[Tarjetas] Total:', todas.length,
+                            '| Cobrables:', cobrables.length);
+
+                if (!cobrables.length) {
+                    seccion.style.display = 'none';
+                    seccion.dataset.tieneTarjetas = '0';
+                    pmMostrarFormularioCompleto();
+                    limpiarTarjetaSeleccionada();
+                    return;
+                }
+
+                seccion.dataset.tieneTarjetas = '1';
+                seccion.style.display = 'block';
+
+                let html = '';
+                cobrables.forEach(m => {
+                    const marca = (m.marca || 'Tarjeta').toUpperCase();
+                    const last4 = m.ultimos4 || '••••';
+                    const titular = m.titular || '';
+                    const expira = m.expira || '';
+                    const pred = m.predeterminado
+                        ? '<span class="badge bg-success ms-1" style="font-size:0.5rem;">Predeterminada</span>'
+                        : '';
+
+                    html += `
+                        <div class="pm-saved-card"
+                             data-id="${m.id}"
+                             data-payment-source="${m.conekta_payment_source_id || ''}"
+                             data-customer-id="${m.conekta_customer_id || ''}"
+                             data-titular="${titular}"
+                             data-marca="${marca}"
+                             data-ultimos4="${last4}"
+                             data-expira="${expira}"
+                             onclick="pmSeleccionarGuardada(this)">
+                            <div class="pm-brand"><i class="bi bi-credit-card-2-front"></i></div>
+                            <div class="pm-info">
+                                <div class="pm-titulo">${marca} •••• ${last4} ${pred}</div>
+                                <div class="pm-detalle">${titular}${expira ? ' · ' + expira : ''}</div>
+                            </div>
+                            <div class="pm-check"></div>
+                        </div>
+                    `;
+                });
+
+                lista.innerHTML = html;
+
+                const tarjetaPred = cobrables.find(m => m.predeterminado);
+                if (tarjetaPred) {
+                    const el = lista.querySelector(`.pm-saved-card[data-id="${tarjetaPred.id}"]`);
+                    if (el) pmSeleccionarGuardada(el);
+                } else {
+                    pmMostrarFormularioCompleto();
+                }
+
+            } catch (e) {
+                console.warn('No se pudieron cargar tarjetas guardadas:', e);
+                seccion.style.display = 'none';
+                pmMostrarFormularioCompleto();
+                limpiarTarjetaSeleccionada();
+            }
+        };
+
+        window.pmSeleccionarGuardada = function (el) {
+            document.querySelectorAll('#pmGuardadasList .pm-saved-card').forEach(c => c.classList.remove('seleccionada'));
+            el.classList.add('seleccionada');
+
+            const id           = el.getAttribute('data-id') || '';
+            const paymentSrcId = el.getAttribute('data-payment-source') || '';
+            const customerId   = el.getAttribute('data-customer-id') || '';
+            const marca        = el.getAttribute('data-marca') || 'Tarjeta';
+            const ultimos4     = el.getAttribute('data-ultimos4') || '••••';
+            const titular      = el.getAttribute('data-titular') || '';
+            const expira       = el.getAttribute('data-expira') || '';
+
+            console.log('[Tarjeta] Seleccionada id="' + id + '"');
+            console.log('[Tarjeta] payment_source_id="' + paymentSrcId + '"');
+
+            window.__tarjetaGuardadaSeleccionada = {
+                id, paymentSrcId, customerId, marca, ultimos4, titular, expira
+            };
+
+            const inputId = document.getElementById('tarjetaGuardadaId');
+            if (inputId) inputId.value = id;
+
+            const psInput = document.getElementById('tarjetaPaymentSourceId');
+            if (psInput) psInput.value = paymentSrcId;
+            const cusInput = document.getElementById('tarjetaCustomerId');
+            if (cusInput) cusInput.value = customerId;
+
+            const tcMarca    = document.getElementById('tcMarca');
+            const tcNumero   = document.getElementById('tcNumero');
+            const tcTitular  = document.getElementById('tcTitular');
+            if (tcMarca)   tcMarca.textContent = marca.toUpperCase();
+            if (tcNumero)  tcNumero.textContent = '•••• •••• •••• ' + ultimos4;
+            if (tcTitular) tcTitular.textContent = titular.toUpperCase() || 'TITULAR';
+
+            pmMostrarVistaTarjetaGuardada();
+
+            if (typeof cargarMSIEnCheckout === 'function') cargarMSIEnCheckout();
+        };
+
+        window.pmUsarOtraTarjeta = function () {
+            limpiarTarjetaSeleccionada();
+            pmMostrarFormularioCompleto();
+
+            const cardNumber = document.getElementById('cardNumber');
+            if (cardNumber) setTimeout(() => cardNumber.focus(), 150);
+        };
+
+        function pmMostrarVistaTarjetaGuardada() {
+            const vistaGuardada = document.getElementById('tarjetaGuardadaVista');
+            const formCompleto  = document.getElementById('tarjetaCompleta');
+            const titulo        = document.getElementById('tarjetaSectionTitle');
+
+            if (vistaGuardada) vistaGuardada.style.display = 'block';
+            if (formCompleto)  formCompleto.style.display  = 'none';
+            if (titulo)        titulo.textContent = 'Confirmar tarjeta guardada';
+        }
+
+        function pmMostrarFormularioCompleto() {
+            const vistaGuardada = document.getElementById('tarjetaGuardadaVista');
+            const formCompleto  = document.getElementById('tarjetaCompleta');
+            const titulo        = document.getElementById('tarjetaSectionTitle');
+
+            if (vistaGuardada) vistaGuardada.style.display = 'none';
+            if (formCompleto)  formCompleto.style.display  = 'block';
+            if (titulo)        titulo.textContent = 'Datos de la tarjeta';
+        }
+
+        window.pmMostrarFormularioCompleto = pmMostrarFormularioCompleto;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('checkoutModal');
+            if (modal) {
+                modal.addEventListener('show.bs.modal', function () {
+                    limpiarTarjetaSeleccionada();
+                    pmMostrarFormularioCompleto();
+                    window.pmCargarGuardadas();
+                });
+            }
+        });
+    })();
+    </script>
+
+    <script>
+    (function () {
+        const MSI_API = '/api/msi/calcular';
+        const MONTO_ACTUAL = {{ total_carrito|default(0) }};
+
+        function fmtMXN(n) {
+            return '$' + Number(n || 0).toLocaleString('es-MX', {
+                minimumFractionDigits: 2, maximumFractionDigits: 2
+            });
+        }
+
+        function actualizarBotonPago(meses) {
+            const btn = document.getElementById('btnSubmitCheckout');
+            if (!btn) return;
+            if (meses === 0) {
+                btn.innerHTML = '<i class="bi bi-check-circle"></i> Realizar pedido';
+            } else {
+                btn.innerHTML = '<i class="bi bi-check-circle"></i> Pagar a ' + meses + ' MSI';
+            }
+        }
+
+        window.cargarMSIEnCheckout = function () {
+            const seccion = document.getElementById('msiSelectorSection');
+            const contenedor = document.getElementById('msiOpciones');
+            const inputMeses = document.getElementById('mesesMsiInput');
+
+            if (!seccion || !contenedor) return;
+            if (MONTO_ACTUAL < 300) { seccion.style.display = 'none'; return; }
+
+            fetch(MSI_API + '?precio=' + MONTO_ACTUAL)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success || !data.opciones || data.opciones.length === 0) {
+                        seccion.style.display = 'none';
+                        return;
+                    }
+
+                    seccion.style.display = 'block';
+
+                    let html = `
+                        <label class="msi-opcion-checkout seleccionada" data-meses="0">
+                            <input type="radio" name="msi_radio" value="0" checked style="display:none;">
+                            <div class="msi-radio-circulo"></div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold" style="font-size:0.9rem;color:#1a1a2e;">Pago de contado</div>
+                                <div class="text-muted" style="font-size:0.75rem;">Cargo único a la tarjeta</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold" style="color:#e10098;font-size:1rem;">${fmtMXN(MONTO_ACTUAL)}</div>
+                                <div class="text-muted" style="font-size:0.65rem;">total</div>
+                            </div>
+                        </label>
+                    `;
+
+                    data.opciones.forEach(op => {
+                        html += `
+                            <label class="msi-opcion-checkout" data-meses="${op.meses}">
+                                <input type="radio" name="msi_radio" value="${op.meses}" style="display:none;">
+                                <div class="msi-radio-circulo"></div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold" style="font-size:0.9rem;color:#1a1a2e;">
+                                        ${op.etiqueta}
+                                        ${op.tipo === 'sin_interes' ? '<span class="badge-si">SIN INTERÉS</span>' : '<span class="badge-ci">CON INTERÉS</span>'}
+                                    </div>
+                                    <div class="text-muted" style="font-size:0.75rem;">Total: ${fmtMXN(op.total)}</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold" style="color:#0284c7;font-size:1rem;">${fmtMXN(op.mensualidad)}</div>
+                                    <div class="text-muted" style="font-size:0.65rem;">por mes</div>
+                                </div>
+                            </label>
+                        `;
+                    });
+
+                    contenedor.innerHTML = html;
+
+                    const opciones = contenedor.querySelectorAll('.msi-opcion-checkout');
+                    opciones.forEach(el => {
+                        el.onclick = function () {
+                            opciones.forEach(o => o.classList.remove('seleccionada'));
+                            el.classList.add('seleccionada');
+                            const meses = parseInt(el.getAttribute('data-meses')) || 0;
+                            if (inputMeses) inputMeses.value = meses;
+                            actualizarBotonPago(meses);
+                        };
+                    });
+
+                    actualizarBotonPago(0);
+                })
+                .catch(err => {
+                    console.error('Error MSI:', err);
+                    seccion.style.display = 'none';
+                });
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            window.cargarMSIEnCheckout();
+        });
+    })();
+    </script>
+
+    <script>
+    async function procesarPagoConMSI(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const form = document.getElementById('checkoutForm');
+        const btn = document.getElementById('btnSubmitCheckout');
+
+        const metodoSeleccionado = form.querySelector('input[name="metodo_pago"]:checked')?.value || 'tarjeta';
+        const tipoEnvio = form.querySelector('input[name="tipo_envio"]:checked')?.value || 'domicilio';
+
+        if (tipoEnvio === 'domicilio') {
+            const calle = form.querySelector('input[name="calle"]');
+            const cp = form.querySelector('input[name="cp"]');
+            const colonia = form.querySelector('input[name="colonia"]');
+            if (!calle?.value || !cp?.value || !colonia?.value) {
+                alert('Por favor completa los datos de envío');
+                return false;
+            }
+        } else {
+            const tiendaSel = form.querySelector('select[name="tienda_recogida"]');
+            if (!tiendaSel?.value) {
+                alert('Por favor selecciona una tienda de recogida');
+                return false;
+            }
+        }
+
+        if (metodoSeleccionado === 'paypal') {
+            form.action = '{{ url_for("web.procesar_checkout") }}';
+            form.submit();
+            return false;
+        }
+
+        const tarjetaGuardadaId = (document.getElementById('tarjetaGuardadaId')?.value || '').trim();
+        const usaTarjetaGuardada = !!tarjetaGuardadaId;
+
+        console.log('[Checkout] tarjeta_guardada_id="' + tarjetaGuardadaId + '" (len=' + tarjetaGuardadaId.length + ')');
+
+        const btnOriginal = btn ? btn.innerHTML : 'Realizar pedido';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+        }
+
+        try {
+            if (usaTarjetaGuardada) {
+                // ⭐ MIT: cobrar sin CVC, sin re-tokenizar
+                await enviarAlBackendTarjetaGuardada(tarjetaGuardadaId, form, btn, btnOriginal);
+
+            } else {
+                const formData = new FormData(form);
+                const cardNumber = (formData.get('card_number') || '').replace(/\s/g, '');
+                const cardName = (formData.get('card_name') || '').trim();
+                const cardExpMonth = (formData.get('card_exp_month') || '').trim();
+                const cardExpYear = (formData.get('card_exp_year') || '').trim();
+                const cardCvc = (formData.get('card_cvc') || '').trim();
+
+                if (cardNumber.length < 13) {
+                    alert('Número de tarjeta inválido. Escribe los 16 dígitos.');
+                    if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+                    return false;
+                }
+                if (!cardName) {
+                    alert('Ingresa el nombre del titular');
+                    if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+                    return false;
+                }
+                if (!/^\d{2}$/.test(cardExpMonth) || !/^\d{2}$/.test(cardExpYear)) {
+                    alert('Fecha de expiración inválida (MM / AA)');
+                    if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+                    return false;
+                }
+                if (!/^\d{3,4}$/.test(cardCvc)) {
+                    alert('CVC inválido');
+                    if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+                    return false;
+                }
+
+                const anioCompleto = cardExpYear.length === 2 ? ('20' + cardExpYear) : cardExpYear;
+
+                if (typeof Conekta === 'undefined') {
+                    alert('El SDK de pagos no se cargó. Recarga la página.');
+                    if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+                    return false;
+                }
+
+                const tokenParams = {
+                    card: {
+                        number: cardNumber,
+                        name: cardName,
+                        exp_year: anioCompleto,
+                        exp_month: cardExpMonth,
+                        cvc: cardCvc
+                    }
+                };
+
+                Conekta.Token.create(
+                    tokenParams,
+                    async function (token) {
+                        await enviarAlBackendNuevaTarjeta(token.id, form, btn, btnOriginal);
+                    },
+                    function (error) {
+                        console.error('[Conekta] Error:', error);
+                        const msg = (error && (error.message_to_purchaser || error.message)) || 'Error al validar la tarjeta';
+                        alert('Error con la tarjeta: ' + msg);
+                        if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+                    }
+                );
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert('Error inesperado al procesar el pago');
+            if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+        }
+
+        return false;
+    }
+
+    /* ⭐ Cobra tarjeta guardada — SIN CVC, SIN re-tokenizar (MIT) */
+    async function enviarAlBackendTarjetaGuardada(tarjetaId, form, btn, btnOriginal) {
+        const formData = new FormData(form);
+        const mesesMsi = parseInt(formData.get('meses_msi')) || 0;
+
+        const payload = {
+            tarjeta_guardada_id: tarjetaId,
+            meses_msi:           mesesMsi,
+            nombre:              '{{ session.get("nombre", "Cliente") }}',
+            email:               '{{ session.get("email", "") }}',
+            telefono:            '+525555555555',
+            tipo_envio:          formData.get('tipo_envio') || 'domicilio',
+            tienda_recogida:     formData.get('tienda_recogida') || '',
+            notas:               formData.get('notas') || '',
+            direccion: {
+                calle:       formData.get('calle') || '',
+                numero:      formData.get('numero') || '',
+                colonia:     formData.get('colonia') || '',
+                cp:          formData.get('cp') || '',
+                ciudad:      formData.get('ciudad') || '',
+                estado:      formData.get('estado') || '',
+                referencias: formData.get('referencias') || ''
+            }
+        };
+
+        console.log('[MSI] Enviando a backend (MIT, sin cvc):', payload);
+
+        try {
+            const res = await fetch('/api/checkout/msi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                alert('Error: ' + (data.error || 'No se pudo procesar el pago'));
+                if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Error de conexión al procesar el pago');
+            if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+        }
+    }
+
+    /* ⭐ Envío al backend con token de tarjeta nueva */
+    async function enviarAlBackendNuevaTarjeta(tokenId, form, btn, btnOriginal) {
+        const formData = new FormData(form);
+        const mesesMsi = parseInt(formData.get('meses_msi')) || 0;
+
+        const guardarTarjeta = document.getElementById('guardarTarjetaCheck')?.checked || false;
+        const cardNumber = (formData.get('card_number') || '').replace(/\s/g, '');
+        const ultimos4 = cardNumber.slice(-4);
+        const cardName = (formData.get('card_name') || '').trim();
+        const expMonth = (formData.get('card_exp_month') || '').trim();
+        const expYear = (formData.get('card_exp_year') || '').trim();
+        const expira = (expMonth && expYear) ? `${expMonth}/${expYear}` : '';
+
+        let marca = 'Tarjeta';
+        if (/^4/.test(cardNumber)) marca = 'Visa';
+        else if (/^5[1-5]/.test(cardNumber)) marca = 'Mastercard';
+        else if (/^3[47]/.test(cardNumber)) marca = 'American Express';
+
+        const payload = {
+            token_id: tokenId,
+            meses_msi: mesesMsi,
+            nombre: cardName || '{{ session.get("nombre", "Cliente") }}',
+            email: '{{ session.get("email", "") }}',
+            telefono: '+525555555555',
+            tipo_envio: formData.get('tipo_envio') || 'domicilio',
+            tienda_recogida: formData.get('tienda_recogida') || '',
+            notas: formData.get('notas') || '',
+            guardar_tarjeta: guardarTarjeta,
+            tarjeta_info: guardarTarjeta ? {
+                marca: marca,
+                ultimos4: ultimos4,
+                titular: cardName,
+                expira: expira
+            } : null,
+            direccion: {
+                calle: formData.get('calle') || '',
+                numero: formData.get('numero') || '',
+                colonia: formData.get('colonia') || '',
+                cp: formData.get('cp') || '',
+                ciudad: formData.get('ciudad') || '',
+                estado: formData.get('estado') || '',
+                referencias: formData.get('referencias') || ''
+            }
+        };
+
+        try {
+            const res = await fetch('/api/checkout/msi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                alert('Error: ' + (data.error || 'No se pudo procesar el pago'));
+                if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Error de conexión al procesar el pago');
+            if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
+        }
+    }
+    </script>
+
+    <script>
+    (function () {
+        const MSI_API = '/api/msi/calcular';
+
+        function fmtMXN(n) {
+            return '$' + Number(n || 0).toLocaleString('es-MX', {
+                minimumFractionDigits: 2, maximumFractionDigits: 2
+            });
+        }
+
+        let _msiModal = null;
+        function getMSIModal() {
+            const el = document.getElementById('modalMSI');
+            if (!el) return null;
+            if (!_msiModal) _msiModal = bootstrap.Modal.getOrCreateInstance(el);
+            return _msiModal;
+        }
+
+        function renderOpciones(data) {
+            const contenido = document.getElementById('msiContenido');
+            if (!contenido) return;
+
+            if (!data.success || !data.opciones || data.opciones.length === 0) {
+                contenido.innerHTML =
+                    '<div style="text-align:center;padding:30px 0;color:#94a3b8;">' +
+                    '<i class="bi bi-info-circle" style="font-size:2rem;display:block;margin-bottom:10px;"></i>' +
+                    'No hay planes MSI disponibles para este monto.' +
+                    '</div>';
+                return;
+            }
+
+            let html = '<div style="font-size:0.85rem;font-weight:700;color:#0369a1;margin-bottom:12px;">' +
+                       '<i class="bi bi-check2-circle"></i> Opciones disponibles:</div>';
+
+            data.opciones.forEach(function (op, idx) {
+                const seleccionada = idx === 0 ? ' seleccionada' : '';
+                const badge = op.tipo === 'sin_interes'
+                    ? '<span class="badge-si">SIN INTERÉS</span>'
+                    : '<span class="badge-ci">CON INTERÉS</span>';
+
+                const bancosHtml = (op.bancos || []).map(function (b) {
+                    return '<span class="msi-banco-chip">' + b + '</span>';
+                }).join('');
+
+                html +=
+                    '<div class="msi-opcion' + seleccionada + '" data-meses="' + op.meses + '">' +
+                        '<div class="msi-opcion-radio"></div>' +
+                        '<div class="msi-opcion-info">' +
+                            '<div class="msi-opcion-titulo">' + op.etiqueta + ' ' + badge + '</div>' +
+                            '<div class="msi-opcion-detalle">Total a pagar: ' + fmtMXN(op.total) + '</div>' +
+                            '<div class="msi-bancos-lista">' + bancosHtml + '</div>' +
+                        '</div>' +
+                        '<div class="msi-opcion-mensualidad">' +
+                            '<div class="monto">' + fmtMXN(op.mensualidad) + '</div>' +
+                            '<span class="small">por mes</span>' +
+                        '</div>' +
+                    '</div>';
+            });
+
+            html += '<div class="msi-legal"><i class="bi bi-info-circle"></i> ' + (data.legal || '') + '</div>';
+            contenido.innerHTML = html;
+
+            const opciones = contenido.querySelectorAll('.msi-opcion');
+            opciones.forEach(el => {
+                el.onclick = function () {
+                    opciones.forEach(o => o.classList.remove('seleccionada'));
+                    el.classList.add('seleccionada');
+                };
+            });
+        }
+
+        window.abrirModalMSI = function (precio) {
+            const modal = getMSIModal();
+            if (!modal) return;
+
+            const contenido = document.getElementById('msiContenido');
+            const precioEl = document.getElementById('msiPrecioActual');
+
+            if (precioEl) precioEl.textContent = fmtMXN(precio);
+            if (contenido) {
+                contenido.innerHTML =
+                    '<div style="text-align:center;padding:40px 0;color:#94a3b8;">' +
+                    '<i class="bi bi-hourglass-split" style="font-size:2rem;display:block;margin-bottom:10px;"></i>' +
+                    'Calculando opciones...</div>';
+            }
+
+            modal.show();
+
+            fetch(MSI_API + '?precio=' + encodeURIComponent(precio))
+                .then(function (r) { return r.json(); })
+                .then(function (data) { renderOpciones(data); })
+                .catch(function (err) {
+                    console.error('Error MSI:', err);
+                });
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const msiBoxCarrito = document.getElementById('msiBoxCarrito');
+            if (msiBoxCarrito) {
+                const totalCarrito = parseFloat(msiBoxCarrito.getAttribute('data-precio')) || 0;
+                if (totalCarrito >= 300) {
+                    fetch(MSI_API + '?precio=' + encodeURIComponent(totalCarrito))
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) {
+                            const mejor = data.mejor_opcion;
+                            const txt = document.getElementById('msiCarritoTexto');
+                            if (mejor && txt) {
+                                txt.innerHTML = 'Paga a <b>' + mejor.meses + ' MSI</b> de <span class="monto">' +
+                                    fmtMXN(mejor.mensualidad) + '</span>';
+                            }
+                        })
+                        .catch(function () {});
+                } else {
+                    msiBoxCarrito.style.display = 'none';
+                }
+
+                msiBoxCarrito.addEventListener('click', function () {
+                    window.abrirModalMSI(totalCarrito);
+                });
+            }
+        });
+    })();
+    </script>
+
+    <script>
+    (function () {
+        const input    = document.getElementById('searchInput');
+        const dropdown = document.getElementById('autocompleteResults');
+        const list     = document.getElementById('autocompleteList');
+        const loading  = document.getElementById('autocompleteLoading');
+        const empty    = document.getElementById('autocompleteEmpty');
+        const footer   = document.getElementById('autocompleteFooter');
+        const verTodos = document.getElementById('autocompleteVerTodos');
+        const form     = document.getElementById('searchForm');
+
+        if (!input || !dropdown) return;
+
+        let debounceTimer = null;
+        let controller    = null;
+        let items         = [];
+        let activeIndex   = -1;
+        let currentQuery  = '';
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+        function escapeRegex(str) {
+            return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+        function highlight(text, query) {
+            if (!query) return escapeHtml(text);
+            const regex = new RegExp('(' + escapeRegex(query) + ')', 'gi');
+            return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+        }
+        function fmtPrecio(n) { return '$' + Number(n || 0).toFixed(2); }
+
+        function showDropdown() { dropdown.style.display = 'block'; }
+        function hideDropdown() { dropdown.style.display = 'none'; activeIndex = -1; }
+
+        function renderResults(resultados, query) {
+            list.innerHTML = '';
+            items = [];
+            activeIndex = -1;
+
+            if (!resultados || resultados.length === 0) {
+                loading.style.display = 'none';
+                empty.style.display   = 'block';
+                footer.style.display  = 'none';
+                list.style.display    = 'none';
+                showDropdown();
+                return;
+            }
+
+            loading.style.display = 'none';
+            empty.style.display   = 'none';
+            list.style.display    = 'block';
+            footer.style.display  = 'block';
+            list.innerHTML = '';
+
+            resultados.forEach(function (p, idx) {
+                const a = document.createElement('a');
+                a.className = 'autocomplete-item';
+                a.href = p.url;
+                a.setAttribute('role', 'option');
+                a.dataset.index = idx;
+
+                const imgHtml = p.foto
+                    ? '<img src="' + escapeHtml(p.foto) + '" class="autocomplete-item-img" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
+                    : '<div class="autocomplete-item-img placeholder"><i class="bi bi-image"></i></div>';
+
+                const meta = [];
+                if (p.marca)     meta.push('<span class="marca">' + escapeHtml(p.marca) + '</span>');
+                if (p.categoria) meta.push('<span>' + escapeHtml(p.categoria) + '</span>');
+
+                a.innerHTML = imgHtml +
+                    '<div class="autocomplete-item-info">' +
+                        '<div class="autocomplete-item-name">' + highlight(p.nombre, query) + '</div>' +
+                        '<div class="autocomplete-item-meta">' + meta.join('') + '</div>' +
+                    '</div>' +
+                    '<div class="autocomplete-item-price">' + fmtPrecio(p.precio) + '</div>';
+
+                list.appendChild(a);
+                items.push(a);
+            });
+
+            showDropdown();
+        }
+
+        function setActive(idx) {
+            items.forEach(function (el) { el.classList.remove('active'); });
+            if (idx < 0) { activeIndex = -1; return; }
+            if (idx >= items.length) idx = 0;
+            if (idx < 0) idx = items.length - 1;
+            items[idx].classList.add('active');
+            items[idx].scrollIntoView({ block: 'nearest' });
+            activeIndex = idx;
+        }
+
+        input.addEventListener('keydown', function (e) {
+            const isOpen = dropdown.style.display === 'block';
+            if (e.key === 'ArrowDown') {
+                if (!isOpen && currentQuery.length >= 2) {
+                    fetchSuggestions(currentQuery);
+                    e.preventDefault();
+                    return;
+                }
+                e.preventDefault();
+                setActive(activeIndex + 1);
+            } else if (e.key === 'ArrowUp') {
+                if (isOpen) { e.preventDefault(); setActive(activeIndex - 1); }
+            } else if (e.key === 'Enter') {
+                if (isOpen && activeIndex >= 0 && items[activeIndex]) {
+                    e.preventDefault();
+                    window.location.href = items[activeIndex].href;
+                }
+            } else if (e.key === 'Escape') {
+                hideDropdown();
+            }
+        });
+
+        function fetchSuggestions(query) {
+            currentQuery = query;
+            if (controller) { try { controller.abort(); } catch (e) {} }
+            controller = new AbortController();
+
+            loading.style.display = 'block';
+            empty.style.display   = 'none';
+            list.style.display    = 'none';
+            footer.style.display  = 'none';
+            showDropdown();
+
+            const url = '/api/productos/autocompletar?q=' + encodeURIComponent(query);
+
+            fetch(url, { signal: controller.signal })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (!data || !data.success) throw new Error('Bad response');
+                    renderResults(data.resultados || [], query);
+                })
+                .catch(function (err) {
+                    if (err.name === 'AbortError') return;
+                    console.warn('Autocompletar error:', err);
+                    loading.style.display = 'none';
+                    empty.style.display   = 'block';
+                });
+        }
+
+        input.addEventListener('input', function () {
+            const q = input.value.trim();
+            clearTimeout(debounceTimer);
+            if (q.length < 2) { hideDropdown(); return; }
+            if (verTodos) verTodos.href = '/catalogo?q=' + encodeURIComponent(q);
+            debounceTimer = setTimeout(function () { fetchSuggestions(q); }, 220);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!dropdown.contains(e.target) && e.target !== input) hideDropdown();
+        });
+
+        input.addEventListener('blur', function () {
+            setTimeout(function () {
+                if (!dropdown.matches(':hover')) hideDropdown();
+            }, 180);
+        });
+
+        input.addEventListener('focus', function () {
+            const q = input.value.trim();
+            if (q.length >= 2 && items.length > 0) showDropdown();
+        });
+
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                const isOpen = dropdown.style.display === 'block';
+                if (isOpen && activeIndex >= 0 && items[activeIndex]) {
+                    e.preventDefault();
+                    window.location.href = items[activeIndex].href;
+                }
+            });
+        }
+    })();
     </script>
 
 </body>

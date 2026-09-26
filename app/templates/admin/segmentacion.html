@@ -623,8 +623,8 @@
             <a href="{{ url_for('web.lista_categorias') }}">
                 <i class="fas fa-tags"></i> <span>Categorías</span>
             </a>
-            <a href="{{ url_for('web.lista_empresas') }}">
-                <i class="fas fa-building"></i> <span>Empresas</span>
+            <a href="{{ url_for('web.lista_marcas') }}">
+                <i class="fas fa-building"></i> <span>Marcas</span>
             </a>
             <a href="{{ url_for('web.lista_productos') }}">
                 <i class="fas fa-box"></i> <span>Productos</span>
@@ -747,7 +747,7 @@
 
             <!-- ===== GRÁFICAS ===== -->
             <div class="charts-row">
-                <!-- Donut Chart -->
+                <!-- Donut Chart de Segmentos -->
                 <div class="chart-card">
                     <div class="chart-title">
                         <i class="fas fa-chart-pie"></i> Distribución de Segmentos
@@ -780,7 +780,7 @@
                     </div>
                 </div>
 
-                <!-- Barras horizontales -->
+                <!-- Barras horizontales de porcentaje -->
                 <div class="chart-card">
                     <div class="chart-title">
                         <i class="fas fa-chart-bar"></i> Porcentaje por Segmento
@@ -818,19 +818,11 @@
                 </div>
             </div>
 
-            <!-- ===== GRÁFICO DE GÉNERO (DONUT + BARRAS) ===== -->
-            <div class="charts-row">
+            <!-- ===== GRÁFICO DE GÉNERO (SOLO BARRAS) ===== -->
+            <div class="charts-row-single">
                 <div class="chart-card">
                     <div class="chart-title">
-                        <i class="fas fa-venus-mars"></i> Distribución por Género (Donut)
-                    </div>
-                    <div class="chart-container" id="genero-container">
-                        <canvas id="chartGenero"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title">
-                        <i class="fas fa-chart-bar"></i> Distribución por Género (Barras)
+                        <i class="fas fa-venus-mars"></i> Distribución por Género (Barras)
                     </div>
                     <div class="chart-container" id="genero-barras-container">
                         <canvas id="chartGeneroBarras"></canvas>
@@ -1012,75 +1004,13 @@
         alert('👤 Ver perfil de: ' + email);
     }
 
-    // ===== GRÁFICO DE GÉNERO (DONUT) =====
+    // ===== GRÁFICO DE GÉNERO (BARRAS) =====
     document.addEventListener('DOMContentLoaded', function() {
         const generos = {{ generos|tojson }};
         const labels = Object.keys(generos);
         const values = Object.values(generos);
         const total = values.reduce((a, b) => a + b, 0);
 
-        // --- Donut ---
-        const container = document.getElementById('genero-container');
-        if (total === 0) {
-            container.innerHTML = `
-                <div style="text-align:center; color:#888; padding:20px;">
-                    <i class="fas fa-venus-mars" style="font-size:2rem; display:block; margin-bottom:10px; opacity:0.5;"></i>
-                    <p style="font-weight:600;">No hay información de género para los clientes</p>
-                    <p style="font-size:0.85rem;">Los clientes no tienen género especificado en su perfil.</p>
-                </div>
-            `;
-        } else {
-            const filteredData = labels.map((label, i) => ({ label, value: values[i] }))
-                .filter(item => item.value > 0);
-
-            const ctx = document.getElementById('chartGenero').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: filteredData.map(item => item.label),
-                    datasets: [{
-                        data: filteredData.map(item => item.value),
-                        backgroundColor: ['#2196F3', '#E91E63', '#9E9E9E'],
-                        borderColor: '#fff',
-                        borderWidth: 3,
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: { size: 12, weight: '600' },
-                                padding: 15,
-                                usePointStyle: true,
-                                pointStyle: 'circle'
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Distribución de clientes por género',
-                            font: { size: 12, weight: '600' },
-                            color: '#1a1a2e'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                    return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
-                                }
-                            }
-                        }
-                    },
-                    cutout: '65%'
-                }
-            });
-        }
-
-        // --- Gráfico de barras ---
         const containerBarras = document.getElementById('genero-barras-container');
         if (total === 0) {
             containerBarras.innerHTML = `

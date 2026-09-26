@@ -1,0 +1,184 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ORION\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mi Perfil"
+msgstr "My Profile"
+
+msgid "Seguridad"
+msgstr "Security"
+
+msgid "Mis Pedidos"
+msgstr "My Orders"
+
+msgid "Direcciones"
+msgstr "Addresses"
+
+msgid "Favoritos"
+msgstr "Favorites"
+
+msgid "Comunicaciones"
+msgstr "Communications"
+
+msgid "Privacidad"
+msgstr "Privacy"
+
+msgid "Facturación"
+msgstr "Billing"
+
+msgid "Métodos de Pago"
+msgstr "Payment Methods"
+
+msgid "Idioma"
+msgstr "Language"
+
+msgid "Cerrar Sesión"
+msgstr "Log Out"
+
+msgid "Información Personal"
+msgstr "Personal Information"
+
+msgid "Nombre(s)"
+msgstr "First Name(s)"
+
+msgid "Apellido Paterno"
+msgstr "Paternal Surname"
+
+msgid "Apellido Materno"
+msgstr "Maternal Surname"
+
+msgid "Teléfono"
+msgstr "Phone"
+
+msgid "Fecha de Nacimiento"
+msgstr "Date of Birth"
+
+msgid "Género"
+msgstr "Gender"
+
+msgid "Guardar Cambios"
+msgstr "Save Changes"
+
+msgid "Seguridad de la Cuenta"
+msgstr "Account Security"
+
+msgid "Verificación en dos pasos"
+msgstr "Two-Factor Authentication"
+
+msgid "Cambiar contraseña"
+msgstr "Change password"
+
+msgid "Contraseña actual"
+msgstr "Current password"
+
+msgid "Nueva contraseña"
+msgstr "New password"
+
+msgid "Confirmar nueva contraseña"
+msgstr "Confirm new password"
+
+msgid "Actualizar contraseña"
+msgstr "Update password"
+
+msgid "Ver todos"
+msgstr "View all"
+
+msgid "Todos"
+msgstr "All"
+
+msgid "Pendientes"
+msgstr "Pending"
+
+msgid "Confirmados"
+msgstr "Confirmed"
+
+msgid "Enviados"
+msgstr "Shipped"
+
+msgid "Entregados"
+msgstr "Delivered"
+
+msgid "Cancelados"
+msgstr "Cancelled"
+
+msgid "Ver detalle"
+msgstr "View details"
+
+msgid "No tienes pedidos realizados"
+msgstr "You have no orders yet"
+
+msgid "Mis Direcciones"
+msgstr "My Addresses"
+
+msgid "Editar"
+msgstr "Edit"
+
+msgid "Eliminar"
+msgstr "Delete"
+
+msgid "Agregar dirección"
+msgstr "Add address"
+
+msgid "Nueva Dirección"
+msgstr "New Address"
+
+msgid "Calle"
+msgstr "Street"
+
+msgid "Colonia"
+msgstr "Neighborhood"
+
+msgid "Ciudad"
+msgstr "City"
+
+msgid "Estado"
+msgstr "State"
+
+msgid "Guardar dirección"
+msgstr "Save address"
+
+msgid "Mis Favoritos"
+msgstr "My Favorites"
+
+msgid "Ver producto"
+msgstr "View product"
+
+msgid "Explorar productos"
+msgstr "Explore products"
+
+msgid "Preferencias de Comunicación"
+msgstr "Communication Preferences"
+
+msgid "Guardar preferencias"
+msgstr "Save preferences"
+
+msgid "Privacidad y Datos"
+msgstr "Privacy and Data"
+
+msgid "Eliminar mi cuenta"
+msgstr "Delete my account"
+
+msgid "Datos fiscales"
+msgstr "Tax information"
+
+msgid "Historial de facturas"
+msgstr "Invoice history"
+
+msgid "Idioma y Región"
+msgstr "Language and Region"
+
+msgid "Moneda"
+msgstr "Currency"
+
+msgid "Región / País"
+msgstr "Region / Country"
+
+msgid "Vista previa"
+msgstr "Preview"
+
+msgid "Guardar cambios"
+msgstr "Save changes"

@@ -12,7 +12,7 @@ class FacturaPDF(FPDF):
         self.set_font("Arial", 'B', 24)
         self.cell(0, 20, 'ORION FACTURA', 0, 1, 'R')
         
-        # Info empresa
+        # Info marca
         self.set_font("Arial", '', 10)
         self.cell(0, 5, 'www.orion-store.com', 0, 1, 'R')
         self.ln(15)

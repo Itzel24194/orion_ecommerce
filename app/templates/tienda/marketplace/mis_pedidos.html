@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos | ORION Marketplace</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            padding: 0; height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px; text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            margin-bottom: 10px; flex-shrink: 0;
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .admin-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a:hover i, .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* MAIN */
+        .main {
+            margin-left: 280px; padding: 30px 35px 20px;
+            width: 100%; min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 20px; border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem; font-weight: 800; color: #1a1a2e;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag {
+            background: #0284c7; color: #fff; padding: 5px 18px;
+            border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; display: flex; align-items: center; gap: 6px;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px; margin-bottom: 24px;
+        }
+        .stat-mini {
+            background: #fff; border-radius: 14px; padding: 18px 20px;
+            border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(0,0,0,.04);
+            display: flex; align-items: center; gap: 14px; transition: all 0.25s;
+        }
+        .stat-mini:hover { border-color: #e10098; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(225,0,152,.1); }
+        .stat-mini .stat-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .stat-mini .stat-icon.pink { background: #fce7f3; color: #e10098; }
+        .stat-mini .stat-icon.green { background: #ecfdf5; color: #10b981; }
+        .stat-mini .stat-icon.blue { background: #dbeafe; color: #3b82f6; }
+        .stat-mini .stat-icon.orange { background: #ffedd5; color: #f97316; }
+        .stat-mini .stat-icon.red { background: #fee2e2; color: #ef4444; }
+        .stat-mini .stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+        .stat-mini .stat-num { font-size: 1.4rem; font-weight: 900; color: #1a1a2e; line-height: 1.1; }
+        .stat-mini .stat-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+        /* Botones */
+        .btn-outline-gray {
+            background: transparent; color: #64748b;
+            border: 2px solid #e2e8f0; font-weight: 700;
+            border-radius: 50px; padding: 9px 22px;
+            transition: all 0.25s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 0.85rem; cursor: pointer;
+        }
+        .btn-outline-gray:hover { background: #f1f5f9; color: #1e293b; border-color: #cbd5e1; }
+        .btn-blue-custom {
+            background: #0284c7; color: white; padding: 10px 25px; border-radius: 50px;
+            text-decoration: none; font-weight: 700; font-size: 0.85rem;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.3s ease; border: none; cursor: pointer;
+        }
+        .btn-blue-custom:hover { background: #0369a1; color: white; transform: translateY(-2px); }
+
+        /* Filtros */
+        .filters-bar {
+            background: #fff; border-radius: 14px; padding: 16px 20px;
+            border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(0,0,0,.04);
+            margin-bottom: 20px; display: flex; gap: 12px; align-items: end; flex-wrap: wrap;
+        }
+        .filter-group { flex: 1; min-width: 180px; }
+        .filter-group label {
+            font-size: 0.7rem; font-weight: 700; color: #64748b;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 5px; display: block;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%; border: 2px solid #e2e8f0; border-radius: 8px;
+            padding: 8px 12px; font-size: 0.85rem;
+            transition: all 0.2s ease; background: white; font-family: inherit;
+        }
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none; border-color: #e10098;
+            box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.1);
+        }
+
+        /* Tabla */
+        .card-tabla {
+            background: #fff; border-radius: 14px;
+            border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(0,0,0,.04);
+            overflow: hidden; margin-bottom: 24px;
+        }
+        .tabla-pedidos { width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; font-size: 0.88rem; }
+        .tabla-pedidos thead th {
+            background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+            color: #fff; font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 14px 16px; border: none; white-space: nowrap; text-align: left;
+        }
+        .tabla-pedidos tbody td {
+            padding: 14px 16px; border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle; background: #fff;
+        }
+        .tabla-pedidos tbody tr:hover td { background: #fdf7fb; }
+        .tabla-pedidos tbody tr:last-child td { border-bottom: none; }
+
+        .pedido-num {
+            font-weight: 800; color: #1e293b; font-size: 0.92rem;
+            font-family: 'Courier New', monospace;
+        }
+        .pedido-fecha { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+
+        .badge-estado {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 5px 12px; border-radius: 50px;
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.3px; text-transform: uppercase;
+        }
+        .badge-estado.pendiente { background: #fef3c7; color: #b45309; }
+        .badge-estado.confirmado { background: #dbeafe; color: #1d4ed8; }
+        .badge-estado.preparando { background: #e0e7ff; color: #4338ca; }
+        .badge-estado.enviado { background: #cffafe; color: #0e7490; }
+        .badge-estado.entregado { background: #d1fae5; color: #047857; }
+        .badge-estado.cancelado { background: #fee2e2; color: #b91c1c; }
+
+        .monto-num { font-weight: 800; color: #e10098; font-size: 0.95rem; }
+        .cliente-nombre { font-weight: 700; color: #1e293b; font-size: 0.85rem; }
+        .cliente-email { font-size: 0.7rem; color: #94a3b8; }
+
+        .acciones-cell { display: flex; gap: 6px; justify-content: flex-end; }
+        .btn-accion {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1.5px solid #e2e8f0; background: #fff;
+            color: #64748b; display: inline-flex; align-items: center; justify-content: center;
+            transition: all 0.2s; text-decoration: none; font-size: 0.85rem; cursor: pointer;
+        }
+        .btn-accion:hover { border-color: #e10098; color: #e10098; transform: translateY(-1px); }
+        .btn-accion.blue:hover { border-color: #0284c7; color: #0284c7; }
+
+        /* Empty */
+        .empty-state { text-align: center; padding: 60px 20px; color: #64748b; }
+        .empty-state i { font-size: 4rem; color: #cbd5e1; display: block; margin-bottom: 16px; }
+        .empty-state h4 { font-weight: 800; color: #475569; margin-bottom: 8px; }
+        .empty-state p { font-size: 0.9rem; margin-bottom: 20px; }
+
+        /* Paginación */
+        .pagination-wrap {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 20px; border-top: 1px solid #f1f5f9;
+            background: #fafbfc; flex-wrap: wrap; gap: 12px;
+        }
+        .pagination-info { font-size: 0.82rem; color: #64748b; font-weight: 600; }
+        .pagination-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        .btn-page {
+            min-width: 36px; height: 36px; padding: 0 12px;
+            border: 2px solid #e2e8f0; background: #fff; color: #334155;
+            border-radius: 8px; font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; font-family: inherit;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-page:hover:not(:disabled) { background: #e10098; color: #fff; border-color: #e10098; }
+        .btn-page.active { background: #e10098; color: #fff; border-color: #e10098; }
+        .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* Footer */
+        .footer-info {
+            background: #ffffff; padding: 15px 25px; border-radius: 16px;
+            border: 1px solid #e8e8e8; text-align: center;
+            margin-top: auto; flex-shrink: 0;
+        }
+        .footer-info p {
+            color: #888; font-size: 0.75rem; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; flex-wrap: wrap;
+        }
+        .footer-info i { color: #e10098; }
+        .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .top-bar h1 { font-size: 1.3rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .tabla-pedidos { font-size: 0.8rem; }
+            .tabla-pedidos thead th, .tabla-pedidos tbody td { padding: 10px 8px; }
+            .filter-group { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Vendedor">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ vendedor.nombre_tienda }}&background=0284c7&color=fff&size=80&bold=true" class="avatar" alt="Vendedor">
+            {% endif %}
+            <div class="name">{{ vendedor.nombre_tienda }}</div>
+            <div class="email">{{ session.get('email', '') }}</div>
+            <div class="rol"><i class="fas fa-shop"></i> Vendedor</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+            <div class="panel-title">MI TIENDA</div>
+            <a href="{{ url_for('web.marketplace_dashboard') }}">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_productos') }}">
+                <i class="fas fa-box"></i> <span>Mis productos</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_pedidos') }}" class="active">
+                <i class="fas fa-shopping-cart"></i> <span>Mis pedidos</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">TIENDA</div>
+
+            {% if vendedor.slug %}
+            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank">
+                <i class="fas fa-eye"></i> <span>Ver mi tienda</span>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('web.marketplace') }}">
+                <i class="fas fa-store"></i> <span>Marketplace</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">CLIENTE</div>
+
+            <a href="{{ url_for('web.raiz_tienda') }}">
+                <i class="fas fa-home"></i> <span>Ir a tienda ORION</span>
+            </a>
+            <a href="{{ url_for('web.perfil') }}">
+                <i class="fas fa-user"></i> <span>Mi perfil</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-shopping-cart"></i> Mis Pedidos</h1>
+            <div class="tag">
+                <i class="fas fa-shop"></i> {{ vendedor.nombre_tienda }}
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for cat, msg in messages %}
+                    <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert" style="border-radius:10px;">
+                        {{ msg }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- STATS -->
+        {% set ns = namespace(pendientes=0, enviados=0, entregados=0, cancelados=0) %}
+        {% for p in pedidos %}
+            {% set est = p.estado if p.estado is defined else (p.get('estado') if p.get is defined else 'pendiente') %}
+            {% if est in ('pendiente', 'confirmado', 'preparando') %}
+                {% set ns.pendientes = ns.pendientes + 1 %}
+            {% elif est == 'enviado' %}
+                {% set ns.enviados = ns.enviados + 1 %}
+            {% elif est == 'entregado' %}
+                {% set ns.entregados = ns.entregados + 1 %}
+            {% elif est == 'cancelado' %}
+                {% set ns.cancelados = ns.cancelados + 1 %}
+            {% endif %}
+        {% endfor %}
+
+        <div class="stats-grid">
+            <div class="stat-mini">
+                <div class="stat-icon blue"><i class="fas fa-receipt"></i></div>
+                <div class="stat-content">
+                    <div class="stat-num">{{ pedidos|length }}</div>
+                    <div class="stat-lbl">Total</div>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+                <div class="stat-content">
+                    <div class="stat-num">{{ ns.pendientes }}</div>
+                    <div class="stat-lbl">Pendientes</div>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-icon purple"><i class="fas fa-truck"></i></div>
+                <div class="stat-content">
+                    <div class="stat-num">{{ ns.enviados }}</div>
+                    <div class="stat-lbl">Enviados</div>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-content">
+                    <div class="stat-num">{{ ns.entregados }}</div>
+                    <div class="stat-lbl">Entregados</div>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-icon red"><i class="fas fa-times-circle"></i></div>
+                <div class="stat-content">
+                    <div class="stat-num">{{ ns.cancelados }}</div>
+                    <div class="stat-lbl">Cancelados</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+            <a href="{{ url_for('web.marketplace_dashboard') }}" class="btn-outline-gray">
+                <i class="fas fa-arrow-left"></i> Volver al dashboard
+            </a>
+            {% if vendedor.slug %}
+            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank" class="btn-blue-custom">
+                <i class="fas fa-eye"></i> Ver tienda pública
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <label><i class="fas fa-search"></i> Buscar</label>
+                <input type="text" id="filtroBusqueda" placeholder="Número de pedido o cliente..." oninput="aplicarFiltros()">
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-toggle-on"></i> Estado</label>
+                <select id="filtroEstado" onchange="aplicarFiltros()">
+                    <option value="">Todos</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="preparando">Preparando</option>
+                    <option value="enviado">Enviado</option>
+                    <option value="entregado">Entregado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 0;">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-outline-gray" onclick="limpiarFiltros()">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <!-- TABLA -->
+        <div class="card-tabla">
+            {% if pedidos %}
+            <div class="table-responsive">
+                <table class="tabla-pedidos">
+                    <thead>
+                        <tr>
+                            <th style="width: 180px;">Pedido</th>
+                            <th>Cliente</th>
+                            <th style="width: 120px;">Productos</th>
+                            <th style="width: 120px;">Total</th>
+                            <th style="width: 130px;">Estado</th>
+                            <th style="width: 100px;" class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-pedidos">
+                        {% for p in pedidos %}
+                            {# Soporta tanto dict como objeto #}
+                            {% set p_numero = p.numero_pedido if p.numero_pedido is defined else p.get('numero_pedido', '') %}
+                            {% set p_estado = p.estado if p.estado is defined else p.get('estado', 'pendiente') %}
+                            {% set p_created = p.created_at if p.created_at is defined else p.get('created_at') %}
+                            {% set p_id = p._id if p._id is defined else p.get('_id', '') %}
+                            {% set p_usuario_nombre = p.usuario_nombre if p.usuario_nombre is defined else p.get('usuario_nombre', '') %}
+                            {% set p_usuario_email = p.usuario_email if p.usuario_email is defined else p.get('usuario_email', '') %}
+                            {% set p_items = p.items if p.items is defined else p.get('items', []) %}
+                            
+                            {# Calcular items del vendedor #}
+                            {% set items_vendedor_count = namespace(c=0) %}
+                            {% set subtotal_vendedor = namespace(s=0) %}
+                            {% for item in (p_items or []) %}
+                                {% set item_vid = item.vendedor_id if item.vendedor_id is defined else item.get('vendedor_id') %}
+                                {% if item_vid and item_vid|string == vendedor._id|string %}
+                                    {% set items_vendedor_count.c = items_vendedor_count.c + 1 %}
+                                    {% set item_precio = item.precio if item.precio is defined else item.get('precio', 0) %}
+                                    {% set item_cantidad = item.cantidad if item.cantidad is defined else item.get('cantidad', 1) %}
+                                    {% set subtotal_vendedor.s = subtotal_vendedor.s + (item_precio * item_cantidad) %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <tr class="fila-pedido"
+                                data-numero="{{ (p_numero or '')|lower }}"
+                                data-cliente="{{ (p_usuario_nombre or '')|lower }}"
+                                data-estado="{{ p_estado or 'pendiente' }}">
+                                <td>
+                                    <div class="pedido-num">
+                                        {% if p_numero %}
+                                            #{{ p_numero }}
+                                        {% else %}
+                                            #{{ p_id[:8]|upper if p_id else 'N/A' }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="pedido-fecha">
+                                        {% if p_created and p_created.strftime is defined %}
+                                            {{ p_created.strftime('%d/%m/%Y · %H:%M') }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cliente-nombre">{{ p_usuario_nombre or 'Cliente' }}</div>
+                                    {% if p_usuario_email %}
+                                        <div class="cliente-email">{{ p_usuario_email }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span style="font-weight:800;color:#1e293b;">{{ items_vendedor_count.c }}</span>
+                                    <div style="font-size:0.7rem;color:#94a3b8;">producto{{ 's' if items_vendedor_count.c != 1 }}</div>
+                                </td>
+                                <td>
+                                    <span class="monto-num">${{ "%.2f"|format(subtotal_vendedor.s) }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge-estado {{ p_estado }}">
+                                        {% if p_estado == 'pendiente' %}<i class="fas fa-clock"></i>
+                                        {% elif p_estado == 'confirmado' %}<i class="fas fa-check"></i>
+                                        {% elif p_estado == 'preparando' %}<i class="fas fa-box"></i>
+                                        {% elif p_estado == 'enviado' %}<i class="fas fa-truck"></i>
+                                        {% elif p_estado == 'entregado' %}<i class="fas fa-check-circle"></i>
+                                        {% elif p_estado == 'cancelado' %}<i class="fas fa-times-circle"></i>
+                                        {% endif %}
+                                        {{ p_estado|capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="acciones-cell">
+                                        <a href="{{ url_for('web.marketplace_ver_pedido', pedido_id=p_id) }}"
+                                           class="btn-accion blue" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <tr id="fila-sin-resultados" style="display:none;">
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="fas fa-search" style="font-size:2rem;display:block;opacity:0.3;margin-bottom:8px;"></i>
+                                No se encontraron pedidos con los filtros aplicados
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-wrap">
+                <div class="pagination-info" id="paginationInfo">Mostrando 0 de 0 pedidos</div>
+                <div class="pagination-controls" id="paginationControls"></div>
+            </div>
+
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h4>Aún no tienes pedidos</h4>
+                <p>Cuando un cliente compre tus productos, los verás aquí.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="footer-info">
+            <p>
+                <i class="fas fa-clock"></i> {{ datetime.now().strftime('%d/%m/%Y %H:%M') if datetime else 'Ahora' }}
+                <span>|</span>
+                <i class="fas fa-shield-alt"></i> ORION Marketplace
+                <span>|</span>
+                <span class="heart"><i class="fas fa-heart"></i></span>
+            </p>
+        </div>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let paginaActual = 1;
+    const tamPagina = 25;
+    let filasVisibles = [];
+
+    function getAllFilas() {
+        return Array.from(document.querySelectorAll('#tbody-pedidos .fila-pedido'));
+    }
+
+    function filtrarFilas() {
+        const q = (document.getElementById('filtroBusqueda').value || '').toLowerCase().trim();
+        const estado = document.getElementById('filtroEstado').value;
+
+        filasVisibles = getAllFilas().filter(function(f) {
+            const numero = f.dataset.numero || '';
+            const cliente = f.dataset.cliente || '';
+            const est = f.dataset.estado || '';
+
+            if (q && !numero.includes(q) && !cliente.includes(q)) return false;
+            if (estado && est !== estado) return false;
+            return true;
+        });
+    }
+
+    function renderPagina() {
+        getAllFilas().forEach(function(f) { f.style.display = 'none'; });
+
+        const total = filasVisibles.length;
+        const totalPags = Math.ceil(total / tamPagina) || 1;
+        if (paginaActual > totalPags) paginaActual = Math.max(1, totalPags);
+
+        const inicio = (paginaActual - 1) * tamPagina;
+        const fin = Math.min(inicio + tamPagina, total);
+
+        filasVisibles.slice(inicio, fin).forEach(function(f) { f.style.display = ''; });
+
+        const filaVacia = document.getElementById('fila-sin-resultados');
+        if (filaVacia) {
+            filaVacia.style.display = (total === 0 && getAllFilas().length > 0) ? '' : 'none';
+        }
+
+        const info = document.getElementById('paginationInfo');
+        if (info) {
+            if (total === 0) {
+                info.textContent = 'No se encontraron pedidos';
+            } else {
+                info.textContent = 'Mostrando ' + (inicio + 1) + '–' + fin + ' de ' + total + ' pedido' + (total !== 1 ? 's' : '');
+            }
+        }
+
+        const ctrl = document.getElementById('paginationControls');
+        if (!ctrl) return;
+        if (totalPags <= 1) { ctrl.innerHTML = ''; return; }
+
+        let html = '';
+        html += '<button class="btn-page" onclick="irPagina(' + (paginaActual - 1) + ')" ' + (paginaActual === 1 ? 'disabled' : '') + '>‹</button>';
+
+        const rango = new Set();
+        rango.add(1); rango.add(totalPags);
+        for (let i = Math.max(1, paginaActual - 2); i <= Math.min(totalPags, paginaActual + 2); i++) rango.add(i);
+        const paginas = Array.from(rango).sort(function(a, b) { return a - b; });
+
+        let prev = 0;
+        paginas.forEach(function(p) {
+            if (p - prev > 1) html += '<span style="padding:5px 4px;color:#94a3b8;">…</span>';
+            html += '<button class="btn-page' + (p === paginaActual ? ' active' : '') + '" onclick="irPagina(' + p + ')">' + p + '</button>';
+            prev = p;
+        });
+
+        html += '<button class="btn-page" onclick="irPagina(' + (paginaActual + 1) + ')" ' + (paginaActual === totalPags ? 'disabled' : '') + '>›</button>';
+        ctrl.innerHTML = html;
+    }
+
+    function irPagina(p) {
+        const totalPags = Math.ceil(filasVisibles.length / tamPagina) || 1;
+        paginaActual = Math.max(1, Math.min(p, totalPags));
+        renderPagina();
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+    }
+
+    function aplicarFiltros() { paginaActual = 1; filtrarFilas(); renderPagina(); }
+    function limpiarFiltros() {
+        document.getElementById('filtroBusqueda').value = '';
+        document.getElementById('filtroEstado').value = '';
+        aplicarFiltros();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        filtrarFilas();
+        renderPagina();
+    });
+</script>
+
+</body>
+</html>

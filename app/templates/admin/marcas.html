@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION Admin | Auditoría de Marcas · MARCANET</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: #f5f6f8;
+            color: #1a1a2e;
+        }
+
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 2px solid #e8e8e8;
+            height: 100vh;
+            position: fixed;
+            left: 0; top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            flex-shrink: 0;
+        }
+
+        .sidebar .admin-profile .avatar {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            background: #f0f0f0;
+        }
+
+        .sidebar .admin-profile .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-top: 10px;
+        }
+
+        .sidebar .admin-profile .email {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .sidebar .logo {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #e10098;
+            text-align: center;
+            padding: 15px 0 5px;
+            letter-spacing: -1px;
+        }
+
+        .sidebar .logo span { color: #1a1a2e; }
+
+        .sidebar .menu-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 10px;
+        }
+
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb {
+            background: #e10098;
+            border-radius: 4px;
+        }
+
+        .sidebar .panel-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #888;
+            padding: 10px 25px 5px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+
+        .sidebar a:hover {
+            background: #f8f0f5;
+            color: #e10098;
+            border-left-color: #e10098;
+        }
+
+        .sidebar a:hover i { color: #e10098; }
+
+        .sidebar a.active {
+            background: #f8f0f5;
+            color: #e10098;
+            border-left-color: #e10098;
+        }
+
+        .sidebar a.active i { color: #e10098; }
+
+        .sidebar .divider {
+            height: 1px;
+            background: #e8e8e8;
+            margin: 10px 25px;
+        }
+
+        .sidebar .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #dc3545;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover {
+            background: #fdf0f0;
+            border-left-color: #dc3545;
+        }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px;
+            padding: 30px 35px 20px;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .top-bar h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-bar h1 i { color: #e10098; }
+
+        .top-bar .tag {
+            background: #e10098;
+            color: #fff;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, #fff, #faf0f5);
+            padding: 25px 30px;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .hero h2 {
+            color: #1a1a2e;
+            margin-bottom: 8px;
+            font-weight: 800;
+            font-size: 1.3rem;
+        }
+
+        .hero h2 i { color: #e10098; }
+
+        .hero p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .hero strong { color: #e10098; }
+
+        /* ===== BOTONES ===== */
+        .btn-primary-custom {
+            background: #e10098;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-custom:hover {
+            background: #c00080;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
+        }
+
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 18px 22px;
+            border-radius: 14px;
+            border: 1px solid #e8e8e8;
+            border-left: 4px solid #e10098;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(225, 0, 152, 0.1);
+        }
+
+        .stat-card.green { border-left-color: #198754; }
+        .stat-card.yellow { border-left-color: #ffc107; }
+        .stat-card.red { border-left-color: #dc3545; }
+        .stat-card.blue { border-left-color: #0d6efd; }
+
+        .stat-card .number {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #1a1a2e;
+            display: block;
+        }
+
+        .stat-card.green .number { color: #198754; }
+        .stat-card.yellow .number { color: #ffc107; }
+        .stat-card.red .number { color: #dc3545; }
+        .stat-card.blue .number { color: #0d6efd; }
+
+        .stat-card .label {
+            color: #888;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 3px;
+            display: block;
+        }
+
+        /* ===== SECTION BOX ===== */
+        .section-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .section-box h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-box h2 i { color: #e10098; }
+
+        /* ===== FORMULARIO ===== */
+        .form-label-custom {
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .form-control-custom,
+        .form-select-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 9px 14px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+            width: 100%;
+        }
+
+        .form-control-custom:focus,
+        .form-select-custom:focus {
+            border-color: #e10098;
+            box-shadow: 0 0 0 4px rgba(225, 0, 152, 0.1);
+            outline: none;
+        }
+
+        /* ===== TABLA ===== */
+        .table-container { overflow-x: auto; }
+
+        .table-custom {
+            width: 100%;
+            font-size: 0.9rem;
+            border-collapse: separate;
+            border-spacing: 0 6px;
+        }
+
+        .table-custom thead th {
+            background: linear-gradient(135deg, #1a2332, #2d3436);
+            color: white;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            border: none;
+        }
+
+        .table-custom tbody td {
+            padding: 12px 16px;
+            background: white;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .table-custom tbody tr:hover td {
+            background: #faf5ff;
+        }
+
+        .table-scroll {
+            max-height: 750px;
+            overflow-y: auto;
+        }
+
+        .table-scroll::-webkit-scrollbar { width: 6px; }
+        .table-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #e10098;
+            border-radius: 10px;
+        }
+
+        /* ===== BADGES ===== */
+        .badge-status {
+            font-size: 0.65rem;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .badge-status.pendiente { background: #fff3cd; color: #856404; }
+        .badge-status.activo    { background: #d1e7dd; color: #0f5132; }
+        .badge-status.negado    { background: #f8d7da; color: #842029; }
+
+        /* ===== FILA IMPI ===== */
+        .row-impi td {
+            background: #f0f7ff !important;
+            border-left: 4px solid #0d6efd;
+            padding: 15px 20px !important;
+        }
+
+        .impi-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #0d6efd;
+            margin-bottom: 12px;
+        }
+
+        /* ============================================================
+           ✅ TABLA IMPI CORREGIDA - Layout fijo + truncado con "..."
+           ============================================================ */
+        .table-impi {
+            font-size: 0.78rem;
+            margin-bottom: 0;
+            background: white;
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .table-impi thead th {
+            background: #cfe2ff;
+            color: #084298;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            padding: 9px 10px;
+            text-align: left;
+            border-bottom: 2px solid #9ec5fe;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .table-impi tbody td {
+            padding: 9px 10px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eef2f7;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 0;
+        }
+
+        .table-impi tbody tr:hover td {
+            background: #f8fbff;
+        }
+
+        .table-impi tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-impi code {
+            background: #f1f3f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            color: #c7254e;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Badge de clase Niza */
+        .badge-clase {
+            display: inline-block;
+            background: #0d6efd;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            min-width: 30px;
+        }
+
+        /* ===== BOTONES DE ACCIÓN ===== */
+        .btn-action-group {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action-group .btn {
+            padding: 5px 10px;
+            font-size: 0.72rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-group .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-action-group .btn-success   { background: #198754; color: white; }
+        .btn-action-group .btn-warning   { background: #ffc107; color: #1a1a2e; }
+        .btn-action-group .btn-info      { background: #0dcaf0; color: white; }
+        .btn-action-group .btn-secondary { background: #6c757d; color: white; }
+        .btn-action-group .btn-danger    { background: #dc3545; color: white; }
+        .btn-action-group .btn-primary   { background: #0d6efd; color: white; }
+
+        /* ===== BOTÓN PDF RESULTADO IMPI ===== */
+        .btn-pdf-impi {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #dc3545;
+            color: white !important;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-pdf-impi:hover {
+            background: #b02a37;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast-notification {
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.4s ease;
+            min-width: 250px;
+        }
+
+        .toast-notification.success { background: #198754; }
+        .toast-notification.error   { background: #dc3545; }
+        .toast-notification.warning { background: #ffc107; color: #1a1a2e; }
+        .toast-notification.info    { background: #0dcaf0; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-info {
+            background: #ffffff;
+            padding: 15px 25px;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            text-align: center;
+            margin-top: auto;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+        }
+
+        .footer-info p {
+            color: #888;
+            font-size: 0.75rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-info i { color: #e10098; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo,
+            .sidebar .panel-title,
+            .sidebar a span,
+            .sidebar .admin-profile .name,
+            .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol,
+            .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .sidebar .logout-btn i { font-size: 1.3rem; margin: 0; }
+            .main { margin-left: 70px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+
+        <div class="admin-profile">
+            {% set nombre_admin = session.get('nombre', 'Admin') %}
+            {% set foto_admin = session.get('foto') %}
+            <img src="{{ url_for('static', filename='uploads/' + foto_admin) if foto_admin else 'https://ui-avatars.com/api/?name=' + nombre_admin + '&background=e10098&color=fff&size=80&bold=true' }}"
+                 class="avatar" alt="Admin"
+                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ nombre_admin }}&background=e10098&color=fff&size=80&bold=true';">
+            <div class="name">{{ nombre_admin }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="bi bi-shield-alt"></i> Administrador</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+
+            <a href="{{ url_for('web.dashboard') }}">
+                <i class="bi bi-house"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('web.lista_usuarios') }}">
+                <i class="bi bi-people"></i> <span>Usuarios</span>
+            </a>
+            <a href="{{ url_for('web.lista_categorias') }}">
+                <i class="bi bi-tags"></i> <span>Categorías</span>
+            </a>
+
+            <a href="{{ url_for('web.lista_marcas') }}" class="active">
+                <i class="bi bi-shield-check"></i> <span>Marcas</span>
+            </a>
+
+            <a href="{{ url_for('web.lista_productos') }}">
+                <i class="bi bi-box"></i> <span>Productos</span>
+            </a>
+            <a href="{{ url_for('web.admin_combos') }}">
+                <i class="bi bi-layer-group"></i> <span>Combos</span>
+            </a>
+            <a href="{{ url_for('web.admin_resenas') }}">
+                <i class="bi bi-star"></i> <span>Reseñas</span>
+            </a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}">
+                <i class="bi bi-cart"></i> <span>Pedidos</span>
+            </a>
+            <a href="{{ url_for('web.lista_atributos') }}">
+                <i class="bi bi-list-ul"></i> <span>Atributos</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}">
+                <i class="bi bi-graph-up"></i> <span>Ventas</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}">
+                <i class="bi bi-gift"></i> <span>Promociones</span>
+            </a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}">
+                <i class="bi bi-ticket-perforated"></i> <span>Cupones</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">IA</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}">
+                <i class="bi bi-cpu"></i> <span>Análisis</span>
+            </a>
+            <a href="{{ url_for('web.segmentacion_clientes') }}">
+                <i class="bi bi-pie-chart"></i> <span>Segmentación</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.reportes') }}">
+                <i class="bi bi-file-text"></i> <span>Reportes</span>
+            </a>
+            <a href="{{ url_for('web.configuracion') }}">
+                <i class="bi bi-gear"></i> <span>Configuración</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+
+        <!-- ===== TOP BAR ===== -->
+        <header class="top-bar">
+            <h1>
+                <i class="bi bi-shield-check"></i> Auditoría de Marcas
+            </h1>
+            <div class="tag">
+                <i class="bi bi-award"></i> Estilo MARCANET
+            </div>
+        </header>
+
+        <!-- ===== HERO ===== -->
+        <section class="hero">
+            <h2><i class="bi bi-search"></i> Consulta, registra y valida marcas contra el Acervo del IMPI</h2>
+            <p>
+                Desde aquí puedes <strong>registrar nuevas marcas</strong>, extraer datos del acervo público del IMPI
+                (estilo MARCANET), aprobar o negar solicitudes, y <strong>descargar fichas en PDF</strong> con el
+                formato oficial de ORION.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="{{ url_for('web.descargar_pdf_todas_marcas') }}"
+                   class="btn-primary-custom" target="_blank">
+                    <i class="bi bi-file-earmark-pdf"></i> Descargar PDF masivo
+                </a>
+                <a href="{{ url_for('web.exportar_marcas_csv') }}"
+                   class="btn-primary-custom" style="background: #198754;">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Exportar CSV
+                </a>
+            </div>
+        </section>
+
+        <!-- ===== STATS ===== -->
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="number">{{ stats.total }}</div>
+                <div class="label">Total marcas</div>
+            </div>
+            <div class="stat-card green">
+                <div class="number">{{ stats.activas }}</div>
+                <div class="label">Activas</div>
+            </div>
+            <div class="stat-card yellow">
+                <div class="number">{{ stats.pendientes }}</div>
+                <div class="label">Pendientes</div>
+            </div>
+            <div class="stat-card red">
+                <div class="number">{{ stats.negadas }}</div>
+                <div class="label">Negadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{{ stats.con_impi }}</div>
+                <div class="label">Con datos IMPI</div>
+            </div>
+        </div>
+
+        <!-- ===== FORMULARIO DE REGISTRO ===== -->
+        <div class="section-box">
+            <h2><i class="bi bi-plus-circle"></i> Registrar nueva marca</h2>
+            <form action="{{ url_for('web.agregar_marca') }}" method="POST" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label-custom">Nombre de la Marca *</label>
+                    <input type="text" name="nombre" class="form-control-custom" required placeholder="Ej: Nike">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label-custom">RFC</label>
+                    <input type="text" name="rfc" class="form-control-custom" placeholder="ABC123456XYZ" maxlength="13">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label-custom">Correo</label>
+                    <input type="email" name="correo" class="form-control-custom" placeholder="contacto@marca.com">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label-custom">Teléfono</label>
+                    <input type="text" name="telefono" class="form-control-custom" placeholder="55 1234 5678">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label-custom">Dirección</label>
+                    <input type="text" name="direccion" class="form-control-custom" placeholder="Av. Reforma 123">
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn-primary-custom">
+                        <i class="bi bi-save"></i> Registrar marca
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ===== TABLA DE MARCAS ===== -->
+        <div class="section-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                <h2 style="margin: 0;"><i class="bi bi-list"></i> Marcas registradas</h2>
+
+                <!-- BUSCADOR -->
+                <form method="GET" action="{{ url_for('web.lista_marcas') }}" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <input type="text" name="q" class="form-control-custom"
+                           placeholder="Buscar por nombre o RFC..."
+                           value="{{ request.args.get('q', '') }}"
+                           style="width: 250px;">
+                    <select name="status" class="form-select-custom" style="width: 150px;">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente" {% if request.args.get('status')=='pendiente' %}selected{% endif %}>Pendiente</option>
+                        <option value="activo" {% if request.args.get('status')=='activo' %}selected{% endif %}>Activo</option>
+                        <option value="negado" {% if request.args.get('status')=='negado' %}selected{% endif %}>Negado</option>
+                    </select>
+                    <button class="btn-primary-custom" type="submit" style="padding: 9px 20px;">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <a href="{{ url_for('web.lista_marcas') }}"
+                       class="btn-primary-custom" style="background: #6c757d; padding: 9px 20px;">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <div class="table-scroll">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th style="width: 200px;">Marca</th>
+                                <th style="width: 120px;">RFC</th>
+                                <th style="width: 200px;">Contacto</th>
+                                <th style="width: 160px;">Acción IMPI</th>
+                                <th style="width: 100px;">Estado</th>
+                                <th style="width: 260px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for marca in marcas %}
+                            <tr>
+                                <td>
+                                    <strong>{{ marca.nombre_comercial }}</strong>
+                                    {% if marca.notas_admin %}
+                                        <br><small class="text-muted">{{ marca.notas_admin[:80] }}{% if marca.notas_admin|length > 80 %}...{% endif %}</small>
+                                    {% endif %}
+                                </td>
+                                <td><code>{{ marca.rfc or '—' }}</code></td>
+                                <td>
+                                    <small>
+                                        {% if marca.correo %}<i class="bi bi-envelope"></i> {{ marca.correo }}<br>{% endif %}
+                                        {% if marca.telefono %}<i class="bi bi-phone"></i> {{ marca.telefono }}{% endif %}
+                                    </small>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('web.validar_impi', id=marca._id) }}"
+                                       class="btn btn-info"
+                                       title="Extraer datos del Acervo IMPI"
+                                       style="padding: 5px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: white;">
+                                        <i class="bi bi-search"></i> Extraer datos
+                                    </a>
+                                    {% if marca.datos_impi %}
+                                        <span class="badge bg-success ms-1">{{ marca.datos_impi|length }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge-status {{ marca.status or 'pendiente' }}">
+                                        {{ (marca.status or 'pendiente')|upper }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-action-group">
+                                        {% if marca.status != 'activo' %}
+                                        <a href="{{ url_for('web.aprobar_marca', id=marca._id) }}"
+                                           class="btn btn-success" title="Aprobar">
+                                            <i class="bi bi-check-circle"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% if marca.status != 'negado' %}
+                                        <button type="button" class="btn btn-warning"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalNegar"
+                                                data-id="{{ marca._id }}"
+                                                data-nombre="{{ marca.nombre_comercial }}"
+                                                title="Negar">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                        {% endif %}
+
+                                        <a href="{{ url_for('web.descargar_pdf_marca', id=marca._id) }}"
+                                           class="btn btn-secondary" title="Descargar ficha PDF"
+                                           target="_blank">
+                                            <i class="bi bi-file-earmark-pdf"></i>
+                                        </a>
+
+                                        <a href="{{ url_for('web.ver_marca', id=marca._id) }}"
+                                           class="btn btn-primary" title="Ver detalle">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+
+                                        <a href="{{ url_for('web.eliminar_marca', id=marca._id) }}"
+                                           class="btn btn-danger"
+                                           onclick="return confirm('¿Eliminar esta marca? Esta acción no se puede deshacer.')"
+                                           title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ===== RESULTADOS IMPI ===== -->
+                            {% if marca.datos_impi %}
+                            <tr class="row-impi">
+                                <td colspan="6">
+                                    <div class="impi-header">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                        Resultados del Acervo IMPI ({{ marca.datos_impi|length }} registros)
+                                    </div>
+                                    <div style="overflow-x: auto; border-radius: 8px;">
+                                        <table class="table-impi">
+                                            <colgroup>
+                                                <col style="width: 22%;">
+                                                <col style="width: 12%;">
+                                                <col style="width: 14%;">
+                                                <col style="width: 12%;">
+                                                <col style="width: 18%;">
+                                                <col style="width: 10%;">
+                                                <col style="width: 12%;">
+                                            </colgroup>
+                                            <thead>
+                                                <tr>
+                                                    <th title="Solicitud">Solicitud</th>
+                                                    <th title="Tipo">Tipo</th>
+                                                    <th title="Expediente">Expediente</th>
+                                                    <th title="Registro">Registro</th>
+                                                    <th title="Denominación">Denominación</th>
+                                                    <th title="Clase" style="text-align: center;">Clase</th>
+                                                    <th title="Descargar PDF" style="text-align: center;">PDF</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in marca.datos_impi %}
+                                                <tr>
+                                                    <td title="{{ item.solicitud }}">
+                                                        {{ item.solicitud or '—' }}
+                                                    </td>
+                                                    <td title="{{ item.tipo }}">
+                                                        {{ item.tipo or '—' }}
+                                                    </td>
+                                                    <td title="{{ item.expediente }}">
+                                                        <code>{{ item.expediente or '—' }}</code>
+                                                    </td>
+                                                    <td title="{{ item.registro }}">
+                                                        <code>{{ item.registro or '—' }}</code>
+                                                    </td>
+                                                    <td title="{{ item.denominacion }}">
+                                                        <strong>{{ item.denominacion or '—' }}</strong>
+                                                    </td>
+                                                    <td style="text-align: center;">
+                                                        {% if item.clase %}
+                                                            <span class="badge-clase">{{ item.clase }}</span>
+                                                        {% else %}
+                                                            <span class="text-muted">—</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td style="text-align: center;">
+                                                        <a href="{{ url_for('web.descargar_pdf_resultado_impi', marca_id=marca._id, index=loop.index0) }}"
+                                                           class="btn-pdf-impi"
+                                                           title="Descargar PDF de este resultado"
+                                                           target="_blank">
+                                                            <i class="bi bi-file-earmark-pdf-fill"></i>
+                                                            PDF
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+
+                            {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 50px 20px; color: #999;">
+                                    <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.4;"></i>
+                                    <p style="margin-top: 12px; font-weight: 600;">No hay marcas registradas</p>
+                                    <small>Usa el formulario de arriba para agregar la primera</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer-info">
+            <p>
+                <i class="bi bi-clock"></i>
+                <span id="fecha-actual"></span>
+                <span>|</span>
+                <i class="bi bi-shield-alt"></i> ORION System v2.0
+                <span>|</span>
+                <i class="bi bi-c-circle"></i> Todos los derechos reservados
+            </p>
+        </div>
+
+    </main>
+
+</div>
+
+<!-- ===== MODAL NEGAR ===== -->
+<div class="modal fade" id="modalNegar" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #dc3545; color: white;">
+                <h5 class="modal-title"><i class="bi bi-x-circle"></i> Negar marca</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formNegar" method="POST">
+                <div class="modal-body">
+                    <p class="small text-muted mb-2">
+                        Vas a negar: <strong id="marcaNombre"></strong>
+                    </p>
+                    <label class="form-label fw-bold">Motivo de negación *</label>
+                    <textarea name="motivo" class="form-control" rows="3" required
+                              placeholder="Ej: Ya existe una marca similar registrada en el IMPI..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-circle"></i> Negar marca
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ============================================================
+    // FECHA ACTUAL EN FOOTER
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const ahora = new Date();
+        const fechaStr = ahora.toLocaleString('es-MX', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+        const el = document.getElementById('fecha-actual');
+        if (el) el.textContent = fechaStr;
+    });
+
+    // ============================================================
+    // MODAL NEGAR - Cargar datos de la marca
+    // ============================================================
+    const modalNegar = document.getElementById('modalNegar');
+    if (modalNegar) {
+        modalNegar.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre');
+
+            document.getElementById('formNegar').action = '/admin/marcas/negar/' + id;
+            document.getElementById('marcaNombre').textContent = nombre;
+        });
+    }
+
+    // ============================================================
+    // TOAST HELPER
+    // ============================================================
+    function mostrarToast(mensaje, tipo = 'success') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${tipo}`;
+
+        const iconos = {
+            success: 'check-circle-fill',
+            error: 'exclamation-circle-fill',
+            warning: 'exclamation-triangle-fill',
+            info: 'info-circle-fill'
+        };
+
+        toast.innerHTML = `
+            <i class="bi bi-${iconos[tipo] || 'check-circle-fill'}"></i>
+            ${mensaje}
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.5s ease forwards';
+            setTimeout(() => toast.remove(), 500);
+        }, 3500);
+    }
+
+    // ============================================================
+    // FLASH MESSAGES → TOAST
+    // ============================================================
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                document.addEventListener('DOMContentLoaded', () => {
+                    mostrarToast({{ message|tojson }}, '{{ "success" if category == "success" else ("error" if category == "danger" else category) }}');
+                });
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</script>
+
+</body>
+</html>

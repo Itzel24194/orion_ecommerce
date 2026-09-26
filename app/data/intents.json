@@ -1,0 +1,183 @@
+{
+  "intents": [
+    {
+      "tag": "saludo",
+      "patterns": [
+        "hola", "buenos días", "buenas tardes", "buenas noches", "qué tal",
+        "hey", "saludos", "holi", "qué onda", "cómo estás", "buen día",
+        "hola buenas", "hey qué tal", "qué hay", "cómo va todo"
+      ],
+      "responses": [
+        "¡Hola! 😊 ¿Cómo puedo ayudarte hoy?",
+        "¡Buen día! Soy el asistente virtual de ORION. ¿En qué puedo servirte?",
+        "¡Saludos! Estoy aquí para ayudarte con lo que necesites.",
+        "¡Hola! Me alegra verte por aquí. ¿Qué puedo hacer por ti?"
+      ]
+    },
+    {
+      "tag": "productos",
+      "patterns": [
+        "qué venden", "qué productos tienen", "muéstrame el catálogo",
+        "quiero ver productos", "qué tienen disponible", "catálogo",
+        "artículos", "mercancía", "qué manejan", "tienen stock",
+        "busco un producto", "quiero comprar algo", "qué hay de nuevo"
+      ],
+      "responses": [
+        "En ORION ofrecemos una amplia variedad de productos de alta calidad. Puedes explorar nuestro catálogo en la sección de Tienda. 🛍️",
+        "Contamos con productos en diversas categorías: electrónica, ropa, accesorios, hogar y más. ¿Hay algo específico que busques?",
+        "Nuestro catálogo está actualizado constantemente. Te recomiendo visitar la tienda para ver todas las novedades."
+      ]
+    },
+    {
+      "tag": "precios",
+      "patterns": [
+        "cuánto cuesta", "cuál es el precio", "cuánto vale", "precio",
+        "costo", "cuánto sale", "me interesa el precio", "qué precio tiene",
+        "cuánto tengo que pagar", "valor", "tarifa", "presupuesto",
+        "es caro", "es barato", "cuánto me cuesta"
+      ],
+      "responses": [
+        "Los precios varían según el producto. Te sugiero revisar el detalle de cada artículo en la tienda. 💰",
+        "Contamos con precios competitivos y ofertas especiales. ¿Qué producto te interesa?",
+        "Puedes consultar los precios actualizados en la sección de productos. ¡Tenemos promociones imperdibles!"
+      ]
+    },
+    {
+      "tag": "envio",
+      "patterns": [
+        "hacen envíos", "cuánto tarda el envío", "envían a domicilio",
+        "cuándo llega mi pedido", "tiempo de entrega", "envío",
+        "entrega", "reparto", "cuánto tarda en llegar", "hacen entregas",
+        "envían a mi ciudad", "tienen envío gratis", "cómo llega mi paquete"
+      ],
+      "responses": [
+        "Realizamos envíos a todo el país. El tiempo de entrega varía según tu ubicación, generalmente de 3 a 7 días hábiles. 📦",
+        "¡Sí! Hacemos envíos a domicilio. El costo y tiempo depende de la zona. Ingresa tu código postal para calcularlo.",
+        "Nuestros envíos son seguros y rastreables. Te daremos un número de seguimiento para que puedas monitorear tu pedido."
+      ]
+    },
+    {
+      "tag": "devoluciones",
+      "patterns": [
+        "puedo devolver", "cómo devuelvo", "quiero cambiar un producto",
+        "garantía", "reembolso", "devolución", "producto defectuoso",
+        "no me gustó", "quiero regresarlo", "cambio", "está fallando",
+        "vino roto", "no funciona", "quiero mi dinero de vuelta"
+      ],
+      "responses": [
+        "Aceptamos devoluciones dentro de los primeros 30 días posteriores a la compra. El producto debe estar en su empaque original. 🔄",
+        "Si tienes algún problema con tu producto, contáctanos y lo resolvemos. Ofrecemos garantía en todos nuestros artículos.",
+        "Para cambios o devoluciones, visita nuestra sección de soporte o escríbenos y te ayudaremos con gusto."
+      ]
+    },
+    {
+      "tag": "contacto",
+      "patterns": [
+        "quiero hablar con alguien", "necesito un asesor", "cómo los contacto",
+        "teléfono", "correo", "contacto", "soporte", "atención al cliente",
+        "hablar con un humano", "necesito ayuda personalizada", "agente",
+        "representante", "asesor", "queja", "reclamo"
+      ],
+      "responses": [
+        "Puedes contactarnos por correo a soporte@orion.com o llamarnos al 55-1234-5678. 📞",
+        "Estamos disponibles de lunes a viernes de 9am a 6pm. También puedes escribirnos por aquí y te atenderemos.",
+        "Nuestro equipo de soporte está listo para ayudarte. ¿Qué tipo de asistencia necesitas?"
+      ]
+    },
+    {
+      "tag": "pago",
+      "patterns": [
+        "cómo puedo pagar", "formas de pago", "aceptan tarjeta",
+        "puedo pagar en efectivo", "métodos de pago", "pago",
+        "tarjeta de crédito", "paypal", "transferencia", "oxxo",
+        "meses sin intereses", "pago contra entrega", "es seguro pagar"
+      ],
+      "responses": [
+        "Aceptamos tarjetas de crédito/débito, transferencias bancarias, PayPal y pago contra entrega en algunas zonas. 💳",
+        "Puedes pagar con tarjeta, transferencia o efectivo (contra entrega). Todos nuestros métodos son seguros.",
+        "Ofrecemos múltiples opciones de pago para tu comodidad. Elige la que mejor se adapte a ti."
+      ]
+    },
+    {
+      "tag": "horario",
+      "patterns": [
+        "cuál es su horario", "a qué hora abren", "están abiertos",
+        "horario de atención", "cuándo atienden", "días de atención",
+        "abren los domingos", "horarios", "a qué hora cierran"
+      ],
+      "responses": [
+        "Nuestro horario de atención es de lunes a viernes de 9:00 am a 6:00 pm. 🕐",
+        "Estamos disponibles de lunes a viernes. Los fines de semana nuestras tiendas físicas abren de 10am a 2pm.",
+        "El chat está disponible 24/7. Para atención personalizada, nuestro horario es de 9am a 6pm."
+      ]
+    },
+    {
+      "tag": "descuentos",
+      "patterns": [
+        "tienen descuentos", "hay ofertas", "promociones",
+        "cupones", "rebajas", "liquidación", "sale", "2x1",
+        "descuento", "oferta", "promoción", "código de descuento",
+        "hay alguna promoción", "tienen rebajas"
+      ],
+      "responses": [
+        "¡Tenemos promociones increíbles! Revisa la sección de ofertas para encontrar descuentos de hasta el 50%. 🎉",
+        "Actualmente contamos con descuentos especiales en temporada. Suscríbete a nuestro boletín para no perderte ninguna.",
+        "En ORION siempre tenemos promociones para nuestros clientes. Visita la tienda para ver las ofertas vigentes."
+      ]
+    },
+    {
+      "tag": "pedido_estado",
+      "patterns": [
+        "dónde está mi pedido", "cuándo llega mi pedido", "estado de mi pedido",
+        "mi pedido no ha llegado", "rastrear pedido", "número de guía",
+        "mi paquete", "mi orden", "quiero saber de mi compra",
+        "ya salió mi pedido", "cuánto falta para mi pedido"
+      ],
+      "responses": [
+        "Puedes rastrear tu pedido desde la sección 'Mis Pedidos' con tu número de guía. 📦",
+        "Para consultar el estado de tu pedido, ingresa a tu cuenta y ve a 'Mis Pedidos'. Ahí verás el seguimiento.",
+        "Lamento la espera. ¿Me puedes dar tu número de pedido para revisarlo? Un asesor te ayudará en breve."
+      ]
+    },
+    {
+      "tag": "agradecimiento",
+      "patterns": [
+        "gracias", "muchas gracias", "te lo agradezco", "muy amable",
+        "gracias por la ayuda", "perfecto gracias", "excelente",
+        "genial", "muy bien", "ok gracias"
+      ],
+      "responses": [
+        "¡Con gusto! Estoy aquí para lo que necesites. 😊",
+        "¡De nada! Si tienes más dudas, no dudes en escribirme.",
+        "¡Un placer ayudarte! Que tengas un excelente día. 🌟"
+      ]
+    },
+    {
+      "tag": "despedida",
+      "patterns": [
+        "adiós", "chao", "hasta luego", "nos vemos", "bye",
+        "hasta pronto", "me voy", "buenas noches", "hasta mañana",
+        "gracias adiós", "me despido"
+      ],
+      "responses": [
+        "¡Ha sido un placer ayudarte! Que tengas un excelente día. 🌟",
+        "¡Gracias por contactarnos! Estamos aquí para lo que necesites. ¡Hasta pronto! 👋",
+        "¡Nos vemos! No dudes en escribirnos si necesitas algo más. ¡Éxitos!"
+      ]
+    },
+    {
+      "tag": "queja",
+      "patterns": [
+        "quiero quejarme", "estoy molesto", "pesimo servicio",
+        "no me atendieron bien", "quiero poner una queja",
+        "esto es un fraude", "me estafaron", "pésimo",
+        "mal servicio", "no cumplieron", "quiero reclamar"
+      ],
+      "responses": [
+        "Lamento mucho esta situación. Voy a canalizarte con un supervisor para resolverlo de inmediato. 🙏",
+        "Entiendo tu molestia y te pido una disculpa. Permíteme ayudarte a resolverlo ahora mismo.",
+        "Tu opinión es muy importante. Un asesor senior te atenderá en breve para dar seguimiento a tu caso."
+      ]
+    }
+  ]
+}

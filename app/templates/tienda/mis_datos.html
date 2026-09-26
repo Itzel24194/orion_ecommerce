@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Datos — ORION</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --brand:      #e10098;
+            --brand-dark: #b4006c;
+            --ink:        #1a1a1a;
+            --muted:      #6b7280;
+            --line:       #e5e7eb;
+            --bg-soft:    #f9fafb;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--ink);
+            background: #eef0f3;
+            font-size: 13px;
+            line-height: 1.5;
+            padding: 30px 20px;
+        }
+
+        /* ===== TOOLBAR (solo pantalla) ===== */
+        .toolbar {
+            max-width: 900px;
+            margin: 0 auto 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+        }
+        .toolbar-title {
+            font-size: .85rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+        .toolbar-title strong { color: var(--ink); font-weight: 700; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: .85rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all .15s;
+        }
+        .btn-primary {
+            background: var(--brand);
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--brand-dark); color: #fff; }
+        .btn-outline {
+            background: #fff;
+            color: var(--ink);
+            border: 1px solid var(--line);
+        }
+        .btn-outline:hover { background: var(--bg-soft); color: var(--ink); }
+
+        /* ===== HOJA ===== */
+        .sheet {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 6px 30px rgba(0,0,0,.08);
+        }
+
+        /* ===== HEADER ===== */
+        .doc-header {
+            background: linear-gradient(135deg, #e10098 0%, #b4006c 60%, #8a0052 100%);
+            color: #fff;
+            padding: 34px 40px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .doc-header::after {
+            content: "";
+            position: absolute;
+            right: -60px;
+            top: -60px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.08);
+        }
+        .doc-brand {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 2;
+        }
+        .doc-brand small {
+            display: block;
+            font-size: .6rem;
+            letter-spacing: 6px;
+            font-weight: 500;
+            opacity: .8;
+            margin-top: 2px;
+        }
+        .doc-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 12px;
+            position: relative;
+            z-index: 2;
+        }
+        .doc-subtitle {
+            font-size: .78rem;
+            opacity: .85;
+            margin-top: 4px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ===== BODY ===== */
+        .doc-body {
+            padding: 34px 40px 40px;
+        }
+
+        /* ===== AVATAR / PERFIL ===== */
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            padding: 22px 24px;
+            background: var(--bg-soft);
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            margin-bottom: 28px;
+        }
+        .avatar {
+            width: 78px;
+            height: 78px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,.12);
+            flex-shrink: 0;
+        }
+        .profile-info h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--ink);
+        }
+        .profile-info .p-email {
+            font-size: .82rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .3px;
+        }
+        .badge-brand  { background: #fdf0f7; color: var(--brand-dark); }
+        .badge-green  { background: #ecfdf5; color: #047857; }
+        .badge-gray   { background: #f3f4f6; color: #4b5563; }
+        .badge-amber  { background: #fffbeb; color: #b45309; }
+
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .stat-box {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 16px 18px;
+            text-align: center;
+        }
+        .stat-num {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--brand-dark);
+            line-height: 1.1;
+        }
+        .stat-lbl {
+            font-size: .68rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* ===== SECCIONES ===== */
+        .section {
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: .95rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--brand);
+        }
+        .section-title i {
+            color: var(--brand);
+            font-size: 1.05rem;
+        }
+        .section-title .count {
+            margin-left: auto;
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--muted);
+            background: var(--bg-soft);
+            padding: 3px 10px;
+            border-radius: 50px;
+        }
+
+        /* ===== TABLAS ===== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .8rem;
+        }
+        .data-table th {
+            text-align: left;
+            padding: 9px 12px;
+            background: var(--bg-soft);
+            font-weight: 700;
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--muted);
+            border-bottom: 1px solid var(--line);
+        }
+        .data-table th:first-child { border-radius: 8px 0 0 0; }
+        .data-table th:last-child  { border-radius: 0 8px 0 0; }
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: top;
+        }
+        .data-table tr:last-child td { border-bottom: none; }
+
+        /* ===== GRID DE CAMPOS CLAVE/VALOR ===== */
+        .kv-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 24px;
+        }
+        .kv-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--line);
+        }
+        .kv-item .kv-k {
+            font-size: .78rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+        .kv-item .kv-v {
+            font-size: .82rem;
+            color: var(--ink);
+            font-weight: 600;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        /* ===== ESTADOS ===== */
+        .status-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+        .status-pendiente   { background: #fef3c7; color: #92400e; }
+        .status-confirmado  { background: #dbeafe; color: #1e40af; }
+        .status-enviado     { background: #ede9fe; color: #5b21b6; }
+        .status-entregado   { background: #d1fae5; color: #065f46; }
+        .status-cancelado   { background: #fee2e2; color: #991b1b; }
+        .status-default     { background: #f3f4f6; color: #4b5563; }
+
+        /* ===== EMPTY ===== */
+        .empty {
+            text-align: center;
+            padding: 26px 20px;
+            color: var(--muted);
+            font-size: .8rem;
+            background: var(--bg-soft);
+            border-radius: 10px;
+            border: 1px dashed var(--line);
+        }
+        .empty i { font-size: 1.4rem; display: block; margin-bottom: 6px; opacity: .5; }
+
+        /* ===== CHIPS ===== */
+        .chips-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: .74rem;
+            font-weight: 600;
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid var(--line);
+        }
+        .chip.on  { background: #fdf0f7; color: var(--brand-dark); border-color: #f0c8de; }
+        .chip.off { opacity: .55; }
+
+        /* ===== FOOTER ===== */
+        .doc-footer {
+            padding: 20px 40px 26px;
+            background: var(--bg-soft);
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: .72rem;
+            color: var(--muted);
+            gap: 12px;
+        }
+        .doc-footer strong { color: var(--brand-dark); font-weight: 800; letter-spacing: 1px; }
+
+        /* ===== IMPRESIÓN ===== */
+        @media print {
+            @page {
+                size: A4;
+                margin: 14mm 12mm;
+            }
+            body {
+                background: #fff;
+                padding: 0;
+                font-size: 11px;
+            }
+            .toolbar { display: none !important; }
+            .sheet {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 100%;
+                margin: 0;
+            }
+            .doc-header {
+                padding: 22px 26px 18px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .doc-brand { font-size: 1.4rem; }
+            .doc-title { font-size: 1.05rem; margin-top: 8px; }
+            .doc-body  { padding: 22px 26px 26px; }
+            .doc-footer {
+                padding: 14px 26px 16px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .profile-card,
+            .stat-box,
+            .data-table th,
+            .empty,
+            .chip,
+            .badge,
+            .status-pill {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .section { page-break-inside: avoid; }
+            .data-table tr { page-break-inside: avoid; }
+        }
+
+        @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .kv-grid    { grid-template-columns: 1fr; }
+            .profile-card { flex-direction: column; text-align: center; }
+            .doc-body   { padding: 22px 20px 30px; }
+            .doc-header { padding: 24px 20px 22px; }
+            .doc-footer { padding: 16px 20px; flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOOLBAR (no se imprime) ===== -->
+    <div class="toolbar">
+        <div class="toolbar-title">
+            <strong>Reporte de datos personales</strong> · Generado el {{ generado.strftime('%d/%m/%Y a las %H:%M') }}
+        </div>
+        <div style="display:flex; gap:8px;">
+            <a href="{{ url_for('web.perfil') }}#tab-privacidad" class="btn btn-outline">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="bi bi-file-earmark-pdf"></i> Guardar como PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== HOJA ===== -->
+    <div class="sheet">
+
+        <!-- HEADER -->
+        <header class="doc-header">
+            <div class="doc-brand">
+                ORION
+                <small>SYSTEM</small>
+            </div>
+            <div class="doc-title">
+                <i class="bi bi-shield-check"></i> Reporte de Datos Personales
+            </div>
+            <div class="doc-subtitle">
+                Documento generado automáticamente · {{ generado.strftime('%d/%m/%Y a las %H:%M UTC') }}
+            </div>
+        </header>
+
+        <!-- BODY -->
+        <div class="doc-body">
+
+            <!-- PERFIL -->
+            <div class="profile-card">
+                {% if datos.perfil.foto %}
+                    <img src="{{ url_for('static', filename='uploads/' + datos.perfil.foto) }}"
+                         alt="Avatar" class="avatar"
+                         onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ datos.perfil.nombre }}&size=120&background=e10098&color=fff';">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ datos.perfil.nombre }}&size=120&background=e10098&color=fff"
+                         alt="Avatar" class="avatar">
+                {% endif %}
+
+                <div class="profile-info">
+                    <h1>{{ datos.perfil.nombre }} {{ datos.perfil.apellido_paterno }} {{ datos.perfil.apellido_materno }}</h1>
+                    <div class="p-email">
+                        <i class="bi bi-envelope"></i> {{ datos.perfil.email }}
+                    </div>
+                    <div class="badges">
+                        <span class="badge badge-brand">
+                            <i class="bi bi-person-badge"></i> {{ datos.perfil.rol|title }}
+                        </span>
+                        {% if datos.perfil.confirmado %}
+                            <span class="badge badge-green"><i class="bi bi-check-circle-fill"></i> Verificado</span>
+                        {% else %}
+                            <span class="badge badge-amber"><i class="bi bi-exclamation-triangle-fill"></i> Sin verificar</span>
+                        {% endif %}
+                        {% if datos.perfil.activo %}
+                            <span class="badge badge-green"><i class="bi bi-circle-fill"></i> Cuenta activa</span>
+                        {% else %}
+                            <span class="badge badge-gray"><i class="bi bi-circle"></i> Inactiva</span>
+                        {% endif %}
+                        {% if datos.perfil.created_at %}
+                            <span class="badge badge-gray">
+                                <i class="bi bi-calendar3"></i> Miembro desde {{ datos.perfil.created_at[:10] }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-num">{{ datos.pedidos|length }}</div>
+                    <div class="stat-lbl">Pedidos</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">{{ datos.direcciones|length }}</div>
+                    <div class="stat-lbl">Direcciones</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">{{ datos.favoritos|length }}</div>
+                    <div class="stat-lbl">Favoritos</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">{{ datos.metodos_pago|length }}</div>
+                    <div class="stat-lbl">Métodos pago</div>
+                </div>
+            </div>
+
+            <!-- INFORMACIÓN PERSONAL -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i class="bi bi-person-vcard"></i> Información Personal
+                </h2>
+                <div class="kv-grid">
+                    <div class="kv-item">
+                        <span class="kv-k">Nombre completo</span>
+                        <span class="kv-v">{{ datos.perfil.nombre }} {{ datos.perfil.apellido_paterno }} {{ datos.perfil.apellido_materno }}</span>
+                    </div>
+                    <div class="kv-item">
+                        <span class="kv-k">Email</span>
+                        <span class="kv-v">{{ datos.perfil.email }}</span>
+                    </div>
+                    <div class="kv-item">
+                        <span class="kv-k">Teléfono</span>
+                        <span class="kv-v">{{ datos.perfil.telefono or '—' }}</span>
+                    </div>
+                    <div class="kv-item">
+                        <span class="kv-k">Fecha de nacimiento</span>
+                        <span class="kv-v">{{ datos.perfil.fecha_nacimiento or '—' }}</span>
+                    </div>
+                    <div class="kv-item">
+                        <span class="kv-k">Género</span>
+                        <span class="kv-v">{{ datos.perfil.genero or '—' }}</span>
+                    </div>
+                    <div class="kv-item">
+                        <span class="kv-k">ID interno</span>
+                        <span class="kv-v" style="font-family: monospace; font-size:.72rem;">{{ datos.perfil.id }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DIRECCIONES -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i class="bi bi-geo-alt"></i> Direcciones
+                    <span class="count">{{ datos.direcciones|length }}</span>
+                </h2>
+                {% if datos.direcciones %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Dirección</th>
+                                <th>Colonia / CP</th>
+                                <th>Ciudad / Estado</th>
+                                <th style="text-align:center;">Predet.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in datos.direcciones %}
+                                <tr>
+                                    <td><strong>{{ d.nombre or 'Dirección' }}</strong></td>
+                                    <td>{{ d.calle }} #{{ d.numero }}</td>
+                                    <td>{{ d.colonia }} · {{ d.cp }}</td>
+                                    <td>{{ d.ciudad or '—' }}{% if d.estado %}, {{ d.estado }}{% endif %}</td>
+                                    <td style="text-align:center;">
+                                        {% if d.predeterminada %}
+                                            <i class="bi bi-star-fill" style="color:var(--brand);"></i>
+                                        {% else %}
+                                            <i class="bi bi-star" style="color:#ccc;"></i>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty">
+                        <i class="bi bi-geo-alt"></i>
+                        No tienes direcciones registradas.
+                    </div>
+                {% endif %}
+            </section>
+
+            <!-- PEDIDOS -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i class="bi bi-box-seam"></i> Pedidos
+                    <span class="count">{{ datos.pedidos|length }}</span>
+                </h2>
+                {% if datos.pedidos %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Artículos</th>
+                                <th style="text-align:right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in datos.pedidos %}
+                                <tr>
+                                    <td style="font-family: monospace; font-size:.72rem;">#{{ p.id[:10] }}</td>
+                                    <td>{{ p.fecha_fmt or '—' }}</td>
+                                    <td>
+                                        <span class="status-pill status-{{ p.estado|lower if p.estado else 'default' }}">
+                                            {{ p.estado|title if p.estado else 'Pendiente' }}
+                                        </span>
+                                    </td>
+                                    {# ⭐ FIX: usar corchetes para acceder a la clave 'items' del dict #}
+                                    <td>{{ p['items']|length }} artículo(s)</td>
+                                    <td style="text-align:right; font-weight:800;">${{ "%.2f"|format(p.total) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty">
+                        <i class="bi bi-box-seam"></i>
+                        No tienes pedidos registrados.
+                    </div>
+                {% endif %}
+            </section>
+
+            <!-- MÉTODOS DE PAGO -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i class="bi bi-credit-card"></i> Métodos de Pago
+                    <span class="count">{{ datos.metodos_pago|length }}</span>
+                </h2>
+                {% if datos.metodos_pago %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Detalle</th>
+                                <th>Titular</th>
+                                <th>Vence</th>
+                                <th style="text-align:center;">Predet.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in datos.metodos_pago %}
+                                <tr>
+                                    <td>
+                                        {% if m.tipo == 'tarjeta' %}💳 Tarjeta
+                                        {% elif m.tipo == 'paypal' %}🅿️ PayPal
+                                        {% elif m.tipo == 'oxxo' %}🏪 OXXO
+                                        {% else %}{{ m.tipo }}{% endif %}
+                                    </td>
+                                    <td>
+                                        {% if m.tipo == 'tarjeta' %}
+                                            {{ m.marca }} •••• {{ m.ultimos4 }}
+                                        {% elif m.tipo == 'paypal' %}
+                                            {{ m.email }}
+                                        {% elif m.tipo == 'oxxo' %}
+                                            Ref: {{ m.referencia }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ m.titular or '—' }}</td>
+                                    <td>{{ m.expira or '—' }}</td>
+                                    <td style="text-align:center;">
+                                        {% if m.predeterminado %}
+                                            <i class="bi bi-star-fill" style="color:var(--brand);"></i>
+                                        {% else %}
+                                            <i class="bi bi-star" style="color:#ccc;"></i>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty">
+                        <i class="bi bi-credit-card"></i>
+                        No tienes métodos de pago guardados.
+                    </div>
+                {% endif %}
+            </section>
+
+            <!-- PREFERENCIAS -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i class="bi bi-sliders"></i> Preferencias
+                </h2>
+
+                <div style="margin-bottom:16px;">
+                    <div style="font-size:.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px;">
+                        Comunicación
+                    </div>
+                    <div class="chips-wrap">
+                        <span class="chip {{ 'on' if datos.preferencias_comunicacion.email_promo else 'off' }}">
+                            <i class="bi bi-{{ 'check-circle-fill' if datos.preferencias_comunicacion.email_promo else 'circle' }}"></i>
+                            Email promociones
+                        </span>
+                        <span class="chip on">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Email pedidos
+                        </span>
+                        <span class="chip {{ 'on' if datos.preferencias_comunicacion.email_newsletter else 'off' }}">
+                            <i class="bi bi-{{ 'check-circle-fill' if datos.preferencias_comunicacion.email_newsletter else 'circle' }}"></i>
+                            Newsletter
+                        </span>
+                        <span class="chip {{ 'on' if datos.preferencias_comunicacion.wa_pedidos else 'off' }}">
+                            <i class="bi bi-{{ 'check-circle-fill' if datos.preferencias_comunicacion.wa_pedidos else 'circle' }}"></i>
+                            WhatsApp pedidos
+                        </span>
+                        <span class="chip {{ 'on' if datos.preferencias_comunicacion.wa_promo else 'off' }}">
+                            <i class="bi bi-{{ 'check-circle-fill' if datos.preferencias_comunicacion.wa_promo else 'circle' }}"></i>
+                            WhatsApp promo
+                        </span>
+                        <span class="chip {{ 'on' if datos.preferencias_comunicacion.push_pedidos else 'off' }}">
+                            <i class="bi bi-{{ 'check-circle-fill' if datos.preferencias_comunicacion.push_pedidos else 'circle' }}"></i>
+                            Push pedidos
+                        </span>
+                        <span class="chip {{ 'on' if datos.preferencias_comunicacion.push_promo else 'off' }}">
+                            <i class="bi bi-{{ 'check-circle-fill' if datos.preferencias_comunicacion.push_promo else 'circle' }}"></i>
+                            Push promo
+                        </span>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-size:.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px;">
+                        Privacidad
+                    </div>
+                    <div class="chips-wrap">
+                        <span class="chip {{ 'on' if datos.preferencias_privacidad.personalizacion else 'off' }}">
+                            <i class="bi bi-{{ 'check-circle-fill' if datos.preferencias_privacidad.personalizacion else 'circle' }}"></i>
+                            Personalización
+                        </span>
+                        <span class="chip {{ 'on' if datos.preferencias_privacidad.analiticas else 'off' }}">
+                            <i class="bi bi-{{ 'check-circle-fill' if datos.preferencias_privacidad.analiticas else 'circle' }}"></i>
+                            Analíticas anónimas
+                        </span>
+                        <span class="chip {{ 'on' if datos.preferencias_privacidad.compartir_socios else 'off' }}">
+                            <i class="bi bi-{{ 'check-circle-fill' if datos.preferencias_privacidad.compartir_socios else 'circle' }}"></i>
+                            Compartir con socios
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DATOS FISCALES -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i class="bi bi-receipt-cutoff"></i> Datos Fiscales
+                </h2>
+                {% if datos.datos_fiscales.rfc or datos.datos_fiscales.razon_social %}
+                    <div class="kv-grid">
+                        <div class="kv-item">
+                            <span class="kv-k">RFC</span>
+                            <span class="kv-v" style="font-family: monospace;">{{ datos.datos_fiscales.rfc or '—' }}</span>
+                        </div>
+                        <div class="kv-item">
+                            <span class="kv-k">Razón social</span>
+                            <span class="kv-v">{{ datos.datos_fiscales.razon_social or '—' }}</span>
+                        </div>
+                        <div class="kv-item">
+                            <span class="kv-k">Régimen fiscal</span>
+                            <span class="kv-v">{{ datos.datos_fiscales.regimen_fiscal or '—' }}</span>
+                        </div>
+                        <div class="kv-item">
+                            <span class="kv-k">Uso de CFDI</span>
+                            <span class="kv-v">{{ datos.datos_fiscales.uso_cfdi or '—' }}</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty">
+                        <i class="bi bi-receipt"></i>
+                        No has registrado datos fiscales.
+                    </div>
+                {% endif %}
+            </section>
+
+            <!-- COMPLEXIÓN -->
+            {% if datos.complexion and (datos.complexion.altura_cm or datos.complexion.talla_camisa or datos.complexion.estilos_preferidos) %}
+            <section class="section">
+                <h2 class="section-title">
+                    <i class="bi bi-rulers"></i> Complexión y Tallas
+                </h2>
+
+                <div class="kv-grid" style="margin-bottom:16px;">
+                    {% if datos.complexion.altura_cm %}
+                    <div class="kv-item">
+                        <span class="kv-k">Altura</span>
+                        <span class="kv-v">{{ datos.complexion.altura_cm }} cm</span>
+                    </div>
+                    {% endif %}
+                    {% if datos.complexion.peso_kg %}
+                    <div class="kv-item">
+                        <span class="kv-k">Peso</span>
+                        <span class="kv-v">{{ datos.complexion.peso_kg }} kg</span>
+                    </div>
+                    {% endif %}
+                    {% if datos.complexion.talla_camisa %}
+                    <div class="kv-item">
+                        <span class="kv-k">Talla camisa/blusa</span>
+                        <span class="kv-v">{{ datos.complexion.talla_camisa }}</span>
+                    </div>
+                    {% endif %}
+                    {% if datos.complexion.talla_pantalon %}
+                    <div class="kv-item">
+                        <span class="kv-k">Talla pantalón</span>
+                        <span class="kv-v">{{ datos.complexion.talla_pantalon }}</span>
+                    </div>
+                    {% endif %}
+                    {% if datos.complexion.talla_calzado %}
+                    <div class="kv-item">
+                        <span class="kv-k">Talla calzado</span>
+                        <span class="kv-v">{{ datos.complexion.talla_calzado }}</span>
+                    </div>
+                    {% endif %}
+                    {% if datos.complexion.talla_sujetador %}
+                    <div class="kv-item">
+                        <span class="kv-k">Talla sujetador</span>
+                        <span class="kv-v">{{ datos.complexion.talla_sujetador }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if datos.complexion.estilos_preferidos %}
+                <div style="margin-bottom:12px;">
+                    <div style="font-size:.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px;">
+                        Estilos preferidos
+                    </div>
+                    <div class="chips-wrap">
+                        {% for e in datos.complexion.estilos_preferidos %}
+                            <span class="chip on"><i class="bi bi-check-circle-fill"></i> {{ e }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if datos.complexion.colores_favoritos %}
+                <div>
+                    <div style="font-size:.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px;">
+                        Colores favoritos
+                    </div>
+                    <div class="chips-wrap">
+                        {% for c in datos.complexion.colores_favoritos %}
+                            <span class="chip on"><i class="bi bi-droplet-fill"></i> {{ c }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
+
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="doc-footer">
+            <div>
+                <strong>ORION SYSTEM</strong> · Documento confidencial
+            </div>
+            <div>
+                Generado: {{ generado.strftime('%d/%m/%Y %H:%M UTC') }}
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Productos | ORION Vendedor</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar { width: 280px; background: #fff; border-right: 2px solid #e8e8e8; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; z-index: 1000; box-shadow: 2px 0 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        .sidebar .admin-profile { padding: 25px 20px 20px; text-align: center; border-bottom: 1px solid #e8e8e8; background: linear-gradient(135deg, #6c5ce7, #4b3db8); flex-shrink: 0; }
+        .sidebar .admin-profile .avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); background: #f0f0f0; }
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .admin-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .admin-profile .rol { font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700; background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px; display: inline-block; margin-top: 5px; }
+        .sidebar .logo { font-size: 1.8rem; font-weight: 900; color: #6c5ce7; text-align: center; padding: 15px 0 5px; letter-spacing: -1px; }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title { font-size: 0.65rem; text-transform: uppercase; color: #888; padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700; }
+        .sidebar a { display: flex; align-items: center; gap: 12px; padding: 11px 25px; color: #555; text-decoration: none; transition: all 0.3s ease; border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500; }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f0eefc; color: #6c5ce7; border-left-color: #6c5ce7; }
+        .sidebar a:hover i, .sidebar a.active i { color: #6c5ce7; }
+        .sidebar a.active { font-weight: 700; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn { display: flex; align-items: center; gap: 12px; padding: 11px 25px; color: #dc3545; text-decoration: none; transition: all 0.3s ease; border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500; cursor: pointer; background: transparent; border: none; width: 100%; text-align: left; }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* MAIN */
+        .main { margin-left: 280px; padding: 30px 35px 20px; width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #e8e8e8; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .top-bar h1 { font-size: 1.6rem; font-weight: 800; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .top-bar h1 i { color: #6c5ce7; }
+        .top-bar .tag { background: #6c5ce7; color: #fff; padding: 5px 18px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+
+        /* BOTONES */
+        .btn-primary-custom { background: #6c5ce7; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-primary-custom:hover { background: #4b3db8; color: white; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3); }
+
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: #fff; padding: 18px 22px; border-radius: 14px; border: 1px solid #e8e8e8; border-left: 4px solid #6c5ce7; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .stat-card.green { border-left-color: #198754; }
+        .stat-card.yellow { border-left-color: #ffc107; }
+        .stat-card.red { border-left-color: #dc3545; }
+        .stat-card .number { font-size: 1.8rem; font-weight: 900; color: #1a1a2e; display: block; }
+        .stat-card.green .number { color: #198754; }
+        .stat-card.yellow .number { color: #ffc107; }
+        .stat-card.red .number { color: #dc3545; }
+        .stat-card .label { color: #888; font-size: 0.72rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-top: 3px; display: block; }
+
+        /* SECTION */
+        .section-box { background: #fff; border-radius: 16px; padding: 25px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .section-box h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; color: #1a1a2e; display: flex; align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+        .section-box h2 > span:first-child { display: flex; align-items: center; gap: 10px; }
+        .section-box h2 i { color: #6c5ce7; }
+
+        /* FILTROS */
+        .filtros-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+        .filtros-bar input, .filtros-bar select { border: 2px solid #e9ecef; border-radius: 10px; padding: 9px 14px; font-size: 0.9rem; transition: all 0.3s ease; }
+        .filtros-bar input:focus, .filtros-bar select:focus { border-color: #6c5ce7; box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); outline: none; }
+
+        /* TABLA */
+        .table-custom { width: 100%; font-size: 0.85rem; border-collapse: separate; border-spacing: 0 6px; }
+        .table-custom thead th { background: linear-gradient(135deg, #1a2332, #2d3436); color: white; font-weight: 700; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; border: none; }
+        .table-custom thead th:first-child { border-radius: 8px 0 0 8px; }
+        .table-custom thead th:last-child { border-radius: 0 8px 8px 0; }
+        .table-custom tbody td { padding: 12px 16px; background: white; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        .table-custom tbody tr:hover td { background: #fafbff; }
+
+        /* PRODUCT MINI */
+        .prod-mini { display: flex; align-items: center; gap: 12px; }
+        .prod-mini img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; background: #f0f0f0; border: 1px solid #e8e8e8; }
+        .prod-mini .info .name { font-weight: 700; font-size: 0.88rem; margin-bottom: 2px; }
+        .prod-mini .info .desc { font-size: 0.72rem; color: #999; }
+
+        /* BADGES */
+        .badge-estado { font-size: 0.65rem; padding: 4px 10px; border-radius: 50px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .badge-estado.activo { background: #d1e7dd; color: #0f5132; }
+        .badge-estado.inactivo { background: #f8d7da; color: #842029; }
+        .badge-stock { font-size: 0.68rem; padding: 3px 9px; border-radius: 50px; font-weight: 700; }
+        .badge-stock.ok { background: #d1e7dd; color: #0f5132; }
+        .badge-stock.bajo { background: #fff3cd; color: #856404; }
+        .badge-stock.agotado { background: #f8d7da; color: #842029; }
+
+        /* ACCIONES */
+        .btn-action-group { display: flex; gap: 4px; flex-wrap: wrap; }
+        .btn-action-group .btn { padding: 5px 10px; font-size: 0.72rem; border-radius: 8px; font-weight: 600; border: none; transition: all 0.2s ease; }
+        .btn-action-group .btn:hover { transform: translateY(-2px); }
+        .btn-action-group .btn-warning { background: #ffc107; color: #1a1a2e; }
+        .btn-action-group .btn-success { background: #198754; color: white; }
+        .btn-action-group .btn-secondary { background: #6c757d; color: white; }
+        .btn-action-group .btn-danger { background: #dc3545; color: white; }
+
+        /* EMPTY */
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state i { font-size: 3.5rem; opacity: 0.3; margin-bottom: 15px; display: block; color: #6c5ce7; }
+        .empty-state p { margin-bottom: 5px; font-weight: 600; font-size: 1rem; }
+        .empty-state small { color: #bbb; }
+
+        /* TOAST */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast-notification { padding: 12px 20px; border-radius: 10px; color: white; font-weight: 600; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; animation: slideIn 0.4s ease; min-width: 250px; }
+        .toast-notification.success { background: #198754; }
+        .toast-notification.error { background: #dc3545; }
+        .toast-notification.warning { background: #ffc107; color: #1a1a2e; }
+        .toast-notification.info { background: #0dcaf0; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        /* MODAL */
+        .modal-content { border-radius: 16px; border: none; }
+        .modal-header { border-radius: 16px 16px 0 0; }
+
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% set nombre_v = vendedor.get('nombre', 'Vendedor') %}
+            {% set foto_v = vendedor.get('foto') %}
+            <img src="{{ url_for('static', filename='uploads/' + foto_v) if foto_v else 'https://ui-avatars.com/api/?name=' + nombre_v + '&background=6c5ce7&color=fff&size=80&bold=true' }}"
+                 class="avatar" alt="Vendedor"
+                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ nombre_v }}&background=6c5ce7&color=fff&size=80&bold=true';">
+            <div class="name">{{ nombre_v }} {{ vendedor.get('apellido_paterno', '') }}</div>
+            <div class="email">{{ vendedor.get('email', '') }}</div>
+            <div class="rol"><i class="bi bi-shop"></i> Vendedor</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+            <div class="panel-title">MI TIENDA</div>
+            <a href="{{ url_for('web.vendedor_dashboard') }}"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.vendedor_productos') }}" class="active"><i class="bi bi-box-seam"></i> <span>Mis Productos</span></a>
+            <a href="{{ url_for('web.vendedor_pedidos') }}"><i class="bi bi-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.vendedor_resenas') }}"><i class="bi bi-star"></i> <span>Reseñas</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">ANÁLISIS</div>
+            <a href="#"><i class="bi bi-graph-up"></i> <span>Mis Ventas</span></a>
+            <a href="#"><i class="bi bi-people"></i> <span>Mis Clientes</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="#"><i class="bi bi-shop-window"></i> <span>Mi Tienda</span></a>
+            <a href="#"><i class="bi bi-truck"></i> <span>Envíos</span></a>
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="bi bi-box-seam"></i> Mis Productos</h1>
+            <div class="tag"><i class="bi bi-shop"></i> Mi Tienda</div>
+        </header>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number">{{ stats.total }}</div>
+                <div class="label">Total productos</div>
+            </div>
+            <div class="stat-card green">
+                <div class="number">{{ stats.activos }}</div>
+                <div class="label">Activos</div>
+            </div>
+            <div class="stat-card yellow">
+                <div class="number">{{ stats.stock_bajo }}</div>
+                <div class="label">Stock bajo</div>
+            </div>
+            <div class="stat-card red">
+                <div class="number">{{ stats.sin_stock }}</div>
+                <div class="label">Agotados</div>
+            </div>
+        </div>
+
+        <!-- FILTROS + BOTÓN CREAR -->
+        <div class="section-box" style="padding: 18px 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <form method="GET" action="{{ url_for('web.vendedor_productos') }}" class="filtros-bar" style="margin: 0;">
+                    <input type="text" name="q" placeholder="Buscar producto..."
+                           value="{{ request.args.get('q', '') }}" style="width: 220px;">
+                    <select name="estado">
+                        <option value="">Todos los estados</option>
+                        <option value="activos" {% if request.args.get('estado')=='activos' %}selected{% endif %}>Activos</option>
+                        <option value="inactivos" {% if request.args.get('estado')=='inactivos' %}selected{% endif %}>Inactivos</option>
+                        <option value="stock_bajo" {% if request.args.get('estado')=='stock_bajo' %}selected{% endif %}>Stock bajo</option>
+                        <option value="agotados" {% if request.args.get('estado')=='agotados' %}selected{% endif %}>Agotados</option>
+                    </select>
+                    <button type="submit" class="btn-primary-custom" style="padding: 9px 20px;">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <a href="{{ url_for('web.vendedor_productos') }}" class="btn-primary-custom" style="background: #6c757d; padding: 9px 20px;">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                </form>
+
+                <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalCrearProducto">
+                    <i class="bi bi-plus-circle"></i> Nuevo producto
+                </button>
+            </div>
+        </div>
+
+        <!-- TABLA DE PRODUCTOS -->
+        <div class="section-box">
+            <h2>
+                <span><i class="bi bi-list"></i> Listado de productos</span>
+                <span style="font-size: 0.85rem; color: #999; font-weight: 600;">
+                    {{ productos|length }} resultado{{ 's' if productos|length != 1 else '' }}
+                </span>
+            </h2>
+
+            {% if productos %}
+            <div style="overflow-x: auto;">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Producto</th>
+                            <th style="width: 12%; text-align: center;">Stock</th>
+                            <th style="width: 12%; text-align: right;">Precio</th>
+                            <th style="width: 12%; text-align: center;">Estado</th>
+                            <th style="width: 24%; text-align: center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in productos %}
+                        <tr>
+                            <td>
+                                <div class="prod-mini">
+                                    <img src="{{ url_for('static', filename='uploads/productos/' + p.imagen) if p.imagen and p.imagen != 'default.jpg' else 'https://via.placeholder.com/48x48/eee/999?text=IMG' }}"
+                                         alt="{{ p.nombre }}"
+                                         onerror="this.onerror=null; this.src='https://via.placeholder.com/48x48/eee/999?text=IMG';">
+                                    <div class="info">
+                                        <div class="name">{{ p.nombre }}</div>
+                                        <div class="desc">{{ p.descripcion[:50] }}{% if p.descripcion|length > 50 %}...{% endif %}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                {% if p.stock <= 0 %}
+                                    <span class="badge-stock agotado">Agotado</span>
+                                {% elif p.stock <= 5 %}
+                                    <span class="badge-stock bajo">{{ p.stock }} uds</span>
+                                {% else %}
+                                    <span class="badge-stock ok">{{ p.stock }} uds</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right; font-weight: 700; color: #6c5ce7;">
+                                ${{ "%.2f"|format(p.precio) }}
+                            </td>
+                            <td style="text-align: center;">
+                                {% if p.activo %}
+                                    <span class="badge-estado activo">Activo</span>
+                                {% else %}
+                                    <span class="badge-estado inactivo">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-action-group" style="justify-content: center;">
+                                    <button class="btn btn-warning"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalEditarProducto"
+                                            data-id="{{ p._id }}"
+                                            data-nombre="{{ p.nombre }}"
+                                            data-descripcion="{{ p.descripcion }}"
+                                            data-precio="{{ p.precio }}"
+                                            data-stock="{{ p.stock }}"
+                                            title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+
+                                    <form method="POST"
+                                          action="{{ url_for('web.vendedor_toggle_producto', producto_id=p._id) }}"
+                                          style="display: inline;">
+                                        <button type="submit" class="btn btn-secondary"
+                                                title="{{ 'Desactivar' if p.activo else 'Activar' }}">
+                                            <i class="bi bi-{{ 'toggle-on' if p.activo else 'toggle-off' }}"></i>
+                                        </button>
+                                    </form>
+
+                                    <form method="POST"
+                                          action="{{ url_for('web.vendedor_eliminar_producto', producto_id=p._id) }}"
+                                          style="display: inline;"
+                                          onsubmit="return confirm('¿Eliminar este producto? Esta acción no se puede deshacer.')">
+                                        <button type="submit" class="btn btn-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-box"></i>
+                <p>No tienes productos todavía</p>
+                <small>Crea tu primer producto para empezar a vender</small>
+                <div style="margin-top: 20px;">
+                    <button class="btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalCrearProducto">
+                        <i class="bi bi-plus-circle"></i> Crear producto
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
+</div>
+
+<!-- ===== MODAL CREAR PRODUCTO ===== -->
+<div class="modal fade" id="modalCrearProducto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #6c5ce7, #4b3db8); color: white;">
+                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Nuevo producto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('web.vendedor_crear_producto') }}" enctype="multipart/form-data">
+                <div class="modal-body" style="padding: 25px;">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Nombre del producto *</label>
+                            <input type="text" name="nombre" class="form-control" required placeholder="Ej: Playera deportiva">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Descripción</label>
+                            <textarea name="descripcion" class="form-control" rows="3" placeholder="Describe tu producto..."></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Precio (MXN) *</label>
+                            <input type="number" name="precio" class="form-control" required min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Stock *</label>
+                            <input type="number" name="stock" class="form-control" required min="0" placeholder="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Imagen</label>
+                            <input type="file" name="foto" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Categoría</label>
+                            <input type="text" name="categoria" class="form-control" placeholder="Ej: Ropa">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Marca</label>
+                            <input type="text" name="marca" class="form-control" placeholder="Ej: Nike">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-custom" style="padding: 10px 25px;">
+                        <i class="bi bi-save"></i> Crear producto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL EDITAR PRODUCTO ===== -->
+<div class="modal fade" id="modalEditarProducto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #1a1a2e;">
+                <h5 class="modal-title"><i class="bi bi-pencil"></i> Editar producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="formEditarProducto" enctype="multipart/form-data">
+                <div class="modal-body" style="padding: 25px;">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Nombre *</label>
+                            <input type="text" name="nombre" id="edit_nombre" class="form-control" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Descripción</label>
+                            <textarea name="descripcion" id="edit_descripcion" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Precio *</label>
+                            <input type="number" name="precio" id="edit_precio" class="form-control" required min="0" step="0.01">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Stock *</label>
+                            <input type="number" name="stock" id="edit_stock" class="form-control" required min="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Nueva imagen</label>
+                            <input type="file" name="foto" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Categoría</label>
+                            <input type="text" name="categoria" id="edit_categoria" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="font-size: 0.8rem;">Marca</label>
+                            <input type="text" name="marca" id="edit_marca" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-custom" style="padding: 10px 25px;">
+                        <i class="bi bi-save"></i> Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // MODAL EDITAR - Cargar datos
+    const modalEditar = document.getElementById('modalEditarProducto');
+    if (modalEditar) {
+        modalEditar.addEventListener('show.bs.modal', function(event) {
+            const btn = event.relatedTarget;
+            const id = btn.getAttribute('data-id');
+
+            document.getElementById('edit_nombre').value = btn.getAttribute('data-nombre') || '';
+            document.getElementById('edit_descripcion').value = btn.getAttribute('data-descripcion') || '';
+            document.getElementById('edit_precio').value = btn.getAttribute('data-precio') || '';
+            document.getElementById('edit_stock').value = btn.getAttribute('data-stock') || '';
+            document.getElementById('formEditarProducto').action = '/vendedor/productos/editar/' + id;
+        });
+    }
+
+    // TOAST
+    function mostrarToast(mensaje, tipo = 'success') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${tipo}`;
+        const iconos = { success: 'check-circle-fill', error: 'exclamation-circle-fill', warning: 'exclamation-triangle-fill', info: 'info-circle-fill' };
+        toast.innerHTML = `<i class="bi bi-${iconos[tipo] || 'check-circle-fill'}"></i> ${mensaje}`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.5s ease forwards';
+            setTimeout(() => toast.remove(), 500);
+        }, 3500);
+    }
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                document.addEventListener('DOMContentLoaded', () => {
+                    mostrarToast({{ message|tojson }}, '{{ "success" if category == "success" else ("error" if category == "danger" else category) }}');
+                });
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</script>
+
+</body>
+</html>

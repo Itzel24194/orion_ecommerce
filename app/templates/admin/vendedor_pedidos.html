@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos | ORION Vendedor</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        .sidebar { width: 280px; background: #fff; border-right: 2px solid #e8e8e8; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; z-index: 1000; box-shadow: 2px 0 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        .sidebar .admin-profile { padding: 25px 20px 20px; text-align: center; border-bottom: 1px solid #e8e8e8; background: linear-gradient(135deg, #6c5ce7, #4b3db8); flex-shrink: 0; }
+        .sidebar .admin-profile .avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); background: #f0f0f0; }
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .admin-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .admin-profile .rol { font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700; background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px; display: inline-block; margin-top: 5px; }
+        .sidebar .logo { font-size: 1.8rem; font-weight: 900; color: #6c5ce7; text-align: center; padding: 15px 0 5px; letter-spacing: -1px; }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title { font-size: 0.65rem; text-transform: uppercase; color: #888; padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700; }
+        .sidebar a { display: flex; align-items: center; gap: 12px; padding: 11px 25px; color: #555; text-decoration: none; transition: all 0.3s ease; border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500; }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f0eefc; color: #6c5ce7; border-left-color: #6c5ce7; }
+        .sidebar a:hover i, .sidebar a.active i { color: #6c5ce7; }
+        .sidebar a.active { font-weight: 700; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn { display: flex; align-items: center; gap: 12px; padding: 11px 25px; color: #dc3545; text-decoration: none; transition: all 0.3s ease; border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500; cursor: pointer; background: transparent; border: none; width: 100%; text-align: left; }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        .main { margin-left: 280px; padding: 30px 35px 20px; width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #e8e8e8; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .top-bar h1 { font-size: 1.6rem; font-weight: 800; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .top-bar h1 i { color: #6c5ce7; }
+        .top-bar .tag { background: #6c5ce7; color: #fff; padding: 5px 18px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+
+        .btn-primary-custom { background: #6c5ce7; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-primary-custom:hover { background: #4b3db8; color: white; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: #fff; padding: 18px 22px; border-radius: 14px; border: 1px solid #e8e8e8; border-left: 4px solid #6c5ce7; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .stat-card.green { border-left-color: #198754; }
+        .stat-card.yellow { border-left-color: #ffc107; }
+        .stat-card.red { border-left-color: #dc3545; }
+        .stat-card.blue { border-left-color: #0d6efd; }
+        .stat-card .number { font-size: 1.8rem; font-weight: 900; color: #1a1a2e; display: block; }
+        .stat-card.green .number { color: #198754; }
+        .stat-card.yellow .number { color: #ffc107; }
+        .stat-card.red .number { color: #dc3545; }
+        .stat-card.blue .number { color: #0d6efd; }
+        .stat-card .label { color: #888; font-size: 0.72rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-top: 3px; display: block; }
+
+        .section-box { background: #fff; border-radius: 16px; padding: 25px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .section-box h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; color: #1a1a2e; display: flex; align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+        .section-box h2 > span:first-child { display: flex; align-items: center; gap: 10px; }
+        .section-box h2 i { color: #6c5ce7; }
+
+        .filtros-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+        .filtros-bar input, .filtros-bar select { border: 2px solid #e9ecef; border-radius: 10px; padding: 9px 14px; font-size: 0.9rem; transition: all 0.3s ease; }
+        .filtros-bar input:focus, .filtros-bar select:focus { border-color: #6c5ce7; box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); outline: none; }
+
+        /* TARJETA DE PEDIDO */
+        .pedido-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px 22px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+        .pedido-card:hover {
+            border-color: #6c5ce7;
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.08);
+        }
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #e8e8e8;
+        }
+        .pedido-numero {
+            font-weight: 800;
+            font-size: 1rem;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pedido-fecha {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pedido-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .pedido-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            padding: 6px 0;
+        }
+        .pedido-item .nombre {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pedido-item .cantidad {
+            background: #f0eefc;
+            color: #6c5ce7;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 50px;
+        }
+        .pedido-item .precio {
+            font-weight: 700;
+            color: #6c5ce7;
+        }
+        .pedido-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 15px;
+            border-top: 1px dashed #e8e8e8;
+        }
+        .pedido-total {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #1a1a2e;
+        }
+        .pedido-total small {
+            font-size: 0.7rem;
+            color: #999;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* BADGES */
+        .badge-estado { font-size: 0.65rem; padding: 5px 12px; border-radius: 50px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; display: inline-block; }
+        .badge-estado.pendiente { background: #fff3cd; color: #856404; }
+        .badge-estado.confirmado { background: #cfe2ff; color: #084298; }
+        .badge-estado.preparando { background: #e2d9f3; color: #4b3db8; }
+        .badge-estado.enviado { background: #cfe2ff; color: #084298; }
+        .badge-estado.entregado { background: #d1e7dd; color: #0f5132; }
+        .badge-estado.cancelado { background: #f8d7da; color: #842029; }
+
+        .btn-accion { padding: 6px 14px; font-size: 0.75rem; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-accion:hover { transform: translateY(-2px); }
+        .btn-ver { background: #6c5ce7; color: white; }
+        .btn-ver:hover { background: #4b3db8; color: white; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state i { font-size: 3.5rem; opacity: 0.3; margin-bottom: 15px; display: block; color: #6c5ce7; }
+        .empty-state p { margin-bottom: 5px; font-weight: 600; font-size: 1rem; }
+        .empty-state small { color: #bbb; }
+
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast-notification { padding: 12px 20px; border-radius: 10px; color: white; font-weight: 600; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; animation: slideIn 0.4s ease; min-width: 250px; }
+        .toast-notification.success { background: #198754; }
+        .toast-notification.error { background: #dc3545; }
+        .toast-notification.warning { background: #ffc107; color: #1a1a2e; }
+        .toast-notification.info { background: #0dcaf0; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% set nombre_v = vendedor.get('nombre', 'Vendedor') %}
+            {% set foto_v = vendedor.get('foto') %}
+            <img src="{{ url_for('static', filename='uploads/' + foto_v) if foto_v else 'https://ui-avatars.com/api/?name=' + nombre_v + '&background=6c5ce7&color=fff&size=80&bold=true' }}"
+                 class="avatar" alt="Vendedor"
+                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ nombre_v }}&background=6c5ce7&color=fff&size=80&bold=true';">
+            <div class="name">{{ nombre_v }} {{ vendedor.get('apellido_paterno', '') }}</div>
+            <div class="email">{{ vendedor.get('email', '') }}</div>
+            <div class="rol"><i class="bi bi-shop"></i> Vendedor</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+            <div class="panel-title">MI TIENDA</div>
+            <a href="{{ url_for('web.vendedor_dashboard') }}"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.vendedor_productos') }}"><i class="bi bi-box-seam"></i> <span>Mis Productos</span></a>
+            <a href="{{ url_for('web.vendedor_pedidos') }}" class="active"><i class="bi bi-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.vendedor_resenas') }}"><i class="bi bi-star"></i> <span>Reseñas</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">ANÁLISIS</div>
+            <a href="#"><i class="bi bi-graph-up"></i> <span>Mis Ventas</span></a>
+            <a href="#"><i class="bi bi-people"></i> <span>Mis Clientes</span></a>
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="#"><i class="bi bi-shop-window"></i> <span>Mi Tienda</span></a>
+            <a href="#"><i class="bi bi-truck"></i> <span>Envíos</span></a>
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="bi bi-cart"></i> Mis Pedidos</h1>
+            <div class="tag"><i class="bi bi-shop"></i> Mi Tienda</div>
+        </header>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="number">{{ stats.total }}</div>
+                <div class="label">Total pedidos</div>
+            </div>
+            <div class="stat-card yellow">
+                <div class="number">{{ stats.pendientes }}</div>
+                <div class="label">Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{{ stats.enviados }}</div>
+                <div class="label">Enviados</div>
+            </div>
+            <div class="stat-card green">
+                <div class="number">{{ stats.entregados }}</div>
+                <div class="label">Entregados</div>
+            </div>
+            <div class="stat-card red">
+                <div class="number">{{ stats.cancelados }}</div>
+                <div class="label">Cancelados</div>
+            </div>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="section-box" style="padding: 18px 25px;">
+            <form method="GET" action="{{ url_for('web.vendedor_pedidos') }}" class="filtros-bar" style="margin: 0;">
+                <input type="text" name="q" placeholder="Buscar por número de pedido..."
+                       value="{{ request.args.get('q', '') }}" style="width: 280px;">
+                <select name="estado" style="width: 200px;">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente" {% if request.args.get('estado')=='pendiente' %}selected{% endif %}>Pendiente</option>
+                    <option value="confirmado" {% if request.args.get('estado')=='confirmado' %}selected{% endif %}>Confirmado</option>
+                    <option value="preparando" {% if request.args.get('estado')=='preparando' %}selected{% endif %}>Preparando</option>
+                    <option value="enviado" {% if request.args.get('estado')=='enviado' %}selected{% endif %}>Enviado</option>
+                    <option value="entregado" {% if request.args.get('estado')=='entregado' %}selected{% endif %}>Entregado</option>
+                    <option value="cancelado" {% if request.args.get('estado')=='cancelado' %}selected{% endif %}>Cancelado</option>
+                </select>
+                <button type="submit" class="btn-primary-custom" style="padding: 9px 20px;">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+                <a href="{{ url_for('web.vendedor_pedidos') }}" class="btn-primary-custom" style="background: #6c757d; padding: 9px 20px;">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </a>
+            </form>
+        </div>
+
+        <!-- LISTA DE PEDIDOS -->
+        <div class="section-box">
+            <h2>
+                <span><i class="bi bi-list"></i> Listado de pedidos</span>
+                <span style="font-size: 0.85rem; color: #999; font-weight: 600;">
+                    {{ pedidos|length }} resultado{{ 's' if pedidos|length != 1 else '' }}
+                </span>
+            </h2>
+
+            {% if pedidos %}
+                {% for p in pedidos %}
+                <div class="pedido-card">
+                    <div class="pedido-header">
+                        <div>
+                            <div class="pedido-numero">
+                                <i class="bi bi-receipt" style="color: #6c5ce7;"></i>
+                                Pedido #{{ p.numero_pedido }}
+                            </div>
+                            <div class="pedido-fecha">
+                                <i class="bi bi-calendar3"></i>
+                                {{ p.created_at.strftime('%d/%m/%Y %H:%M') if p.created_at else 'Fecha no disponible' }}
+                            </div>
+                            {% if p.usuario_nombre %}
+                            <div class="pedido-fecha">
+                                <i class="bi bi-person"></i> {{ p.usuario_nombre }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="badge-estado {{ p.estado }}">{{ p.estado|upper }}</span>
+                        </div>
+                    </div>
+
+                    <div class="pedido-items">
+                        {% for item in p.items %}
+                        <div class="pedido-item">
+                            <div class="nombre">
+                                <i class="bi bi-box" style="color: #6c5ce7;"></i>
+                                <span>{{ item.nombre }}</span>
+                                <span class="cantidad">x{{ item.cantidad }}</span>
+                            </div>
+                            <span class="precio">${{ "%.2f"|format(item.subtotal) }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="pedido-footer">
+                        <div class="pedido-total">
+                            ${{ "%.2f"|format(p.subtotal_vendedor) }}
+                            <small>· Mi subtotal</small>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('web.vendedor_ver_pedido', pedido_id=p._id) }}" class="btn-accion btn-ver">
+                                <i class="bi bi-eye"></i> Ver detalle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p>No tienes pedidos todavía</p>
+                <small>Cuando un cliente compre tus productos, aparecerán aquí</small>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function mostrarToast(mensaje, tipo = 'success') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${tipo}`;
+        const iconos = { success: 'check-circle-fill', error: 'exclamation-circle-fill', warning: 'exclamation-triangle-fill', info: 'info-circle-fill' };
+        toast.innerHTML = `<i class="bi bi-${iconos[tipo] || 'check-circle-fill'}"></i> ${mensaje}`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.5s ease forwards';
+            setTimeout(() => toast.remove(), 500);
+        }, 3500);
+    }
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                document.addEventListener('DOMContentLoaded', () => {
+                    mostrarToast({{ message|tojson }}, '{{ "success" if category == "success" else ("error" if category == "danger" else category) }}');
+                });
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</script>
+
+</body>
+</html>

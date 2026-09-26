@@ -201,7 +201,7 @@ class Carrito(Document):
                     'descripcion': producto.get('descripcion'),
                     'fotos': producto.get('fotos', []),
                     'categoria': producto.get('categoria'),
-                    'empresa_nombre': producto.get('empresa_nombre')
+                    'marca_nombre': producto.get('marca_nombre')
                 }
                 items_con_detalles.append(item_completo)
         

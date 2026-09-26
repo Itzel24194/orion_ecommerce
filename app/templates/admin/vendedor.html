@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Vendedor | ORION</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: #f5f6f8;
+            color: #1a1a2e;
+        }
+
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 2px solid #e8e8e8;
+            height: 100vh;
+            position: fixed;
+            left: 0; top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #6c5ce7, #4b3db8);
+            flex-shrink: 0;
+        }
+
+        .sidebar .admin-profile .avatar {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            background: #f0f0f0;
+        }
+
+        .sidebar .admin-profile .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-top: 10px;
+        }
+
+        .sidebar .admin-profile .email {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .sidebar .logo {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #6c5ce7;
+            text-align: center;
+            padding: 15px 0 5px;
+            letter-spacing: -1px;
+        }
+
+        .sidebar .logo span { color: #1a1a2e; }
+
+        .sidebar .menu-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 10px;
+        }
+
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb {
+            background: #6c5ce7;
+            border-radius: 4px;
+        }
+
+        .sidebar .panel-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #888;
+            padding: 10px 25px 5px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+
+        .sidebar a:hover {
+            background: #f0eefc;
+            color: #6c5ce7;
+            border-left-color: #6c5ce7;
+        }
+
+        .sidebar a:hover i { color: #6c5ce7; }
+
+        .sidebar a.active {
+            background: #f0eefc;
+            color: #6c5ce7;
+            border-left-color: #6c5ce7;
+            font-weight: 700;
+        }
+
+        .sidebar a.active i { color: #6c5ce7; }
+
+        .sidebar .divider {
+            height: 1px;
+            background: #e8e8e8;
+            margin: 10px 25px;
+        }
+
+        .sidebar .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 25px;
+            color: #dc3545;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover {
+            background: #fdf0f0;
+            border-left-color: #dc3545;
+        }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px;
+            padding: 30px 35px 20px;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .top-bar h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-bar h1 i { color: #6c5ce7; }
+
+        .top-bar .tag {
+            background: #6c5ce7;
+            color: #fff;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, #fff, #f3f0ff);
+            padding: 25px 30px;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .hero h2 {
+            color: #1a1a2e;
+            margin-bottom: 8px;
+            font-weight: 800;
+            font-size: 1.3rem;
+        }
+
+        .hero h2 i { color: #6c5ce7; }
+
+        .hero p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .hero strong { color: #6c5ce7; }
+
+        /* ===== BOTONES ===== */
+        .btn-primary-custom {
+            background: #6c5ce7;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-custom:hover {
+            background: #4b3db8;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-success-custom {
+            background: #198754;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-success-custom:hover {
+            background: #146c43;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 20px 22px;
+            border-radius: 14px;
+            border: 1px solid #e8e8e8;
+            border-left: 4px solid #6c5ce7;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(108, 92, 231, 0.1);
+        }
+
+        .stat-card.green { border-left-color: #198754; }
+        .stat-card.yellow { border-left-color: #ffc107; }
+        .stat-card.red { border-left-color: #dc3545; }
+        .stat-card.blue { border-left-color: #0d6efd; }
+        .stat-card.pink { border-left-color: #e10098; }
+
+        .stat-card .icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 2.5rem;
+            opacity: 0.08;
+            color: #6c5ce7;
+        }
+
+        .stat-card.green .icon { color: #198754; }
+        .stat-card.yellow .icon { color: #ffc107; }
+        .stat-card.red .icon { color: #dc3545; }
+        .stat-card.blue .icon { color: #0d6efd; }
+
+        .stat-card .number {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #1a1a2e;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card.green .number { color: #198754; }
+        .stat-card.yellow .number { color: #ffc107; }
+        .stat-card.red .number { color: #dc3545; }
+        .stat-card.blue .number { color: #0d6efd; }
+
+        .stat-card .label {
+            color: #888;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card .sub {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 4px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== SECTION BOX ===== */
+        .section-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .section-box h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .section-box h2 > span:first-child {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-box h2 i { color: #6c5ce7; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* ===== TABLAS ===== */
+        .table-simple {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .table-simple thead th {
+            background: #f8f9fc;
+            color: #555;
+            font-weight: 700;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e8e8e8;
+        }
+
+        .table-simple tbody td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .table-simple tbody tr:hover td {
+            background: #fafbff;
+        }
+
+        .table-simple tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ===== BADGES ===== */
+        .badge-estado {
+            font-size: 0.62rem;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: inline-block;
+        }
+
+        .badge-estado.pendiente  { background: #fff3cd; color: #856404; }
+        .badge-estado.confirmado { background: #cfe2ff; color: #084298; }
+        .badge-estado.preparando { background: #e2d9f3; color: #4b3db8; }
+        .badge-estado.enviado    { background: #cfe2ff; color: #084298; }
+        .badge-estado.entregado  { background: #d1e7dd; color: #0f5132; }
+        .badge-estado.cancelado  { background: #f8d7da; color: #842029; }
+
+        .badge-stock {
+            font-size: 0.65rem;
+            padding: 3px 9px;
+            border-radius: 50px;
+            font-weight: 700;
+        }
+
+        .badge-stock.ok      { background: #d1e7dd; color: #0f5132; }
+        .badge-stock.bajo    { background: #fff3cd; color: #856404; }
+        .badge-stock.agotado { background: #f8d7da; color: #842029; }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            opacity: 0.3;
+            margin-bottom: 10px;
+            display: block;
+            color: #6c5ce7;
+        }
+
+        .empty-state p {
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .empty-state small { color: #bbb; }
+
+        /* ===== PRODUCT MINI ===== */
+        .prod-mini {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prod-mini img {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f0f0f0;
+            border: 1px solid #e8e8e8;
+        }
+
+        .prod-mini .info { flex: 1; }
+
+        .prod-mini .info .name {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+
+        .prod-mini .info .price {
+            font-size: 0.75rem;
+            color: #6c5ce7;
+            font-weight: 700;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-info {
+            background: #ffffff;
+            padding: 15px 25px;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            text-align: center;
+            margin-top: auto;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+        }
+
+        .footer-info p {
+            color: #888;
+            font-size: 0.75rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-info i { color: #6c5ce7; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo,
+            .sidebar .panel-title,
+            .sidebar a span,
+            .sidebar .admin-profile .name,
+            .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol,
+            .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .sidebar .logout-btn i { font-size: 1.3rem; margin: 0; }
+            .main { margin-left: 70px; padding: 15px; }
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast-notification {
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.4s ease;
+            min-width: 250px;
+        }
+
+        .toast-notification.success { background: #198754; }
+        .toast-notification.error   { background: #dc3545; }
+        .toast-notification.warning { background: #ffc107; color: #1a1a2e; }
+        .toast-notification.info    { background: #0dcaf0; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+
+        <div class="admin-profile">
+            {% set nombre_v = vendedor.get('nombre', 'Vendedor') %}
+            {% set foto_v = vendedor.get('foto') %}
+            <img src="{{ url_for('static', filename='uploads/' + foto_v) if foto_v else 'https://ui-avatars.com/api/?name=' + nombre_v + '&background=6c5ce7&color=fff&size=80&bold=true' }}"
+                 class="avatar" alt="Vendedor"
+                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ nombre_v }}&background=6c5ce7&color=fff&size=80&bold=true';">
+            <div class="name">{{ nombre_v }} {{ vendedor.get('apellido_paterno', '') }}</div>
+            <div class="email">{{ vendedor.get('email', 'vendedor@orion.com') }}</div>
+            <div class="rol"><i class="bi bi-shop"></i> Vendedor</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+
+            <div class="panel-title">MI TIENDA</div>
+
+            <a href="{{ url_for('web.vendedor_dashboard') }}" class="active">
+                <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('web.vendedor_productos') }}">
+                <i class="bi bi-box-seam"></i> <span>Mis Productos</span>
+            </a>
+            <a href="{{ url_for('web.vendedor_pedidos') }}">
+                <i class="bi bi-cart"></i> <span>Pedidos</span>
+            </a>
+            <a href="{{ url_for('web.vendedor_resenas') }}">
+                <i class="bi bi-star"></i> <span>Reseñas</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">ANÁLISIS</div>
+            <a href="#">
+                <i class="bi bi-graph-up"></i> <span>Mis Ventas</span>
+            </a>
+            <a href="#">
+                <i class="bi bi-people"></i> <span>Mis Clientes</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="#">
+                <i class="bi bi-shop-window"></i> <span>Mi Tienda</span>
+            </a>
+            <a href="#">
+                <i class="bi bi-truck"></i> <span>Envíos</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+
+        <!-- ===== TOP BAR ===== -->
+        <header class="top-bar">
+            <h1>
+                <i class="bi bi-speedometer2"></i> Dashboard de Vendedor
+            </h1>
+            <div class="tag">
+                <i class="bi bi-shop"></i> Mi Tienda
+            </div>
+        </header>
+
+        <!-- ===== HERO ===== -->
+        <section class="hero">
+            <h2><i class="bi bi-hand-thumbs-up"></i> ¡Hola, {{ vendedor.get('nombre', 'Vendedor') }}!</h2>
+            <p>
+                Aquí tienes un resumen de tu actividad en <strong>ORION</strong>. Puedes gestionar tus
+                <strong>productos</strong>, revisar <strong>pedidos</strong>, responder <strong>reseñas</strong>
+                y analizar tus <strong>ventas</strong>.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="{{ url_for('web.vendedor_productos') }}" class="btn-primary-custom">
+                    <i class="bi bi-box-seam"></i> Ver mis productos
+                </a>
+                <a href="{{ url_for('web.vendedor_pedidos') }}" class="btn-success-custom">
+                    <i class="bi bi-cart-check"></i> Ver pedidos
+                </a>
+            </div>
+        </section>
+
+        <!-- ===== KPIs ===== -->
+        <div class="stats-grid">
+
+            <div class="stat-card green">
+                <i class="bi bi-currency-dollar icon"></i>
+                <div class="number">${{ "%.2f"|format(ventas_totales) }}</div>
+                <div class="label">Ventas totales</div>
+                <span class="sub">Este mes: ${{ "%.2f"|format(ventas_mes) }}</span>
+            </div>
+
+            <div class="stat-card blue">
+                <i class="bi bi-cart icon"></i>
+                <div class="number">{{ total_pedidos }}</div>
+                <div class="label">Pedidos totales</div>
+                <span class="sub">{{ pedidos_pendientes }} pendientes</span>
+            </div>
+
+            <div class="stat-card">
+                <i class="bi bi-box-seam icon"></i>
+                <div class="number">{{ total_productos }}</div>
+                <div class="label">Productos</div>
+                <span class="sub">{{ productos_activos }} activos</span>
+            </div>
+
+            <div class="stat-card yellow">
+                <i class="bi bi-star icon"></i>
+                <div class="number">{{ promedio_resenas }}</div>
+                <div class="label">Promedio reseñas</div>
+                <span class="sub">{{ total_resenas }} reseñas totales</span>
+            </div>
+
+            <div class="stat-card red">
+                <i class="bi bi-exclamation-triangle icon"></i>
+                <div class="number">{{ productos_stock_bajo + productos_sin_stock }}</div>
+                <div class="label">Atención stock</div>
+                <span class="sub">{{ productos_stock_bajo }} bajos · {{ productos_sin_stock }} agotados</span>
+            </div>
+
+        </div>
+
+        <!-- ===== GRÁFICA ===== -->
+        <div class="section-box">
+            <h2>
+                <span><i class="bi bi-graph-up-arrow"></i> Ventas últimos 7 días</span>
+            </h2>
+            <div class="chart-wrapper">
+                <canvas id="chartVentas"></canvas>
+            </div>
+        </div>
+
+        <!-- ===== 2 COLUMNAS ===== -->
+        <div class="grid-2">
+
+            <div class="section-box">
+                <h2>
+                    <span><i class="bi bi-trophy"></i> Top productos vendidos</span>
+                </h2>
+
+                {% if top_productos %}
+                <table class="table-simple">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Producto</th>
+                            <th style="text-align: center;">Unidades</th>
+                            <th style="text-align: right;">Ingresos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in top_productos %}
+                        <tr>
+                            <td><strong>#{{ loop.index }}</strong></td>
+                            <td>{{ p.nombre }}</td>
+                            <td style="text-align: center;">
+                                <span class="badge-stock ok">{{ p.unidades }}</span>
+                            </td>
+                            <td style="text-align: right; color: #198754; font-weight: 700;">
+                                ${{ "%.2f"|format(p.ingresos) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-bar-chart"></i>
+                    <p>Sin datos de ventas</p>
+                    <small>Aún no has vendido productos</small>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="section-box">
+                <h2>
+                    <span><i class="bi bi-clock-history"></i> Pedidos recientes</span>
+                    <a href="{{ url_for('web.vendedor_pedidos') }}"
+                       style="font-size: 0.75rem; color: #6c5ce7; text-decoration: none; font-weight: 700;">
+                        Ver todos <i class="bi bi-arrow-right"></i>
+                    </a>
+                </h2>
+
+                {% if pedidos_recientes %}
+                <table class="table-simple">
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Estado</th>
+                            <th style="text-align: right;">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in pedidos_recientes %}
+                        <tr>
+                            <td>
+                                <strong style="font-size: 0.78rem;">#{{ p.numero_pedido }}</strong>
+                                <div style="font-size: 0.7rem; color: #999;">
+                                    {{ p.items|length }} producto{{ 's' if p.items|length != 1 else '' }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-estado {{ p.estado }}">
+                                    {{ p.estado|upper }}
+                                </span>
+                            </td>
+                            <td style="text-align: right; font-weight: 700; color: #6c5ce7;">
+                                ${{ "%.2f"|format(p.subtotal_vendedor) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>Sin pedidos recientes</p>
+                    <small>Cuando alguien compre tus productos aparecerán aquí</small>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- ===== PRODUCTOS RECIENTES ===== -->
+        <div class="section-box">
+            <h2>
+                <span><i class="bi bi-box-seam"></i> Mis productos recientes</span>
+                <a href="{{ url_for('web.vendedor_productos') }}"
+                   style="font-size: 0.75rem; color: #6c5ce7; text-decoration: none; font-weight: 700;">
+                    Ver todos <i class="bi bi-arrow-right"></i>
+                </a>
+            </h2>
+
+            {% if productos_recientes %}
+            <table class="table-simple">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th style="text-align: center;">Stock</th>
+                        <th style="text-align: right;">Precio</th>
+                        <th style="text-align: center;">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in productos_recientes %}
+                    <tr>
+                        <td>
+                            <div class="prod-mini">
+                                <img src="{{ url_for('static', filename='uploads/productos/' + p.imagen) if p.imagen and p.imagen != 'default.jpg' else 'https://via.placeholder.com/44x44/eee/999?text=IMG' }}"
+                                     alt="{{ p.nombre }}"
+                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/44x44/eee/999?text=IMG';">
+                                <div class="info">
+                                    <div class="name">{{ p.nombre }}</div>
+                                    <div class="price">${{ "%.2f"|format(p.precio) }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            {% if p.stock <= 0 %}
+                                <span class="badge-stock agotado">Agotado</span>
+                            {% elif p.stock <= 5 %}
+                                <span class="badge-stock bajo">{{ p.stock }} uds</span>
+                            {% else %}
+                                <span class="badge-stock ok">{{ p.stock }} uds</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right; font-weight: 700;">
+                            ${{ "%.2f"|format(p.precio) }}
+                        </td>
+                        <td style="text-align: center;">
+                            {% if p.activo %}
+                                <span class="badge-estado entregado">ACTIVO</span>
+                            {% else %}
+                                <span class="badge-estado cancelado">INACTIVO</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-box"></i>
+                <p>No tienes productos aún</p>
+                <small>Empieza agregando tu primer producto</small>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer-info">
+            <p>
+                <i class="bi bi-clock"></i>
+                <span id="fecha-actual"></span>
+                <span>|</span>
+                <i class="bi bi-shop"></i> Panel de Vendedor ORION
+                <span>|</span>
+                <i class="bi bi-c-circle"></i> Todos los derechos reservados
+            </p>
+        </div>
+
+    </main>
+
+</div>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ============================================================
+    // FECHA
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const ahora = new Date();
+        const fechaStr = ahora.toLocaleString('es-MX', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+        const el = document.getElementById('fecha-actual');
+        if (el) el.textContent = fechaStr;
+    });
+
+    // ============================================================
+    // GRÁFICA
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('chartVentas');
+        if (!ctx) return;
+
+        const labels = {{ labels_7d|tojson }};
+        const data = {{ ventas_7d|tojson }};
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Ventas ($)',
+                    data: data,
+                    borderColor: '#6c5ce7',
+                    backgroundColor: 'rgba(108, 92, 231, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#6c5ce7',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1a1a2e',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        padding: 12,
+                        borderColor: '#6c5ce7',
+                        borderWidth: 1,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#888',
+                            font: { size: 11 },
+                            callback: function(value) { return '$' + value; }
+                        },
+                        grid: { color: '#f0f0f0', drawBorder: false }
+                    },
+                    x: {
+                        ticks: { color: '#888', font: { size: 11 } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    });
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function mostrarToast(mensaje, tipo = 'success') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${tipo}`;
+
+        const iconos = {
+            success: 'check-circle-fill',
+            error: 'exclamation-circle-fill',
+            warning: 'exclamation-triangle-fill',
+            info: 'info-circle-fill'
+        };
+
+        toast.innerHTML = `
+            <i class="bi bi-${iconos[tipo] || 'check-circle-fill'}"></i>
+            ${mensaje}
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.5s ease forwards';
+            setTimeout(() => toast.remove(), 500);
+        }, 3500);
+    }
+
+    // ============================================================
+    // FLASH → TOAST
+    // ============================================================
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                document.addEventListener('DOMContentLoaded', () => {
+                    mostrarToast({{ message|tojson }}, '{{ "success" if category == "success" else ("error" if category == "danger" else category) }}');
+                });
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</script>
+
+</body>
+</html>

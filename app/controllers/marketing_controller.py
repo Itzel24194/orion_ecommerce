@@ -17,7 +17,6 @@ class MarketingController:
     def obtener_banners_publicos(self):
         """Retorna solo los banners activos para mostrar en la web principal."""
         todos = Marketing.obtener_todo('banners')
-        # Filtramos los que tengan el campo 'activo' en True
         return [b for b in todos if b.get('activo') == True]
 
     def obtener_cupones_publicos(self):
@@ -83,6 +82,107 @@ class MarketingController:
             else:
                 flash('Banner no encontrado', 'danger')
         return redirect('/admin/marketing/banners')
+
+
+    # ================================================================
+    # MÉTODOS PARA MARCAS (ADMIN)
+    # ================================================================
+    # NOTA: la colección en Mongo sigue llamándose 'marcas',
+    #       pero en UI y rutas se maneja como 'Marcas'.
+
+    def listar_marcas(self):
+        """Lista todas las marcas (colección 'marcas')."""
+        db = current_app.db
+        marcas = list(db.marcas.find({}).sort('nombre', 1))
+        for m in marcas:
+            m['_id'] = str(m['_id'])
+        return render_template('admin/marcas.html', marcas=marcas)
+
+    def agregar_marca(self):
+        """Agrega una nueva marca."""
+        if request.method == 'POST':
+            db = current_app.db
+            data = {
+                'nombre': request.form.get('nombre', '').strip(),
+                'descripcion': request.form.get('descripcion', '').strip(),
+                'pais_origen': request.form.get('pais_origen', '').strip(),
+                'sitio_web': request.form.get('sitio_web', '').strip(),
+                'logo': request.form.get('logo', '').strip(),
+                'activa': True,
+                'created_at': datetime.utcnow(),
+            }
+            if not data['nombre']:
+                flash('El nombre de la marca es obligatorio', 'danger')
+                return redirect('/admin/marcas')
+            if db.marcas.find_one({'nombre': data['nombre']}):
+                flash('Ya existe una marca con ese nombre', 'warning')
+                return redirect('/admin/marcas')
+            db.marcas.insert_one(data)
+            flash('Marca agregada correctamente', 'success')
+        return redirect('/admin/marcas')
+
+    def editar_marca(self, id):
+        """Edita una marca existente."""
+        if request.method == 'POST':
+            db = current_app.db
+            data = {
+                'nombre': request.form.get('nombre', '').strip(),
+                'descripcion': request.form.get('descripcion', '').strip(),
+                'pais_origen': request.form.get('pais_origen', '').strip(),
+                'sitio_web': request.form.get('sitio_web', '').strip(),
+                'logo': request.form.get('logo', '').strip(),
+                'updated_at': datetime.utcnow(),
+            }
+            db.marcas.update_one({'_id': ObjectId(id)}, {'$set': data})
+            flash('Marca actualizada correctamente', 'success')
+        return redirect('/admin/marcas')
+
+    def eliminar_marca(self, id):
+        """Elimina una marca (solo si no tiene productos)."""
+        db = current_app.db
+        try:
+            oid = ObjectId(id)
+        except Exception:
+            flash('ID de marca inválido', 'danger')
+            return redirect('/admin/marcas')
+
+        # Verificar productos asociados (soporta marca_id y marca_id)
+        productos_count = db.productos.count_documents({
+            '$or': [
+                {'marca_id': oid},
+                {'marca_id': oid},
+            ]
+        })
+
+        if productos_count > 0:
+            flash(f'No se puede eliminar: hay {productos_count} producto(s) asociados a esta marca', 'danger')
+            return redirect('/admin/marcas')
+
+        db.marcas.delete_one({'_id': oid})
+        flash('Marca eliminada correctamente', 'success')
+        return redirect('/admin/marcas')
+
+    def toggle_marca(self, id):
+        """Activa/Desactiva una marca."""
+        if request.method == 'POST':
+            db = current_app.db
+            try:
+                oid = ObjectId(id)
+            except Exception:
+                flash('ID inválido', 'danger')
+                return redirect('/admin/marcas')
+
+            marca = db.marcas.find_one({'_id': oid})
+            if marca:
+                nuevo = not marca.get('activa', True)
+                db.marcas.update_one(
+                    {'_id': oid},
+                    {'$set': {'activa': nuevo, 'updated_at': datetime.utcnow()}}
+                )
+                flash(f'Marca {"activada" if nuevo else "desactivada"}', 'success')
+            else:
+                flash('Marca no encontrada', 'danger')
+        return redirect('/admin/marcas')
 
 
     # ================================================================
@@ -231,11 +331,7 @@ class MarketingController:
                 flash('Campaña no encontrada', 'danger')
                 return redirect('/admin/marketing/campanas')
             
-            # Obtener suscriptores
             suscriptores = list(db.suscriptores.find({'activo': True}))
-            
-            # Aquí iría la lógica de envío de emails
-            # Por ahora solo marcamos como enviada
             
             db.campanas_email.update_one(
                 {'_id': ObjectId(id)},

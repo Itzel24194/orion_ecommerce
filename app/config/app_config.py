@@ -29,6 +29,7 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'orionecommerce8@gmail.com'
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'ifpysudjgsgupzim'
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'orionecommerce8@gmail.com'
+
     
     # Configuración de la tienda
     TIENDA_NOMBRE = 'Orion E-commerce'
@@ -36,3 +37,5 @@ class Config:
     
     # Debug mode
     DEBUG = os.environ.get('FLASK_DEBUG', 'True') == 'True'
+
+    CONEKTA_PUBLIC_KEY = 'key_JgXL03KIZGKjAzwPzG4UElh'

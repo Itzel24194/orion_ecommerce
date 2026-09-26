@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuración general · Liverpool Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lp-magenta:#e1007a;
+  --lp-magenta-dark:#b80064;
+  --lp-magenta-soft:#fce4f0;
+  --lp-border:#e5e5e5;
+  --lp-border-soft:#f0f0f0;
+  --lp-bg:#ffffff;
+  --lp-bg-alt:#f7f7f7;
+  --lp-text:#1a1a1a;
+  --lp-text-soft:#666;
+  --lp-text-mute:#999;
+  --lp-radius:3px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--lp-bg-alt);color:var(--lp-text);font-size:14px;line-height:1.5;}
+
+/* ============ HEADER STICKY ============ */
+.lp-header{background:#fff;border-bottom:1px solid var(--lp-border);position:sticky;top:0;z-index:100;}
+.lp-header__inner{max-width:1200px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.lp-header__brand{font-size:22px;font-weight:300;letter-spacing:8px;color:var(--lp-magenta);text-transform:uppercase;}
+.lp-header__brand strong{font-weight:700;letter-spacing:0;}
+.lp-header__breadcrumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--lp-text-mute);letter-spacing:.3px;text-transform:uppercase;}
+.lp-header__breadcrumb a{color:var(--lp-text-soft);text-decoration:none;transition:color .2s;}
+.lp-header__breadcrumb a:hover{color:var(--lp-magenta);}
+.lp-header__breadcrumb i{font-size:8px;color:var(--lp-text-mute);}
+
+/* ============ CONTENIDO ============ */
+.lp-main{max-width:900px;margin:0 auto;padding:40px 24px 60px;}
+.lp-title{font-size:26px;font-weight:300;letter-spacing:2px;text-transform:uppercase;color:var(--lp-text);margin-bottom:6px;}
+.lp-subtitle{font-size:13px;color:var(--lp-text-soft);margin-bottom:36px;letter-spacing:.2px;}
+
+/* ============ CARD FORM ============ */
+.lp-card{background:#fff;border:1px solid var(--lp-border);border-radius:var(--lp-radius);padding:36px 40px;}
+
+.lp-form__grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px 28px;margin-bottom:32px;}
+.lp-field{display:flex;flex-direction:column;gap:8px;}
+.lp-field--full{grid-column:1/-1;}
+.lp-field label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--lp-text-soft);}
+.lp-field input,.lp-field select{
+  padding:12px 14px;border:1px solid var(--lp-border);border-radius:var(--lp-radius);
+  font-size:14px;font-family:inherit;color:var(--lp-text);background:#fff;
+  transition:border-color .15s,box-shadow .15s;
+}
+.lp-field input:focus,.lp-field select:focus{
+  outline:none;border-color:var(--lp-magenta);box-shadow:0 0 0 3px rgba(225,0,122,.08);
+}
+.lp-field input::placeholder{color:#bbb;}
+
+/* ============ BOTONES LIVERPOOL ============ */
+.lp-actions{display:flex;gap:12px;justify-content:flex-end;padding-top:24px;border-top:1px solid var(--lp-border-soft);flex-wrap:wrap;}
+.lp-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 32px;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  border:1px solid transparent;border-radius:var(--lp-radius);cursor:pointer;
+  text-decoration:none;transition:all .2s;font-family:inherit;
+}
+.lp-btn--primary{background:var(--lp-magenta);color:#fff;}
+.lp-btn--primary:hover{background:var(--lp-magenta-dark);}
+.lp-btn--ghost{background:#fff;color:var(--lp-text-soft);border-color:var(--lp-border);}
+.lp-btn--ghost:hover{border-color:var(--lp-text);color:var(--lp-text);}
+
+@media(max-width:640px){
+  .lp-header__inner{padding:14px 20px;}
+  .lp-header__brand{font-size:18px;letter-spacing:4px;}
+  .lp-header__breadcrumb{display:none;}
+  .lp-main{padding:24px 16px 40px;}
+  .lp-title{font-size:20px;letter-spacing:1px;}
+  .lp-card{padding:24px 20px;}
+  .lp-form__grid{grid-template-columns:1fr;gap:18px;}
+  .lp-actions{flex-direction:column-reverse;}
+  .lp-btn{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<header class="lp-header">
+  <div class="lp-header__inner">
+    <div class="lp-header__brand">ORION<strong>.</strong></div>
+    <nav class="lp-header__breadcrumb">
+      <a href="{{ url_for('web.dashboard') }}">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{{ url_for('web.configuracion') }}">Configuración</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>General</span>
+    </nav>
+  </div>
+</header>
+
+<main class="lp-main">
+
+  <h1 class="lp-title">Configuración general</h1>
+  <p class="lp-subtitle">Datos de la tienda, moneda y contacto.</p>
+
+  <div class="lp-card">
+    <form method="POST">
+      <div class="lp-form__grid">
+
+        <div class="lp-field">
+          <label for="nombre_tienda">Nombre de la tienda</label>
+          <input type="text" id="nombre_tienda" name="nombre_tienda"
+                 value="{{ config.nombre_tienda if config else '' }}"
+                 placeholder="ORION System" required>
+        </div>
+
+        <div class="lp-field">
+          <label for="email_tienda">Email de la tienda</label>
+          <input type="email" id="email_tienda" name="email_tienda"
+                 value="{{ config.email_tienda if config else '' }}"
+                 placeholder="contacto@orion.com">
+        </div>
+
+        <div class="lp-field">
+          <label for="telefono_tienda">Teléfono</label>
+          <input type="tel" id="telefono_tienda" name="telefono_tienda"
+                 value="{{ config.telefono_tienda if config else '' }}"
+                 placeholder="+52 55 0000 0000">
+        </div>
+
+        <div class="lp-field">
+          <label for="moneda">Moneda</label>
+          <select id="moneda" name="moneda">
+            {% set mon = config.moneda if config else 'MXN' %}
+            <option value="MXN" {% if mon=='MXN' %}selected{% endif %}>MXN — Peso mexicano</option>
+            <option value="USD" {% if mon=='USD' %}selected{% endif %}>USD — Dólar</option>
+            <option value="EUR" {% if mon=='EUR' %}selected{% endif %}>EUR — Euro</option>
+          </select>
+        </div>
+
+        <div class="lp-field lp-field--full">
+          <label for="direccion_tienda">Dirección</label>
+          <input type="text" id="direccion_tienda" name="direccion_tienda"
+                 value="{{ config.direccion_tienda if config else '' }}"
+                 placeholder="Av. Reforma 222, CDMX">
+        </div>
+
+      </div>
+
+      <div class="lp-actions">
+        <a href="{{ url_for('web.dashboard') }}" class="lp-btn lp-btn--ghost">Cancelar</a>
+        <button type="submit" class="lp-btn lp-btn--primary">
+          <i class="fas fa-check"></i> Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+
+</main>
+
+</body>
+</html>

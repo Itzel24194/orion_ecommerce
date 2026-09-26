@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migraciones · Liverpool Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--lp-magenta:#e1007a;--lp-magenta-dark:#b80064;--lp-border:#e5e5e5;--lp-border-soft:#f0f0f0;--lp-bg-alt:#f7f7f7;--lp-text:#1a1a1a;--lp-text-soft:#666;--lp-text-mute:#999;--lp-radius:3px;--lp-warning:#f0b400;--lp-warning-bg:#fff8e1;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--lp-bg-alt);color:var(--lp-text);font-size:14px;line-height:1.5;}
+.lp-header{background:#fff;border-bottom:1px solid var(--lp-border);position:sticky;top:0;z-index:100;}
+.lp-header__inner{max-width:1200px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.lp-header__brand{font-size:22px;font-weight:300;letter-spacing:8px;color:var(--lp-magenta);text-transform:uppercase;}
+.lp-header__brand strong{font-weight:700;letter-spacing:0;}
+.lp-header__breadcrumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--lp-text-mute);letter-spacing:.3px;text-transform:uppercase;}
+.lp-header__breadcrumb a{color:var(--lp-text-soft);text-decoration:none;}
+.lp-header__breadcrumb a:hover{color:var(--lp-magenta);}
+.lp-header__breadcrumb i{font-size:8px;}
+.lp-main{max-width:900px;margin:0 auto;padding:40px 24px 60px;}
+.lp-title{font-size:26px;font-weight:300;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.lp-subtitle{font-size:13px;color:var(--lp-text-soft);margin-bottom:36px;}
+.lp-card{background:#fff;border:1px solid var(--lp-border);border-radius:var(--lp-radius);padding:36px 40px;}
+
+.lp-alert{display:flex;gap:14px;align-items:flex-start;padding:18px 22px;background:var(--lp-warning-bg);border-left:3px solid var(--lp-warning);border-radius:var(--lp-radius);margin-bottom:28px;}
+.lp-alert i{color:var(--lp-warning);font-size:18px;flex-shrink:0;margin-top:2px;}
+.lp-alert strong{color:#7a5a00;display:block;font-size:13px;font-weight:700;margin-bottom:4px;letter-spacing:.3px;}
+.lp-alert p{margin:0;font-size:13px;color:#8a6a10;line-height:1.5;}
+
+.lp-actions{display:flex;gap:12px;justify-content:flex-end;padding-top:24px;border-top:1px solid var(--lp-border-soft);flex-wrap:wrap;}
+.lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 32px;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;border:1px solid transparent;border-radius:var(--lp-radius);cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit;}
+.lp-btn--primary{background:var(--lp-magenta);color:#fff;}
+.lp-btn--primary:hover{background:var(--lp-magenta-dark);}
+.lp-btn--ghost{background:#fff;color:var(--lp-text-soft);border-color:var(--lp-border);}
+.lp-btn--ghost:hover{border-color:var(--lp-text);color:var(--lp-text);}
+@media(max-width:640px){.lp-header__inner{padding:14px 20px;}.lp-header__brand{font-size:18px;letter-spacing:4px;}.lp-header__breadcrumb{display:none;}.lp-main{padding:24px 16px 40px;}.lp-title{font-size:20px;}.lp-card{padding:24px 20px;}.lp-actions{flex-direction:column-reverse;}.lp-btn{width:100%;}}
+</style>
+</head>
+<body>
+
+<header class="lp-header">
+  <div class="lp-header__inner">
+    <div class="lp-header__brand">ORION<strong>.</strong></div>
+    <nav class="lp-header__breadcrumb">
+      <a href="{{ url_for('web.dashboard') }}">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{{ url_for('web.configuracion') }}">Configuración</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Migraciones</span>
+    </nav>
+  </div>
+</header>
+
+<main class="lp-main">
+
+  <h1 class="lp-title">Migraciones</h1>
+  <p class="lp-subtitle">Mantenimiento y actualizaciones de la base de datos.</p>
+
+  <div class="lp-card">
+
+    <div class="lp-alert">
+      <i class="fas fa-exclamation-triangle"></i>
+      <div>
+        <strong>Zona de riesgo</strong>
+        <p>Estas acciones modifican la base de datos de forma permanente. Haz un respaldo completo antes de continuar.</p>
+      </div>
+    </div>
+
+    <form method="POST" onsubmit="return confirm('¿Ejecutar migraciones? Esta acción modifica la base de datos.');">
+      <div class="lp-actions">
+        <a href="{{ url_for('web.dashboard') }}" class="lp-btn lp-btn--ghost">Volver al dashboard</a>
+        <button type="submit" class="lp-btn lp-btn--primary">
+          <i class="fas fa-play"></i> Ejecutar migraciones
+        </button>
+      </div>
+    </form>
+  </div>
+
+</main>
+
+</body>
+</html>

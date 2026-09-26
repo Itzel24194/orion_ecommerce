@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tienda | ORION Marketplace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --orion-primary: #e10098; --orion-primary-dark: #c00080; --orion-primary-soft: #fff0f8; --orion-dark: #1a1a2e; --orion-gray: #64748b; --orion-border: #ececf1; --orion-success: #10b981; --orion-danger: #ef4444; --orion-blue: #0284c7; }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { background: #f8f9fa; color: var(--orion-dark); min-height: 100vh; padding-bottom: 60px; }
+
+        .main-navbar { background: #fff; border-bottom: 2px solid #f0f0f0; padding: 12px 0; }
+        .brand-logo { font-weight: 900; font-size: 2.3rem; letter-spacing: -1.5px; color: var(--orion-primary) !important; text-decoration: none; }
+        .brand-border { height: 4px; background: linear-gradient(90deg, var(--orion-primary), var(--orion-primary-dark)); width: 100%; }
+
+        .vendor-header {
+            background: linear-gradient(135deg, var(--orion-primary), var(--orion-primary-dark));
+            padding: 40px 0;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .vendor-header::before {
+            content: '';
+            position: absolute;
+            top: -60%; right: -10%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%);
+        }
+        .vendor-header .container { position: relative; z-index: 1; }
+        .vendor-header h1 { font-weight: 900; font-size: 1.9rem; margin-bottom: 6px; color: #fff; display: flex; align-items: center; gap: 12px; }
+        .vendor-header h1 i { color: #FFD700; }
+        .vendor-header p { font-size: .92rem; opacity: .95; margin: 0; }
+
+        /* ⭐ Botón compartir en header */
+        .btn-share-header {
+            background: rgba(255,255,255,.18);
+            border: 2px solid rgba(255,255,255,.35);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: .85rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .25s;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .btn-share-header:hover {
+            background: rgba(255,255,255,.3);
+            border-color: #fff;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .btn-share-header i { color: #FFD700; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin: -36px auto 40px;
+            position: relative;
+            z-index: 2;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.06);
+            border: 1px solid var(--orion-border);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--orion-primary), var(--orion-primary-dark));
+        }
+        .stat-card .lbl { font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--orion-gray); font-weight: 700; margin-bottom: 8px; }
+        .stat-card .num { font-size: 1.8rem; font-weight: 900; color: var(--orion-dark); line-height: 1; }
+        .stat-card .num.pink { color: var(--orion-primary); }
+        .stat-card .num.green { color: var(--orion-success); }
+
+        .card { background: #fff; border-radius: 14px; padding: 26px; box-shadow: 0 4px 16px rgba(0,0,0,.05); border: 1px solid var(--orion-border); margin-bottom: 24px; }
+        .card h3 { font-weight: 800; font-size: 1.05rem; color: var(--orion-dark); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 2px solid var(--orion-primary-soft); }
+        .card h3 i { color: var(--orion-primary); }
+        .card h3 .ver-todos { margin-left: auto; font-size: .78rem; color: var(--orion-primary); text-decoration: none; font-weight: 700; }
+        .card h3 .ver-todos:hover { text-decoration: underline; }
+
+        .empty-inline { text-align: center; padding: 40px 20px; color: var(--orion-gray); }
+        .empty-inline i { font-size: 3rem; color: #ddd; display: block; margin-bottom: 12px; }
+        .empty-inline p { font-size: .85rem; margin: 0 0 16px; }
+
+        .btn-orion {
+            background: var(--orion-primary); color: #fff;
+            border: none; font-weight: 700;
+            border-radius: 50px; padding: 10px 22px;
+            transition: all .25s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: .88rem;
+        }
+        .btn-orion:hover { background: var(--orion-primary-dark); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(225,0,152,.3); }
+
+        .btn-outline-orion {
+            background: transparent; color: var(--orion-primary);
+            border: 2px solid var(--orion-primary); font-weight: 700;
+            border-radius: 50px; padding: 9px 20px;
+            transition: all .25s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: .88rem;
+        }
+        .btn-outline-orion:hover { background: var(--orion-primary); color: #fff; }
+
+        .btn-blue-orion {
+            background: var(--orion-blue); color: #fff;
+            border: none; font-weight: 700;
+            border-radius: 50px; padding: 10px 22px;
+            transition: all .25s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: .88rem;
+        }
+        .btn-blue-orion:hover { background: #0369a1; color: #fff; transform: translateY(-1px); }
+
+        /* ⭐ Botón compartir WhatsApp (verde) */
+        .btn-share-green {
+            background: #25D366; color: #fff;
+            border: none; font-weight: 700;
+            border-radius: 50px; padding: 10px 22px;
+            transition: all .25s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: .88rem; cursor: pointer;
+        }
+        .btn-share-green:hover { background: #1da851; color: #fff; transform: translateY(-1px); }
+
+        .tabla-productos th {
+            font-size: .7rem; text-transform: uppercase;
+            color: var(--orion-gray); letter-spacing: .5px;
+            border-bottom: 2px solid var(--orion-border);
+        }
+        .tabla-productos td { vertical-align: middle; }
+        .acciones-cell { display: flex; gap: 6px; }
+        .btn-accion {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid var(--orion-border);
+            background: #fff;
+            color: var(--orion-gray);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+            text-decoration: none;
+            font-size: .8rem;
+        }
+        .btn-accion:hover { border-color: var(--orion-primary); color: var(--orion-primary); }
+        .btn-accion.danger:hover { border-color: var(--orion-danger); color: var(--orion-danger); background: #fef2f2; }
+
+        .badge-estado {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+        .badge-estado.activo { background: #ecfdf5; color: #10b981; }
+        .badge-estado.inactivo { background: #f1f5f9; color: #64748b; }
+        .badge-estado.agotado { background: #fef2f2; color: #ef4444; }
+
+        .pedido-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f8;
+        }
+        .pedido-row:last-child { border-bottom: none; }
+        .pedido-num { font-weight: 800; color: var(--orion-dark); font-size: .9rem; }
+        .pedido-meta { font-size: .72rem; color: var(--orion-gray); margin-top: 2px; }
+        .pedido-monto { font-weight: 800; color: var(--orion-primary); font-size: .95rem; }
+
+        /* ⭐ Toast */
+        .toast-orion {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1a1a1a;
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast-orion.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-orion.success i { color: #22c55e; }
+        .toast-orion.error i { color: #ef4444; }
+
+        footer {
+            background: linear-gradient(135deg, #e10098 0%, #c00080 100%) !important;
+            color: #fff !important;
+            padding: 24px 0 !important;
+            text-align: center !important;
+            font-size: .8rem !important;
+            margin-top: 60px !important;
+        }
+        footer p { margin: 0 !important; color: #fff !important; }
+
+        @media (max-width: 576px) {
+            .vendor-header h1 { font-size: 1.4rem; }
+            .btn-share-header { padding: 8px 16px; font-size: .78rem; }
+            .stats-grid { margin-top: -20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light main-navbar">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
+            <div class="d-flex gap-3 align-items-center">
+                <a href="{{ url_for('web.marketplace') }}" style="text-decoration:none; color:var(--orion-gray); font-size:.8rem; font-weight:600;">
+                    <i class="bi bi-arrow-left"></i> Marketplace
+                </a>
+                <a href="{{ url_for('web.raiz_tienda') }}" style="text-decoration:none; color:var(--orion-gray); font-size:.8rem; font-weight:600;">
+                    <i class="bi bi-house"></i> Tienda
+                </a>
+            </div>
+        </div>
+    </nav>
+    <div class="brand-border"></div>
+
+    <section class="vendor-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <h1><i class="bi bi-shop-window"></i> {{ vendedor.nombre_tienda }}</h1>
+                    <p>
+                        <i class="bi bi-check-circle-fill" style="color:#FFD700;"></i>
+                        Tienda aprobada · Comisión {{ vendedor.comision_pct }}%
+                        {% if vendedor.slug %}
+                            · <i class="bi bi-link"></i> /marketplace/tienda/{{ vendedor.slug }}
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <button type="button"
+                            class="btn-share-header"
+                            id="btnShareHeader"
+                            data-url="{% if vendedor.slug %}{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug, _external=True) }}{% else %}{{ url_for('web.marketplace', _external=True) }}{% endif %}"
+                            data-nombre="{{ vendedor.nombre_tienda }}">
+                        <i class="bi bi-share-fill"></i> Compartir tienda
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="lbl">Productos</div>
+                <div class="num">{{ productos|length }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="lbl">Ventas totales</div>
+                <div class="num pink">{{ total_ventas|default(0) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="lbl">Ingresos brutos</div>
+                <div class="num">${{ "%.2f"|format(total_ingresos|default(0)) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="lbl">Comisiones</div>
+                <div class="num">${{ "%.2f"|format(total_comisiones|default(0)) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="lbl">Saldo neto</div>
+                <div class="num green">${{ "%.2f"|format(saldo_neto|default(0)) }}</div>
+            </div>
+        </div>
+
+        <!-- ACCIONES RÁPIDAS -->
+        <div class="d-flex gap-2 mb-4 flex-wrap">
+            <a href="{{ url_for('web.marketplace_nuevo_producto') }}" class="btn-orion">
+                <i class="bi bi-plus-circle"></i> Agregar producto
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_productos') }}" class="btn-outline-orion">
+                <i class="bi bi-box"></i> Mis productos
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_pedidos') }}" class="btn-outline-orion">
+                <i class="bi bi-receipt"></i> Mis pedidos
+            </a>
+
+            <button type="button"
+                    class="btn-share-green"
+                    id="btnShareWhatsapp"
+                    data-url="{% if vendedor.slug %}{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug, _external=True) }}{% else %}{{ url_for('web.marketplace', _external=True) }}{% endif %}"
+                    data-nombre="{{ vendedor.nombre_tienda }}">
+                <i class="bi bi-whatsapp"></i> Compartir por WhatsApp
+            </button>
+
+            {% if vendedor.slug %}
+                <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank" rel="noopener" class="btn-blue-orion">
+                    <i class="bi bi-eye"></i> Ver mi tienda pública
+                </a>
+            {% else %}
+                <a href="{{ url_for('web.marketplace') }}" class="btn-blue-orion">
+                    <i class="bi bi-eye"></i> Ver marketplace
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- PRODUCTOS -->
+        <div class="card">
+            <h3>
+                <i class="bi bi-box"></i> Mis productos ({{ productos|length }})
+                {% if productos %}
+                    <a href="{{ url_for('web.marketplace_mis_productos') }}" class="ver-todos">
+                        Ver todos <i class="bi bi-arrow-right"></i>
+                    </a>
+                {% endif %}
+            </h3>
+            {% if productos %}
+                <div class="table-responsive">
+                    <table class="table table-hover tabla-productos align-middle">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Estado</th>
+                                <th>Stock</th>
+                                <th>Precio</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in productos[:5] %}
+                            {% set precio = p.variables[0].precio if p.variables else (p.precio or 0) %}
+                            {% set stock = p.variables[0].stock if p.variables else (p.stock or 0) %}
+                            {% set estado_real = p.estado or ('activo' if p.activo else 'inactivo') %}
+                            <tr>
+                                <td><strong>{{ p.nombre }}</strong></td>
+                                <td>
+                                    {% if estado_real == 'activo' and stock > 0 %}
+                                        <span class="badge-estado activo">Activo</span>
+                                    {% elif stock <= 0 %}
+                                        <span class="badge-estado agotado">Agotado</span>
+                                    {% else %}
+                                        <span class="badge-estado inactivo">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ stock }}</td>
+                                <td>${{ "%.2f"|format(precio) }}</td>
+                                <td class="text-end">
+                                    <div class="acciones-cell justify-content-end">
+                                        <a href="{{ url_for('web.marketplace_editar_producto', producto_id=p._id) }}"
+                                           class="btn-accion" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="{{ url_for('web.marketplace_eliminar_producto', producto_id=p._id) }}"
+                                              method="POST" style="display:inline;">
+                                            <button type="submit"
+                                                    class="btn-accion danger"
+                                                    title="Eliminar"
+                                                    onclick="return confirm('¿Eliminar este producto? Esta acción no se puede deshacer.');"
+                                                    style="border:none; background:transparent; padding:0; cursor:pointer; width:32px; height:32px;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-inline">
+                    <i class="bi bi-box-seam"></i>
+                    <p>Aún no has agregado productos. Empieza subiendo tu primero.</p>
+                    <a href="{{ url_for('web.marketplace_nuevo_producto') }}" class="btn-orion">
+                        <i class="bi bi-plus-circle"></i> Agregar mi primer producto
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- PEDIDOS RECIENTES -->
+        <div class="card">
+            <h3>
+                <i class="bi bi-receipt"></i> Pedidos recientes
+                {% if pedidos %}
+                    <a href="{{ url_for('web.marketplace_mis_pedidos') }}" class="ver-todos">
+                        Ver todos <i class="bi bi-arrow-right"></i>
+                    </a>
+                {% endif %}
+            </h3>
+            {% if pedidos %}
+                {% for p in pedidos[:5] %}
+                <div class="pedido-row">
+                    <div>
+                        <div class="pedido-num">
+                            {% if p.numero_pedido %}
+                                #{{ p.numero_pedido }}
+                            {% else %}
+                                #{{ p._id[:8]|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="pedido-meta">
+                            {{ p.created_at.strftime('%d/%m/%Y · %H:%M') if p.created_at else '' }}
+                            {% if p.usuario_nombre %}
+                                · {{ p.usuario_nombre }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="pedido-monto">${{ "%.2f"|format(p.total|default(0)) }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-inline">
+                    <i class="bi bi-inbox"></i>
+                    <p>Aún no tienes pedidos. Comparte tu tienda para empezar a vender.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 ORION Marketplace. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <div class="toast-orion" id="orionToast">
+        <i class="bi bi-check-circle-fill"></i>
+        <span id="orionToastText">Listo</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function() {
+        // ================================================================
+        // TOAST
+        // ================================================================
+        function mostrarToast(msg, tipo) {
+            tipo = tipo || 'success';
+            var toast = document.getElementById('orionToast');
+            var txt = document.getElementById('orionToastText');
+            if (!toast || !txt) return;
+            txt.textContent = msg;
+            toast.className = 'toast-orion show ' + tipo;
+            var icon = toast.querySelector('i');
+            if (icon) {
+                icon.className = (tipo === 'error')
+                    ? 'bi bi-exclamation-circle-fill'
+                    : 'bi bi-check-circle-fill';
+            }
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(function() {
+                toast.classList.remove('show');
+            }, 2400);
+        }
+
+        // ================================================================
+        // COMPARTIR — Web Share API + fallback a copiar al portapapeles
+        // ================================================================
+        function compartirTienda(url, nombre) {
+            if (!url) {
+                mostrarToast('No se pudo obtener la URL de tu tienda', 'error');
+                return;
+            }
+
+            var texto = '¡Mira mi tienda ' + (nombre || 'ORION') + ' en ORION Marketplace!';
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Mi tienda en ORION',
+                    text: texto,
+                    url: url
+                }).then(function() {
+                    // Compartido con éxito
+                }).catch(function(err) {
+                    if (err.name !== 'AbortError') {
+                        copiarAlPortapapeles(url);
+                    }
+                });
+                return;
+            }
+
+            copiarAlPortapapeles(url);
+        }
+
+        function copiarAlPortapapeles(url) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function() {
+                    mostrarToast('¡Enlace copiado! Pégalo donde quieras 🔗', 'success');
+                }).catch(function() {
+                    fallbackCopiar(url);
+                });
+            } else {
+                fallbackCopiar(url);
+            }
+        }
+
+        function fallbackCopiar(url) {
+            try {
+                var ta = document.createElement('textarea');
+                ta.value = url;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                mostrarToast('¡Enlace copiado! Pégalo donde quieras 🔗', 'success');
+            } catch (e) {
+                console.error('Error copiando:', e);
+                prompt('Copia este enlace:', url);
+            }
+        }
+
+        // ================================================================
+        // BOTÓN: Compartir (header)
+        // ================================================================
+        var btnHeader = document.getElementById('btnShareHeader');
+        if (btnHeader) {
+            btnHeader.addEventListener('click', function() {
+                compartirTienda(this.dataset.url, this.dataset.nombre);
+            });
+        }
+
+        // ================================================================
+        // BOTÓN: Compartir por WhatsApp
+        // ================================================================
+        var btnWa = document.getElementById('btnShareWhatsapp');
+        if (btnWa) {
+            btnWa.addEventListener('click', function() {
+                var url = this.dataset.url;
+                var nombre = this.dataset.nombre;
+                if (!url) {
+                    mostrarToast('No se pudo obtener la URL', 'error');
+                    return;
+                }
+                var texto = encodeURIComponent('¡Mira mi tienda ' + nombre + ' en ORION Marketplace! ' + url);
+                window.open('https://wa.me/?text=' + texto, '_blank');
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ vendedor.nombre_tienda or 'Vendedor' }} | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --orion-primary: #e10098; --orion-primary-dark: #c00080; --orion-primary-soft: #fff0f8; --orion-dark: #1a1a2e; --orion-gray: #64748b; --orion-border: #ececf1; }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { background: #f5f6f8; color: var(--orion-dark); min-height: 100vh; padding-bottom: 60px; }
+        .topbar { background: #fff; border-bottom: 2px solid #f0f0f0; padding: 14px 0; }
+        .brand-logo { font-weight: 900; font-size: 1.8rem; color: var(--orion-primary); text-decoration: none; letter-spacing: -1px; }
+        .page-header { background: linear-gradient(135deg, var(--orion-primary), var(--orion-primary-dark)); color: #fff; padding: 36px 0; margin-bottom: 30px; }
+        .page-header h1 { font-weight: 900; font-size: 1.8rem; color: #fff; margin: 0; }
+        .card { background: #fff; border-radius: 14px; padding: 26px; box-shadow: 0 4px 16px rgba(0,0,0,.05); border: 1px solid var(--orion-border); margin-bottom: 20px; }
+        .card h3 { font-weight: 800; font-size: 1rem; color: var(--orion-dark); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--orion-primary-soft); display: flex; align-items: center; gap: 10px; }
+        .card h3 i { color: var(--orion-primary); }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f8; font-size: .85rem; }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .lbl { color: var(--orion-gray); font-weight: 600; }
+        .info-row .val { color: var(--orion-dark); font-weight: 700; text-align: right; max-width: 60%; word-break: break-word; }
+        .btn-action { padding: 10px 22px; border-radius: 50px; font-weight: 700; font-size: .82rem; border: none; cursor: pointer; transition: all .2s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-aprobar { background: #10b981; color: #fff; }
+        .btn-aprobar:hover { background: #059669; color: #fff; }
+        .btn-rechazar { background: #ef4444; color: #fff; }
+        .btn-rechazar:hover { background: #dc2626; color: #fff; }
+        .btn-suspender { background: #64748b; color: #fff; }
+        .btn-suspender:hover { background: #475569; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('web.dashboard') }}" class="brand-logo">ORION <small style="color:#1a1a2e;font-size:.5em;">ADMIN</small></a>
+            <a href="{{ url_for('web.admin_marketplace_vendedores') }}" style="color:var(--orion-gray);text-decoration:none;font-size:.82rem;font-weight:600;">
+                <i class="bi bi-arrow-left"></i> Volver a vendedores
+            </a>
+        </div>
+    </div>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>{{ vendedor.nombre_tienda or 'Vendedor' }}</h1>
+            <p style="opacity:.9; margin: 4px 0 0;">
+                {% set estado_color = vendedor.estado_color if vendedor.estado_color is defined and vendedor.estado_color else '#64748b' %}
+                {% set estado_icon = vendedor.estado_icon if vendedor.estado_icon is defined and vendedor.estado_icon else '•' %}
+                {% set estado_label = vendedor.estado_label if vendedor.estado_label is defined and vendedor.estado_label else (vendedor.estado or 'pendiente')|capitalize %}
+                <span style="background:{{ estado_color }}; padding: 3px 12px; border-radius: 50px; font-size: .7rem; font-weight: 800; text-transform: uppercase; color: #fff;">
+                    {{ estado_icon }} {{ estado_label }}
+                </span>
+            </p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+
+                <div class="card">
+                    <h3><i class="bi bi-shop"></i> Datos de la tienda</h3>
+                    <div class="info-row"><span class="lbl">Nombre</span><span class="val">{{ vendedor.nombre_tienda or '—' }}</span></div>
+                    <div class="info-row"><span class="lbl">Descripción</span><span class="val">{{ vendedor.descripcion or '—' }}</span></div>
+                    <div class="info-row"><span class="lbl">Comisión</span><span class="val">{{ vendedor.comision_pct or 0 }}%</span></div>
+                    <div class="info-row">
+                        <span class="lbl">Categorías</span>
+                        <span class="val">
+                            {% if vendedor.categorias is defined and vendedor.categorias %}
+                                {{ vendedor.categorias|join(', ') }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Registrado</span>
+                        <span class="val">
+                            {% if vendedor.created_at_fmt is defined and vendedor.created_at_fmt %}
+                                {{ vendedor.created_at_fmt }}
+                            {% elif vendedor.created_at is defined and vendedor.created_at %}
+                                {% if vendedor.created_at.strftime is defined %}
+                                    {{ vendedor.created_at.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                    {{ vendedor.created_at }}
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Slug</span>
+                        <span class="val">
+                            {% if vendedor.slug %}
+                                <code>/marketplace/tienda/{{ vendedor.slug }}</code>
+                            {% else %}
+                                <span style="color:#94a3b8;">Sin slug</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="bi bi-receipt"></i> Datos fiscales</h3>
+                    <div class="info-row"><span class="lbl">RFC</span><span class="val">{{ vendedor.rfc or '—' }}</span></div>
+                    <div class="info-row"><span class="lbl">Razón social</span><span class="val">{{ vendedor.razon_social or '—' }}</span></div>
+                    <div class="info-row"><span class="lbl">Teléfono</span><span class="val">{{ vendedor.telefono or '—' }}</span></div>
+                    <div class="info-row"><span class="lbl">Email</span><span class="val">{{ vendedor.email_contacto or '—' }}</span></div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="bi bi-bank"></i> Datos bancarios</h3>
+                    {% set banco = vendedor.banco if vendedor.banco is defined and vendedor.banco else {} %}
+                    <div class="info-row">
+                        <span class="lbl">Banco</span>
+                        <span class="val">{{ banco.banco if banco.banco is defined else (banco.get('banco') if banco.get is defined else '—') or '—' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">CLABE</span>
+                        <span class="val">{{ banco.clabe if banco.clabe is defined else (banco.get('clabe') if banco.get is defined else '—') or '—' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="lbl">Titular</span>
+                        <span class="val">{{ banco.titular if banco.titular is defined else (banco.get('titular') if banco.get is defined else '—') or '—' }}</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="bi bi-box"></i> Productos ({{ productos|length if productos else 0 }})</h3>
+                    {% if productos and productos|length > 0 %}
+                        {% for p in productos[:10] %}
+                        <div class="info-row">
+                            <span class="lbl">{{ p.nombre or 'Producto' }}</span>
+                            <span class="val">
+                                {% if p.variables and p.variables|length > 0 %}
+                                    ${{ "%.2f"|format(p.variables[0].precio or 0) }}
+                                {% else %}
+                                    ${{ "%.2f"|format(p.precio or 0) }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color:var(--orion-gray); font-size:.85rem; margin:0;">Este vendedor aún no ha subido productos.</p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+
+                <div class="card">
+                    <h3><i class="bi bi-graph-up"></i> Métricas</h3>
+
+                    {# ⭐ Defensive: obtener metricas como dict con defaults #}
+                    {% set m = vendedor.metricas if vendedor.metricas is defined and vendedor.metricas else {} %}
+                    {% set m_productos  = (m.productos  if m.productos  is defined else (m.get('productos', 0)  if m.get is defined else 0)) or 0 %}
+                    {% set m_ventas     = (m.ventas     if m.ventas     is defined else (m.get('ventas', 0)     if m.get is defined else 0)) or 0 %}
+                    {% set m_ingresos   = (m.ingresos   if m.ingresos   is defined else (m.get('ingresos', 0)   if m.get is defined else 0)) or 0 %}
+                    {% set m_comisiones = (m.comisiones if m.comisiones is defined else (m.get('comisiones', 0) if m.get is defined else 0)) or 0 %}
+                    {% set m_rating     = (m.rating     if m.rating     is defined else (m.get('rating', 0)     if m.get is defined else 0)) or 0 %}
+
+                    <div class="info-row"><span class="lbl">Productos</span><span class="val">{{ m_productos }}</span></div>
+                    <div class="info-row"><span class="lbl">Ventas</span><span class="val">{{ m_ventas }}</span></div>
+                    <div class="info-row"><span class="lbl">Ingresos</span><span class="val">${{ "%.2f"|format(m_ingresos) }}</span></div>
+                    <div class="info-row"><span class="lbl">Comisiones</span><span class="val">${{ "%.2f"|format(m_comisiones) }}</span></div>
+                    <div class="info-row">
+                        <span class="lbl">Rating</span>
+                        <span class="val">
+                            {% if m_rating and m_rating > 0 %}
+                                ⭐ {{ "%.1f"|format(m_rating) }}
+                            {% else %}
+                                <span style="color:#94a3b8;">Sin valoraciones</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="bi bi-gear"></i> Acciones</h3>
+
+                    <div class="d-grid gap-2">
+                        {% set estado_actual = vendedor.estado if vendedor.estado is defined else 'pendiente' %}
+                        {% if estado_actual == 'pendiente' %}
+                            <button class="btn-action btn-aprobar" onclick="cambiarEstado('aprobado')">
+                                <i class="bi bi-check-circle"></i> Aprobar tienda
+                            </button>
+                            <button class="btn-action btn-rechazar" onclick="rechazar()">
+                                <i class="bi bi-x-circle"></i> Rechazar
+                            </button>
+                        {% elif estado_actual == 'aprobado' %}
+                            <button class="btn-action btn-suspender" onclick="cambiarEstado('suspendido')">
+                                <i class="bi bi-pause-circle"></i> Suspender
+                            </button>
+                        {% else %}
+                            <button class="btn-action btn-aprobar" onclick="cambiarEstado('aprobado')">
+                                <i class="bi bi-play-circle"></i> Reactivar
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <hr style="margin: 20px 0;">
+
+                    <label class="form-label" style="font-size:.78rem; font-weight:700;">Comisión actual</label>
+                    <div class="input-group mb-3">
+                        <input type="number" id="comisionInput" class="form-control" value="{{ vendedor.comision_pct or 15 }}" min="0" max="50" step="0.5">
+                        <span class="input-group-text">%</span>
+                        <button class="btn btn-outline-secondary" onclick="actualizarComision()">Guardar</button>
+                    </div>
+
+                    <button class="btn btn-outline-danger w-100" onclick="eliminarVendedor()" style="border-radius:50px; font-weight:700; font-size:.82rem;">
+                        <i class="bi bi-trash"></i> Eliminar vendedor
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const VID = "{{ vendedor._id }}";
+
+        function cambiarEstado(estado) {
+            if (!confirm('¿Cambiar estado a "' + estado + '"?')) return;
+            fetch('/api/admin/marketplace/vendedores/' + VID + '/estado', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'same-origin',
+                body: JSON.stringify({ estado: estado })
+            }).then(r => r.json()).then(d => {
+                if (d.success) location.reload();
+                else alert(d.error || 'Error');
+            });
+        }
+
+        function rechazar() {
+            const motivo = prompt('Motivo del rechazo:');
+            if (motivo === null) return;
+            fetch('/api/admin/marketplace/vendedores/' + VID + '/estado', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'same-origin',
+                body: JSON.stringify({ estado: 'rechazado', motivo: motivo })
+            }).then(r => r.json()).then(d => {
+                if (d.success) location.reload();
+                else alert(d.error);
+            });
+        }
+
+        function actualizarComision() {
+            const pct = parseFloat(document.getElementById('comisionInput').value);
+            fetch('/api/admin/marketplace/vendedores/' + VID + '/comision', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'same-origin',
+                body: JSON.stringify({ comision_pct: pct })
+            }).then(r => r.json()).then(d => {
+                if (d.success) alert('✅ ' + d.message);
+                else alert(d.error);
+            });
+        }
+
+        function eliminarVendedor() {
+            if (!confirm('¿Eliminar definitivamente este vendedor?')) return;
+            fetch('/api/admin/marketplace/vendedores/' + VID + '/eliminar', {
+                method: 'DELETE',
+                credentials: 'same-origin'
+            }).then(r => r.json()).then(d => {
+                if (d.success) window.location.href = '{{ url_for("web.admin_marketplace_vendedores") }}';
+                else alert(d.error);
+            });
+        }
+    </script>
+</body>
+</html>

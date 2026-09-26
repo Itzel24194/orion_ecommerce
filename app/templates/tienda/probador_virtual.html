@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ORION | Probador Virtual</title>
+
+    <!-- ===== BOOTSTRAP + ICONS ===== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+
+        /* ============================================= */
+        /* ROOT & GLOBAL */
+        /* ============================================= */
+
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-bg: #f5f5f5;
+            --orion-card-radius: 24px;
+            --orion-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+            --orion-success: #28a745;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--orion-bg);
+            color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ============================================= */
+        /* TOP NAV */
+        /* ============================================= */
+
+        .top-nav {
+            font-size: 0.6rem;
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 4px 0;
+        }
+        .top-nav a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        .top-nav a:hover { color: var(--orion-primary); }
+
+        /* ============================================= */
+        /* NAVBAR */
+        /* ============================================= */
+
+        .navbar-main {
+            background: #fff;
+            border-bottom: 2px solid #f0f0f0;
+            padding: 8px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-logo {
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: var(--orion-primary) !important;
+            letter-spacing: -1px;
+            text-decoration: none;
+        }
+        .brand-logo:hover { color: var(--orion-primary-dark) !important; }
+
+        .search-bar {
+            border: 2px solid #e5e5e5 !important;
+            border-radius: 50px !important;
+            padding: 6px 16px !important;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .search-bar:focus {
+            border-color: var(--orion-primary) !important;
+            box-shadow: none !important;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--orion-primary);
+        }
+
+        .nav-icon {
+            color: #333;
+            font-size: 1.1rem;
+            text-decoration: none;
+            position: relative;
+        }
+        .nav-icon:hover { color: var(--orion-primary); }
+
+        /* ============================================= */
+        /* CONTENEDOR PRINCIPAL */
+        /* ============================================= */
+
+        .probador-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            flex: 1 0 auto;
+        }
+
+        /* ============================================= */
+        /* TARJETAS */
+        /* ============================================= */
+
+        .probador-card {
+            background: #ffffff;
+            border-radius: var(--orion-card-radius);
+            padding: 28px;
+            box-shadow: var(--orion-shadow);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: box-shadow 0.25s ease;
+            height: 100%;
+        }
+
+        .probador-card:hover {
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.07);
+        }
+
+        /* ============================================= */
+        /* ÁREA DE FOTO */
+        /* ============================================= */
+
+        .photo-area {
+            min-height: 480px;
+            border: 2px dashed #e2e2e2;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            overflow: hidden;
+            background: #fafafa;
+            position: relative;
+            transition: border-color 0.3s ease, background 0.3s ease;
+        }
+
+        .photo-area.drag-over {
+            border-color: var(--orion-primary);
+            background: #fff0fa;
+        }
+
+        .photo-area img {
+            max-width: 100%;
+            max-height: 650px;
+            object-fit: contain;
+        }
+
+        .upload-button {
+            background: var(--orion-primary);
+            border: none;
+            color: white;
+            padding: 14px 36px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(225, 0, 152, 0.25);
+        }
+
+        .upload-button:hover {
+            background: var(--orion-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(225, 0, 152, 0.35);
+        }
+
+        /* ============================================= */
+        /* LISTA DE PRODUCTOS */
+        /* ============================================= */
+
+        .product-selector {
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .product-selector::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .product-selector::-webkit-scrollbar-thumb {
+            background: #d0d0d0;
+            border-radius: 10px;
+        }
+
+        .product-option {
+            border: 2px solid #eeeeee;
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .product-option:hover {
+            border-color: var(--orion-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(225, 0, 152, 0.08);
+        }
+
+        .product-option.selected {
+            border-color: var(--orion-primary);
+            background: #fff0fa;
+            box-shadow: 0 4px 16px rgba(225, 0, 152, 0.12);
+        }
+
+        .product-option img {
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #f5f5f5;
+            border: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+
+        .product-option .product-price {
+            color: var(--orion-primary);
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .product-option .product-category-badge {
+            background: #f0f0f0;
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #777;
+            display: inline-block;
+            letter-spacing: 0.3px;
+        }
+
+        /* ============================================= */
+        /* BOTONES DE CATEGORÍA */
+        /* ============================================= */
+
+        .category-button {
+            border-radius: 40px;
+            margin: 2px;
+            padding: 6px 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 2px solid #e8e8e8;
+            background: white;
+            color: #555;
+        }
+
+        .category-button:hover {
+            border-color: var(--orion-primary);
+            color: var(--orion-primary);
+        }
+
+        .category-button.active {
+            border-color: var(--orion-primary);
+            background: var(--orion-primary);
+            color: white;
+        }
+
+        /* ============================================= */
+        /* BOTÓN GENERAR */
+        /* ============================================= */
+
+        .generate-button {
+            width: 100%;
+            background: var(--orion-primary);
+            border: none;
+            color: white;
+            padding: 18px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(225, 0, 152, 0.2);
+        }
+
+        .generate-button:hover:not(:disabled) {
+            background: var(--orion-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(225, 0, 152, 0.3);
+        }
+
+        .generate-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        /* ============================================= */
+        /* OVERLAY DE GENERACIÓN */
+        /* ============================================= */
+
+        .ia-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            text-align: center;
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        .ia-overlay.activo {
+            display: flex;
+        }
+
+        .ia-overlay .spinner-border {
+            color: var(--orion-primary);
+            width: 3.6rem;
+            height: 3.6rem;
+        }
+
+        .ia-overlay .progress {
+            width: 70%;
+            max-width: 360px;
+            height: 6px;
+            border-radius: 10px;
+            margin-top: 24px;
+            background: #f0f0f0;
+        }
+
+        .ia-overlay .progress-bar {
+            background: linear-gradient(90deg, var(--orion-primary), #ff6bc1);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* ============================================= */
+        /* RESULTADO Y ERRORES */
+        /* ============================================= */
+
+        .resultado-toolbar {
+            display: none;
+            gap: 10px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        .resultado-toolbar.activo {
+            display: flex;
+        }
+
+        .ia-error-box {
+            display: none;
+            background: #fdecea;
+            color: #c0392b;
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            border-left: 5px solid #c0392b;
+        }
+
+        .ia-error-box.activo {
+            display: block;
+        }
+
+        /* ============================================= */
+        /* PRODUCTOS SELECCIONADOS */
+        /* ============================================= */
+
+        #selectedProducts .badge {
+            font-size: 0.85rem;
+            padding: 6px 16px;
+            background: #f5f5f5;
+            color: #222;
+            border-radius: 30px;
+            margin: 3px 4px 3px 0;
+            font-weight: 600;
+        }
+
+        #selectedProducts .badge i {
+            margin-right: 6px;
+            color: var(--orion-primary);
+        }
+
+        /* ============================================= */
+        /* ESTADO DE CARGA VACÍO */
+        /* ============================================= */
+
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 12px;
+        }
+
+        /* ============================================= */
+        /* RESPONSIVE */
+        /* ============================================= */
+
+        @media (max-width: 992px) {
+            .probador-card {
+                padding: 20px;
+            }
+            .photo-area {
+                min-height: 380px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .probador-container {
+                padding: 16px;
+            }
+            .photo-area {
+                min-height: 300px;
+            }
+            .product-option img {
+                width: 56px;
+                height: 56px;
+            }
+            .category-button {
+                font-size: 0.7rem;
+                padding: 4px 14px;
+            }
+            .container {
+                max-width: 100% !important;
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .photo-area {
+                min-height: 240px;
+            }
+            .product-option {
+                padding: 10px 12px;
+            }
+        }
+
+        .container {
+            max-width: 80% !important;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1600px;
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+        }
+
+        /* ============================================= */
+        /* FOOTER */
+        /* ============================================= */
+
+        .footer-orion {
+            background: #1a1a1a;
+            color: white;
+            padding: 16px 0;
+            margin-top: 20px;
+            flex-shrink: 0;
+        }
+
+        .footer-orion a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.7rem;
+            margin: 0 10px;
+        }
+        .footer-orion a:hover { color: var(--orion-primary); }
+        .footer-orion p {
+            font-size: 0.7rem;
+            color: #888;
+            margin: 0;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- ============================================= -->
+    <!-- TOP NAV -->
+    <!-- ============================================= -->
+
+    <div class="top-nav">
+        <div class="container">
+            <div class="d-flex justify-content-end">
+                <a href="#"><i class="bi bi-geo-alt me-1"></i> Tiendas</a>
+                <a href="#"><i class="bi bi-question-circle me-1"></i> Ayuda</a>
+                <a href="#"><i class="bi bi-person me-1"></i> Mi cuenta</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- NAVBAR -->
+    <!-- ============================================= -->
+
+    <nav class="navbar-main">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between">
+                <a class="brand-logo" href="/">
+                    <i class="bi bi-stars"></i> ORION
+                </a>
+
+                <form class="d-flex flex-grow-1 mx-3" action="{{ url_for('web.catalogo') }}" method="GET">
+                    <div class="input-group">
+                        <input class="form-control search-bar" type="search" name="q" placeholder="Buscar productos...">
+                    </div>
+                </form>
+
+                <div class="d-flex align-items-center gap-2">
+                    {% if session.get('nombre') %}
+                        <a href="/perfil" class="nav-icon d-flex align-items-center gap-1 text-decoration-none">
+                            {% if session.get('foto') %}
+                                <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}?t={{ range(1, 10000) | random }}" class="user-avatar" alt="Perfil">
+                            {% else %}
+                                <i class="bi bi-person-circle fs-5"></i>
+                            {% endif %}
+                            <span class="small fw-bold text-dark" style="font-size:0.7rem;">{{ session['nombre'] }}</span>
+                        </a>
+                    {% else %}
+                        <a href="/login" class="nav-icon">
+                            <i class="bi bi-person-circle fs-5"></i>
+                            <span class="small fw-bold" style="font-size:0.7rem;">Login</span>
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('web.ver_carrito') }}" class="nav-icon">
+                        <i class="bi bi-bag fs-5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================= -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <!-- ============================================= -->
+
+    <div class="probador-container">
+
+        <div class="text-center mb-5">
+
+            <h1 class="fw-bold" style="color: var(--orion-primary); font-size: 2.6rem;">
+                <i class="bi bi-person-bounding-box"></i> Probador Virtual
+            </h1>
+
+            <p class="text-muted" style="font-size: 1.05rem;">
+                Sube tu foto, elige tus prendas y <strong>prueba tu outfit</strong> al instante.
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <!-- ========================================= -->
+            <!-- COLUMNA IZQUIERDA: FOTO -->
+            <!-- ========================================= -->
+
+            <div class="col-lg-7">
+
+                <div class="probador-card">
+
+                    <h4 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-image"></i> Mi fotografía
+                        <span class="badge bg-light text-dark ms-2" id="fotoEstado">Sin foto</span>
+                    </h4>
+
+                    <div class="photo-area" id="photoArea">
+
+                        <!-- Mensaje inicial -->
+                        <div id="uploadMessage" class="text-center">
+                            <i class="bi bi-cloud-arrow-up" style="font-size:4.2rem;color:var(--orion-primary);"></i>
+                            <h5 class="mt-3 fw-bold">Sube tu fotografía</h5>
+                            <p class="text-muted">Preferentemente de cuerpo completo.</p>
+
+                            <input type="file" id="photoInput" accept=".jpg,.jpeg,.png,.webp" hidden>
+
+                            <button class="upload-button" onclick="document.getElementById('photoInput').click()">
+                                <i class="bi bi-upload"></i> Subir fotografía
+                            </button>
+                            <p class="text-muted small mt-2">o arrastra una imagen aquí</p>
+                        </div>
+
+                        <!-- Foto del usuario -->
+                        <img id="userPhoto" style="display:none;" alt="Tu fotografía">
+
+                        <!-- Overlay de generación -->
+                        <div class="ia-overlay" id="iaOverlay">
+                            <div class="spinner-border mb-3" role="status"></div>
+                            <h5 class="fw-bold" id="iaOverlayTexto">Generando tu simulación...</h5>
+                            <p class="text-muted small mb-0">Esto puede tomar unos segundos.</p>
+                            <div class="progress">
+                                <div class="progress-bar" id="iaProgress" style="width: 0%;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Barra de herramientas -->
+                    <div class="resultado-toolbar" id="resultadoToolbar">
+                        <button class="btn btn-outline-dark rounded-pill btn-sm px-4" onclick="mostrarFotoOriginal()">
+                            <i class="bi bi-arrow-counterclockwise"></i> Ver original
+                        </button>
+                        <a id="descargarResultado" class="btn btn-dark rounded-pill btn-sm px-4" download="mi-outfit-orion.jpg">
+                            <i class="bi bi-download"></i> Descargar
+                        </a>
+                        <button class="btn btn-outline-danger rounded-pill btn-sm px-4" onclick="limpiarResultado()">
+                            <i class="bi bi-x-lg"></i> Limpiar
+                        </button>
+                    </div>
+
+                    <!-- Error -->
+                    <div class="ia-error-box" id="iaErrorBox"></div>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================= -->
+            <!-- COLUMNA DERECHA: PRODUCTOS -->
+            <!-- ========================================= -->
+
+            <div class="col-lg-5">
+
+                <div class="probador-card">
+
+                    <h4 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-bag"></i> Selecciona tu outfit
+                        <span class="badge bg-light text-dark ms-2" id="productosContador">0</span>
+                    </h4>
+
+                    <!-- Filtros -->
+                    <div class="mb-3 d-flex flex-wrap gap-1">
+                        <button class="category-button active" onclick="filtrarCategoria('', this)">Todos</button>
+                        <button class="category-button" onclick="filtrarCategoria('vestido', this)">Vestidos</button>
+                        <button class="category-button" onclick="filtrarCategoria('camisa', this)">Camisas</button>
+                        <button class="category-button" onclick="filtrarCategoria('pantalon', this)">Pantalones</button>
+                        <button class="category-button" onclick="filtrarCategoria('tenis', this)">Tenis</button>
+                        <button class="category-button" onclick="filtrarCategoria('chaqueta', this)">Chaquetas</button>
+                    </div>
+
+                    <!-- Lista de productos (100% desde backend) -->
+                    <div class="product-selector" id="productList">
+
+                        {% if productos and productos|length > 0 %}
+
+                            {% for producto in productos %}
+                            <div class="product-option"
+                                 data-product-id="{{ producto.id }}"
+                                 data-product-name="{{ producto.nombre }}"
+                                 data-category="{{ producto.descripcion|lower }}"
+                                 onclick="seleccionarProducto(this)">
+
+                                <div class="d-flex align-items-center">
+                                    {% if producto.foto %}
+                                    <img src="{{ url_for('static', filename='uploads/productos/' + producto.foto) }}"
+                                         alt="{{ producto.nombre }}"
+                                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect fill=%22%23f0f0f0%22 width=%2280%22 height=%2280%22/%3E%3Ctext x=%2240%22 y=%2245%22 text-anchor=%22middle%22 fill=%22%23aaa%22 font-family=%22Arial%22 font-size=%2212%22%3Esin foto%3C/text%3E%3C/svg%3E'">
+                                    {% else %}
+                                    <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect fill=%22%23f0f0f0%22 width=%2280%22 height=%2280%22/%3E%3Ctext x=%2240%22 y=%2245%22 text-anchor=%22middle%22 fill=%22%23aaa%22 font-family=%22Arial%22 font-size=%2212%22%3Esin foto%3C/text%3E%3C/svg%3E"
+                                         alt="{{ producto.nombre }}">
+                                    {% endif %}
+
+                                    <div class="ms-3 flex-grow-1">
+                                        <strong>{{ producto.nombre }}</strong>
+                                        <div class="text-muted small">{{ producto.descripcion[:60] }}</div>
+                                        <div class="d-flex align-items-center gap-2 mt-1">
+                                            <span class="product-price">${{ "%.2f"|format(producto.precio|float) }}</span>
+                                            <span class="product-category-badge">
+                                                {% if 'vestido' in (producto.descripcion|lower) %}Vestido
+                                                {% elif 'pantalon' in (producto.descripcion|lower) or 'jeans' in (producto.descripcion|lower) %}Pantalón
+                                                {% elif 'tenis' in (producto.descripcion|lower) or 'zapato' in (producto.descripcion|lower) %}Tenis
+                                                {% elif 'chaqueta' in (producto.descripcion|lower) or 'blazer' in (producto.descripcion|lower) %}Chaqueta
+                                                {% else %}Prenda{% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            {% endfor %}
+
+                        {% else %}
+
+                            <!-- Estado vacío (sin productos simulados) -->
+                            <div class="empty-state">
+                                <i class="bi bi-box-seam"></i>
+                                <p class="fw-bold mb-0">No hay productos disponibles</p>
+                                <p class="text-muted small">Agrega productos desde el catálogo.</p>
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <hr class="my-3">
+
+                    <!-- Productos seleccionados -->
+                    <h6 class="fw-bold">
+                        <i class="bi bi-check-circle"></i> Productos seleccionados
+                    </h6>
+
+                    <div id="selectedProducts">
+                        <p class="text-muted small">Aún no has seleccionado ningún producto.</p>
+                    </div>
+
+                    <!-- Botón generar -->
+                    <button id="generateButton" class="generate-button mt-3" onclick="generarOutfit()" disabled>
+                        <span id="normalText">
+                            <i class="bi bi-stars"></i> Probar outfit
+                        </span>
+                        <span id="loadingText" class="loading">
+                            <span class="spinner-border spinner-border-sm"></span> Generando...
+                        </span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================= -->
+    <!-- FOOTER -->
+    <!-- ============================================= -->
+
+    <footer class="footer-orion">
+        <div class="container text-center">
+            <div class="mb-2">
+                <a href="#"><i class="bi bi-geo-alt"></i> Tiendas</a>
+                <a href="#"><i class="bi bi-question-circle"></i> Ayuda</a>
+                <a href="#"><i class="bi bi-envelope"></i> Contacto</a>
+                <a href="#"><i class="bi bi-shield-check"></i> Privacidad</a>
+            </div>
+            <p>© 2026 ORION System - Todos los derechos reservados</p>
+            <p class="text-secondary" style="font-size:0.6rem;">
+                <i class="bi bi-geo-alt"></i> México |
+                <i class="bi bi-envelope"></i> contacto@orion.com |
+                <i class="bi bi-telephone"></i> 55 1234 5678
+            </p>
+        </div>
+    </footer>
+
+    <!-- ============================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================= -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const ESTADO_URL_TEMPLATE = "{{ url_for('web.probador_estado', probador_id='__ID__') }}";
+
+        let probadorId = null;
+        let fotoSubida = false;
+        let productosSeleccionados = [];
+        let urlFotoOriginal = null;
+        let pollingInterval = null;
+        let progressInterval = null;
+        let startTime = null;
+
+        // =============================================
+        // DRAG & DROP
+        // =============================================
+
+        const photoArea = document.getElementById('photoArea');
+
+        photoArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        });
+
+        photoArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+        });
+
+        photoArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('photoInput').files = files;
+                document.getElementById('photoInput').dispatchEvent(new Event('change'));
+            }
+        });
+
+        // =============================================
+        // SUBIR FOTO
+        // =============================================
+
+        document.getElementById("photoInput").addEventListener("change", async function() {
+            const archivo = this.files[0];
+            if (!archivo) return;
+
+            const formData = new FormData();
+            formData.append("foto", archivo);
+
+            try {
+                const response = await fetch("{{ url_for('web.probador_virtual_subir') }}", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    alert(data.message);
+                    return;
+                }
+
+                probadorId = data.probador_id;
+                fotoSubida = true;
+                urlFotoOriginal = data.url;
+
+                const img = document.getElementById("userPhoto");
+                img.src = data.url;
+                img.style.display = "block";
+
+                document.getElementById("uploadMessage").style.display = "none";
+                document.getElementById("fotoEstado").textContent = " Foto subida";
+                document.getElementById("fotoEstado").className = "badge bg-success text-white ms-2";
+
+                ocultarResultadoToolbar();
+                actualizarBoton();
+
+            } catch (error) {
+                console.error(error);
+                alert("No fue posible subir la fotografía.");
+            }
+        });
+
+        // =============================================
+        // SELECCIONAR PRODUCTO
+        // =============================================
+
+        function seleccionarProducto(element) {
+            const id = element.dataset.productId;
+            const nombre = element.dataset.productName;
+
+            const existe = productosSeleccionados.find(p => p.id === id);
+
+            if (existe) {
+                productosSeleccionados = productosSeleccionados.filter(p => p.id !== id);
+                element.classList.remove("selected");
+            } else {
+                productosSeleccionados.push({ id, nombre });
+                element.classList.add("selected");
+            }
+
+            mostrarSeleccionados();
+            actualizarBoton();
+            actualizarContador();
+        }
+
+        function mostrarSeleccionados() {
+            const container = document.getElementById("selectedProducts");
+
+            if (productosSeleccionados.length === 0) {
+                container.innerHTML = `<p class="text-muted small">Aún no has seleccionado ningún producto.</p>`;
+                return;
+            }
+
+            container.innerHTML = productosSeleccionados.map(p =>
+                `<span class="badge"><i class="bi bi-check-circle-fill"></i> ${p.nombre}</span>`
+            ).join("");
+        }
+
+        function actualizarContador() {
+            document.getElementById("productosContador").textContent = productosSeleccionados.length;
+        }
+
+        // =============================================
+        // FILTRAR CATEGORÍA
+        // =============================================
+
+        function filtrarCategoria(categoria, btn) {
+            document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            document.querySelectorAll(".product-option").forEach(producto => {
+                const texto = producto.dataset.category || '';
+                producto.style.display = (!categoria || texto.includes(categoria)) ? "block" : "none";
+            });
+        }
+
+        // =============================================
+        // BOTÓN GENERAR
+        // =============================================
+
+        function actualizarBoton() {
+            const button = document.getElementById("generateButton");
+            button.disabled = !fotoSubida || productosSeleccionados.length === 0;
+        }
+
+        function restaurarBotonGenerar() {
+            document.getElementById("normalText").style.display = "inline";
+            document.getElementById("loadingText").style.display = "none";
+            actualizarBoton();
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+
+        // =============================================
+        // GENERAR OUTFIT
+        // =============================================
+
+        async function generarOutfit() {
+            if (!probadorId) {
+                alert("Primero sube tu fotografía.");
+                return;
+            }
+
+            if (productosSeleccionados.length === 0) {
+                alert("Selecciona al menos una prenda.");
+                return;
+            }
+
+            document.getElementById("normalText").style.display = "none";
+            document.getElementById("loadingText").style.display = "inline";
+            document.getElementById("generateButton").disabled = true;
+
+            ocultarError();
+            ocultarResultadoToolbar();
+            mostrarOverlayIA("Enviando tu foto y prendas al motor de IA...");
+
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 15, 90);
+                document.getElementById("iaProgress").style.width = progress + "%";
+            }, 500);
+
+            try {
+                const response = await fetch("{{ url_for('web.probador_generar') }}", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        probador_id: probadorId,
+                        productos: productosSeleccionados.map(p => p.id)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    mostrarError(data.message || "No fue posible iniciar la simulación.");
+                    ocultarOverlayIA();
+                    restaurarBotonGenerar();
+                    return;
+                }
+
+                mostrarOverlayIA("🧠 IA generando tu outfit...");
+                startTime = Date.now();
+                iniciarPollingEstado();
+
+            } catch (error) {
+                console.error(error);
+                mostrarError("Error de conexión al preparar el outfit.");
+                ocultarOverlayIA();
+                restaurarBotonGenerar();
+            }
+        }
+
+        // =============================================
+        // POLLING DE ESTADO
+        // =============================================
+
+        function iniciarPollingEstado() {
+            if (pollingInterval) clearInterval(pollingInterval);
+
+            const url = ESTADO_URL_TEMPLATE.replace("__ID__", probadorId);
+
+            pollingInterval = setInterval(async function() {
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (!data.success) return;
+
+                    if (data.estado === "generando") {
+                        const texto = document.getElementById("iaOverlayTexto");
+                        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                        if (elapsed > 30) texto.textContent = "⏳ La generación está tomando más de lo esperado...";
+                        else if (elapsed > 15) texto.textContent = "🎨 Creando tu outfit personalizado...";
+                        return;
+                    }
+
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+
+                    if (progressInterval) {
+                        clearInterval(progressInterval);
+                        progressInterval = null;
+                        document.getElementById("iaProgress").style.width = "100%";
+                    }
+
+                    if (data.estado === "completado" && data.resultado_url) {
+                        setTimeout(() => {
+                            mostrarResultado(data.resultado_url);
+                            ocultarOverlayIA();
+                            restaurarBotonGenerar();
+                            document.getElementById("fotoEstado").textContent = " Outfit generado";
+                            document.getElementById("fotoEstado").className = "badge bg-success text-white ms-2";
+                        }, 300);
+                    } else if (data.estado === "error") {
+                        mostrarError(data.message || "Ocurrió un error al generar la simulación.");
+                        ocultarOverlayIA();
+                        restaurarBotonGenerar();
+                    }
+
+                } catch (error) {
+                    console.error("Error consultando estado:", error);
+                }
+            }, 2500);
+        }
+
+        // =============================================
+        // UI: OVERLAY, RESULTADO Y ERRORES
+        // =============================================
+
+        function mostrarOverlayIA(texto) {
+            const overlay = document.getElementById("iaOverlay");
+            if (texto) document.getElementById("iaOverlayTexto").textContent = texto;
+            overlay.classList.add("activo");
+        }
+
+        function ocultarOverlayIA() {
+            document.getElementById("iaOverlay").classList.remove("activo");
+            document.getElementById("iaProgress").style.width = "0%";
+        }
+
+        function mostrarResultado(url) {
+            const img = document.getElementById("userPhoto");
+            img.src = url;
+            img.style.display = "block";
+
+            document.getElementById("descargarResultado").href = url;
+            document.getElementById("resultadoToolbar").classList.add("activo");
+            document.getElementById("uploadMessage").style.display = "none";
+        }
+
+        function ocultarResultadoToolbar() {
+            document.getElementById("resultadoToolbar").classList.remove("activo");
+        }
+
+        function mostrarFotoOriginal() {
+            if (!urlFotoOriginal) return;
+            document.getElementById("userPhoto").src = urlFotoOriginal;
+            document.getElementById("fotoEstado").textContent = "📸 Foto original";
+            document.getElementById("fotoEstado").className = "badge bg-info text-white ms-2";
+        }
+
+        function limpiarResultado() {
+            if (!urlFotoOriginal) return;
+            document.getElementById("userPhoto").src = urlFotoOriginal;
+            ocultarResultadoToolbar();
+            document.getElementById("fotoEstado").textContent = " Foto subida";
+            document.getElementById("fotoEstado").className = "badge bg-success text-white ms-2";
+            ocultarError();
+        }
+
+        function mostrarError(mensaje) {
+            const box = document.getElementById("iaErrorBox");
+            box.textContent = mensaje;
+            box.classList.add("activo");
+        }
+
+        function ocultarError() {
+            document.getElementById("iaErrorBox").classList.remove("activo");
+        }
+
+        // =============================================
+        // INICIALIZAR
+        // =============================================
+
+        actualizarBoton();
+        actualizarContador();
+        console.log(" Probador Virtual ORION cargado correctamente");
+    </script>
+
+</body>
+</html>

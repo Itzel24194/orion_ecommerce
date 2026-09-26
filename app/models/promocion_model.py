@@ -53,7 +53,7 @@ class Promocion:
             'combo_descuento': float(data.get('combo_descuento', 0)),
             'productos_aplicables': data.get('productos_aplicables', []),
             'categorias_aplicables': data.get('categorias_aplicables', []),
-            'empresas_aplicables': data.get('empresas_aplicables', []),
+            'marcas_aplicables': data.get('marcas_aplicables', []),
             'segmentos': data.get('segmentos', ['todos']),
             'metodos_pago': data.get('metodos_pago', []),
             'uso_maximo': int(data.get('uso_maximo', 0)) or None,
@@ -117,7 +117,7 @@ class Promocion:
             'fecha_inicio', 'fecha_fin', 'descuento_tipo', 'descuento_valor',
             'monto_minimo', 'cantidad_requerida', 'cantidad_gratis',
             'combo_productos', 'combo_descuento',
-            'productos_aplicables', 'categorias_aplicables', 'empresas_aplicables',
+            'productos_aplicables', 'categorias_aplicables', 'marcas_aplicables',
             'segmentos', 'metodos_pago', 'uso_maximo', 'usos_por_usuario',
             'mostrar_en_home', 'mostrar_en_producto'
         ]

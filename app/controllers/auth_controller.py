@@ -1,3 +1,7 @@
+# ================================================================
+# app/controllers/auth_controller.py
+# ================================================================
+
 import os
 import re
 import sys
@@ -12,6 +16,7 @@ from bson import ObjectId
 from itsdangerous import URLSafeTimedSerializer
 from app.models.usuarios_model import Usuario as UsuarioModel
 
+
 # ================================================================
 # FUNCIONES AUXILIARES
 # ================================================================
@@ -19,16 +24,42 @@ from app.models.usuarios_model import Usuario as UsuarioModel
 def get_serializer():
     return URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
 
+
 def normalizar_rol(rol):
+    """
+    Normaliza cualquier variante de rol a uno de 3 valores canónicos:
+    'admin', 'vendedor' o 'cliente'.
+    """
     if not rol:
         return 'cliente'
-    rol = rol.lower().strip()
-    if rol in ['administrador', 'admin', 'superadmin', 'root']:
+
+    rol_lower = str(rol).strip().lower()
+
+    # ---- ADMIN ----
+    if rol_lower in ('admin', 'administrador', 'superadmin', 'super_admin', 'root'):
         return 'admin'
-    return rol
+
+    # ---- VENDEDOR ----
+    if rol_lower in ('vendedor', 'vendedora', 'vendor', 'seller', 'sellers'):
+        return 'vendedor'
+
+    # ---- CLIENTE (y cualquier otra cosa) ----
+    return 'cliente'
+
+
+def _redirigir_por_rol(rol_normalizado):
+    """
+    Devuelve la redirección correspondiente según el rol normalizado.
+    """
+    if rol_normalizado == 'admin':
+        return redirect(url_for('web.dashboard'))
+    if rol_normalizado == 'vendedor':
+        return redirect(url_for('web.vendedor_dashboard'))
+    return redirect(url_for('web.raiz_tienda'))
+
 
 # ================================================================
-# FUNCIÓN PARA ENVIAR CORREO CON smtplib (CON LOGS)
+# ENVIAR CORREO SMTP
 # ================================================================
 
 def enviar_correo_smtp(destinatario, asunto, contenido_html):
@@ -57,14 +88,17 @@ def enviar_correo_smtp(destinatario, asunto, contenido_html):
         msg['To'] = destinatario
         msg['Subject'] = asunto
 
-        text_part = MIMEText(contenido_html.replace('<br>', '\n').replace('<p>', '').replace('</p>', ''), 'plain')
+        text_part = MIMEText(
+            contenido_html.replace('<br>', '\n').replace('<p>', '').replace('</p>', ''),
+            'plain'
+        )
         html_part = MIMEText(contenido_html, 'html')
         msg.attach(text_part)
         msg.attach(html_part)
 
         print("📤 Conectando al servidor...", file=sys.stderr)
         server = smtplib.SMTP(smtp_server, smtp_port)
-        server.set_debuglevel(1)   # Muestra la comunicación SMTP
+        server.set_debuglevel(1)
         server.starttls()
         print("🔑 Iniciando sesión...", file=sys.stderr)
         server.login(username, password_mail)
@@ -80,8 +114,9 @@ def enviar_correo_smtp(destinatario, asunto, contenido_html):
         traceback.print_exc(file=sys.stderr)
         return False
 
+
 # ================================================================
-# LOGIN
+# LOGIN (con soporte 2FA)
 # ================================================================
 
 def login():
@@ -121,41 +156,203 @@ def login():
             flash("Error al verificar la contraseña.", "danger")
             return redirect(url_for('web.login'))
 
+        # ============================================================
+        # Si tiene 2FA activado, pedir el código
+        # ============================================================
+        dos_fa = usuario.get('2fa', {}) or {}
+        if dos_fa.get('habilitado'):
+            session.clear()
+            session['2fa_pendiente_user_id'] = str(usuario['_id'])
+            session['2fa_pendiente_email']   = usuario.get('email')
+            session['2fa_pendiente_nombre']  = usuario.get('nombre', 'Usuario')
+            session['2fa_pendiente_rol']     = usuario.get('rol', 'cliente')
+            session['2fa_pendiente_foto']    = usuario.get('foto')
+            flash('Ingresa tu código de verificación de 6 dígitos.', 'info')
+            return redirect(url_for('web.verificar_2fa_login'))
+
+        # ============================================================
+        # Login normal (sin 2FA)
+        # ============================================================
         session.clear()
 
         session['user_id'] = str(usuario['_id'])
         session['email'] = usuario.get('email')
         session['nombre'] = usuario.get('nombre', 'Usuario')
 
-        rol = usuario.get('rol', 'cliente')
-        rol_normalizado = normalizar_rol(rol)
+        # 🔥 Normalizar el rol
+        rol_normalizado = normalizar_rol(usuario.get('rol', 'cliente'))
         session['rol'] = rol_normalizado
 
-        segmento = UsuarioModel.obtener_segmento(str(usuario['_id']))
-        session['segmento'] = segmento
+        # ⭐ NUEVO: Guardar en sesión si el usuario es vendedor de marketplace
+        session['es_vendedor'] = bool(usuario.get('es_vendedor', False))
 
+        # Segmento
+        try:
+            segmento = UsuarioModel.obtener_segmento(str(usuario['_id']))
+            session['segmento'] = segmento
+        except Exception:
+            session['segmento'] = 'Inactivo'
+
+        # Foto
         foto = usuario.get('foto')
         if foto:
             session['foto'] = foto
         else:
             session.pop('foto', None)
 
+        # Último login
         try:
             UsuarioModel.actualizar(str(usuario['_id']), {'ultimo_login': datetime.utcnow()})
         except Exception:
             pass
 
+        # 🔥 Log de debug: qué rol y a dónde se redirige
+        print(
+            f"🔐 LOGIN OK: {email} | rol_raw={usuario.get('rol')!r} "
+            f"rol_norm={rol_normalizado!r} es_vendedor={session['es_vendedor']} → redirigiendo",
+            file=sys.stderr
+        )
+
+        # 🔥 Redirigir según el rol
         if rol_normalizado == 'admin':
             flash(f"¡Bienvenido Administrador {session['nombre']}!", "success")
             return redirect(url_for('web.dashboard'))
-        else:
-            flash(f"¡Bienvenido {session['nombre']}!", "success")
-            return redirect(url_for('web.raiz_tienda'))
+
+        if rol_normalizado == 'vendedor':
+            flash(f"¡Bienvenido, {session['nombre']}! Panel de vendedor.", "success")
+            return redirect(url_for('web.vendedor_dashboard'))
+
+        flash(f"¡Bienvenido {session['nombre']}!", "success")
+        return redirect(url_for('web.raiz_tienda'))
 
     return render_template('auth/login.html')
 
+
 # ================================================================
-# REGISTRO (con smtplib y logs)
+# VERIFICACIÓN 2FA EN EL LOGIN
+# ================================================================
+
+def verificar_2fa_login():
+    """Muestra la pantalla para ingresar el código 2FA y valida el POST."""
+    user_id = session.get('2fa_pendiente_user_id')
+    if not user_id:
+        flash('Debes iniciar sesión primero.', 'warning')
+        return redirect(url_for('web.login'))
+
+    db = current_app.db
+    usuario = db.usuarios.find_one({'_id': ObjectId(user_id)})
+    if not usuario:
+        session.pop('2fa_pendiente_user_id', None)
+        flash('Usuario no encontrado.', 'danger')
+        return redirect(url_for('web.login'))
+
+    if request.method == 'POST':
+        codigo = (request.form.get('codigo') or '').strip()
+        usar_respaldo = request.form.get('usar_respaldo')
+
+        dos_fa = usuario.get('2fa', {}) or {}
+        secreto = dos_fa.get('secreto')
+
+        if not secreto:
+            session.pop('2fa_pendiente_user_id', None)
+            flash('Error de configuración 2FA.', 'danger')
+            return redirect(url_for('web.login'))
+
+        # ---- Códigos de respaldo ----
+        if usar_respaldo:
+            codigos = dos_fa.get('codigos_respaldo', []) or []
+            codigo_up = codigo.upper()
+            if codigo_up in codigos:
+                codigos.remove(codigo_up)
+                db.usuarios.update_one(
+                    {'_id': usuario['_id']},
+                    {'$set': {
+                        '2fa.codigos_respaldo': codigos,
+                        'updated_at': datetime.utcnow()
+                    }}
+                )
+                return _completar_login_2fa(usuario, 'Código de respaldo aceptado.')
+            else:
+                flash('Código de respaldo inválido.', 'danger')
+                return render_template('auth/verificar_2fa.html')
+
+        # ---- Código TOTP normal ----
+        if not codigo or len(codigo) != 6:
+            flash('Ingresa un código de 6 dígitos.', 'danger')
+            return render_template('auth/verificar_2fa.html')
+
+        try:
+            import pyotp
+            totp = pyotp.TOTP(secreto)
+            if not totp.verify(codigo, valid_window=1):
+                flash('Código incorrecto. Intenta de nuevo.', 'danger')
+                return render_template('auth/verificar_2fa.html')
+        except Exception as e:
+            print(f"❌ Error validando TOTP: {e}", file=sys.stderr)
+            flash('Error al validar el código.', 'danger')
+            return render_template('auth/verificar_2fa.html')
+
+        return _completar_login_2fa(usuario, '¡Bienvenido!')
+
+    return render_template('auth/verificar_2fa.html')
+
+
+def _completar_login_2fa(usuario, mensaje):
+    """Completa el login después de validar 2FA."""
+    session['user_id'] = str(usuario['_id'])
+    session['nombre'] = usuario.get('nombre', 'Usuario')
+    session['email'] = usuario.get('email', '')
+
+    # 🔥 Normalizar rol
+    rol_normalizado = normalizar_rol(usuario.get('rol', 'cliente'))
+    session['rol'] = rol_normalizado
+
+    # ⭐ NUEVO: Guardar en sesión si el usuario es vendedor de marketplace
+    session['es_vendedor'] = bool(usuario.get('es_vendedor', False))
+
+    foto = usuario.get('foto')
+    if foto:
+        session['foto'] = foto
+    else:
+        session.pop('foto', None)
+
+    try:
+        segmento = UsuarioModel.obtener_segmento(str(usuario['_id']))
+        session['segmento'] = segmento
+    except Exception:
+        session['segmento'] = 'Inactivo'
+
+    try:
+        UsuarioModel.actualizar(str(usuario['_id']), {'ultimo_login': datetime.utcnow()})
+    except Exception:
+        pass
+
+    # Limpiar variables temporales de 2FA
+    for k in ('2fa_pendiente_user_id', '2fa_pendiente_email',
+              '2fa_pendiente_nombre', '2fa_pendiente_rol',
+              '2fa_pendiente_foto'):
+        session.pop(k, None)
+
+    flash(mensaje, 'success')
+
+    # 🔥 Log de debug
+    print(
+        f"🔐 LOGIN 2FA OK: {session.get('email')} | "
+        f"rol_raw={usuario.get('rol')!r} rol_norm={rol_normalizado!r} "
+        f"es_vendedor={session['es_vendedor']}",
+        file=sys.stderr
+    )
+
+    # 🔥 Redirigir según el rol
+    if rol_normalizado == 'admin':
+        return redirect(url_for('web.dashboard'))
+    if rol_normalizado == 'vendedor':
+        return redirect(url_for('web.vendedor_dashboard'))
+    return redirect(url_for('web.raiz_tienda'))
+
+
+# ================================================================
+# REGISTRO
 # ================================================================
 
 def register():
@@ -221,8 +418,9 @@ def register():
 
     return render_template('auth/register.html')
 
+
 # ================================================================
-# REENVIAR CONFIRMACIÓN (con smtplib)
+# REENVIAR CONFIRMACIÓN
 # ================================================================
 
 def reenviar_confirmacion():
@@ -264,6 +462,7 @@ def reenviar_confirmacion():
 
     return redirect(url_for('web.login'))
 
+
 # ================================================================
 # CONFIRMAR EMAIL
 # ================================================================
@@ -293,6 +492,7 @@ def confirmar_email(token):
     except Exception as e:
         flash("Error al confirmar el correo.", "danger")
         return redirect(url_for('web.login'))
+
 
 # ================================================================
 # REGISTRO DE PERFIL
@@ -340,6 +540,7 @@ def register_profile():
 
     return render_template('auth/register_profile.html')
 
+
 # ================================================================
 # LOGOUT
 # ================================================================
@@ -349,8 +550,9 @@ def logout():
     flash("Sesión cerrada correctamente.", "info")
     return redirect(url_for('web.login'))
 
+
 # ================================================================
-# VER PERFIL
+# VER PERFIL  ← MODIFICADO PARA INCLUIR FAVORITOS
 # ================================================================
 
 def ver_perfil():
@@ -365,18 +567,92 @@ def ver_perfil():
         return redirect(url_for('web.login'))
 
     db = current_app.db
+
+    # ---------- ID DE USUARIO COMO ObjectId ----------
+    try:
+        usuario_oid = ObjectId(session['user_id'])
+    except Exception:
+        flash("Sesión inválida.", "danger")
+        session.clear()
+        return redirect(url_for('web.login'))
+
+    # ---------- PEDIDOS ----------
     pedidos = []
     try:
-        pedidos = list(db.pedidos.find({'usuario_id': session['user_id']}).sort('created_at', -1).limit(5))
+        pedidos = list(
+            db.pedidos.find({'usuario_id': usuario_oid})
+                      .sort('created_at', -1)
+                      .limit(5)
+        )
         for pedido in pedidos:
             pedido['_id'] = str(pedido['_id'])
+            if 'items' in pedido and 'items_list' not in pedido:
+                pedido['items_list'] = pedido['items']
+            elif 'productos' in pedido and 'items_list' not in pedido:
+                pedido['items_list'] = pedido['productos']
             if 'created_at' not in pedido:
                 pedido['created_at'] = datetime.utcnow()
-    except Exception:
-        pass
+    except Exception as e:
+        current_app.logger.error(f'Error cargando pedidos en perfil: {e}')
+        pedidos = []
 
-    segmento = UsuarioModel.obtener_segmento(session['user_id'])
-    return render_template('tienda/perfil.html', usuario=usuario, pedidos=pedidos, segmento=segmento)
+    # ---------- ⭐ FAVORITOS (desde la colección favoritos) ----------
+    favoritos = []
+    try:
+        favs = list(db.favoritos.find({'usuario_id': usuario_oid}))
+        fav_ids = []
+        for f in favs:
+            pid = f.get('producto_id')
+            if not pid:
+                continue
+            # Convertir a ObjectId si viene como string
+            if isinstance(pid, ObjectId):
+                fav_ids.append(pid)
+            else:
+                try:
+                    fav_ids.append(ObjectId(pid))
+                except Exception:
+                    continue
+
+        if fav_ids:
+            favoritos = list(db.productos.find({'_id': {'$in': fav_ids}}))
+
+            # Enriquecer con nombre de marca
+            marcas = list(db.marcas.find({}))
+            marcas_dict = {str(m['_id']): m.get('nombre_comercial', '') for m in marcas}
+            for prod in favoritos:
+                mid = prod.get('marca_id')
+                prod['marca_nombre'] = marcas_dict.get(str(mid), '') if mid else ''
+    except Exception as e:
+        current_app.logger.error(f'Error cargando favoritos en perfil: {e}')
+        favoritos = []
+
+    # ---------- CATEGORÍAS (para el navbar) ----------
+    categorias = []
+    try:
+        categorias = list(db.categorias.find({}))
+    except Exception:
+        categorias = []
+
+    # ---------- CARRITO (para el badge del navbar) ----------
+    carrito_items = session.get('carrito', []) or []
+
+    # ---------- SEGMENTO ----------
+    try:
+        segmento = UsuarioModel.obtener_segmento(session['user_id'])
+    except Exception:
+        segmento = 'Inactivo'
+
+    return render_template(
+        'tienda/perfil.html',
+        usuario=usuario,
+        pedidos=pedidos,
+        favoritos=favoritos,          # ⭐ AQUÍ ESTABA EL PROBLEMA
+        categorias=categorias,
+        carrito_items=carrito_items,
+        segmento=segmento
+    )
+
 
 # ================================================================
 # ACTUALIZAR PERFIL
@@ -428,6 +704,7 @@ def actualizar_perfil():
 
     return redirect(url_for('web.perfil'))
 
+
 # ================================================================
 # RECUPERAR CONTRASEÑA
 # ================================================================
@@ -467,6 +744,7 @@ def recuperar_password():
         return redirect(url_for('web.login'))
 
     return render_template('auth/recuperar_password.html')
+
 
 # ================================================================
 # RESETEAR CONTRASEÑA
@@ -510,6 +788,7 @@ def resetear_password(token):
             return redirect(url_for('web.resetear_password', token=token))
 
     return render_template('auth/resetear_password.html', token=token)
+
 
 # ================================================================
 # CAMBIAR CONTRASEÑA (autenticado)
@@ -567,6 +846,7 @@ def cambiar_password():
     flash('Método no permitido', 'danger')
     return redirect(url_for('web.perfil'))
 
+
 # ================================================================
 # API
 # ================================================================
@@ -582,6 +862,7 @@ def obtener_usuario_actual():
         return jsonify(usuario)
     return jsonify({'error': 'Usuario no encontrado'}), 404
 
+
 def verificar_autenticacion():
     if 'user_id' in session:
         return jsonify({
@@ -590,10 +871,14 @@ def verificar_autenticacion():
             'email': session.get('email', ''),
             'nombre': session.get('nombre', ''),
             'rol': session.get('rol', 'cliente'),
+            'rol_normalizado': normalizar_rol(session.get('rol', 'cliente')),
             'foto': session.get('foto', ''),
-            'segmento': session.get('segmento', 'Inactivo')
+            'segmento': session.get('segmento', 'Inactivo'),
+            # ⭐ NUEVO: exponer es_vendedor para el frontend
+            'es_vendedor': bool(session.get('es_vendedor', False)),
         })
     return jsonify({'autenticado': False})
+
 
 def registrar_admin():
     if request.method == 'POST':
@@ -625,6 +910,7 @@ def registrar_admin():
 
     return render_template('auth/registrar_admin.html')
 
+
 def debug_sesion():
     db = current_app.db
     user_id = session.get('user_id')
@@ -635,15 +921,193 @@ def debug_sesion():
             usuario['_id'] = str(usuario['_id'])
             usuario.pop('password', None)
 
+    rol_norm = normalizar_rol(session.get('rol', 'cliente'))
+
     return jsonify({
         'session': dict(session),
         'user_id': session.get('user_id'),
         'rol': session.get('rol'),
+        'rol_normalizado': rol_norm,
         'nombre': session.get('nombre'),
         'email': session.get('email'),
         'foto': session.get('foto'),
         'segmento': session.get('segmento', 'Inactivo'),
+        'es_vendedor': bool(session.get('es_vendedor', False)),
         'usuario_bd': usuario,
-        'es_admin': session.get('rol') == 'admin',
-        'redireccion': 'web.dashboard' if session.get('rol') == 'admin' else 'web.raiz_tienda'
+        'es_admin': rol_norm == 'admin',
+        'es_vendedor_rol': rol_norm == 'vendedor',
+        'redireccion': (
+            'web.dashboard' if rol_norm == 'admin'
+            else 'web.vendedor_dashboard' if rol_norm == 'vendedor'
+            else 'web.raiz_tienda'
+        )
     }), 200
+
+# ================================================================
+# API v1 - AUTENTICACIÓN CON JWT (para React Native / SPA)
+# ================================================================
+
+from app.jwt_utils import create_access_token, get_current_user_from_request
+
+
+def _crear_token_para_usuario(usuario):
+    """Helper: crea un JWT a partir de un doc de usuario de Mongo."""
+    rol_norm = normalizar_rol(usuario.get('rol', 'cliente'))
+    return create_access_token(
+        user_id=str(usuario['_id']),
+        email=usuario.get('email'),
+        rol=rol_norm,
+        nombre=usuario.get('nombre', 'Usuario'),
+    )
+
+
+def _respuesta_login_ok(usuario):
+    """Helper: arma el JSON de respuesta tras un login exitoso."""
+    rol_norm = normalizar_rol(usuario.get('rol', 'cliente'))
+    token = _crear_token_para_usuario(usuario)
+
+    # Actualizar último login
+    try:
+        UsuarioModel.actualizar(str(usuario['_id']), {'ultimo_login': datetime.utcnow()})
+    except Exception:
+        pass
+
+    return jsonify({
+        "access_token": token,
+        "token_type": "Bearer",
+        "expires_in": int(os.getenv("JWT_EXPIRATION_HOURS", "24")) * 3600,
+        "user": {
+            "id": str(usuario['_id']),
+            "email": usuario.get('email'),
+            "nombre": usuario.get('nombre', 'Usuario'),
+            "rol": rol_norm,
+            "foto": usuario.get('foto'),
+            # ⭐ NUEVO: exponer es_vendedor para móvil/SPA
+            "es_vendedor": bool(usuario.get('es_vendedor', False)),
+        }
+    }), 200
+
+
+def api_login_jwt():
+    """POST /api/v1/auth/login — Devuelve un JWT (para móvil / SPA)."""
+    data = request.get_json(silent=True) or {}
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password') or ''
+
+    if not email or not password:
+        return jsonify({"error": "Email y contraseña son requeridos"}), 400
+
+    usuario = UsuarioModel.obtener_por_email(email)
+
+    if not usuario:
+        return jsonify({"error": "Correo o contraseña incorrectos"}), 401
+
+    if not usuario.get('confirmado', False):
+        return jsonify({
+            "error": "Debes confirmar tu correo electrónico antes de iniciar sesión.",
+            "code": "email_no_confirmado",
+        }), 403
+
+    if not usuario.get('activo', True):
+        return jsonify({"error": "Tu cuenta está desactivada. Contacta al administrador."}), 403
+
+    try:
+        password_hash = usuario.get('password', '')
+        if not password_hash:
+            return jsonify({"error": "Correo o contraseña incorrectos"}), 401
+
+        if not bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8')):
+            return jsonify({"error": "Correo o contraseña incorrectos"}), 401
+    except Exception:
+        return jsonify({"error": "Error al verificar la contraseña"}), 500
+
+    # 2FA: si está habilitado, NO emitimos token aún.
+    # El cliente debe llamar al flujo de 2FA y luego pedir el token.
+    dos_fa = usuario.get('2fa', {}) or {}
+    if dos_fa.get('habilitado'):
+        return jsonify({
+            "requires_2fa": True,
+            "message": "Se requiere verificación en dos pasos.",
+            "user_id": str(usuario['_id']),
+        }), 200
+
+    return _respuesta_login_ok(usuario)
+
+
+def api_register_jwt():
+    """POST /api/v1/auth/register — Crea un usuario y devuelve JWT."""
+    data = request.get_json(silent=True) or {}
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password') or ''
+    nombre = (data.get('nombre') or '').strip()
+
+    if not email or not password:
+        return jsonify({"error": "Email y contraseña son requeridos"}), 400
+
+    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+        return jsonify({"error": "El correo electrónico no es válido"}), 400
+
+    if len(password) < 6:
+        return jsonify({"error": "La contraseña debe tener al menos 6 caracteres"}), 400
+
+    if UsuarioModel.obtener_por_email(email):
+        return jsonify({"error": "Este correo ya está registrado"}), 409
+
+    try:
+        UsuarioModel.crear_usuario({
+            "email": email,
+            "password": password,
+            "confirmado": True,   # ← Para móvil: auto-confirmado
+            "rol": "cliente",
+            "activo": True,
+            "nombre": nombre or email.split('@')[0],
+        })
+    except Exception as e:
+        print(f"❌ Error creando usuario vía API: {e}", file=sys.stderr)
+        return jsonify({"error": "Error al crear el usuario"}), 500
+
+    usuario = UsuarioModel.obtener_por_email(email)
+    if not usuario:
+        return jsonify({"error": "Error al recuperar el usuario creado"}), 500
+
+    return _respuesta_login_ok(usuario)
+
+
+def api_me_jwt():
+    """GET /api/v1/auth/me — Devuelve el usuario autenticado por JWT."""
+    payload = get_current_user_from_request()
+    if not payload:
+        return jsonify({"error": "No autorizado"}), 401
+
+    usuario = UsuarioModel.obtener_por_id(payload['user_id'])
+    if not usuario:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    usuario['_id'] = str(usuario['_id'])
+    usuario.pop('password', None)
+    usuario.pop('2fa', None)  # no exponer el secreto 2FA
+
+    return jsonify(usuario), 200
+
+def api_listar_usuarios_jwt():
+    """GET /api/v1/usuarios — Lista de usuarios (solo admin)."""
+    from app.jwt_utils import get_current_user_from_request
+    payload = get_current_user_from_request()
+    if not payload:
+        return jsonify({"error": "No autorizado"}), 401
+
+    if payload.get('rol') != 'admin':
+        return jsonify({"error": "Solo administradores"}), 403
+
+    db = current_app.db
+    usuarios = list(db.usuarios.find({}, {
+        'email': 1, 'nombre': 1, 'rol': 1,
+        'confirmado': 1, 'activo': 1, 'created_at': 1
+    }).sort('created_at', -1))
+
+    for u in usuarios:
+        u['_id'] = str(u['_id'])
+        if 'created_at' in u and u['created_at']:
+            u['created_at'] = u['created_at'].isoformat()
+
+    return jsonify({"usuarios": usuarios, "total": len(usuarios)}), 200

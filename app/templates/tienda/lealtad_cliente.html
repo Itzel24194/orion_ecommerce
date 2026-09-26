@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente Consentido | ORION</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #E6007E;
+            --primary-dark: #B8005F;
+            --primary-light: #FDE7F1;
+            --success: #00A650;
+            --success-light: #E5F7ED;
+            --warning: #FF9900;
+            --warning-light: #FFF4E5;
+            --info: #0074C2;
+            --info-light: #E5F3FB;
+            --purple: #7A5FE0;
+            --purple-light: #EFE9FD;
+            --gold: #C99B2E;
+            --bg: #F4F5F9;
+            --card-bg: #FFFFFF;
+            --border: #ECEDF2;
+            --text-dark: #14213D;
+            --text-muted: #6B7280;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 3px rgba(20,33,61,0.06);
+            --shadow-md: 0 6px 20px rgba(20,33,61,0.08);
+            --shadow-lg: 0 14px 34px rgba(20,33,61,0.14);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* ===== HERO DEL NIVEL ===== */
+        .hero-nivel {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 40px 30px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-nivel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .hero-info h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .hero-info .nivel-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .hero-info p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* ===== BARRA DE PROGRESO ===== */
+        .progreso-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 20px 24px;
+            min-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .progreso-card .progreso-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+        .progreso-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progreso-bar .fill {
+            height: 100%;
+            background: #fff;
+            border-radius: 10px;
+            transition: width 0.8s ease;
+        }
+        .progreso-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container-lealtad {
+            max-width: 1200px;
+            margin: -30px auto 0;
+            padding: 0 30px 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        .stat-card .icon-circle {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            float: right;
+            font-size: 1.15rem;
+        }
+        .stat-card .num {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: block;
+            letter-spacing: -0.5px;
+        }
+        .stat-card .label {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+            display: block;
+        }
+        .stat-card.primary .icon-circle { background: var(--primary-light); color: var(--primary); }
+        .stat-card.success .icon-circle { background: var(--success-light); color: var(--success); }
+        .stat-card.warning .icon-circle { background: var(--warning-light); color: var(--warning); }
+        .stat-card.purple .icon-circle { background: var(--purple-light); color: var(--purple); }
+
+        /* ===== SECCIONES ===== */
+        .section-box {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 26px;
+        }
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== CUPONES ===== */
+        .cupones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+        }
+        .cupon-card {
+            background: linear-gradient(135deg, #fff, #fafafa);
+            border-radius: 16px;
+            padding: 22px;
+            border: 2px dashed var(--border);
+            position: relative;
+            transition: all 0.25s ease;
+        }
+        .cupon-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(230,0,126,0.12);
+        }
+        .cupon-card .cupon-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 14px;
+        }
+        .cupon-card .cupon-titulo {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        .cupon-card .cupon-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .cupon-card .cupon-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .cupon-card .cupon-id {
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+        .cupon-card .cupon-validez {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .cupon-card .cupon-valor {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* ===== NIVELES ===== */
+        .niveles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .nivel-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid var(--border);
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+        .nivel-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        .nivel-card.actual {
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(230,0,126,0.15);
+        }
+        .nivel-card .nivel-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .nivel-card .nivel-nombre {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        .nivel-card .nivel-min {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+        .nivel-card .nivel-beneficios {
+            text-align: left;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+        .nivel-card .nivel-beneficios li {
+            list-style: none;
+            padding-left: 20px;
+            position: relative;
+        }
+        .nivel-card .nivel-beneficios li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: 800;
+        }
+        .nivel-card .badge-actual {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 12px;
+        }
+
+        /* ===== HISTORIAL ===== */
+        .historial-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid #F5F5F7;
+        }
+        .historial-item:last-child { border-bottom: none; }
+        .historial-item .hist-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .historial-item .hist-icon.positivo { background: var(--success-light); color: var(--success); }
+        .historial-item .hist-icon.negativo { background: var(--danger-light); color: var(--danger); }
+        .historial-item .hist-info { flex: 1; }
+        .historial-item .hist-desc { font-weight: 600; font-size: 0.88rem; }
+        .historial-item .hist-fecha { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+        .historial-item .hist-puntos { font-weight: 800; font-size: 0.95rem; }
+        .historial-item .hist-puntos.positivo { color: var(--success); }
+        .historial-item .hist-puntos.negativo { color: var(--danger); }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--border);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content { flex-direction: column; align-items: stretch; }
+            .progreso-card { min-width: 0; }
+            .container-lealtad { padding: 0 16px 40px; margin-top: -20px; }
+            .hero-nivel { padding: 30px 20px; }
+            .hero-info h1 { font-size: 1.4rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .stat-card { padding: 16px; }
+            .stat-card .num { font-size: 1.5rem; }
+            .section-box { padding: 20px; }
+            .cupones-grid { grid-template-columns: 1fr; }
+            .niveles-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HERO DEL NIVEL ===== -->
+    <div class="hero-nivel">
+        <div class="hero-content">
+            <div class="hero-info">
+                <h1>
+                    <span style="font-size: 2.5rem;">{{ info_nivel.emoji }}</span>
+                    ¡Hola, {{ nombre }}!
+                </h1>
+                <div class="nivel-badge">
+                    Nivel actual: <strong>{{ registro.nivel }}</strong>
+                </div>
+                <p style="margin-top: 10px;">Disfruta de tus beneficios exclusivos de Cliente Consentido</p>
+            </div>
+
+            <div class="progreso-card">
+                <div class="progreso-label">
+                    {% if progreso.siguiente_nivel %}
+                        Progreso hacia {{ progreso.siguiente_nivel }}
+                    {% else %}
+                        ¡Estás en el nivel máximo!
+                    {% endif %}
+                </div>
+                <div class="progreso-bar">
+                    <div class="fill" style="width: {{ progreso.progreso_pct }}%;"></div>
+                </div>
+                <div class="progreso-info">
+                    <span>Gasto: ${{ "%.0f"|format(progreso.gasto_actual) }}</span>
+                    {% if progreso.siguiente_nivel %}
+                        <span>Meta: ${{ "%.0f"|format(progreso.gasto_para_siguiente) }}</span>
+                    {% else %}
+                        <span>Nivel máximo alcanzado 🏆</span>
+                    {% endif %}
+                </div>
+                {% if progreso.siguiente_nivel and progreso.gasto_restante > 0 %}
+                <div style="margin-top: 10px; font-size: 0.8rem; opacity: 0.95;">
+                    Te faltan <strong>${{ "%.0f"|format(progreso.gasto_restante) }}</strong> para subir de nivel
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTAINER ===== -->
+    <div class="container-lealtad">
+
+        <!-- ===== STATS ===== -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="icon-circle"><i class="fas fa-star"></i></div>
+                <span class="num">{{ registro.puntos_disponibles }}</span>
+                <span class="label">Puntos disponibles</span>
+            </div>
+            <div class="stat-card success">
+                <div class="icon-circle"><i class="fas fa-dollar-sign"></i></div>
+                <span class="num">${{ "%.2f"|format(registro.puntos_disponibles * 0.1) }}</span>
+                <span class="label">Valor en pesos</span>
+            </div>
+            <div class="stat-card warning">
+                <div class="icon-circle"><i class="fas fa-shopping-bag"></i></div>
+                <span class="num">{{ registro.compras_realizadas }}</span>
+                <span class="label">Compras realizadas</span>
+            </div>
+            <div class="stat-card purple">
+                <div class="icon-circle"><i class="fas fa-trophy"></i></div>
+                <span class="num">${{ "%.0f"|format(registro.gasto_total) }}</span>
+                <span class="label">Gasto acumulado</span>
+            </div>
+        </div>
+
+        <!-- ===== CUPONES ===== -->
+        <div class="section-box">
+            <div class="section-title">
+                <div class="section-icon"><i class="fas fa-ticket-alt"></i></div>
+                Mis cupones ({{ total_cupones }})
+            </div>
+
+            {% if cupones %}
+            <div class="cupones-grid">
+                {% for cupon in cupones %}
+                <div class="cupon-card" style="border-color: {{ cupon.color }}33;">
+                    <div class="cupon-icon" style="background: {{ cupon.color }}20; color: {{ cupon.color }};">
+                        {% if cupon.tipo == 'porcentaje' %}
+                            <i class="fas fa-percent"></i>
+                        {% else %}
+                            <i class="fas fa-dollar-sign"></i>
+                        {% endif %}
+                    </div>
+                    <div class="cupon-titulo" style="color: {{ cupon.color }};">{{ cupon.titulo }}</div>
+                    <div class="cupon-desc">{{ cupon.descripcion }}</div>
+                    <div class="cupon-valor">
+                        {% if cupon.tipo == 'porcentaje' %}
+                            {{ cupon.valor }}% OFF
+                        {% else %}
+                            ${{ cupon.valor }} OFF
+                        {% endif %}
+                    </div>
+                    <div class="cupon-footer">
+                        <span class="cupon-id">{{ cupon.id[:16] }}...</span>
+                        <span class="cupon-validez">
+                            {% if cupon.valido_hasta %}
+                                Válido hasta {{ cupon.valido_hasta[:10] }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-ticket-alt"></i>
+                <h3 style="margin-bottom: 8px;">Aún no tienes cupones disponibles</h3>
+                <p style="font-size: 0.9rem;">Sigue comprando para desbloquear beneficios exclusivos</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ===== NIVELES ===== -->
+        <div class="section-box">
+            <div class="section-title">
+                <div class="section-icon"><i class="fas fa-crown"></i></div>
+                Niveles de Cliente Consentido
+            </div>
+
+            <div class="niveles-grid">
+                {% for nivel in niveles %}
+                <div class="nivel-card {% if nivel.nombre == registro.nivel %}actual{% endif %}">
+                    <div class="nivel-emoji">{{ nivel.emoji }}</div>
+                    <div class="nivel-nombre" style="color: {{ nivel.color }};">{{ nivel.nombre }}</div>
+                    <div class="nivel-min">
+                        {% if nivel.min_gasto == 0 %}
+                            Desde $0
+                        {% else %}
+                            Desde ${{ "{:,}".format(nivel.min_gasto) }}
+                        {% endif %}
+                    </div>
+                    <ul class="nivel-beneficios">
+                        {% for beneficio in nivel.beneficios %}
+                        <li>{{ beneficio }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% if nivel.nombre == registro.nivel %}
+                        <div class="badge-actual">Nivel actual</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ===== HISTORIAL DE PUNTOS ===== -->
+        <div class="section-box">
+            <div class="section-title">
+                <div class="section-icon"><i class="fas fa-history"></i></div>
+                Historial de puntos
+            </div>
+
+            {% if registro.historial_puntos %}
+            <div>
+                {% for entrada in registro.historial_puntos[-20:]|reverse %}
+                <div class="historial-item">
+                    <div class="hist-icon {% if entrada.puntos >= 0 %}positivo{% else %}negativo{% endif %}">
+                        {% if entrada.puntos >= 0 %}
+                            <i class="fas fa-plus"></i>
+                        {% else %}
+                            <i class="fas fa-minus"></i>
+                        {% endif %}
+                    </div>
+                    <div class="hist-info">
+                        <div class="hist-desc">{{ entrada.descripcion }}</div>
+                        <div class="hist-fecha">{{ entrada.fecha.strftime('%d/%m/%Y %H:%M') if entrada.fecha else 'N/A' }}</div>
+                    </div>
+                    <div class="hist-puntos {% if entrada.puntos >= 0 %}positivo{% else %}negativo{% endif %}">
+                        {% if entrada.puntos >= 0 %}+{% endif %}{{ entrada.puntos }} pts
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-history"></i>
+                <p>Aún no tienes movimientos de puntos</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente Consentido | ORION Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #E6007E;
+            --primary-dark: #B8005F;
+            --primary-light: #FDE7F1;
+            --success: #00A650;
+            --success-light: #E5F7ED;
+            --warning: #FF9900;
+            --warning-light: #FFF4E5;
+            --info: #0074C2;
+            --info-light: #E5F3FB;
+            --danger: #E4002B;
+            --danger-light: #FDE8EC;
+            --purple: #7A5FE0;
+            --purple-light: #EFE9FD;
+            --gold: #C99B2E;
+            --bronze: #CD7F32;
+            --silver: #A9AFBC;
+            --bg: #F4F5F9;
+            --card-bg: #FFFFFF;
+            --border: #ECEDF2;
+            --text-dark: #14213D;
+            --text-muted: #6B7280;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 3px rgba(20,33,61,0.06);
+            --shadow-md: 0 6px 20px rgba(20,33,61,0.08);
+            --shadow-lg: 0 14px 34px rgba(20,33,61,0.14);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+        }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--card-bg);
+            box-shadow: 2px 0 12px rgba(20,33,61,0.05);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 28px 20px 22px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            position: relative;
+        }
+        .sidebar .admin-profile .avatar {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.85);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+        }
+        .sidebar .admin-profile .name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #fff;
+            margin-top: 12px;
+        }
+        .sidebar .admin-profile .email {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.85);
+        }
+        .sidebar .admin-profile .rol {
+            font-size: 0.62rem;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: rgba(255,255,255,0.22);
+            padding: 3px 14px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+        .sidebar .logo {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-align: center;
+            padding: 16px 0 6px;
+            letter-spacing: -1px;
+        }
+        .sidebar .logo span { color: var(--text-dark); }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 14px; }
+        .sidebar .panel-title {
+            font-size: 0.63rem;
+            text-transform: uppercase;
+            color: #9AA1B1;
+            padding: 14px 25px 6px;
+            letter-spacing: 1.6px;
+            font-weight: 700;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 25px;
+            margin: 1px 12px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #9AA1B1; }
+        .sidebar a:hover { background: var(--primary-light); color: var(--primary); }
+        .sidebar a:hover i { color: var(--primary); }
+        .sidebar a.active { background: var(--primary-light); color: var(--primary); font-weight: 700; }
+        .sidebar a.active i { color: var(--primary); }
+        .sidebar .divider { height: 1px; background: var(--border); margin: 10px 24px; }
+        .sidebar .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 25px;
+            margin: 1px 12px 8px;
+            color: var(--danger);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: calc(100% - 24px);
+            text-align: left;
+        }
+        .sidebar .logout-btn i { color: var(--danger); }
+        .sidebar .logout-btn:hover { background: var(--danger-light); }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px;
+            padding: 28px 34px 30px;
+            width: 100%;
+            min-height: 100vh;
+        }
+        .breadcrumb {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .breadcrumb .sep { color: #C6CAD6; }
+        .breadcrumb .current { color: var(--primary); }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 18px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .top-bar h1 {
+            font-size: 1.65rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-bar h1 i { color: var(--primary); }
+        .top-bar .subtitulo {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .top-bar .acciones {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn-volver {
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-volver:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn-primary-top {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: inherit;
+        }
+        .btn-primary-top:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 6px 16px rgba(230,0,126,0.28);
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 20px 22px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--accent, var(--primary));
+        }
+        .stat-card .icon-circle {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            float: right;
+            font-size: 1.05rem;
+            background: var(--accent-light, var(--primary-light));
+            color: var(--accent, var(--primary));
+        }
+        .stat-card .num {
+            font-size: 1.9rem;
+            font-weight: 800;
+            display: block;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+        .stat-card .label {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+            display: block;
+        }
+        .stat-card.primary { --accent: var(--primary); --accent-light: var(--primary-light); }
+        .stat-card.success { --accent: var(--success); --accent-light: var(--success-light); }
+        .stat-card.warning { --accent: var(--warning); --accent-light: var(--warning-light); }
+        .stat-card.info { --accent: var(--info); --accent-light: var(--info-light); }
+        .stat-card.purple { --accent: var(--purple); --accent-light: var(--purple-light); }
+
+        /* ===== SECCIONES ===== */
+        .section-box {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 22px;
+        }
+        .section-title {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+        .icon-badge-primary { background: var(--primary-light); color: var(--primary); }
+        .icon-badge-info { background: var(--info-light); color: var(--info); }
+        .icon-badge-success { background: var(--success-light); color: var(--success); }
+        .icon-badge-warning { background: var(--warning-light); color: var(--warning); }
+        .icon-badge-purple { background: var(--purple-light); color: var(--purple); }
+
+        /* ===== GRÁFICOS ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        .chart-card h5 {
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chart-container {
+            position: relative;
+            height: 260px;
+        }
+
+        /* ===== ACCIONES MASIVAS ===== */
+        .acciones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .accion-card {
+            background: var(--bg);
+            border: 1.5px dashed var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            transition: all 0.2s ease;
+        }
+        .accion-card:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .accion-card h6 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dark);
+        }
+        .accion-card input,
+        .accion-card select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-family: inherit;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+        .accion-card input:focus,
+        .accion-card select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .accion-card button {
+            width: 100%;
+            padding: 9px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-accion-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-accion-primary:hover {
+            background: var(--primary-dark);
+        }
+        .btn-accion-info {
+            background: var(--info);
+            color: #fff;
+        }
+        .btn-accion-info:hover {
+            background: #005A99;
+        }
+
+        /* ===== TABLA CLIENTES ===== */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .table-header {
+            padding: 18px 22px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .table-header h5 {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filtros-tabla {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filtros-tabla select,
+        .filtros-tabla input {
+            padding: 7px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-family: inherit;
+            background: var(--bg);
+            color: var(--text-dark);
+        }
+        .filtros-tabla select:focus,
+        .filtros-tabla input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        table.lealtad-tabla {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.lealtad-tabla thead th {
+            background: var(--bg);
+            font-weight: 700;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+        table.lealtad-tabla tbody td {
+            padding: 12px 18px;
+            font-size: 0.82rem;
+            border-bottom: 1px solid #F5F5F7;
+            color: var(--text-dark);
+            vertical-align: middle;
+        }
+        table.lealtad-tabla tbody tr:nth-child(even) { background: #FAFAFC; }
+        table.lealtad-tabla tbody tr:hover { background: var(--primary-light); }
+
+        .cliente-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cliente-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--info-light);
+            color: var(--info);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .badge-nivel {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .badge-nivel.Bronce { background: #F5E6D3; color: #8B5A2B; }
+        .badge-nivel.Plata { background: #F0F1F5; color: #6B7280; }
+        .badge-nivel.Oro { background: #FFF4CC; color: #A67C00; }
+        .badge-nivel.Diamante { background: var(--purple-light); color: var(--purple); }
+
+        .puntos-cell {
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .gasto-cell {
+            font-weight: 700;
+            color: var(--success);
+        }
+        .btn-mini {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-mini:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-custom {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20,33,61,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-custom.activo { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-box h3 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-box .modal-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+        .modal-box label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-dark);
+        }
+        .modal-box input,
+        .modal-box textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-family: inherit;
+            margin-bottom: 16px;
+            background: var(--bg);
+        }
+        .modal-box input:focus,
+        .modal-box textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+        }
+        .modal-acciones {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+        .modal-acciones button {
+            padding: 9px 22px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-cancelar {
+            background: var(--bg);
+            color: var(--text-muted);
+            border: 1.5px solid var(--border) !important;
+        }
+        .btn-cancelar:hover { background: #E5E7EB; }
+        .btn-guardar {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-guardar:hover { background: var(--primary-dark); }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .toast.activo {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast.error { background: var(--danger); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 14px; justify-content: center; margin: 1px 8px; }
+            .sidebar a i { font-size: 1.25rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 12px; }
+            .main { margin-left: 70px; padding: 16px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .top-bar h1 { font-size: 1.3rem; }
+            .table-header { flex-direction: column; align-items: stretch; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .top-bar .acciones { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+        <div class="logo">ORION<span>.</span></div>
+        <div class="menu-scroll">
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_marcas') }}"><i class="fas fa-building"></i> <span>Marcas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.admin_chat_panel') }}"><i class="fas fa-comment-dots"></i> <span>Chat en vivo</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}"><i class="fas fa-gift"></i> <span>Promociones</span></a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+            <a href="{{ url_for('web.admin_lealtad_panel') }}" class="active"><i class="fas fa-crown"></i> <span>Cliente Consentido</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}"><i class="fas fa-brain"></i> <span>Análisis Supervisado</span></a>
+            <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
+            <a href="{{ url_for('web.admin_dashboard_auditoria') }}"><i class="fas fa-shield-check"></i> <span>Auditoría</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+
+        <div class="breadcrumb">
+            <span>Inicio</span> <span class="sep">/</span> <span>Promociones</span> <span class="sep">/</span> <span class="current">Cliente Consentido</span>
+        </div>
+
+        <div class="top-bar">
+            <div>
+                <h1><i class="fas fa-crown"></i> Cliente Consentido</h1>
+                <div class="subtitulo">Programa de lealtad personalizado para tus mejores clientes.</div>
+            </div>
+            <div class="acciones">
+                <button class="btn-primary-top" onclick="abrirModalOtorgarPuntos()">
+                    <i class="fas fa-star"></i> Otorgar puntos
+                </button>
+                <a href="{{ url_for('web.dashboard') }}" class="btn-volver">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+
+        <!-- ===== STATS ===== -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="icon-circle"><i class="fas fa-users"></i></div>
+                <span class="num">{{ stats.total_clientes }}</span>
+                <span class="label">Clientes en el programa</span>
+            </div>
+            <div class="stat-card warning">
+                <div class="icon-circle"><i class="fas fa-star"></i></div>
+                <span class="num">{{ stats.puntos_disponibles }}</span>
+                <span class="label">Puntos disponibles</span>
+            </div>
+            <div class="stat-card success">
+                <div class="icon-circle"><i class="fas fa-trophy"></i></div>
+                <span class="num">{{ stats.puntos_historicos }}</span>
+                <span class="label">Puntos históricos</span>
+            </div>
+            <div class="stat-card info">
+                <div class="icon-circle"><i class="fas fa-dollar-sign"></i></div>
+                <span class="num">${{ "%.0f"|format(stats.gasto_total) }}</span>
+                <span class="label">Gasto total acumulado</span>
+            </div>
+        </div>
+
+        <!-- ===== GRÁFICOS ===== -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h5><i class="fas fa-chart-pie" style="color: var(--primary);"></i> Distribución por nivel</h5>
+                <div class="chart-container">
+                    <canvas id="chartNiveles"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h5><i class="fas fa-chart-bar" style="color: var(--info);"></i> Top clientes por puntos</h5>
+                <div class="chart-container">
+                    <canvas id="chartTopClientes"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ACCIONES MASIVAS ===== -->
+        <div class="section-box">
+            <div class="section-title">
+                <span class="section-icon icon-badge-primary"><i class="fas fa-bolt"></i></span>
+                Acciones masivas
+            </div>
+            <div class="acciones-grid">
+                <div class="accion-card">
+                    <h6><i class="fas fa-star"></i> Otorgar puntos a un nivel</h6>
+                    <select id="selectNivelPuntos">
+                        <option value="todos">Todos los niveles</option>
+                        <option value="Bronce">🥉 Bronce</option>
+                        <option value="Plata">🥈 Plata</option>
+                        <option value="Oro">🥇 Oro</option>
+                        <option value="Diamante">💎 Diamante</option>
+                    </select>
+                    <input type="number" id="inputPuntosMasivos" placeholder="Puntos a otorgar" min="1" value="100">
+                    <input type="text" id="inputMotivoPuntos" placeholder="Motivo (ej: Campaña de bienvenida)" value="Campaña especial">
+                    <button class="btn-accion-primary" onclick="otorgarPuntosMasivos()">
+                        <i class="fas fa-paper-plane"></i> Otorgar puntos
+                    </button>
+                </div>
+
+                <div class="accion-card">
+                    <h6><i class="fas fa-ticket-alt"></i> Generar cupones para un nivel</h6>
+                    <select id="selectNivelCupones">
+                        <option value="">Todos los niveles</option>
+                        <option value="Bronce">🥉 Bronce</option>
+                        <option value="Plata">🥈 Plata</option>
+                        <option value="Oro">🥇 Oro</option>
+                        <option value="Diamante">💎 Diamante</option>
+                    </select>
+                    <input type="number" id="inputMontoMinimoCupones" placeholder="Gasto mínimo (opcional)" min="0">
+                    <button class="btn-accion-info" onclick="generarCuponesMasivos()">
+                        <i class="fas fa-magic"></i> Generar cupones
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TABLA DE CLIENTES ===== -->
+        <div class="table-container">
+            <div class="table-header">
+                <h5>
+                    <span class="section-icon icon-badge-info"><i class="fas fa-list"></i></span>
+                    Clientes del programa ({{ clientes|length }})
+                </h5>
+                <div class="filtros-tabla">
+                    <select id="filtroNivel" onchange="filtrarClientes()">
+                        <option value="">Todos los niveles</option>
+                        <option value="Bronce">🥉 Bronce</option>
+                        <option value="Plata">🥈 Plata</option>
+                        <option value="Oro">🥇 Oro</option>
+                        <option value="Diamante">💎 Diamante</option>
+                    </select>
+                    <input type="text" id="buscarCliente" placeholder="Buscar cliente..." oninput="filtrarClientes()">
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="lealtad-tabla" id="tablaClientes">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Nivel</th>
+                            <th>Puntos</th>
+                            <th>Gasto total</th>
+                            <th>Compras</th>
+                            <th>Cupones</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in clientes %}
+                        <tr data-nivel="{{ c.nivel }}" data-nombre="{{ c.nombre_usuario }}">
+                            <td>
+                                <div class="cliente-cell">
+                                    <span class="cliente-avatar">{{ (c.nombre_usuario or 'NA')[:2]|upper }}</span>
+                                    <span><strong>{{ c.nombre_usuario or 'Cliente' }}</strong></span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-nivel {{ c.nivel }}">
+                                    {% if c.nivel == 'Bronce' %}🥉{% elif c.nivel == 'Plata' %}🥈{% elif c.nivel == 'Oro' %}🥇{% else %}💎{% endif %}
+                                    {{ c.nivel }}
+                                </span>
+                            </td>
+                            <td class="puntos-cell">{{ c.puntos_disponibles }} pts</td>
+                            <td class="gasto-cell">${{ "%.2f"|format(c.gasto_total) }}</td>
+                            <td>{{ c.compras_realizadas }}</td>
+                            <td>
+                                {{ c.cupones_personalizados|selectattr('usado', 'equalto', False)|list|length }}
+                                activos
+                            </td>
+                            <td>
+                                <button class="btn-mini" onclick="abrirModalAjustar('{{ c.usuario_id }}', '{{ c.nombre_usuario }}', {{ c.puntos_disponibles }})">
+                                    <i class="fas fa-edit"></i> Ajustar
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not clientes %}
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding: 40px; color: var(--text-muted);">
+                                <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 10px; color: var(--border);"></i>
+                                No hay clientes en el programa todavía.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ===== MODAL: AJUSTAR PUNTOS ===== -->
+<div class="modal-custom" id="modalAjustar">
+    <div class="modal-box">
+        <h3><i class="fas fa-edit" style="color: var(--primary);"></i> Ajustar puntos</h3>
+        <p class="modal-sub" id="modalAjustarSub">Cliente: —</p>
+
+        <input type="hidden" id="ajustarUsuarioId">
+
+        <label>Puntos (positivo para sumar, negativo para restar)</label>
+        <input type="number" id="ajustarPuntos" placeholder="Ej: 100 o -50">
+
+        <label>Motivo</label>
+        <input type="text" id="ajustarMotivo" placeholder="Ej: Compensación por retraso" value="Ajuste manual">
+
+        <div class="modal-acciones">
+            <button class="btn-cancelar" onclick="cerrarModalAjustar()">Cancelar</button>
+            <button class="btn-guardar" onclick="guardarAjuste()">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: OTORGAR PUNTOS MASIVOS ===== -->
+<div class="modal-custom" id="modalOtorgar">
+    <div class="modal-box">
+        <h3><i class="fas fa-star" style="color: var(--warning);"></i> Otorgar puntos masivos</h3>
+        <p class="modal-sub">Otorga puntos a todos los clientes de un nivel.</p>
+
+        <label>Nivel objetivo</label>
+        <select id="otorgarNivel" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius: var(--radius-sm); font-size:0.85rem; font-family:inherit; margin-bottom:16px; background: var(--bg);">
+            <option value="todos">Todos los niveles</option>
+            <option value="Bronce">🥉 Bronce</option>
+            <option value="Plata">🥈 Plata</option>
+            <option value="Oro">🥇 Oro</option>
+            <option value="Diamante">💎 Diamante</option>
+        </select>
+
+        <label>Puntos a otorgar por cliente</label>
+        <input type="number" id="otorgarPuntos" value="100" min="1">
+
+        <label>Motivo</label>
+        <input type="text" id="otorgarMotivo" value="Campaña especial" placeholder="Ej: Black Friday">
+
+        <div class="modal-acciones">
+            <button class="btn-cancelar" onclick="cerrarModalOtorgar()">Cancelar</button>
+            <button class="btn-guardar" onclick="confirmarOtorgar()">
+                <i class="fas fa-paper-plane"></i> Otorgar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast">Acción completada</div>
+
+<script>
+// ============================================================
+// GRÁFICOS
+// ============================================================
+let chartNiveles = null;
+let chartTopClientes = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderChartNiveles();
+    renderChartTopClientes();
+});
+
+function renderChartNiveles() {
+    const canvas = document.getElementById('chartNiveles');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (chartNiveles) chartNiveles.destroy();
+
+    const datos = {
+        'Bronce': {{ stats.distribucion_niveles.get('Bronce', 0) }},
+        'Plata': {{ stats.distribucion_niveles.get('Plata', 0) }},
+        'Oro': {{ stats.distribucion_niveles.get('Oro', 0) }},
+        'Diamante': {{ stats.distribucion_niveles.get('Diamante', 0) }}
+    };
+
+    const labels = Object.keys(datos);
+    const valores = Object.values(datos);
+    const total = valores.reduce((a, b) => a + b, 0);
+    const colores = ['#CD7F32', '#A9AFBC', '#C99B2E', '#7A5FE0'];
+
+    chartNiveles = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: valores,
+                backgroundColor: colores,
+                borderWidth: 3,
+                borderColor: '#fff',
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        font: { size: 11, weight: '600' },
+                        boxWidth: 14,
+                        padding: 10,
+                        generateLabels: function(chart) {
+                            return labels.map(function(label, i) {
+                                const value = valores[i];
+                                const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return {
+                                    text: label + ' · ' + value + ' (' + pct + '%)',
+                                    fillStyle: colores[i],
+                                    strokeStyle: '#fff',
+                                    lineWidth: 2,
+                                    index: i
+                                };
+                            });
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#14213D',
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed;
+                            const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return [
+                                'Clientes: ' + value,
+                                'Porcentaje: ' + pct + '%'
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderChartTopClientes() {
+    const canvas = document.getElementById('chartTopClientes');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (chartTopClientes) chartTopClientes.destroy();
+
+    // Obtener top 10 clientes desde el HTML
+    const filas = document.querySelectorAll('#tablaClientes tbody tr');
+    const clientes = [];
+
+    filas.forEach(function(fila) {
+        const nombreEl = fila.querySelector('.cliente-cell strong');
+        const puntosEl = fila.querySelector('.puntos-cell');
+        if (nombreEl && puntosEl) {
+            const puntos = parseInt(puntosEl.textContent.replace(' pts', '')) || 0;
+            clientes.push({ nombre: nombreEl.textContent, puntos: puntos });
+        }
+    });
+
+    clientes.sort(function(a, b) { return b.puntos - a.puntos; });
+    const top10 = clientes.slice(0, 10);
+
+    chartTopClientes = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: top10.map(function(c) { return c.nombre; }),
+            datasets: [{
+                label: 'Puntos',
+                data: top10.map(function(c) { return c.puntos; }),
+                backgroundColor: 'rgba(230, 0, 126, 0.75)',
+                borderColor: '#E6007E',
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#14213D',
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Puntos: ' + context.parsed.x;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: '#F0F1F5' },
+                    title: { display: true, text: 'Puntos disponibles', font: { weight: '700', size: 11 } }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10 } }
+                }
+            }
+        }
+    });
+}
+
+// ============================================================
+// FILTROS TABLA
+// ============================================================
+function filtrarClientes() {
+    const nivel = document.getElementById('filtroNivel').value;
+    const busqueda = document.getElementById('buscarCliente').value.toLowerCase().trim();
+
+    document.querySelectorAll('#tablaClientes tbody tr').forEach(function(fila) {
+        const nivelFila = fila.dataset.nivel || '';
+        const nombreFila = (fila.dataset.nombre || '').toLowerCase();
+
+        const coincideNivel = !nivel || nivelFila === nivel;
+        const coincideBusqueda = !busqueda || nombreFila.includes(busqueda);
+
+        fila.style.display = (coincideNivel && coincideBusqueda) ? '' : 'none';
+    });
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function mostrarToast(mensaje, esError) {
+    const toast = document.getElementById('toast');
+    toast.textContent = mensaje;
+    toast.className = 'toast activo' + (esError ? ' error' : '');
+    setTimeout(function() {
+        toast.classList.remove('activo');
+    }, 3000);
+}
+
+// ============================================================
+// MODAL AJUSTAR PUNTOS
+// ============================================================
+function abrirModalAjustar(usuarioId, nombre, puntosActuales) {
+    document.getElementById('ajustarUsuarioId').value = usuarioId;
+    document.getElementById('modalAjustarSub').textContent = 'Cliente: ' + nombre + ' · ' + puntosActuales + ' pts actuales';
+    document.getElementById('ajustarPuntos').value = '';
+    document.getElementById('ajustarMotivo').value = 'Ajuste manual';
+    document.getElementById('modalAjustar').classList.add('activo');
+}
+
+function cerrarModalAjustar() {
+    document.getElementById('modalAjustar').classList.remove('activo');
+}
+
+function guardarAjuste() {
+    const usuarioId = document.getElementById('ajustarUsuarioId').value;
+    const puntos = parseInt(document.getElementById('ajustarPuntos').value);
+    const motivo = document.getElementById('ajustarMotivo').value.trim();
+
+    if (!usuarioId || isNaN(puntos) || puntos === 0) {
+        mostrarToast('Ingresa una cantidad válida de puntos', true);
+        return;
+    }
+
+    fetch('/api/admin/lealtad/ajustar-puntos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            usuario_id: usuarioId,
+            puntos: puntos,
+            motivo: motivo
+        })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            mostrarToast('Puntos ajustados correctamente');
+            cerrarModalAjustar();
+            setTimeout(function() { window.location.reload(); }, 800);
+        } else {
+            mostrarToast('Error: ' + (data.error || 'Desconocido'), true);
+        }
+    })
+    .catch(function(err) { mostrarToast('Error de red: ' + err.message, true); });
+}
+
+// ============================================================
+// MODAL OTORGAR PUNTOS
+// ============================================================
+function abrirModalOtorgarPuntos() {
+    document.getElementById('modalOtorgar').classList.add('activo');
+}
+
+function cerrarModalOtorgar() {
+    document.getElementById('modalOtorgar').classList.remove('activo');
+}
+
+function confirmarOtorgar() {
+    const nivel = document.getElementById('otorgarNivel').value;
+    const puntos = parseInt(document.getElementById('otorgarPuntos').value);
+    const motivo = document.getElementById('otorgarMotivo').value.trim();
+
+    if (isNaN(puntos) || puntos <= 0) {
+        mostrarToast('Los puntos deben ser mayores a 0', true);
+        return;
+    }
+
+    fetch('/api/admin/lealtad/otorgar-puntos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            nivel: nivel,
+            puntos: puntos,
+            motivo: motivo
+        })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            mostrarToast(data.clientes_afectados + ' clientes recibieron ' + puntos + ' pts');
+            cerrarModalOtorgar();
+            setTimeout(function() { window.location.reload(); }, 1000);
+        } else {
+            mostrarToast('Error: ' + (data.error || 'Desconocido'), true);
+        }
+    })
+    .catch(function(err) { mostrarToast('Error de red: ' + err.message, true); });
+}
+
+// ============================================================
+// ACCIONES MASIVAS (tarjetas)
+// ============================================================
+function otorgarPuntosMasivos() {
+    const nivel = document.getElementById('selectNivelPuntos').value;
+    const puntos = parseInt(document.getElementById('inputPuntosMasivos').value);
+    const motivo = document.getElementById('inputMotivoPuntos').value.trim();
+
+    if (isNaN(puntos) || puntos <= 0) {
+        mostrarToast('Los puntos deben ser mayores a 0', true);
+        return;
+    }
+
+    if (!confirm('¿Otorgar ' + puntos + ' puntos a los clientes de nivel "' + nivel + '"?')) return;
+
+    fetch('/api/admin/lealtad/otorgar-puntos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nivel: nivel, puntos: puntos, motivo: motivo })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            mostrarToast('✅ ' + data.clientes_afectados + ' clientes recibieron ' + puntos + ' pts');
+            setTimeout(function() { window.location.reload(); }, 1200);
+        } else {
+            mostrarToast('Error: ' + (data.error || 'Desconocido'), true);
+        }
+    })
+    .catch(function(err) { mostrarToast('Error de red: ' + err.message, true); });
+}
+
+function generarCuponesMasivos() {
+    const nivel = document.getElementById('selectNivelCupones').value;
+    const montoMinimo = parseFloat(document.getElementById('inputMontoMinimoCupones').value) || 0;
+
+    if (!confirm('¿Generar cupones para ' + (nivel || 'todos los niveles') + '?')) return;
+
+    fetch('/api/admin/lealtad/generar-cupones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nivel: nivel || null, monto_minimo: montoMinimo || null })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            mostrarToast('✅ ' + data.cupones_generados + ' cupones generados');
+        } else {
+            mostrarToast('Error: ' + (data.error || 'Desconocido'), true);
+        }
+    })
+    .catch(function(err) { mostrarToast('Error de red: ' + err.message, true); });
+}
+
+// Cerrar modales al hacer clic fuera
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-custom')) {
+        e.target.classList.remove('activo');
+    }
+});
+</script>
+
+</body>
+</html>

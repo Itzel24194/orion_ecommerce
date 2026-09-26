@@ -1,0 +1,184 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ORION\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mi Perfil"
+msgstr "マイプロフィール"
+
+msgid "Seguridad"
+msgstr "セキュリティ"
+
+msgid "Mis Pedidos"
+msgstr "注文履歴"
+
+msgid "Direcciones"
+msgstr "住所"
+
+msgid "Favoritos"
+msgstr "お気に入り"
+
+msgid "Comunicaciones"
+msgstr "コミュニケーション"
+
+msgid "Privacidad"
+msgstr "プライバシー"
+
+msgid "Facturación"
+msgstr "請求"
+
+msgid "Métodos de Pago"
+msgstr "支払い方法"
+
+msgid "Idioma"
+msgstr "言語"
+
+msgid "Cerrar Sesión"
+msgstr "ログアウト"
+
+msgid "Información Personal"
+msgstr "個人情報"
+
+msgid "Nombre(s)"
+msgstr "名前"
+
+msgid "Apellido Paterno"
+msgstr "姓"
+
+msgid "Apellido Materno"
+msgstr "母方の姓"
+
+msgid "Teléfono"
+msgstr "電話番号"
+
+msgid "Fecha de Nacimiento"
+msgstr "生年月日"
+
+msgid "Género"
+msgstr "性別"
+
+msgid "Guardar Cambios"
+msgstr "変更を保存"
+
+msgid "Seguridad de la Cuenta"
+msgstr "アカウントのセキュリティ"
+
+msgid "Verificación en dos pasos"
+msgstr "二段階認証"
+
+msgid "Cambiar contraseña"
+msgstr "パスワード変更"
+
+msgid "Contraseña actual"
+msgstr "現在のパスワード"
+
+msgid "Nueva contraseña"
+msgstr "新しいパスワード"
+
+msgid "Confirmar nueva contraseña"
+msgstr "新しいパスワードを確認"
+
+msgid "Actualizar contraseña"
+msgstr "パスワードを更新"
+
+msgid "Ver todos"
+msgstr "すべて表示"
+
+msgid "Todos"
+msgstr "すべて"
+
+msgid "Pendientes"
+msgstr "保留中"
+
+msgid "Confirmados"
+msgstr "確認済み"
+
+msgid "Enviados"
+msgstr "発送済み"
+
+msgid "Entregados"
+msgstr "配達済み"
+
+msgid "Cancelados"
+msgstr "キャンセル済み"
+
+msgid "Ver detalle"
+msgstr "詳細を見る"
+
+msgid "No tienes pedidos realizados"
+msgstr "注文履歴はありません"
+
+msgid "Mis Direcciones"
+msgstr "私の住所"
+
+msgid "Editar"
+msgstr "編集"
+
+msgid "Eliminar"
+msgstr "削除"
+
+msgid "Agregar dirección"
+msgstr "住所を追加"
+
+msgid "Nueva Dirección"
+msgstr "新しい住所"
+
+msgid "Calle"
+msgstr "通り"
+
+msgid "Colonia"
+msgstr "地区"
+
+msgid "Ciudad"
+msgstr "市"
+
+msgid "Estado"
+msgstr "州"
+
+msgid "Guardar dirección"
+msgstr "住所を保存"
+
+msgid "Mis Favoritos"
+msgstr "お気に入り"
+
+msgid "Ver producto"
+msgstr "商品を見る"
+
+msgid "Explorar productos"
+msgstr "商品を探す"
+
+msgid "Preferencias de Comunicación"
+msgstr "コミュニケーション設定"
+
+msgid "Guardar preferencias"
+msgstr "設定を保存"
+
+msgid "Privacidad y Datos"
+msgstr "プライバシーとデータ"
+
+msgid "Eliminar mi cuenta"
+msgstr "アカウントを削除"
+
+msgid "Datos fiscales"
+msgstr "税務情報"
+
+msgid "Historial de facturas"
+msgstr "請求履歴"
+
+msgid "Idioma y Región"
+msgstr "言語と地域"
+
+msgid "Moneda"
+msgstr "通貨"
+
+msgid "Región / País"
+msgstr "地域 / 国"
+
+msgid "Vista previa"
+msgstr "プレビュー"
+
+msgid "Guardar cambios"
+msgstr "変更を保存"

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monedero · Clientes · ORION Admin</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            padding: 0; height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px; text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            margin-bottom: 10px; flex-shrink: 0;
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .admin-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a:hover i, .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main { margin-left: 280px; padding: 30px 35px 20px; width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #e8e8e8; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0; }
+        .top-bar h1 { font-size: 1.6rem; font-weight: 800; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag { background: #e10098; color: #fff; padding: 5px 18px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .top-bar__right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .top-bar__crumb { font-size: 0.72rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .top-bar__crumb a { color: #666; text-decoration: none; font-weight: 600; }
+        .top-bar__crumb a:hover { color: #e10098; }
+        .top-bar__crumb i { font-size: 0.6rem; margin: 0 6px; }
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; }
+
+        /* ===== HERO ===== */
+        .hero { background: linear-gradient(135deg, #fff, #faf0f5); padding: 25px 30px; border-radius: 16px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); flex-shrink: 0; }
+        .hero h2 { color: #1a1a2e; margin-bottom: 8px; font-weight: 800; font-size: 1.3rem; }
+        .hero h2 i { color: #e10098; }
+        .hero p { color: #666; margin-bottom: 0; font-size: 0.95rem; line-height: 1.6; }
+        .hero strong { color: #e10098; }
+        .hero__actions { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ===== BOTONES ===== */
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border: 1px solid #e8e8e8; background: #fff; border-radius: 50px; font-family: inherit; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #666; text-decoration: none; cursor: pointer; transition: all 0.3s ease; }
+        .btn:hover { border-color: #e10098; color: #e10098; transform: translateY(-2px); }
+        .btn--primary { background: #e10098; border-color: #e10098; color: #fff; }
+        .btn--primary:hover { background: #c00080; border-color: #c00080; color: #fff; box-shadow: 0 4px 15px rgba(225,0,152,.3); }
+        .btn--success { background: #16a34a; border-color: #16a34a; color: #fff; }
+        .btn--success:hover { background: #15803d; border-color: #15803d; color: #fff; box-shadow: 0 4px 15px rgba(22,163,74,.3); }
+        .btn--danger { background: #dc2626; border-color: #dc2626; color: #fff; }
+        .btn--danger:hover { background: #b91c1c; border-color: #b91c1c; color: #fff; box-shadow: 0 4px 15px rgba(220,38,38,.3); }
+        .btn--ghost { background: #fff; color: #666; }
+        .btn--sm { padding: 7px 12px; font-size: 0.7rem; }
+        .btn--icon { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 10px; }
+
+        /* ===== SECTION BOX ===== */
+        .section-box { background: #ffffff; border-radius: 16px; padding: 25px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0; }
+        .section-box h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .section-box h2 i { color: #e10098; }
+        .section-box--flush { padding: 0; overflow: hidden; }
+
+        /* ===== TOOLBAR / BUSCADOR ===== */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+        .search { flex: 1; max-width: 500px; position: relative; }
+        .search input {
+            width: 100%; padding: 12px 42px 12px 16px; border: 1px solid #e8e8e8; border-radius: 12px;
+            font-family: inherit; font-size: 0.88rem; background: #fafafa; color: #1a1a2e;
+            transition: all 0.2s ease; outline: none;
+        }
+        .search input:focus { border-color: #e10098; background: #fff; box-shadow: 0 0 0 3px rgba(225,0,152,.08); }
+        .search i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+
+        /* ===== TABLA ===== */
+        .table-wrap { overflow-x: auto; }
+        .table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .table thead { background: #fafafa; border-bottom: 1px solid #e8e8e8; }
+        .table th { padding: 14px 16px; text-align: left; font-size: 0.68rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #999; white-space: nowrap; }
+        .table td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        .table tr:last-child td { border-bottom: none; }
+        .table tr:hover td { background: #fdf5fa; }
+
+        .user { display: flex; align-items: center; gap: 12px; }
+        .user__avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #e10098, #b80064); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; flex-shrink: 0; box-shadow: 0 3px 10px rgba(225,0,152,.2); }
+        .user__info { min-width: 0; }
+        .user__name { font-weight: 700; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.85rem; }
+        .user__email { font-size: 0.72rem; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        .badge--ok { background: #dcfce7; color: #166534; }
+        .badge--block { background: #fee2e2; color: #991b1b; }
+
+        .saldo { font-weight: 800; color: #e10098; font-size: 0.92rem; white-space: nowrap; }
+        .tarjeta { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.75rem; color: #666; letter-spacing: 0.5px; }
+        .movs { font-weight: 700; color: #1a1a2e; }
+
+        .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+        .empty { text-align: center; padding: 60px 20px; color: #999; }
+        .empty i { font-size: 44px; color: #e8e8e8; display: block; margin-bottom: 14px; }
+        .empty p { font-size: 0.9rem; }
+
+        /* ===== PAGINACIÓN ===== */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 22px; border-top: 1px solid #f0f0f0; flex-wrap: wrap; }
+        .pagination__info { font-size: 0.72rem; color: #999; font-weight: 600; margin-left: 8px; }
+        .pagination a, .pagination span {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 34px; height: 34px; padding: 0 10px;
+            border: 1px solid #e8e8e8; border-radius: 10px;
+            font-size: 0.78rem; font-weight: 700; text-decoration: none;
+            color: #666; transition: all 0.2s ease;
+        }
+        .pagination a:hover { border-color: #e10098; color: #e10098; transform: translateY(-2px); }
+        .pagination .active { background: #e10098; color: #fff; border-color: #e10098; box-shadow: 0 4px 12px rgba(225,0,152,.25); }
+        .pagination .disabled { opacity: 0.35; pointer-events: none; }
+        .pagination .dots { border: none; color: #bbb; pointer-events: none; }
+
+        /* ===== MODAL ===== */
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(26,26,46,.55); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-backdrop.active { display: flex; }
+        .modal { background: #fff; border-radius: 16px; width: 100%; max-width: 480px; padding: 28px 30px; box-shadow: 0 20px 60px rgba(0,0,0,.25); animation: modalIn .22s ease; }
+        @keyframes modalIn { from { opacity: 0; transform: translateY(15px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal__header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .modal__header i { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: #fff; background: #e10098; flex-shrink: 0; }
+        .modal__header.danger i { background: #dc2626; }
+        .modal__header.success i { background: #16a34a; }
+        .modal__header h3 { font-size: 1.05rem; font-weight: 800; color: #1a1a2e; }
+        .modal__header p { font-size: 0.78rem; color: #888; margin-top: 2px; }
+        .modal__body { margin-bottom: 22px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #666; margin-bottom: 6px; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 11px 14px; border: 1px solid #e8e8e8; border-radius: 10px;
+            font-family: inherit; font-size: 0.88rem; color: #1a1a2e; background: #fafafa;
+            transition: all 0.2s ease; outline: none;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: #e10098; background: #fff; box-shadow: 0 0 0 3px rgba(225,0,152,.08);
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-help { font-size: 0.72rem; color: #999; margin-top: 5px; }
+        .modal__actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .modal__actions .btn { flex: 1; justify-content: center; }
+
+        .alert { padding: 10px 14px; border-radius: 10px; font-size: 0.8rem; margin-bottom: 14px; display: none; font-weight: 600; }
+        .alert.show { display: block; }
+        .alert--err { background: #fee2e2; color: #991b1b; }
+        .alert--ok { background: #dcfce7; color: #166534; }
+
+        /* ===== FOOTER ===== */
+        .footer-info { background: #ffffff; padding: 15px 25px; border-radius: 16px; border: 1px solid #e8e8e8; text-align: center; margin-top: auto; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+        .footer-info p { color: #888; font-size: 0.75rem; margin: 0; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .footer-info p .separator { color: #ddd; }
+        .footer-info i { color: #e10098; }
+        .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .sidebar .logout-btn i { font-size: 1.3rem; margin: 0; }
+            .main { margin-left: 70px; padding: 15px; }
+            .footer-info p { font-size: 0.65rem; gap: 8px; }
+        }
+        @media (max-width: 480px) {
+            .top-bar h1 { font-size: 1.2rem; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .hero { padding: 20px; }
+            .hero h2 { font-size: 1.1rem; }
+            .hero p { font-size: 0.85rem; }
+            .section-box { padding: 18px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .search { max-width: 100%; }
+            .footer-info p { flex-direction: column; gap: 5px; }
+            .pagination { gap: 4px; padding: 15px 10px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <nav class="sidebar">
+
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_marcas') }}"><i class="fas fa-building"></i> <span>Marcas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_combos') }}"><i class="fas fa-layer-group" style="color: #fd7e14;"></i> <span>Combos</span></a>
+            <a href="{{ url_for('web.admin_marketplace_vendedores') }}"><i class="fas fa-store" style="color: #0284c7;"></i> <span>Marketplace</span></a>
+            <a href="{{ url_for('web.admin_resenas') }}"><i class="fas fa-star" style="color: #ffc107;"></i> <span>Reseñas</span></a>
+            <a href="{{ url_for('web.admin_chat_panel') }}"><i class="fas fa-comment-dots" style="color: #00d4ff;"></i> <span>Chat en vivo</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
+            <a href="{{ url_for('web.listar_temporadas') }}"><i class="fas fa-calendar-alt" style="color: #f9a825;"></i> <span>Temporadas</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}"><i class="fas fa-gift"></i> <span>Promociones</span></a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+            <a href="{{ url_for('web.admin_lealtad_panel') }}"><i class="fas fa-crown" style="color: #e10098;"></i> <span>Cliente Consentido</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">FINANZAS</div>
+            <a href="{{ url_for('web.admin_monedero_panel') }}" class="active"><i class="fas fa-wallet" style="color: #e10098;"></i> <span>Monedero ORION</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}"><i class="fas fa-brain" style="color: #6f42c1;"></i> <span>Análisis Supervisado</span></a>
+            <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
+            <a href="{{ url_for('web.clasificacion_binaria') }}"><i class="fas fa-toggle-on" style="color: #17a2b8;"></i> <span>Clasificación Binaria</span></a>
+            <a href="{{ url_for('web.admin_dashboard_auditoria') }}"><i class="fas fa-shield-check" style="color: #0d47a1;"></i> <span>Auditoría</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
+            <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
+            <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+            <div class="divider"></div>
+
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+
+        </div>
+
+    </nav>
+
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-users"></i> Clientes con Monedero</h1>
+            <div class="top-bar__right">
+                <div class="top-bar__crumb">
+                    <a href="{{ url_for('web.admin_monedero_panel') }}">Monedero</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Clientes</span>
+                </div>
+                <div class="tag"><i class="fas fa-shield-alt"></i> Admin</div>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <!-- HERO -->
+            <section class="hero">
+                <h2><i class="fas fa-wallet"></i> Monederos registrados</h2>
+                <p>
+                    Administra los monederos de tus clientes: consulta <strong>saldos</strong>,
+                    <strong>movimientos</strong>, <strong>estado</strong> (activo/bloqueado),
+                    ajusta saldos manualmente y bloquea o desbloquea cuentas.
+                    Actualmente hay <strong>{{ total }}</strong> monedero{{ 's' if total != 1 else '' }} registrado{{ 's' if total != 1 else '' }}.
+                </p>
+                <div class="hero__actions">
+                    <a href="{{ url_for('web.admin_monedero_panel') }}" class="btn"><i class="fas fa-arrow-left"></i> Volver al panel</a>
+                    <a href="{{ url_for('web.admin_monedero_exportar_csv') }}" class="btn btn--success"><i class="fas fa-file-csv"></i> Exportar CSV</a>
+                    <a href="{{ url_for('web.admin_monedero_config') }}" class="btn btn--ghost"><i class="fas fa-sliders-h"></i> Configuración</a>
+                </div>
+            </section>
+
+            <!-- LISTADO -->
+            <div class="section-box">
+
+                <div class="toolbar">
+                    <form method="GET" class="search">
+                        <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nombre o email...">
+                        <i class="fas fa-search"></i>
+                    </form>
+                    <div style="display:flex;gap:8px;">
+                        <a href="{{ url_for('web.admin_monedero_clientes') }}" class="btn btn--ghost"><i class="fas fa-rotate"></i> Limpiar</a>
+                    </div>
+                </div>
+
+                {% if monederos %}
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Tarjeta</th>
+                                <th>Saldo</th>
+                                <th>Movs.</th>
+                                <th>Estado</th>
+                                <th style="text-align:right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in monederos %}
+                            <tr data-uid="{{ m.usuario_id }}" data-nombre="{{ m.nombre }}" data-saldo="{{ m.saldo }}" data-bloqueado="{{ 'true' if m.bloqueado else 'false' }}">
+                                <td>
+                                    <div class="user">
+                                        <div class="user__avatar">{{ (m.nombre or '?')[0]|upper }}</div>
+                                        <div class="user__info">
+                                            <div class="user__name">{{ m.nombre }}</div>
+                                            <div class="user__email">{{ m.email or 'sin email' }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="tarjeta">{{ m.numero_tarjeta or '—' }}</span></td>
+                                <td><span class="saldo">${{ "%.2f"|format(m.saldo) }}</span></td>
+                                <td><span class="movs">{{ m.total_movimientos }}</span></td>
+                                <td>
+                                    {% if m.bloqueado %}
+                                        <span class="badge badge--block"><i class="fas fa-lock"></i> Bloqueado</span>
+                                    {% else %}
+                                        <span class="badge badge--ok"><i class="fas fa-check"></i> Activo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a href="{{ url_for('web.admin_monedero_cliente', usuario_id=m.usuario_id) }}"
+                                           class="btn btn--sm btn--ghost btn--icon" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button type="button" class="btn btn--sm btn--success btn--icon" title="Ajustar saldo"
+                                                onclick="abrirAjuste('{{ m.usuario_id }}','{{ m.nombre|e }}',{{ m.saldo }})">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </button>
+                                        {% if m.bloqueado %}
+                                        <button type="button" class="btn btn--sm btn--ghost btn--icon" title="Desbloquear"
+                                                onclick="abrirDesbloqueo('{{ m.usuario_id }}','{{ m.nombre|e }}')">
+                                            <i class="fas fa-unlock"></i>
+                                        </button>
+                                        {% else %}
+                                        <button type="button" class="btn btn--sm btn--danger btn--icon" title="Bloquear"
+                                                onclick="abrirBloqueo('{{ m.usuario_id }}','{{ m.nombre|e }}')">
+                                            <i class="fas fa-lock"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if total_paginas > 1 %}
+                <div class="pagination">
+                    {% set qs = ('&q=' + q) if q else '' %}
+                    {% if page > 1 %}
+                        <a href="?page={{ page - 1 }}{{ qs }}"><i class="fas fa-chevron-left"></i></a>
+                    {% else %}
+                        <span class="disabled"><i class="fas fa-chevron-left"></i></span>
+                    {% endif %}
+
+                    {% for p in range(1, total_paginas + 1) %}
+                        {% if p == 1 or p == total_paginas or (p >= page - 2 and p <= page + 2) %}
+                            {% if p == page %}
+                                <span class="active">{{ p }}</span>
+                            {% else %}
+                                <a href="?page={{ p }}{{ qs }}">{{ p }}</a>
+                            {% endif %}
+                        {% elif p == page - 3 or p == page + 3 %}
+                            <span class="dots">…</span>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page < total_paginas %}
+                        <a href="?page={{ page + 1 }}{{ qs }}"><i class="fas fa-chevron-right"></i></a>
+                    {% else %}
+                        <span class="disabled"><i class="fas fa-chevron-right"></i></span>
+                    {% endif %}
+
+                    <span class="pagination__info">Página {{ page }} de {{ total_paginas }}</span>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="empty">
+                    <i class="fas fa-wallet"></i>
+                    <p>No hay monederos {% if q %}que coincidan con "{{ q }}"{% endif %}.</p>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer-info">
+                <p>
+                    <i class="fas fa-clock"></i>
+                    {{ datetime.now().strftime('%d/%m/%Y %H:%M') if datetime else 'Ahora' }}
+                    <span class="separator">|</span>
+                    <i class="fas fa-shield-alt"></i> ORION System v2.0
+                    <span class="separator">|</span>
+                    <i class="fas fa-copyright"></i> Todos los derechos reservados
+                    <span class="separator">|</span>
+                    <span class="heart"><i class="fas fa-heart"></i></span>
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL: AJUSTAR SALDO                                         -->
+<!-- ============================================================ -->
+<div class="modal-backdrop" id="modal-ajuste">
+    <div class="modal">
+        <div class="modal__header">
+            <i class="fas fa-dollar-sign"></i>
+            <div>
+                <h3>Ajustar saldo</h3>
+                <p>Cliente: <strong id="ajuste-nombre">—</strong> · Saldo actual: <strong id="ajuste-saldo">$0.00</strong></p>
+            </div>
+        </div>
+        <div class="modal__body">
+            <div class="alert alert--err" id="ajuste-err"></div>
+            <div class="form-group">
+                <label for="ajuste-monto">Monto</label>
+                <input type="number" step="0.01" id="ajuste-monto" placeholder="Ej. 100 o -50">
+                <div class="form-help">Positivo para abonar, negativo para cargar.</div>
+            </div>
+            <div class="form-group">
+                <label for="ajuste-motivo">Motivo</label>
+                <textarea id="ajuste-motivo" placeholder="Ej. Reembolso por pedido #1234"></textarea>
+            </div>
+        </div>
+        <div class="modal__actions">
+            <button type="button" class="btn btn--ghost" onclick="cerrarModal('modal-ajuste')">Cancelar</button>
+            <button type="button" class="btn btn--primary" id="ajuste-btn" onclick="enviarAjuste()">
+                <i class="fas fa-check"></i> Aplicar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL: BLOQUEAR                                              -->
+<!-- ============================================================ -->
+<div class="modal-backdrop" id="modal-bloqueo">
+    <div class="modal">
+        <div class="modal__header danger">
+            <i class="fas fa-lock"></i>
+            <div>
+                <h3>Bloquear monedero</h3>
+                <p>Cliente: <strong id="bloqueo-nombre">—</strong></p>
+            </div>
+        </div>
+        <div class="modal__body">
+            <div class="alert alert--err" id="bloqueo-err"></div>
+            <div class="form-group">
+                <label for="bloqueo-motivo">Motivo del bloqueo</label>
+                <textarea id="bloqueo-motivo" placeholder="Ej. Actividad sospechosa"></textarea>
+                <div class="form-help">Este motivo quedará registrado en el historial.</div>
+            </div>
+        </div>
+        <div class="modal__actions">
+            <button type="button" class="btn btn--ghost" onclick="cerrarModal('modal-bloqueo')">Cancelar</button>
+            <button type="button" class="btn btn--danger" id="bloqueo-btn" onclick="enviarBloqueo()">
+                <i class="fas fa-lock"></i> Bloquear
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL: DESBLOQUEAR                                           -->
+<!-- ============================================================ -->
+<div class="modal-backdrop" id="modal-desbloqueo">
+    <div class="modal">
+        <div class="modal__header success">
+            <i class="fas fa-unlock"></i>
+            <div>
+                <h3>Desbloquear monedero</h3>
+                <p>Cliente: <strong id="desbloqueo-nombre">—</strong></p>
+            </div>
+        </div>
+        <div class="modal__body">
+            <p style="font-size:0.88rem;color:#444;line-height:1.5;">
+                ¿Confirmas que deseas <strong>desbloquear</strong> este monedero?
+                El cliente podrá volver a operar con su saldo de inmediato.
+            </p>
+        </div>
+        <div class="modal__actions">
+            <button type="button" class="btn btn--ghost" onclick="cerrarModal('modal-desbloqueo')">Cancelar</button>
+            <button type="button" class="btn btn--success" id="desbloqueo-btn" onclick="enviarDesbloqueo()">
+                <i class="fas fa-unlock"></i> Desbloquear
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentUid = null;
+
+    /* ===== Sidebar activo ===== */
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            if (link.getAttribute('href') === currentPath) link.classList.add('active');
+        });
+    });
+
+    /* ===== Modales ===== */
+    function abrirModal(id) { document.getElementById(id).classList.add('active'); }
+    function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    document.querySelectorAll('.modal-backdrop').forEach(b => {
+        b.addEventListener('click', e => { if (e.target === b) b.classList.remove('active'); });
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-backdrop.active').forEach(b => b.classList.remove('active'));
+        }
+    });
+
+    /* ===== Ajustar saldo ===== */
+    function abrirAjuste(uid, nombre, saldo) {
+        currentUid = uid;
+        document.getElementById('ajuste-nombre').textContent = nombre;
+        document.getElementById('ajuste-saldo').textContent = '$' + Number(saldo).toFixed(2);
+        document.getElementById('ajuste-monto').value = '';
+        document.getElementById('ajuste-motivo').value = '';
+        document.getElementById('ajuste-err').classList.remove('show');
+        abrirModal('modal-ajuste');
+        setTimeout(() => document.getElementById('ajuste-monto').focus(), 100);
+    }
+
+    async function enviarAjuste() {
+        const monto = parseFloat(document.getElementById('ajuste-monto').value || '0');
+        const motivo = (document.getElementById('ajuste-motivo').value || '').trim();
+        const errBox = document.getElementById('ajuste-err');
+        errBox.classList.remove('show');
+
+        if (!monto || isNaN(monto)) { errBox.textContent = 'Monto inválido'; errBox.classList.add('show'); return; }
+        if (!motivo) { errBox.textContent = 'El motivo es obligatorio'; errBox.classList.add('show'); return; }
+
+        const btn = document.getElementById('ajuste-btn');
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aplicando...';
+
+        try {
+            const r = await fetch('/admin/monedero/' + currentUid + '/ajustar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ monto, motivo })
+            });
+            const data = await r.json();
+            if (!data.success) {
+                errBox.textContent = data.error || 'Error';
+                errBox.classList.add('show');
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Aplicar';
+                return;
+            }
+            cerrarModal('modal-ajuste');
+            location.reload();
+        } catch (e) {
+            errBox.textContent = 'Error de red';
+            errBox.classList.add('show');
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Aplicar';
+        }
+    }
+
+    /* ===== Bloquear ===== */
+    function abrirBloqueo(uid, nombre) {
+        currentUid = uid;
+        document.getElementById('bloqueo-nombre').textContent = nombre;
+        document.getElementById('bloqueo-motivo').value = '';
+        document.getElementById('bloqueo-err').classList.remove('show');
+        abrirModal('modal-bloqueo');
+        setTimeout(() => document.getElementById('bloqueo-motivo').focus(), 100);
+    }
+
+    async function enviarBloqueo() {
+        const motivo = (document.getElementById('bloqueo-motivo').value || '').trim() || 'Bloqueado por administrador';
+        const errBox = document.getElementById('bloqueo-err');
+        errBox.classList.remove('show');
+
+        const btn = document.getElementById('bloqueo-btn');
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Bloqueando...';
+
+        try {
+            const r = await fetch('/admin/monedero/' + currentUid + '/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accion: 'bloquear', motivo })
+            });
+            const data = await r.json();
+            if (!data.success) {
+                errBox.textContent = data.error || 'Error';
+                errBox.classList.add('show');
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> Bloquear';
+                return;
+            }
+            cerrarModal('modal-bloqueo');
+            location.reload();
+        } catch (e) {
+            errBox.textContent = 'Error de red';
+            errBox.classList.add('show');
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> Bloquear';
+        }
+    }
+
+    /* ===== Desbloquear ===== */
+    function abrirDesbloqueo(uid, nombre) {
+        currentUid = uid;
+        document.getElementById('desbloqueo-nombre').textContent = nombre;
+        abrirModal('modal-desbloqueo');
+    }
+
+    async function enviarDesbloqueo() {
+        const btn = document.getElementById('desbloqueo-btn');
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Desbloqueando...';
+
+        try {
+            const r = await fetch('/admin/monedero/' + currentUid + '/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accion: 'desbloquear' })
+            });
+            const data = await r.json();
+            if (!data.success) {
+                alert(data.error || 'Error');
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-unlock"></i> Desbloquear';
+                return;
+            }
+            cerrarModal('modal-desbloqueo');
+            location.reload();
+        } catch (e) {
+            alert('Error de red');
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-unlock"></i> Desbloquear';
+        }
+    }
+</script>
+
+</body>
+</html>

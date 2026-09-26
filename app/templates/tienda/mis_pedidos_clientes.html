@@ -205,13 +205,47 @@
             color: var(--orion-primary);
         }
 
-        /* ===== HERO ===== */
+        /* ⭐ NUEVO: Flecha de regresar */
+        .back-bar {
+            background: var(--orion-gray);
+            padding: 14px 0 0;
+        }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            color: #1a1a2e;
+            border: 2px solid #e8e8e8;
+            padding: 10px 20px 10px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-back i {
+            font-size: 1rem;
+            color: var(--orion-primary);
+            transition: transform 0.2s;
+        }
+        .btn-back:hover {
+            border-color: var(--orion-primary);
+            color: var(--orion-primary);
+            background: #fff0f8;
+        }
+        .btn-back:hover i {
+            transform: translateX(-4px);
+        }
+
+        /* ===== HERO (ROSA ORION) ===== */
         .hero-pedidos {
-            background: linear-gradient(135deg, #0033A0 0%, #002277 100%);
+            background: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary-dark) 100%);
             padding: 20px 0;
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
+            margin-top: 20px;
         }
 
         .hero-pedidos::before {
@@ -221,7 +255,7 @@
             right: -5%;
             width: 250px;
             height: 250px;
-            background: rgba(227, 24, 55, 0.06);
+            background: rgba(255, 255, 255, 0.10);
             border-radius: 50%;
         }
 
@@ -232,7 +266,7 @@
             left: -3%;
             width: 200px;
             height: 200px;
-            background: rgba(255, 215, 0, 0.04);
+            background: rgba(255, 255, 255, 0.06);
             border-radius: 50%;
         }
 
@@ -270,7 +304,7 @@
         }
 
         .hero-pedidos .hero-subtitle {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.9);
             font-size: 0.9rem;
             font-weight: 400;
             max-width: 500px;
@@ -284,11 +318,11 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            background: rgba(255, 255, 255, 0.10);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(8px);
             padding: 8px 22px;
             border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .hero-pedidos .hero-stats .stat-item {
@@ -308,7 +342,7 @@
         .hero-pedidos .hero-stats .stat-divider {
             width: 1px;
             height: 24px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.25);
         }
 
         /* ===== FILTROS ===== */
@@ -639,6 +673,105 @@
             margin: 10px auto 24px;
         }
 
+        /* ===== PAGINACIÓN ===== */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+            box-shadow: var(--orion-shadow);
+        }
+
+        .pagination-info {
+            font-size: 0.82rem;
+            color: #64748b;
+        }
+
+        .pagination-info strong {
+            color: var(--orion-primary);
+            font-weight: 800;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: #64748b;
+        }
+
+        .page-size-selector select {
+            width: auto;
+            padding: 5px 10px;
+            font-size: 0.82rem;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .page-size-selector select:focus {
+            outline: none;
+            border-color: var(--orion-primary);
+        }
+
+        .btn-page {
+            min-width: 36px;
+            height: 36px;
+            padding: 0 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            color: #334155;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-page:hover:not(:disabled) {
+            background: var(--orion-primary);
+            color: white;
+            border-color: var(--orion-primary);
+        }
+
+        .btn-page.active {
+            background: var(--orion-primary);
+            color: white;
+            border-color: var(--orion-primary);
+            box-shadow: 0 4px 12px rgba(225, 0, 152, 0.3);
+        }
+
+        .btn-page:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-ellipsis {
+            padding: 5px 4px;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
         /* ===== MODAL ===== */
         .modal-confirmacion {
             position: fixed;
@@ -879,6 +1012,17 @@
             .modal-confirmacion .modal-title-custom {
                 font-size: 1.1rem;
             }
+            .pagination-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .pagination-controls {
+                justify-content: center;
+            }
+            .btn-back {
+                font-size: 0.78rem;
+                padding: 9px 16px 9px 12px;
+            }
         }
 
         @media (max-width: 576px) {
@@ -914,6 +1058,11 @@
             }
             .pedido-header .order-total {
                 font-size: 1rem;
+            }
+            .btn-page {
+                min-width: 32px;
+                height: 32px;
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -1007,6 +1156,15 @@
 
         <div class="brand-border"></div>
 
+        <!-- ⭐ FLECHA DE REGRESAR -->
+        <div class="back-bar">
+            <div class="container">
+                <a href="{{ url_for('web.perfil') }}" class="btn-back">
+                    <i class="bi bi-arrow-left"></i> Volver a Mi Cuenta
+                </a>
+            </div>
+        </div>
+
         <!-- ===== HERO ===== -->
         <section class="hero-pedidos">
             <div class="container">
@@ -1062,6 +1220,7 @@
 
             <!-- Lista de Pedidos -->
             {% if pedidos and pedidos|length > 0 %}
+            <div id="pedidosList">
                 {% for pedido in pedidos %}
                 <div class="pedido-card" data-estado="{{ pedido.estado if pedido.estado else 'pendiente' }}">
                     
@@ -1175,6 +1334,28 @@
                     </div>
                 </div>
                 {% endfor %}
+            </div>
+
+            <!-- ===== PAGINACIÓN ===== -->
+            <div class="pagination-wrapper" id="paginationWrapper">
+                <div class="pagination-info" id="paginationInfo">
+                    Mostrando <strong>0</strong> de <strong>0</strong> pedidos
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div class="page-size-selector">
+                        <label for="pageSizeSelect">Mostrar:</label>
+                        <select id="pageSizeSelect" onchange="cambiarTamanoPagina()">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="0">Todos</option>
+                        </select>
+                    </div>
+                    <div class="pagination-controls" id="paginationControls"></div>
+                </div>
+            </div>
+
             {% else %}
                 <div class="empty-state">
                     <div class="icon">
@@ -1224,21 +1405,22 @@
     <script>
         let pedidoIdCancelar = null;
 
+        // ============================================================
+        // PAGINACIÓN
+        // ============================================================
+        let paginaActual = 1;
+        let tamPagina = 5;
+        let filtroActual = 'todos';
+        let pedidosFiltrados = [];
+
         $(document).ready(function() {
-            // Filtros
+            // Filtros (ahora resetean paginación)
             $('.filter-btn').on('click', function() {
-                const filter = $(this).data('filter');
+                filtroActual = $(this).data('filter');
                 $('.filter-btn').removeClass('active');
                 $(this).addClass('active');
-
-                $('.pedido-card').each(function() {
-                    const estado = $(this).data('estado');
-                    if (filter === 'todos' || estado === filter) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
+                paginaActual = 1;
+                aplicarFiltroYPaginar();
             });
 
             // Confirmar cancelación
@@ -1247,8 +1429,87 @@
                     cancelarPedido(pedidoIdCancelar);
                 }
             });
+
+            // Inicializar paginación
+            tamPagina = parseInt(document.getElementById('pageSizeSelect').value) || 5;
+            aplicarFiltroYPaginar();
         });
 
+        function aplicarFiltroYPaginar() {
+            const todas = Array.from(document.querySelectorAll('.pedido-card'));
+            pedidosFiltrados = todas.filter(function(card) {
+                if (filtroActual === 'todos') return true;
+                return card.dataset.estado === filtroActual;
+            });
+            renderPagina();
+        }
+
+        function renderPagina() {
+            const todas = Array.from(document.querySelectorAll('.pedido-card'));
+            todas.forEach(c => { c.style.display = 'none'; });
+
+            const totalFiltradas = pedidosFiltrados.length;
+            const tp = tamPagina === 0 ? totalFiltradas : tamPagina;
+            const totalPags = tp > 0 ? Math.ceil(totalFiltradas / tp) : 1;
+            if (paginaActual > totalPags) paginaActual = Math.max(1, totalPags);
+
+            const inicio = tp > 0 ? (paginaActual - 1) * tp : 0;
+            const fin = tp > 0 ? Math.min(inicio + tp, totalFiltradas) : totalFiltradas;
+
+            pedidosFiltrados.slice(inicio, fin).forEach(c => { c.style.display = 'block'; });
+
+            const infoEl = document.getElementById('paginationInfo');
+            const wrapper = document.getElementById('paginationWrapper');
+            if (!infoEl || !wrapper) return;
+
+            if (totalFiltradas === 0) {
+                infoEl.innerHTML = 'No se encontraron pedidos con los filtros aplicados';
+            } else if (tamPagina === 0) {
+                infoEl.innerHTML = 'Mostrando <strong>todos</strong> los <strong>' + totalFiltradas + '</strong> pedidos';
+            } else {
+                infoEl.innerHTML = 'Mostrando <strong>' + (inicio + 1) + '</strong>–<strong>' + fin + '</strong> de <strong>' + totalFiltradas + '</strong> pedido' + (totalFiltradas !== 1 ? 's' : '');
+            }
+
+            const ctrl = document.getElementById('paginationControls');
+            if (tamPagina === 0 || totalPags <= 1) { ctrl.innerHTML = ''; return; }
+
+            let btns = '';
+            btns += '<button class="btn-page" onclick="irPagina(' + (paginaActual-1) + ')" ' + (paginaActual === 1 ? 'disabled' : '') + '>‹</button>';
+
+            const rango = new Set();
+            rango.add(1); rango.add(totalPags);
+            for (let i = Math.max(1, paginaActual - 2); i <= Math.min(totalPags, paginaActual + 2); i++) rango.add(i);
+            const paginas = Array.from(rango).sort((a, b) => a - b);
+
+            let prev = 0;
+            paginas.forEach(p => {
+                if (p - prev > 1) btns += '<span class="pagination-ellipsis">…</span>';
+                btns += '<button class="btn-page' + (p === paginaActual ? ' active' : '') + '" onclick="irPagina(' + p + ')">' + p + '</button>';
+                prev = p;
+            });
+
+            btns += '<button class="btn-page" onclick="irPagina(' + (paginaActual+1) + ')" ' + (paginaActual === totalPags ? 'disabled' : '') + '>›</button>';
+            ctrl.innerHTML = btns;
+        }
+
+        function irPagina(p) {
+            const tp = tamPagina === 0 ? pedidosFiltrados.length : tamPagina;
+            const totalPags = tp > 0 ? Math.ceil(pedidosFiltrados.length / tp) : 1;
+            paginaActual = Math.max(1, Math.min(p, totalPags));
+            renderPagina();
+            const listEl = document.getElementById('pedidosList');
+            if (listEl) listEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function cambiarTamanoPagina() {
+            tamPagina = parseInt(document.getElementById('pageSizeSelect').value);
+            paginaActual = 1;
+            renderPagina();
+        }
+
+        // ============================================================
+        // MODAL CANCELAR
+        // ============================================================
         function abrirModalCancelar(id) {
             pedidoIdCancelar = id;
             const modal = document.getElementById('modalCancelar');

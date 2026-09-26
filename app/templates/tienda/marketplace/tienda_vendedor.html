@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ vendedor.nombre_tienda }} | Marketplace ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --orion-primary: #e10098; --orion-primary-dark: #c00080; --orion-ink: #1a1a1a; --mkt-blue: #0284c7; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; color: #2b2b2b; background: #f8f9fa; }
+        @media (min-width: 1400px) { .container { max-width: 2000px; } }
+
+        /* NAVBAR */
+        .main-navbar { background: #fff; border-bottom: 2px solid #f0f0f0; padding: 10px 0 !important; }
+        .brand-logo { font-weight: 900; font-size: 2.3rem; color: var(--orion-primary) !important; letter-spacing: -1.5px; text-decoration: none; }
+
+        /* HERO DEL VENDEDOR */
+        .vendedor-hero {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #fff;
+            padding: 48px 0 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        .vendedor-hero::after {
+            content: '';
+            position: absolute;
+            right: -80px;
+            top: -80px;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .vendedor-hero::before {
+            content: '';
+            position: absolute;
+            left: -60px;
+            bottom: -60px;
+            width: 240px;
+            height: 240px;
+            background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .vendedor-hero-content { position: relative; z-index: 2; }
+        .vendedor-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 24px;
+            background: #fff;
+            color: var(--mkt-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.6rem;
+            font-weight: 900;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+            border: 4px solid rgba(255,255,255,0.4);
+        }
+        .vendedor-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
+        .vendedor-nombre {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin: 0 0 6px;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+        .vendedor-descripcion {
+            font-size: 1rem;
+            opacity: 0.92;
+            max-width: 620px;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+        .vendedor-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+        .vendedor-badge-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.28);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .vendedor-badge-chip i { font-size: 0.9rem; }
+        .vendedor-verificado { background: rgba(16,185,129,0.28); border-color: rgba(16,185,129,0.55); }
+
+        .vendedor-stats {
+            display: flex;
+            gap: 18px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        .vendedor-stat {
+            background: rgba(255,255,255,0.14);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 16px;
+            padding: 14px 22px;
+            min-width: 120px;
+        }
+        .vendedor-stat .valor {
+            font-size: 1.5rem;
+            font-weight: 900;
+            line-height: 1;
+            display: block;
+        }
+        .vendedor-stat .label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            opacity: 0.85;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .btn-hero {
+            background: #fff;
+            color: var(--mkt-blue);
+            font-weight: 800;
+            border-radius: 50px;
+            padding: 12px 26px;
+            border: none;
+            transition: 0.25s;
+            font-size: 0.92rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.2); color: var(--mkt-blue); }
+        .btn-hero-outline {
+            background: transparent;
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.5);
+            font-weight: 800;
+            border-radius: 50px;
+            padding: 12px 26px;
+            transition: 0.25s;
+            font-size: 0.92rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-hero-outline:hover { background: rgba(255,255,255,0.12); border-color: #fff; color: #fff; }
+
+        /* FILTROS */
+        .filtros-categorias {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+        .filtro-chip {
+            background: #fff;
+            border: 1.5px solid #e2e8f0;
+            color: #475569;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .filtro-chip:hover { border-color: var(--mkt-blue); color: var(--mkt-blue); }
+        .filtro-chip.active {
+            background: var(--mkt-blue);
+            border-color: var(--mkt-blue);
+            color: #fff;
+            box-shadow: 0 6px 16px rgba(2,132,199,0.28);
+        }
+
+        /* GRID DE PRODUCTOS */
+        .producto-card {
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: 0.25s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .producto-card:hover {
+            box-shadow: 0 12px 32px rgba(0,0,0,0.10);
+            transform: translateY(-4px);
+            border-color: #e2e8f0;
+        }
+        .producto-card-img-wrap {
+            width: 100%;
+            height: 240px;
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .producto-card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .producto-card:hover .producto-card-img-wrap img { transform: scale(1.06); }
+        .producto-card-noimg { color: #cbd5e1; font-size: 2.4rem; }
+        .producto-card-badge-agotado {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(220,38,38,0.92);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 50px;
+            letter-spacing: 0.3px;
+        }
+        .producto-card-body {
+            padding: 14px 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+        }
+        .producto-card-marca {
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--orion-primary);
+            text-transform: uppercase;
+        }
+        .producto-card-nombre {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #1e293b;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.35;
+            min-height: 2.5em;
+        }
+        .producto-card-precio {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--orion-ink);
+            margin-top: auto;
+            padding-top: 6px;
+        }
+        .producto-card-precio .desde {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            font-weight: 600;
+            display: block;
+        }
+        .producto-card-precio .msi-mini {
+            font-size: 0.7rem;
+            color: var(--mkt-blue);
+            font-weight: 700;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: #fff;
+            border-radius: 20px;
+            border: 1px dashed #e2e8f0;
+        }
+        .empty-state i { font-size: 3.4rem; color: #cbd5e1; display: block; margin-bottom: 16px; }
+        .empty-state h4 { font-weight: 800; color: #475569; }
+        .empty-state p { color: #94a3b8; }
+
+        /* SECCIÓN INFO VENDEDOR */
+        .info-vendedor-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+        }
+        .info-vendedor-card h5 {
+            font-weight: 800;
+            font-size: 1.05rem;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1e293b;
+        }
+        .info-vendedor-card h5 i { color: var(--mkt-blue); }
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-row i { color: #94a3b8; font-size: 1.1rem; margin-top: 2px; flex-shrink: 0; }
+        .info-row .label { color: #64748b; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px; display: block; }
+        .info-row .valor { color: #1e293b; font-weight: 700; }
+
+        /* BREADCRUMB */
+        .breadcrumb-orion { margin-bottom: 1.25rem; }
+        .breadcrumb-orion .breadcrumb { background: transparent; padding: 0; margin: 0; }
+        .breadcrumb-orion a { color: #777; text-decoration: none; font-weight: 600; }
+        .breadcrumb-orion a:hover { color: var(--orion-primary); text-decoration: underline; }
+        .breadcrumb-orion .breadcrumb-item.active { color: #999; }
+        .breadcrumb-orion .breadcrumb-item + .breadcrumb-item::before { color: #ccc; }
+
+        /* FOOTER CHIP */
+        .footer-cta {
+            background: linear-gradient(135deg, #fdf2f8 0%, #fef6fb 100%);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            border: 1px solid #fce4f1;
+            margin-top: 40px;
+        }
+        .footer-cta h4 { font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+        .footer-cta p { color: #64748b; margin-bottom: 18px; }
+        .btn-orion {
+            background: var(--orion-primary);
+            color: #fff;
+            border: none;
+            font-weight: 800;
+            border-radius: 50px;
+            padding: 12px 28px;
+            transition: 0.25s;
+        }
+        .btn-orion:hover { background: var(--orion-primary-dark); color: #fff; transform: translateY(-1px); }
+
+        @media (max-width: 767px) {
+            .vendedor-nombre { font-size: 1.5rem; }
+            .vendedor-logo { width: 72px; height: 72px; font-size: 1.9rem; border-radius: 18px; }
+            .vendedor-hero { padding: 32px 0 40px; }
+            .vendedor-stat { padding: 10px 16px; min-width: 100px; }
+            .vendedor-stat .valor { font-size: 1.2rem; }
+            .producto-card-img-wrap { height: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-light main-navbar shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand brand-logo" href="/">ORION</a>
+        <form class="d-flex flex-grow-1 mx-4" action="{{ url_for('web.catalogo') }}" method="GET">
+            <div class="input-group rounded-pill overflow-hidden bg-light" style="border:2px solid #eee;">
+                <input class="form-control border-0 bg-light ps-4" type="search" name="q" placeholder="Buscar productos...">
+                <button class="btn btn-light border-0 text-muted px-3" type="submit"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+        <div class="d-flex align-items-center gap-3">
+            {% if session.get('nombre') %}
+                <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                    {% if session.get('foto') %}<img src="{{ url_for('static', filename='uploads/' + session['foto']) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;">{% endif %}
+                    Hola, {{ session['nombre'] }}
+                </a>
+            {% else %}
+                <a href="/login" class="text-dark fw-bold small text-uppercase text-decoration-none"><i class="bi bi-person fs-5 me-1"></i> Iniciar sesión</a>
+            {% endif %}
+            <a href="{{ url_for('web.ver_carrito') }}" class="text-dark"><i class="bi bi-bag fs-4"></i></a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO DEL VENDEDOR -->
+<section class="vendedor-hero">
+    <div class="container vendedor-hero-content">
+        <nav aria-label="breadcrumb" class="breadcrumb-orion mb-3" style="--bs-breadcrumb-divider-color: rgba(255,255,255,0.5);">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="/" style="color:rgba(255,255,255,0.8);">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('web.marketplace') }}" style="color:rgba(255,255,255,0.8);">Marketplace</a></li>
+                <li class="breadcrumb-item active" aria-current="page" style="color:rgba(255,255,255,0.65);">{{ vendedor.nombre_tienda }}</li>
+            </ol>
+        </nav>
+
+        <div class="row align-items-center g-4">
+            <div class="col-auto">
+                <div class="vendedor-logo">
+                    {% if vendedor.logo %}
+                        <img src="{{ url_for('static', filename='uploads/vendedores/' + vendedor.logo) }}" alt="{{ vendedor.nombre_tienda }}">
+                    {% else %}
+                        {{ vendedor.nombre_tienda[0]|upper }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <h1 class="vendedor-nombre">{{ vendedor.nombre_tienda }}</h1>
+                {% if vendedor.descripcion %}
+                    <p class="vendedor-descripcion">{{ vendedor.descripcion }}</p>
+                {% endif %}
+
+                <div class="vendedor-badges">
+                    <span class="vendedor-badge-chip vendedor-verificado">
+                        <i class="bi bi-patch-check-fill"></i> Vendedor verificado
+                    </span>
+                    {% if vendedor.rating and vendedor.rating > 0 %}
+                        <span class="vendedor-badge-chip">
+                            <i class="bi bi-star-fill" style="color:#fbbf24;"></i>
+                            {{ "%.1f"|format(vendedor.rating) }} ({{ vendedor.total_resenas or 0 }})
+                        </span>
+                    {% endif %}
+                    {% if vendedor.ubicacion or (vendedor.direccion and vendedor.direccion.ciudad) %}
+                        <span class="vendedor-badge-chip">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            {{ vendedor.ubicacion or vendedor.direccion.ciudad }}
+                        </span>
+                    {% endif %}
+                    <span class="vendedor-badge-chip">
+                        <i class="bi bi-box-seam"></i>
+                        {{ productos|length }} producto{% if productos|length != 1 %}s{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto d-none d-lg-block">
+                <div class="d-flex flex-column gap-2">
+                    <a href="{{ url_for('web.marketplace') }}" class="btn-hero">
+                        <i class="bi bi-shop"></i> Ver más vendedores
+                    </a>
+                    {% if vendedor.whatsapp %}
+                        <a href="https://wa.me/{{ vendedor.whatsapp }}" target="_blank" rel="noopener" class="btn-hero-outline">
+                            <i class="bi bi-whatsapp"></i> Contactar
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="vendedor-stats">
+            <div class="vendedor-stat">
+                <span class="valor">{{ vendedor.metricas.ventas or 0 }}</span>
+                <span class="label">Ventas</span>
+            </div>
+            <div class="vendedor-stat">
+                <span class="valor">{{ productos|length }}</span>
+                <span class="label">Productos</span>
+            </div>
+            <div class="vendedor-stat">
+                <span class="valor">{{ categorias|length }}</span>
+                <span class="label">Categorías</span>
+            </div>
+            {% if vendedor.created_at %}
+            <div class="vendedor-stat">
+                <span class="valor">{{ vendedor.created_at.year }}</span>
+                <span class="label">Desde</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- CONTENIDO PRINCIPAL -->
+<main class="container py-5">
+
+    <!-- Filtros de categorías -->
+    {% if categorias and categorias|length > 0 %}
+    <div class="filtros-categorias">
+        <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}"
+           class="filtro-chip {% if not request.args.get('cat') %}active{% endif %}">
+            <i class="bi bi-grid"></i> Todas
+        </a>
+        {% for cat in categorias %}
+            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}?cat={{ cat._id }}"
+               class="filtro-chip {% if request.args.get('cat') == cat._id|string %}active{% endif %}">
+                {{ cat.nombre }}
+            </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Columna productos -->
+        <div class="col-lg-9">
+            {% if productos and productos|length > 0 %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-bag-check" style="color:var(--mkt-blue);"></i>
+                        Productos de la tienda
+                    </h5>
+                    <span class="text-muted small">{{ productos|length }} resultado{% if productos|length != 1 %}s{% endif %}</span>
+                </div>
+
+                <div class="row g-3">
+                    {% for p in productos %}
+                    <div class="col-6 col-md-4 col-xl-3">
+                        <a href="{{ url_for('web.ver_detalle_producto', id=p._id) }}" class="producto-card">
+                            <div class="producto-card-img-wrap">
+                                {% if p.foto_principal %}
+                                    <img src="{{ url_for('static', filename='uploads/productos/' + p.foto_principal) }}"
+                                         alt="{{ p.nombre }}" loading="lazy">
+                                {% else %}
+                                    <div class="producto-card-noimg"><i class="bi bi-image"></i></div>
+                                {% endif %}
+                                {% if not p.activo or (p.stock is defined and p.stock == 0) %}
+                                    <span class="producto-card-badge-agotado">Agotado</span>
+                                {% endif %}
+                            </div>
+                            <div class="producto-card-body">
+                                {% if p.marca_nombre %}
+                                    <span class="producto-card-marca">{{ p.marca_nombre }}</span>
+                                {% endif %}
+                                <span class="producto-card-nombre">{{ p.nombre }}</span>
+                                <span class="producto-card-precio">
+                                    {% if p.variantes_para_template and p.variantes_para_template|length > 0 %}
+                                        <span class="desde">Desde</span>
+                                    {% endif %}
+                                    ${{ "%.2f"|format(p.precio_mostrado or 0) }}
+                                    {% if (p.precio_mostrado or 0) >= 300 %}
+                                        <span class="msi-mini">
+                                            <i class="bi bi-credit-card"></i> Hasta 12 MSI
+                                        </span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="footer-cta">
+                    <h4>¿Te gustó algo?</h4>
+                    <p>Agrega los productos de <strong>{{ vendedor.nombre_tienda }}</strong> a tu bolsa y aprovecha envío a todo México.</p>
+                    <a href="{{ url_for('web.catalogo') }}" class="btn-orion">
+                        <i class="bi bi-bag-plus"></i> Seguir explorando
+                    </a>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h4>Esta tienda aún no tiene productos</h4>
+                    <p>Vuelve pronto — <strong>{{ vendedor.nombre_tienda }}</strong> está preparando novedades.</p>
+                    <a href="{{ url_for('web.marketplace') }}" class="btn-orion mt-3 d-inline-block">
+                        <i class="bi bi-arrow-left"></i> Volver al Marketplace
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar info vendedor -->
+        <div class="col-lg-3">
+            <div class="info-vendedor-card mb-3">
+                <h5><i class="bi bi-shop-window"></i> Sobre la tienda</h5>
+
+                {% if vendedor.descripcion %}
+                    <p class="text-muted small mb-3" style="line-height:1.55;">{{ vendedor.descripcion }}</p>
+                {% endif %}
+
+                {% if vendedor.razon_social %}
+                <div class="info-row">
+                    <i class="bi bi-building"></i>
+                    <div>
+                        <span class="label">Razón social</span>
+                        <span class="valor">{{ vendedor.razon_social }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if vendedor.rfc %}
+                <div class="info-row">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <div>
+                        <span class="label">RFC</span>
+                        <span class="valor">{{ vendedor.rfc }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if vendedor.direccion and (vendedor.direccion.ciudad or vendedor.direccion.estado) %}
+                <div class="info-row">
+                    <i class="bi bi-geo-alt"></i>
+                    <div>
+                        <span class="label">Ubicación</span>
+                        <span class="valor">
+                            {% if vendedor.direccion.ciudad %}{{ vendedor.direccion.ciudad }}{% endif %}
+                            {% if vendedor.direccion.estado %}, {{ vendedor.direccion.estado }}{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if vendedor.created_at %}
+                <div class="info-row">
+                    <i class="bi bi-calendar-check"></i>
+                    <div>
+                        <span class="label">En ORION desde</span>
+                        <span class="valor">{{ vendedor.created_at.strftime('%B %Y') }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if vendedor.email_contacto %}
+                <div class="info-row">
+                    <i class="bi bi-envelope"></i>
+                    <div>
+                        <span class="label">Contacto</span>
+                        <span class="valor" style="font-size:0.82rem; word-break:break-all;">{{ vendedor.email_contacto }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if vendedor.categorias and vendedor.categorias|length > 0 %}
+            <div class="info-vendedor-card">
+                <h5><i class="bi bi-tags"></i> Especialidades</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for cat in vendedor.categorias %}
+                        <span style="background:#f1f5f9; color:#475569; font-size:0.78rem; font-weight:700; padding:6px 12px; border-radius:50px;">
+                            {{ cat }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if vendedor.whatsapp %}
+            <a href="https://wa.me/{{ vendedor.whatsapp }}" target="_blank" rel="noopener"
+               class="btn w-100 mt-3 d-flex align-items-center justify-content-center gap-2"
+               style="background:#25D366; color:#fff; font-weight:800; border-radius:50px; padding:12px;">
+                <i class="bi bi-whatsapp"></i> Contactar por WhatsApp
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="text-center py-5 mt-4" style="background:#fff; border-top:1px solid #f0f0f0;">
+    <div class="container">
+        <a href="/" class="brand-logo d-inline-block mb-2">ORION</a>
+        <p class="text-muted small mb-0">© {{ now_year or 2026 }} ORION · Todos los derechos reservados</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
