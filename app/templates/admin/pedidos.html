@@ -8,18 +8,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+
     <style>
-        :root { 
-            --orion-primary: #e10098; 
+        :root {
+            --orion-primary: #e10098;
             --orion-secondary: #00d4ff;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
@@ -27,351 +23,238 @@
             color: #1a1a2e;
         }
 
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
+        .layout { display: flex; min-height: 100vh; }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 280px;
-            background: #ffffff;
-            border-right: 2px solid #e8e8e8;
-            padding: 0;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-            z-index: 1000;
-            transition: all 0.3s ease;
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            padding: 0; height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
             box-shadow: 2px 0 20px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
 
         .sidebar .admin-profile {
-            padding: 25px 20px 20px;
-            text-align: center;
+            padding: 25px 20px 20px; text-align: center;
             border-bottom: 1px solid #e8e8e8;
             background: linear-gradient(135deg, #e10098, #c00080);
             flex-shrink: 0;
         }
-
         .sidebar .admin-profile .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
-        .sidebar .admin-profile .name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #fff;
-            margin-top: 10px;
-        }
-
-        .sidebar .admin-profile .email {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.8);
-        }
-
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .admin-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
         .sidebar .admin-profile .rol {
-            font-size: 0.65rem;
-            color: #fff;
-            text-transform: uppercase;
-            font-weight: 700;
-            background: rgba(255,255,255,0.2);
-            padding: 2px 12px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 5px;
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
         }
 
         .sidebar .logo {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: #e10098;
-            text-align: center;
-            padding: 15px 0 5px;
-            letter-spacing: -1px;
-            flex-shrink: 0;
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px; flex-shrink: 0;
         }
+        .sidebar .logo span { color: #1a1a2e; }
 
-        .sidebar .logo span {
-            color: #1a1a2e;
-        }
-
-        .sidebar .menu-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 10px;
-        }
-
-        .sidebar .menu-scroll::-webkit-scrollbar {
-            width: 3px;
-        }
-        .sidebar .menu-scroll::-webkit-scrollbar-track {
-            background: #f5f6f8;
-        }
-        .sidebar .menu-scroll::-webkit-scrollbar-thumb {
-            background: #e10098;
-            border-radius: 4px;
-        }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
 
         .sidebar .panel-title {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: #888;
-            padding: 10px 25px 5px;
-            letter-spacing: 2px;
-            font-weight: 700;
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
         }
 
         .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 11px 25px;
-            color: #555;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-            font-size: 0.85rem;
-            font-weight: 500;
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
         }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active {
+            background: #f8f0f5; color: #e10098; border-left-color: #e10098;
+        }
+        .sidebar a:hover i, .sidebar a.active i { color: #e10098; }
 
-        .sidebar a i {
-            width: 20px;
-            font-size: 1rem;
-            color: #888;
-        }
-
-        .sidebar a:hover {
-            background: #f8f0f5;
-            color: #e10098;
-            border-left-color: #e10098;
-        }
-
-        .sidebar a:hover i {
-            color: #e10098;
-        }
-
-        .sidebar a.active {
-            background: #f8f0f5;
-            color: #e10098;
-            border-left-color: #e10098;
-        }
-
-        .sidebar a.active i {
-            color: #e10098;
-        }
-
-        .sidebar .divider {
-            height: 1px;
-            background: #e8e8e8;
-            margin: 10px 25px;
-        }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
 
         .sidebar .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 11px 25px;
-            color: #dc3545;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            width: 100%;
-            text-align: left;
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
         }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
 
-        .sidebar .logout-btn i {
-            width: 20px;
-            font-size: 1rem;
-            color: #dc3545;
-        }
-
-        .sidebar .logout-btn:hover {
-            background: #fdf0f0;
-            border-left-color: #dc3545;
-            color: #dc3545;
-        }
-
-        .sidebar .logout-btn:hover i {
-            color: #dc3545;
-        }
-
-        /* ===== MAIN CONTENT ===== */
+        /* ===== MAIN ===== */
         .main {
-            margin-left: 280px;
-            padding: 30px 35px 20px;
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin-left: 280px; padding: 30px 35px 20px;
+            width: 100%; min-height: 100vh; display: flex; flex-direction: column;
         }
 
         .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e8e8e8;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-            flex-shrink: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 20px; border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0;
         }
-
         .top-bar h1 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #1a1a2e;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1.6rem; font-weight: 800; color: #1a1a2e;
+            display: flex; align-items: center; gap: 10px;
         }
-
-        .top-bar h1 i {
-            color: #e10098;
-        }
+        .top-bar h1 i { color: #e10098; }
 
         .top-bar .tag {
-            background: #e10098;
-            color: #fff;
-            padding: 5px 18px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            background: #e10098; color: #fff; padding: 5px 18px;
+            border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; display: flex; align-items: center; gap: 6px;
         }
 
-        .content-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+        .top-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+        .btn-pdf {
+            background: #dc3545; color: white; padding: 10px 22px;
+            border-radius: 50px; font-weight: 700; font-size: 0.82rem;
+            border: none; cursor: pointer; display: inline-flex;
+            align-items: center; gap: 8px; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.25);
+        }
+        .btn-pdf:hover:not(:disabled) {
+            background: #c82333; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+        .btn-pdf:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-csv {
+            background: #16a34a; color: white; padding: 10px 22px;
+            border-radius: 50px; font-weight: 700; font-size: 0.82rem;
+            border: none; cursor: pointer; display: inline-flex;
+            align-items: center; gap: 8px; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.25);
+        }
+        .btn-csv:hover:not(:disabled) {
+            background: #15803d; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+        }
+        .btn-csv:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-refresh {
+            background: #ffffff; color: #334155; border: 2px solid #e2e8f0;
+            padding: 9px 16px; border-radius: 50px; font-weight: 700;
+            font-size: 0.82rem; cursor: pointer; display: inline-flex;
+            align-items: center; gap: 8px; transition: all 0.3s ease;
+        }
+        .btn-refresh:hover {
+            border-color: var(--orion-primary); color: var(--orion-primary);
+            transform: rotate(15deg);
+        }
+
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; }
+
+        /* ===== SEARCH BAR ===== */
+        .search-sort-row {
+            display: flex; gap: 12px; margin-bottom: 20px;
+            flex-wrap: wrap; align-items: center;
+        }
+        .search-box {
+            flex: 1; min-width: 250px; position: relative;
+        }
+        .search-box i {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            color: #94a3b8; font-size: 0.9rem;
+        }
+        .search-box input {
+            width: 100%; padding: 11px 40px 11px 42px;
+            border: 2px solid #e2e8f0; border-radius: 50px;
+            font-size: 0.85rem; font-family: inherit;
+            transition: all 0.3s ease; background: #fff;
+        }
+        .search-box input:focus {
+            outline: none; border-color: var(--orion-primary);
+            box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.1);
+        }
+        .search-box .clear-btn {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            background: transparent; border: none; color: #94a3b8;
+            cursor: pointer; padding: 6px; border-radius: 50%;
+            display: none; align-items: center; justify-content: center;
+        }
+        .search-box .clear-btn:hover { color: var(--orion-primary); background: #f8f0f5; }
+        .search-box.has-value .clear-btn { display: flex; }
+
+        .sort-selector {
+            display: flex; align-items: center; gap: 8px;
+            background: #fff; padding: 6px 14px; border-radius: 50px;
+            border: 2px solid #e2e8f0; font-size: 0.82rem; color: #64748b;
+            font-weight: 600;
+        }
+        .sort-selector select {
+            border: none; outline: none; background: transparent;
+            font-family: inherit; font-size: 0.82rem; font-weight: 700;
+            color: #334155; cursor: pointer; padding: 4px 0;
         }
 
         /* ===== STATS ===== */
         .stats-mini {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-shrink: 0;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px; margin-bottom: 25px; flex-shrink: 0;
         }
-
         .stats-mini .stat {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid #e8e8e8;
+            background: #ffffff; padding: 20px; border-radius: 16px;
+            text-align: center; border: 1px solid #e8e8e8;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
         }
-
         .stats-mini .stat::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #e10098, #00d4ff);
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 3px; background: linear-gradient(90deg, #e10098, #00d4ff);
         }
-
-        .stats-mini .stat:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(225, 0, 152, 0.1);
-        }
-
-        .stats-mini .stat .num {
-            font-size: 2rem;
-            font-weight: 900;
-            color: #e10098;
-        }
-
+        .stats-mini .stat:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(225, 0, 152, 0.1); }
+        .stats-mini .stat .num { font-size: 1.9rem; font-weight: 900; color: #e10098; }
+        .stats-mini .stat .num.money { font-size: 1.5rem; color: #16a34a; }
         .stats-mini .stat .label {
-            font-size: 0.7rem;
-            color: #888;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin-top: 3px;
+            font-size: 0.7rem; color: #888; text-transform: uppercase;
+            font-weight: 600; letter-spacing: 0.5px; margin-top: 3px;
         }
 
         /* ===== FILTROS ===== */
         .filtros-container {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 25px;
-            flex-shrink: 0;
+            display: flex; gap: 10px; flex-wrap: wrap;
+            margin-bottom: 25px; flex-shrink: 0;
         }
-
         .filter-btn {
-            background: #ffffff;
-            border: 2px solid #e8e8e8;
-            color: #888;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            background: #ffffff; border: 2px solid #e8e8e8; color: #888;
+            padding: 8px 18px; border-radius: 50px; font-weight: 600;
+            font-size: 0.75rem; transition: all 0.3s ease; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
         }
-
-        .filter-btn:hover {
-            border-color: var(--orion-primary);
-            color: var(--orion-primary);
-        }
-
+        .filter-btn:hover { border-color: var(--orion-primary); color: var(--orion-primary); }
         .filter-btn.active {
-            background: var(--orion-primary);
-            border-color: var(--orion-primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(225, 0, 152, 0.3);
+            background: var(--orion-primary); border-color: var(--orion-primary);
+            color: white; box-shadow: 0 4px 15px rgba(225, 0, 152, 0.3);
+        }
+        .filter-btn .count-badge {
+            background: rgba(0,0,0,0.08); padding: 1px 8px;
+            border-radius: 20px; font-size: 0.65rem; font-weight: 800;
+        }
+        .filter-btn.active .count-badge {
+            background: rgba(255,255,255,0.25);
         }
 
         /* ===== PEDIDO CARD ===== */
         .pedido-card {
-            background: #ffffff;
-            border: 1px solid #e8e8e8;
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            position: relative;
+            background: #ffffff; border: 1px solid #e8e8e8; border-radius: 16px;
+            padding: 25px; margin-bottom: 20px; transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative;
         }
-
         .pedido-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #e10098, #00d4ff);
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 3px; background: linear-gradient(90deg, #e10098, #00d4ff);
             opacity: 0.6;
         }
-
         .pedido-card:hover {
             border-color: var(--orion-primary);
             box-shadow: 0 8px 30px rgba(225, 0, 152, 0.08);
@@ -379,14 +262,9 @@
         }
 
         .status-badge {
-            font-size: 0.65rem;
-            padding: 4px 14px;
-            border-radius: 50px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 0.65rem; padding: 4px 14px; border-radius: 50px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
         }
-
         .status-pendiente { background: #fff3cd; color: #856404; }
         .status-pendiente::before { content: '⏳ '; }
         .status-confirmado { background: #cce5ff; color: #004085; }
@@ -401,337 +279,287 @@
         .status-cancelado::before { content: '❌ '; }
 
         .btn-orion {
-            background: var(--orion-primary);
-            color: white;
-            border: none;
-            padding: 6px 18px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            cursor: pointer;
+            background: var(--orion-primary); color: white; border: none;
+            padding: 6px 18px; border-radius: 50px; font-weight: 600;
+            font-size: 0.75rem; transition: all 0.3s ease;
+            text-decoration: none; display: inline-block; cursor: pointer;
         }
-
         .btn-orion:hover {
-            background: #c00080;
-            color: white;
-            transform: translateY(-2px);
+            background: #c00080; color: white; transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(225, 0, 152, 0.3);
         }
 
         .btn-danger-custom {
-            background: transparent;
-            border: 2px solid #dc3545;
-            color: #dc3545;
-            padding: 4px 14px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.7rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            background: transparent; border: 2px solid #dc3545; color: #dc3545;
+            padding: 4px 14px; border-radius: 50px; font-weight: 600;
+            font-size: 0.7rem; transition: all 0.3s ease; cursor: pointer;
+        }
+        .btn-danger-custom:hover { background: #dc3545; color: white; }
+
+        .btn-outline-custom {
+            background: transparent; border: 2px solid #cbd5e1; color: #64748b;
+            padding: 4px 14px; border-radius: 50px; font-weight: 600;
+            font-size: 0.7rem; transition: all 0.3s ease; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-outline-custom:hover {
+            border-color: var(--orion-primary); color: var(--orion-primary);
+        }
+        .btn-outline-custom.copied {
+            background: #16a34a; border-color: #16a34a; color: #fff;
         }
 
-        .btn-danger-custom:hover {
-            background: #dc3545;
-            color: white;
+        .btn-factura {
+            background: transparent; border: 2px solid #dc3545; color: #dc3545;
+            padding: 4px 14px; border-radius: 50px; font-weight: 600;
+            font-size: 0.7rem; transition: all 0.3s ease; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            text-decoration: none;
+        }
+        .btn-factura:hover {
+            background: #dc3545; color: #fff;
         }
 
         .producto-mini {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0; border-bottom: 1px solid #f0f0f0;
         }
-
-        .producto-mini:last-child {
-            border-bottom: none;
-        }
-
+        .producto-mini:last-child { border-bottom: none; }
         .producto-mini img {
-            width: 45px;
-            height: 45px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #e8e8e8;
+            width: 45px; height: 45px; object-fit: cover;
+            border-radius: 8px; border: 1px solid #e8e8e8;
+            background: #f5f6f8;
         }
-
-        .producto-mini .info-producto {
-            flex: 1;
-        }
-
-        .producto-mini .nombre {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #1a1a2e;
-        }
-
-        .producto-mini .detalle {
-            font-size: 0.7rem;
-            color: #888;
-        }
-
-        .producto-mini .precio {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--orion-primary);
-        }
-
-        .producto-mini .subtotal {
-            font-size: 0.7rem;
-            color: #888;
-        }
+        .producto-mini .info-producto { flex: 1; }
+        .producto-mini .nombre { font-weight: 600; font-size: 0.85rem; color: #1a1a2e; }
+        .producto-mini .detalle { font-size: 0.7rem; color: #888; }
+        .producto-mini .precio { font-size: 0.8rem; font-weight: 700; color: var(--orion-primary); }
+        .producto-mini .subtotal { font-size: 0.7rem; color: #888; }
 
         .select-estado {
-            background: #ffffff;
-            color: #1a1a2e;
-            border: 2px solid #e8e8e8;
-            border-radius: 8px;
-            padding: 4px 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            background: #ffffff; color: #1a1a2e; border: 2px solid #e8e8e8;
+            border-radius: 8px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600;
         }
-
-        .select-estado:focus {
-            border-color: var(--orion-primary);
-            outline: none;
-        }
+        .select-estado:focus { border-color: var(--orion-primary); outline: none; }
 
         .badge-click-collect {
-            background: #ffc107;
-            color: #000;
-            padding: 2px 10px;
-            border-radius: 50px;
-            font-size: 0.6rem;
-            font-weight: 700;
+            background: #ffc107; color: #000; padding: 2px 10px;
+            border-radius: 50px; font-size: 0.6rem; font-weight: 700;
         }
 
-        .no-items {
-            color: #888;
-            font-size: 0.8rem;
-            padding: 15px;
-            text-align: center;
+        .badge-msi {
+            background: #dbeafe; color: #1e40af;
+            padding: 3px 12px; border-radius: 50px;
+            font-size: 0.62rem; font-weight: 800;
+            display: inline-flex; align-items: center; gap: 5px;
+            text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .badge-envio-gratis {
+            background: #d1fae5; color: #065f46;
+            padding: 3px 12px; border-radius: 50px;
+            font-size: 0.62rem; font-weight: 800;
+            display: inline-flex; align-items: center; gap: 5px;
+            text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .badge-pago-pagado {
+            background: #d1fae5; color: #065f46;
+            padding: 3px 12px; border-radius: 50px;
+            font-size: 0.62rem; font-weight: 800;
+            display: inline-flex; align-items: center; gap: 5px;
+            text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .badge-pago-pendiente {
+            background: #fef3c7; color: #92400e;
+            padding: 3px 12px; border-radius: 50px;
+            font-size: 0.62rem; font-weight: 800;
+            display: inline-flex; align-items: center; gap: 5px;
+            text-transform: uppercase; letter-spacing: 0.3px;
         }
 
-        /* ===== TOAST NOTIFICATIONS ===== */
+        /* ⭐ NUEVO: badge "Estimado" para fecha de entrega */
+        .badge-estimado {
+            background: #fff0f8; color: #e10098;
+            padding: 1px 8px; border-radius: 50px;
+            font-size: 0.58rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-left: 4px; display: inline-block;
+        }
+
+        .no-items { color: #888; font-size: 0.8rem; padding: 15px; text-align: center; }
+
+        /* ===== SECCIÓN EXTRA COLAPSABLE ===== */
+        .pedido-extra {
+            display: none; margin-top: 15px; padding: 15px;
+            background: #f8fafc; border-radius: 12px;
+            border-left: 3px solid var(--orion-primary);
+            animation: slideDown 0.25s ease;
+        }
+        .pedido-extra.show { display: block; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .extra-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .extra-block {
+            background: #fff; padding: 12px 15px; border-radius: 10px;
+            border: 1px solid #e8e8e8;
+        }
+        .extra-block .extra-title {
+            font-size: 0.68rem; color: #94a3b8;
+            text-transform: uppercase; font-weight: 700;
+            letter-spacing: 0.8px; margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .extra-block .extra-title i { color: var(--orion-primary); }
+        .extra-block .extra-content {
+            font-size: 0.82rem; color: #334155; line-height: 1.5;
+        }
+        .extra-block .extra-content strong { color: #1a1a2e; }
+
+        .mini-money-row {
+            display: flex; justify-content: space-between;
+            padding: 3px 0; font-size: 0.78rem;
+        }
+        .mini-money-row.discount { color: #16a34a; }
+        .mini-money-row.total {
+            border-top: 1px dashed #cbd5e1; margin-top: 6px;
+            padding-top: 8px; font-weight: 800; color: #1a1a2e; font-size: 0.88rem;
+        }
+
+        /* ===== PAGINACIÓN ===== */
+        .pagination-wrapper {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 20px; background: #ffffff; border-radius: 16px;
+            border: 1px solid #e8e8e8; flex-wrap: wrap; gap: 12px;
+            margin-top: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .pagination-info { font-size: 0.85rem; color: #64748b; }
+        .pagination-info strong { color: var(--orion-primary); font-weight: 800; }
+        .pagination-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .page-size-selector {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.85rem; color: #64748b;
+        }
+        .page-size-selector select {
+            width: auto; padding: 5px 10px; font-size: 0.85rem;
+            border-radius: 8px; border: 2px solid #e2e8f0;
+            background: white; cursor: pointer;
+        }
+        .page-size-selector select:focus { outline: none; border-color: var(--orion-primary); }
+
+        .btn-page {
+            min-width: 36px; height: 36px; padding: 0 12px;
+            border: 2px solid #e2e8f0; background: white; color: #334155;
+            border-radius: 8px; font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; font-family: inherit;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-page:hover:not(:disabled) {
+            background: var(--orion-primary); color: white; border-color: var(--orion-primary);
+        }
+        .btn-page.active {
+            background: var(--orion-primary); color: white;
+            border-color: var(--orion-primary);
+            box-shadow: 0 4px 12px rgba(225, 0, 152, 0.3);
+        }
+        .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ===== TOAST ===== */
         .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
         }
-
         .toast {
-            padding: 15px 25px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
+            padding: 15px 25px; border-radius: 12px; color: white;
+            font-weight: 600; font-size: 0.9rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            animation: slideIn 0.3s ease;
-            min-width: 250px;
-            max-width: 450px;
+            animation: slideIn 0.3s ease; min-width: 250px; max-width: 450px;
         }
-
-        .toast-success {
-            background: #28a745;
-        }
-
-        .toast-error {
-            background: #dc3545;
-        }
-
-        .toast-warning {
-            background: #ffc107;
-            color: #000;
-        }
-
-        .toast-info {
-            background: #17a2b8;
-        }
+        .toast-success { background: #28a745; }
+        .toast-error { background: #dc3545; }
+        .toast-warning { background: #ffc107; color: #000; }
+        .toast-info { background: #17a2b8; }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-
         @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
         }
-
-        .toast-hide {
-            animation: slideOut 0.3s ease forwards;
-        }
+        .toast-hide { animation: slideOut 0.3s ease forwards; }
 
         /* ===== FOOTER ===== */
         .footer-info {
-            background: #ffffff;
-            padding: 15px 25px;
-            border-radius: 16px;
-            border: 1px solid #e8e8e8;
-            text-align: center;
-            margin-top: auto;
-            flex-shrink: 0;
+            background: #ffffff; padding: 15px 25px; border-radius: 16px;
+            border: 1px solid #e8e8e8; text-align: center;
+            margin-top: auto; flex-shrink: 0;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
         }
-
         .footer-info p {
-            color: #888;
-            font-size: 0.75rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            color: #888; font-size: 0.75rem; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; flex-wrap: wrap;
         }
+        .footer-info p .separator { color: #ddd; }
+        .footer-info i { color: #e10098; }
+        .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
-        .footer-info p .separator {
-            color: #ddd;
-        }
-
-        .footer-info i {
-            color: #e10098;
-        }
-
-        .footer-info .heart {
-            color: #e10098;
-            animation: heartbeat 1.5s infinite;
-        }
-
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        /* ===== LOADING SPINNER ===== */
+        /* ===== LOADING ===== */
         .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 9998;
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.55); z-index: 9998;
+            justify-content: center; align-items: center; flex-direction: column; gap: 15px;
         }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
+        .loading-overlay.active { display: flex; }
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
+            width: 50px; height: 50px; border: 5px solid #f3f3f3;
             border-top: 5px solid var(--orion-primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+            border-radius: 50%; animation: spin 1s linear infinite;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .loading-text {
+            color: white; font-weight: 700; font-size: 0.9rem;
+            background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 50px;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-            }
-            .sidebar .logo,
-            .sidebar .panel-title,
-            .sidebar a span,
-            .sidebar .admin-profile .name,
-            .sidebar .admin-profile .email,
-            .sidebar .admin-profile .rol,
-            .sidebar .logout-btn span {
-                display: none;
-            }
-            .sidebar a {
-                padding: 15px;
-                justify-content: center;
-            }
-            .sidebar a i {
-                font-size: 1.3rem;
-            }
-            .sidebar .admin-profile .avatar {
-                width: 40px;
-                height: 40px;
-            }
-            .sidebar .admin-profile {
-                padding: 10px;
-            }
-            .sidebar .logout-btn {
-                padding: 15px;
-                justify-content: center;
-            }
-            .main {
-                margin-left: 70px;
-                padding: 15px;
-            }
-            .stats-mini {
-                grid-template-columns: 1fr 1fr;
-            }
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+            .stats-mini { grid-template-columns: 1fr 1fr; }
+            .pagination-wrapper { flex-direction: column; align-items: stretch; }
+            .pagination-controls { justify-content: center; }
+            .search-sort-row { flex-direction: column; align-items: stretch; }
         }
-
         @media (max-width: 480px) {
-            .stats-mini {
-                grid-template-columns: 1fr;
-            }
-            .top-bar h1 {
-                font-size: 1.2rem;
-            }
-            .top-bar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .pedido-card {
-                padding: 15px;
-            }
-            .producto-mini {
-                flex-wrap: wrap;
-            }
-            .producto-mini img {
-                width: 35px;
-                height: 35px;
-            }
-            .filtros-container {
-                gap: 6px;
-            }
-            .filter-btn {
-                padding: 5px 12px;
-                font-size: 0.65rem;
-            }
-            .footer-info p {
-                flex-direction: column;
-                gap: 5px;
-            }
-            .toast {
-                min-width: 200px;
-                font-size: 0.8rem;
-                padding: 12px 18px;
-            }
+            .stats-mini { grid-template-columns: 1fr; }
+            .top-bar h1 { font-size: 1.2rem; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .top-actions { width: 100%; }
+            .btn-pdf, .btn-csv { flex: 1; justify-content: center; }
+            .pedido-card { padding: 15px; }
+            .producto-mini { flex-wrap: wrap; }
+            .producto-mini img { width: 35px; height: 35px; }
+            .filtros-container { gap: 6px; }
+            .filter-btn { padding: 5px 12px; font-size: 0.65rem; }
+            .footer-info p { flex-direction: column; gap: 5px; }
+            .toast { min-width: 200px; font-size: 0.8rem; padding: 12px 18px; }
         }
     </style>
 </head>
@@ -741,6 +569,7 @@
 <!-- ===== LOADING OVERLAY ===== -->
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Generando PDF...</div>
 </div>
 
 <!-- ===== TOAST CONTAINER ===== -->
@@ -750,8 +579,6 @@
 
     <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar">
-
-        <!-- ===== PERFIL ADMIN ===== -->
         <div class="admin-profile">
             {% if session.get('foto') %}
                 <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
@@ -763,32 +590,26 @@
             <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
         </div>
 
-        <!-- ===== LOGO ===== -->
         <div class="logo">ORION<span>.</span></div>
 
-        <!-- ===== MENÚ ===== -->
         <div class="menu-scroll">
             <div class="panel-title">MENÚ PRINCIPAL</div>
             <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Inicio</span></a>
             <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
             <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
-            <a href="{{ url_for('web.lista_empresas') }}"><i class="fas fa-building"></i> <span>Empresas</span></a>
+            <a href="{{ url_for('web.lista_marcas') }}"><i class="fas fa-building"></i> <span>Marcas</span></a>
             <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
             <a href="{{ url_for('web.admin_listar_pedidos') }}" class="active"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
             <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
-             <div class="divider"></div>
+            <div class="divider"></div>
 
-            <!-- REPORTES -->
             <div class="panel-title">REPORTES</div>
-
             <a href="{{ url_for('web.admin_reporte_ventas') }}">
                 <i class="fas fa-chart-line"></i> <span>Ventas</span>
             </a>
             <div class="divider"></div>
 
-            <!-- PROMOCIONES -->
             <div class="panel-title">PROMOCIONES</div>
-
             <a href="{{ url_for('web.admin_listar_promociones') }}">
                 <i class="fas fa-gift"></i> <span>Promociones</span>
             </a>
@@ -817,7 +638,6 @@
                 </button>
             </form>
         </div>
-
     </nav>
 
     <!-- ===== CONTENIDO ===== -->
@@ -825,12 +645,22 @@
 
         <header class="top-bar">
             <h1><i class="fas fa-shopping-cart"></i> Gestión de Pedidos</h1>
-            <div class="tag"><i class="fas fa-shield-alt"></i> Admin</div>
+            <div class="top-actions">
+                <button type="button" class="btn-refresh" onclick="recargarPagina()" title="Recargar">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button type="button" class="btn-csv" id="btnExportarCSV" onclick="exportarCSV()">
+                    <i class="fas fa-file-csv"></i> Exportar CSV
+                </button>
+                <button type="button" class="btn-pdf" id="btnExportarPDF" onclick="exportarPDF()">
+                    <i class="fas fa-file-pdf"></i> <span id="btnPdfText">Exportar PDF</span>
+                </button>
+                <div class="tag"><i class="fas fa-shield-alt"></i> Admin</div>
+            </div>
         </header>
 
         <div class="content-wrapper">
 
-            <!-- ===== STATS ===== -->
             <div class="stats-mini">
                 <div class="stat">
                     <div class="num" id="totalPedidos">{{ pedidos|length if pedidos else 0 }}</div>
@@ -848,34 +678,89 @@
                     <div class="num" id="entregadosCount">{{ pedidos|selectattr('estado', 'equalto', 'entregado')|list|length if pedidos else 0 }}</div>
                     <div class="label">Entregados</div>
                 </div>
+                <div class="stat">
+                    <div class="num money" id="ingresosTotales">$0.00</div>
+                    <div class="label">Ingresos Totales</div>
+                </div>
             </div>
 
-            <!-- ===== FILTROS ===== -->
-            <div class="filtros-container">
-                <button class="filter-btn active" data-filter="todos">Todos</button>
-                <button class="filter-btn" data-filter="pendiente">Pendientes</button>
-                <button class="filter-btn" data-filter="confirmado">Confirmados</button>
-                <button class="filter-btn" data-filter="preparando">Preparando</button>
-                <button class="filter-btn" data-filter="enviado">Enviados</button>
-                <button class="filter-btn" data-filter="entregado">Entregados</button>
-                <button class="filter-btn" data-filter="cancelado">Cancelados</button>
+            <div class="search-sort-row">
+                <div class="search-box" id="searchBox">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por # pedido, nombre, email o monto..." oninput="onSearchInput(this.value)">
+                    <button type="button" class="clear-btn" onclick="limpiarBusqueda()" title="Limpiar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="sort-selector">
+                    <i class="fas fa-sort-amount-down" style="color:#e10098;"></i>
+                    <label for="sortSelect">Ordenar:</label>
+                    <select id="sortSelect" onchange="aplicarFiltroYPaginar()">
+                        <option value="reciente">Más recientes primero</option>
+                        <option value="antiguo">Más antiguos primero</option>
+                        <option value="mayor_monto">Mayor monto</option>
+                        <option value="menor_monto">Menor monto</option>
+                        <option value="estado">Por estado (A-Z)</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- ===== LISTA DE PEDIDOS ===== -->
+            <div class="filtros-container" id="filtrosContainer">
+                <button class="filter-btn active" data-filter="todos">Todos <span class="count-badge" data-count="todos">0</span></button>
+                <button class="filter-btn" data-filter="pendiente">Pendientes <span class="count-badge" data-count="pendiente">0</span></button>
+                <button class="filter-btn" data-filter="confirmado">Confirmados <span class="count-badge" data-count="confirmado">0</span></button>
+                <button class="filter-btn" data-filter="preparando">Preparando <span class="count-badge" data-count="preparando">0</span></button>
+                <button class="filter-btn" data-filter="enviado">Enviados <span class="count-badge" data-count="enviado">0</span></button>
+                <button class="filter-btn" data-filter="entregado">Entregados <span class="count-badge" data-count="entregado">0</span></button>
+                <button class="filter-btn" data-filter="cancelado">Cancelados <span class="count-badge" data-count="cancelado">0</span></button>
+            </div>
+
             <div id="pedidosList">
                 {% if pedidos and pedidos|length > 0 %}
                     {% for pedido in pedidos %}
+
+                    {# ============================================================
+                       CÁLCULO DE FECHA ESTIMADA (misma lógica que el detalle cliente)
+                       ------------------------------------------------------------
+                       · dias_estimados_admin: SLA por defecto (5 días).
+                       · fecha_estimada_admin: la que se mostrará (real, guardada o calculada).
+                       · es_estimada_admin: True cuando se calculó → pinta badge "Estimado".
+                    #}
+                    {% set dias_estimados_admin = 5 %}
+                    {% set fecha_estimada_admin = None %}
+                    {% set es_estimada_admin = False %}
+                    {% if pedido.fecha_entrega_estimada %}
+                        {% set fecha_estimada_admin = pedido.fecha_entrega_estimada %}
+                    {% elif pedido.fecha_entrega_real %}
+                        {% set fecha_estimada_admin = pedido.fecha_entrega_real %}
+                    {% elif pedido.created_at %}
+                        {% set fecha_estimada_admin = pedido.created_at + timedelta(days=dias_estimados_admin) %}
+                        {% set es_estimada_admin = True %}
+                    {% endif %}
+
                     <div class="pedido-card" data-estado="{{ pedido.estado if pedido.estado else 'pendiente' }}" data-pedido-id="{{ pedido._id }}">
-                        
-                        <!-- HEADER -->
+
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
                             <div>
-                                <div style="font-weight: 700; font-size: 1rem; color: #1a1a2e;">
-                                    <i class="fas fa-receipt" style="color: #e10098;"></i> 
+                                <div style="font-weight: 700; font-size: 1rem; color: #1a1a2e; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                    <i class="fas fa-receipt" style="color: #e10098;"></i>
                                     #{{ pedido.numero_pedido if pedido.numero_pedido else pedido._id|string|truncate(8, True, '') }}
+                                    <button type="button" class="btn-outline-custom" onclick="copiarNumero(this, '{{ pedido.numero_pedido if pedido.numero_pedido else pedido._id }}')" title="Copiar número">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    {% if pedido.msi_meses and pedido.msi_meses > 0 %}
+                                        <span class="badge-msi">
+                                            <i class="fas fa-credit-card"></i> {{ pedido.msi_meses }} MSI
+                                        </span>
+                                    {% endif %}
+                                    {% if pedido.envio is defined and pedido.envio == 0 and pedido.tipo_envio != 'click_collect' %}
+                                        <span class="badge-envio-gratis">
+                                            <i class="fas fa-truck"></i> Envío gratis
+                                        </span>
+                                    {% endif %}
                                 </div>
                                 <div style="font-size: 0.75rem; color: #888;">
-                                    <i class="fas fa-calendar-alt"></i> 
+                                    <i class="fas fa-calendar-alt"></i>
                                     {{ pedido.created_at.strftime('%d/%m/%Y %H:%M') if pedido.created_at else 'Fecha no disponible' }}
                                 </div>
                                 <div style="font-size: 0.75rem; color: #888;">
@@ -883,7 +768,7 @@
                                     <span style="font-size: 0.65rem; color: #aaa;">({{ pedido.usuario_email or 'Sin email' }})</span>
                                 </div>
                             </div>
-                            
+
                             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                                 <div style="font-weight: 800; font-size: 1.2rem; color: var(--orion-primary);">
                                     ${{ "%.2f"|format(pedido.total|default(0)) }}
@@ -896,15 +781,23 @@
                                         <i class="fas fa-store"></i> Click & Collect
                                     </span>
                                 {% endif %}
+                                {% if pedido.pago_estado %}
+                                    {% if pedido.pago_estado == 'pagado' %}
+                                        <span class="badge-pago-pagado">
+                                            <i class="fas fa-check-circle"></i> Pagado
+                                        </span>
+                                    {% else %}
+                                        <span class="badge-pago-pendiente">
+                                            <i class="fas fa-clock"></i> {{ pedido.pago_estado|title }}
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
                             </div>
                         </div>
 
-                        <!-- ============================================================ -->
-                        <!-- PRODUCTOS - CORREGIDO USANDO items_list                       -->
-                        <!-- ============================================================ -->
                         <div style="margin-bottom: 15px;">
                             <div style="font-size: 0.7rem; color: #888; margin-bottom: 8px; font-weight: 600;">
-                                <i class="fas fa-box" style="color: #e10098;"></i> Productos 
+                                <i class="fas fa-box" style="color: #e10098;"></i> Productos
                                 {% set items = pedido.items_list if pedido.items_list is defined else [] %}
                                 ({{ items|length if items else 0 }})
                             </div>
@@ -914,7 +807,7 @@
                                     {% for item in items_list %}
                                     <div class="producto-mini">
                                         {% set imagen = item.imagen or item.foto or 'default.jpg' %}
-                                        <img src="{{ url_for('static', filename='uploads/productos/' + imagen) }}" alt="{{ item.nombre }}" onerror="this.src='https://via.placeholder.com/45/1a1a2e/666?text=Producto'">
+                                        <img src="{{ url_for('static', filename='uploads/productos/' + imagen) }}" alt="{{ item.nombre }}" onerror="this.onerror=null; this.src='https://via.placeholder.com/45/1a1a2e/666?text=?';">
                                         <div class="info-producto">
                                             <div class="nombre">{{ item.nombre }}</div>
                                             <div class="detalle">
@@ -922,7 +815,9 @@
                                                 {% if item.atributos %}
                                                     {% if item.atributos.color %} | Color: {{ item.atributos.color }}{% endif %}
                                                     {% if item.atributos.tamano %} | Talla: {{ item.atributos.tamano }}{% endif %}
+                                                    {% if item.atributos.talla %} | Talla: {{ item.atributos.talla }}{% endif %}
                                                 {% endif %}
+                                                {% if item.sku %} | SKU: {{ item.sku }}{% endif %}
                                             </div>
                                         </div>
                                         <div style="text-align: right;">
@@ -939,7 +834,6 @@
                             </div>
                         </div>
 
-                        <!-- ===== ACCIONES ===== -->
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-top: 1px solid #f0f0f0; padding-top: 15px;">
                             <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
                                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -957,22 +851,210 @@
                                     <i class="fas fa-credit-card" style="color: #e10098;"></i> {{ pedido.metodo_pago|title if pedido.metodo_pago else 'No especificado' }}
                                 </span>
                                 <span style="font-size: 0.65rem; color: #888;">
-                                    <i class="fas fa-truck" style="color: #e10098;"></i> 
-                                    {% if pedido.tipo_envio == 'click_collect' %}
-                                        Click & Collect
-                                    {% else %}
-                                        Domicilio
-                                    {% endif %}
+                                    <i class="fas fa-truck" style="color: #e10098;"></i>
+                                    {% if pedido.tipo_envio == 'click_collect' %}Click & Collect{% else %}Domicilio{% endif %}
                                 </span>
                             </div>
-                            
+
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <a href="{{ url_for('web.admin_generar_factura_pdf', id=pedido._id) }}"
+                                   target="_blank"
+                                   class="btn-factura"
+                                   title="Descargar factura PDF">
+                                    <i class="fas fa-file-pdf"></i> Factura
+                                </a>
+                                <button type="button" class="btn-outline-custom" onclick="toggleExtra('{{ pedido._id }}', this)">
+                                    <i class="fas fa-chevron-down"></i> Ver más
+                                </button>
                                 <a href="{{ url_for('web.admin_ver_pedido', id=pedido._id) }}" class="btn-orion">
                                     <i class="fas fa-eye"></i> Ver
                                 </a>
                                 <button class="btn-danger-custom" onclick="eliminarPedido('{{ pedido._id }}')">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- ⭐ Sección extra colapsable -->
+                        <div class="pedido-extra" id="extra-{{ pedido._id }}">
+                            <div class="extra-grid">
+
+                                <!-- Envío + Fechas -->
+                                <div class="extra-block">
+                                    <div class="extra-title"><i class="fas fa-map-marker-alt"></i> Envío</div>
+                                    <div class="extra-content">
+                                        {% if pedido.tipo_envio == 'click_collect' %}
+                                            <div><strong>Click &amp; Collect</strong></div>
+                                            {% if pedido.tienda_recogida %}
+                                                <div><i class="fas fa-store"></i> {{ pedido.tienda_recogida }}</div>
+                                            {% endif %}
+                                            {% if pedido.codigo_recogida %}
+                                                <div><i class="fas fa-qrcode"></i> Código: <strong>{{ pedido.codigo_recogida }}</strong></div>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if pedido.direccion %}
+                                                <div>
+                                                    {{ pedido.direccion.calle or '' }} {{ pedido.direccion.numero or '' }}
+                                                    {% if pedido.direccion.colonia %}, {{ pedido.direccion.colonia }}{% endif %}
+                                                </div>
+                                                <div>{{ pedido.direccion.ciudad or '' }} {{ pedido.direccion.estado or '' }} {{ pedido.direccion.cp or '' }}</div>
+                                                {% if pedido.direccion.referencias %}
+                                                    <div style="color:#64748b; font-size:0.75rem; margin-top:4px;">
+                                                        <i class="fas fa-info-circle"></i> {{ pedido.direccion.referencias }}
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <span style="color:#94a3b8;">Sin dirección registrada</span>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #e2e8f0;">
+                                            {# ⭐ FECHA ESTIMADA con cálculo automático #}
+                                            <div style="font-size:0.72rem; color:#64748b; margin-bottom:4px;">
+                                                <i class="fas fa-calendar-check" style="color:#e10098;"></i>
+                                                <strong>Entrega estimada:</strong>
+                                                {% if fecha_estimada_admin %}
+                                                    {% if pedido.fecha_entrega_real %}
+                                                        <span style="color:#16a34a; font-weight:700;">
+                                                            <i class="fas fa-check-circle"></i>
+                                                            {{ fecha_estimada_admin.strftime('%d/%m/%Y') }}
+                                                        </span>
+                                                        <span class="badge-estimado" style="background:#d1fae5;color:#065f46;">Entregado</span>
+                                                    {% else %}
+                                                        {{ fecha_estimada_admin.strftime('%d/%m/%Y') }}
+                                                        {% if es_estimada_admin %}
+                                                            <span class="badge-estimado">Estimado</span>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span style="color:#94a3b8;">Por confirmar</span>
+                                                {% endif %}
+                                            </div>
+                                            {% if pedido.fecha_entrega_real %}
+                                                <div style="font-size:0.72rem; color:#16a34a;">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <strong>Entrega real:</strong>
+                                                    {{ pedido.fecha_entrega_real.strftime('%d/%m/%Y %H:%M') }}
+                                                </div>
+                                            {% endif %}
+                                            {% if pedido.fecha_cancelacion %}
+                                                <div style="font-size:0.72rem; color:#dc3545;">
+                                                    <i class="fas fa-times-circle"></i>
+                                                    <strong>Cancelado:</strong>
+                                                    {{ pedido.fecha_cancelacion.strftime('%d/%m/%Y %H:%M') }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Totales y descuentos -->
+                                <div class="extra-block">
+                                    <div class="extra-title"><i class="fas fa-calculator"></i> Desglose</div>
+                                    <div class="extra-content">
+                                        <div class="mini-money-row">
+                                            <span>Subtotal</span>
+                                            <span>${{ "%.2f"|format(pedido.subtotal|default(0)) }}</span>
+                                        </div>
+                                        {% if pedido.descuento_total and pedido.descuento_total > 0 %}
+                                        <div class="mini-money-row discount">
+                                            <span><i class="fas fa-tag"></i> Descuentos</span>
+                                            <span>-${{ "%.2f"|format(pedido.descuento_total|default(0)) }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if pedido.descuento_volumen and pedido.descuento_volumen > 0 %}
+                                        <div class="mini-money-row discount">
+                                            <span>Volumen ({{ pedido.porcentaje_descuento|default(0) }}%)</span>
+                                            <span>-${{ "%.2f"|format(pedido.descuento_volumen|default(0)) }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if pedido.descuento_cupon and pedido.descuento_cupon > 0 %}
+                                        <div class="mini-money-row discount">
+                                            <span>Cupón {% if pedido.codigo_cupon %}({{ pedido.codigo_cupon }}){% endif %}</span>
+                                            <span>-${{ "%.2f"|format(pedido.descuento_cupon|default(0)) }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if pedido.descuento_promocion and pedido.descuento_promocion > 0 %}
+                                        <div class="mini-money-row discount">
+                                            <span>Promoción</span>
+                                            <span>-${{ "%.2f"|format(pedido.descuento_promocion|default(0)) }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if pedido.descuento_lealtad and pedido.descuento_lealtad > 0 %}
+                                        <div class="mini-money-row discount">
+                                            <span>Lealtad {{ pedido.nivel_lealtad|default('') }}</span>
+                                            <span>-${{ "%.2f"|format(pedido.descuento_lealtad|default(0)) }}</span>
+                                        </div>
+                                        {% endif %}
+                                        <div class="mini-money-row">
+                                            <span>IVA (16%)</span>
+                                            <span>${{ "%.2f"|format(pedido.iva|default(0)) }}</span>
+                                        </div>
+                                        <div class="mini-money-row">
+                                            <span>Envío</span>
+                                            <span>
+                                                {% if pedido.envio is defined and pedido.envio == 0 %}
+                                                    <span style="color:#16a34a; font-weight:700;">Gratis</span>
+                                                {% else %}
+                                                    ${{ "%.2f"|format(pedido.envio|default(0)) }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="mini-money-row total">
+                                            <span>Total</span>
+                                            <span>${{ "%.2f"|format(pedido.total|default(0)) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Lealtad / Cashback -->
+                                <div class="extra-block">
+                                    <div class="extra-title"><i class="fas fa-star"></i> Beneficios</div>
+                                    <div class="extra-content">
+                                        {% if pedido.puntos_ganados %}
+                                        <div><i class="fas fa-crown" style="color:#C99B2E;"></i> Puntos ganados: <strong>{{ pedido.puntos_ganados }}</strong></div>
+                                        {% endif %}
+                                        {% if pedido.puntos_multiplicador and pedido.puntos_multiplicador > 1 %}
+                                        <div><i class="fas fa-bolt" style="color:#e10098;"></i> Multiplicador: <strong>{{ pedido.puntos_multiplicador }}x</strong></div>
+                                        {% endif %}
+                                        {% if pedido.cashback_ganado and pedido.cashback_ganado > 0 %}
+                                        <div><i class="fas fa-wallet" style="color:#16a34a;"></i> Cashback: <strong>${{ "%.2f"|format(pedido.cashback_ganado) }}</strong></div>
+                                        {% endif %}
+                                        {% if not pedido.puntos_ganados and not pedido.cashback_ganado %}
+                                        <span style="color:#94a3b8;">Sin beneficios aplicados</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Notas / Metadata -->
+                                <div class="extra-block">
+                                    <div class="extra-title"><i class="fas fa-sticky-note"></i> Notas internas</div>
+                                    <div class="extra-content" style="white-space: pre-wrap; font-size:0.78rem;">
+                                        {% if pedido.notas %}
+                                            {{ pedido.notas }}
+                                        {% else %}
+                                            <span style="color:#94a3b8;">Sin notas</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Pago / Conekta -->
+                                <div class="extra-block">
+                                    <div class="extra-title"><i class="fas fa-receipt"></i> Pago</div>
+                                    <div class="extra-content">
+                                        <div>Método: <strong>{{ pedido.metodo_pago|title if pedido.metodo_pago else 'No especificado' }}</strong></div>
+                                        {% if pedido.msi_meses and pedido.msi_meses > 0 %}
+                                        <div>MSI: <strong>{{ pedido.msi_meses }} meses</strong></div>
+                                        {% endif %}
+                                        <div>Estado pago: <strong>{{ pedido.pago_estado|title if pedido.pago_estado else 'pendiente' }}</strong></div>
+                                        {% if pedido.conekta_order_id %}
+                                        <div style="font-size:0.7rem; color:#94a3b8; margin-top:4px;">
+                                            Conekta: <code>{{ pedido.conekta_order_id }}</code>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
@@ -987,11 +1069,28 @@
                 {% endif %}
             </div>
 
-            <!-- ===== FOOTER ===== -->
+            <div class="pagination-wrapper" id="paginationWrapper">
+                <div class="pagination-info" id="paginationInfo">
+                    Mostrando <strong>0</strong> de <strong>0</strong> pedidos
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div class="page-size-selector">
+                        <label for="pageSizeSelect">Mostrar:</label>
+                        <select id="pageSizeSelect" onchange="cambiarTamanoPagina()">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="0">Todos</option>
+                        </select>
+                    </div>
+                    <div class="pagination-controls" id="paginationControls"></div>
+                </div>
+            </div>
+
             <div class="footer-info">
                 <p>
-                    <i class="fas fa-clock"></i> 
-                    {{ "Ahora"|format }}
+                    <i class="fas fa-clock"></i> Ahora
                     <span class="separator">|</span>
                     <i class="fas fa-shield-alt"></i> ORION System v2.0
                     <span class="separator">|</span>
@@ -1009,7 +1108,7 @@
 
 <script>
     // ============================================================
-    // TOAST NOTIFICATIONS
+    // TOAST
     // ============================================================
     function showToast(message, type = 'success') {
         const container = document.getElementById('toastContainer');
@@ -1017,66 +1116,359 @@
         toast.className = `toast toast-${type}`;
         toast.innerHTML = message;
         container.appendChild(toast);
-        
         setTimeout(() => {
             toast.classList.add('toast-hide');
-            setTimeout(() => {
-                toast.remove();
-            }, 300);
-        }, 3000);
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
     }
 
     // ============================================================
-    // LOADING OVERLAY
+    // LOADING
     // ============================================================
-    function showLoading() {
+    function showLoading(text = 'Generando PDF...') {
+        document.getElementById('loadingText').textContent = text;
         document.getElementById('loadingOverlay').classList.add('active');
     }
-
     function hideLoading() {
         document.getElementById('loadingOverlay').classList.remove('active');
     }
 
     // ============================================================
-    // FILTROS
+    // PAGINACIÓN + FILTROS + BÚSQUEDA + SORT
     // ============================================================
+    let paginaActual = 1;
+    let tamPagina = 5;
+    let filtroActual = 'todos';
+    let busquedaActual = '';
+    let pedidosFiltrados = [];
+
     document.querySelectorAll('.filter-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            const filter = this.dataset.filter;
+            filtroActual = this.dataset.filter;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            
-            let visibleCount = 0;
-            document.querySelectorAll('.pedido-card').forEach(function(card) {
-                if (filter === 'todos') {
-                    card.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    if (card.dataset.estado === filter) {
-                        card.style.display = 'block';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                }
-            });
-
-            const noResults = document.querySelector('.no-results-message');
-            if (visibleCount === 0) {
-                if (!noResults) {
-                    const msg = document.createElement('div');
-                    msg.className = 'no-results-message';
-                    msg.style.cssText = 'text-align: center; padding: 40px; color: #888;';
-                    msg.innerHTML = '<i class="fas fa-search" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i> No hay pedidos con este estado';
-                    document.getElementById('pedidosList').appendChild(msg);
-                }
-            } else {
-                if (noResults) {
-                    noResults.remove();
-                }
-            }
+            paginaActual = 1;
+            aplicarFiltroYPaginar();
         });
     });
+
+    function onSearchInput(value) {
+        busquedaActual = (value || '').toLowerCase().trim();
+        const box = document.getElementById('searchBox');
+        if (busquedaActual) {
+            box.classList.add('has-value');
+        } else {
+            box.classList.remove('has-value');
+        }
+        paginaActual = 1;
+        aplicarFiltroYPaginar();
+    }
+
+    function limpiarBusqueda() {
+        document.getElementById('searchInput').value = '';
+        onSearchInput('');
+    }
+
+    function _textoBuscableCard(card) {
+        const txt = card.innerText || card.textContent || '';
+        return txt.toLowerCase();
+    }
+
+    function _montoCard(card) {
+        const el = card.querySelector('div[style*="font-weight: 800"]');
+        if (!el) return 0;
+        const num = (el.textContent || '').replace(/[^0-9.\-]/g, '');
+        return parseFloat(num) || 0;
+    }
+
+    function _fechaCard(card) {
+        const divs = card.querySelectorAll('div[style*="font-size: 0.75rem"]');
+        for (const d of divs) {
+            const m = (d.textContent || '').match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+            if (m) {
+                const [_, dd, mm, yyyy, hh, mi] = m;
+                return new Date(`${yyyy}-${mm}-${dd}T${hh}:${mi}:00`).getTime();
+            }
+        }
+        return 0;
+    }
+
+    function _ordenarCards(cards) {
+        const sort = document.getElementById('sortSelect').value;
+        const arr = cards.slice();
+        if (sort === 'reciente') {
+            arr.sort((a, b) => _fechaCard(b) - _fechaCard(a));
+        } else if (sort === 'antiguo') {
+            arr.sort((a, b) => _fechaCard(a) - _fechaCard(b));
+        } else if (sort === 'mayor_monto') {
+            arr.sort((a, b) => _montoCard(b) - _montoCard(a));
+        } else if (sort === 'menor_monto') {
+            arr.sort((a, b) => _montoCard(a) - _montoCard(b));
+        } else if (sort === 'estado') {
+            arr.sort((a, b) => (a.dataset.estado || '').localeCompare(b.dataset.estado || ''));
+        }
+        return arr;
+    }
+
+    function aplicarFiltroYPaginar() {
+        const todas = Array.from(document.querySelectorAll('.pedido-card'));
+
+        let filtradas = todas.filter(function(card) {
+            if (filtroActual !== 'todos' && card.dataset.estado !== filtroActual) return false;
+            if (busquedaActual) {
+                const txt = _textoBuscableCard(card);
+                if (!txt.includes(busquedaActual)) return false;
+            }
+            return true;
+        });
+
+        pedidosFiltrados = _ordenarCards(filtradas);
+
+        renderPagina();
+        actualizarContadoresFiltros(todas);
+    }
+
+    function renderPagina() {
+        const todas = Array.from(document.querySelectorAll('.pedido-card'));
+        todas.forEach(c => { c.style.display = 'none'; });
+
+        const totalFiltradas = pedidosFiltrados.length;
+        const tp = tamPagina === 0 ? totalFiltradas : tamPagina;
+        const totalPags = tp > 0 ? Math.ceil(totalFiltradas / tp) : 1;
+        if (paginaActual > totalPags) paginaActual = Math.max(1, totalPags);
+
+        const inicio = tp > 0 ? (paginaActual - 1) * tp : 0;
+        const fin = tp > 0 ? Math.min(inicio + tp, totalFiltradas) : totalFiltradas;
+
+        pedidosFiltrados.slice(inicio, fin).forEach(c => { c.style.display = 'block'; });
+
+        const infoEl = document.getElementById('paginationInfo');
+        if (totalFiltradas === 0) {
+            infoEl.innerHTML = 'No se encontraron pedidos con los filtros aplicados';
+        } else if (tamPagina === 0) {
+            infoEl.innerHTML = 'Mostrando <strong>todos</strong> los <strong>' + totalFiltradas + '</strong> pedidos';
+        } else {
+            infoEl.innerHTML = 'Mostrando <strong>' + (inicio + 1) + '</strong>–<strong>' + fin + '</strong> de <strong>' + totalFiltradas + '</strong> pedido' + (totalFiltradas !== 1 ? 's' : '');
+        }
+
+        const ctrl = document.getElementById('paginationControls');
+        if (tamPagina === 0 || totalPags <= 1) { ctrl.innerHTML = ''; return; }
+
+        let btns = '';
+        btns += '<button class="btn-page" onclick="irPagina(' + (paginaActual-1) + ')" ' + (paginaActual === 1 ? 'disabled' : '') + '>‹</button>';
+
+        const rango = new Set();
+        rango.add(1); rango.add(totalPags);
+        for (let i = Math.max(1, paginaActual - 2); i <= Math.min(totalPags, paginaActual + 2); i++) rango.add(i);
+        const paginas = Array.from(rango).sort((a, b) => a - b);
+
+        let prev = 0;
+        paginas.forEach(p => {
+            if (p - prev > 1) btns += '<span style="padding:5px 4px;color:#94a3b8;">…</span>';
+            btns += '<button class="btn-page' + (p === paginaActual ? ' active' : '') + '" onclick="irPagina(' + p + ')">' + p + '</button>';
+            prev = p;
+        });
+
+        btns += '<button class="btn-page" onclick="irPagina(' + (paginaActual+1) + ')" ' + (paginaActual === totalPags ? 'disabled' : '') + '>›</button>';
+        ctrl.innerHTML = btns;
+    }
+
+    function irPagina(p) {
+        const tp = tamPagina === 0 ? pedidosFiltrados.length : tamPagina;
+        const totalPags = tp > 0 ? Math.ceil(pedidosFiltrados.length / tp) : 1;
+        paginaActual = Math.max(1, Math.min(p, totalPags));
+        renderPagina();
+        document.getElementById('pedidosList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cambiarTamanoPagina() {
+        tamPagina = parseInt(document.getElementById('pageSizeSelect').value);
+        paginaActual = 1;
+        renderPagina();
+    }
+
+    function actualizarContadoresFiltros(todas) {
+        const counts = {
+            todos: todas.length,
+            pendiente: 0, confirmado: 0, preparando: 0,
+            enviado: 0, entregado: 0, cancelado: 0
+        };
+        todas.forEach(c => {
+            const e = c.dataset.estado;
+            if (counts[e] !== undefined) counts[e]++;
+        });
+        document.querySelectorAll('.count-badge').forEach(b => {
+            const k = b.dataset.count;
+            if (counts[k] !== undefined) b.textContent = counts[k];
+        });
+    }
+
+    // ============================================================
+    // EXPORTAR A PDF
+    // ============================================================
+    function exportarPDF() {
+        const btn = document.getElementById('btnExportarPDF');
+        const btnText = document.getElementById('btnPdfText');
+
+        btn.disabled = true;
+        btnText.textContent = 'Generando...';
+        showLoading('Generando PDF (puede tardar unos segundos)...');
+
+        const filtro = filtroActual || 'todos';
+        const url = '/admin/pedidos/exportar-pdf?filtro=' + encodeURIComponent(filtro);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(() => {
+            document.body.removeChild(a);
+            hideLoading();
+            btn.disabled = false;
+            btnText.textContent = 'Exportar PDF';
+            showToast('✅ PDF descargado correctamente', 'success');
+        }, 2000);
+    }
+
+    // ============================================================
+    // EXPORTAR A CSV
+    // ============================================================
+    function exportarCSV() {
+        const btn = document.getElementById('btnExportarCSV');
+        btn.disabled = true;
+
+        const cards = pedidosFiltrados.length ? pedidosFiltrados : Array.from(document.querySelectorAll('.pedido-card'));
+
+        if (cards.length === 0) {
+            showToast('⚠️ No hay pedidos para exportar', 'warning');
+            btn.disabled = false;
+            return;
+        }
+
+        const headers = [
+            'Número Pedido', 'Fecha', 'Cliente', 'Email',
+            'Estado', 'Método Pago', 'Tipo Envío',
+            'Subtotal', 'IVA', 'Envío', 'Descuentos', 'Total',
+            'Unidades', 'Puntos', 'Cashback'
+        ];
+
+        const rows = [headers];
+
+        cards.forEach(card => {
+            const id = card.dataset.pedidoId;
+
+            const numeroMatch = card.innerHTML.match(/#([A-Z0-9\-]+)/);
+            const numero = numeroMatch ? numeroMatch[1] : id;
+
+            const txt = card.innerText || '';
+
+            const fechaMatch = txt.match(/(\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2})/);
+            const fecha = fechaMatch ? fechaMatch[1] : '';
+
+            const clienteMatch = txt.match(/Usuario:\s*(.+)/);
+            const emailMatch = txt.match(/\(([^\s@]+@[^\s@]+)\)/);
+
+            const totalMatch = txt.match(/\$([0-9,]+\.\d{2})/);
+            const total = totalMatch ? totalMatch[1].replace(',', '') : '0';
+
+            const select = card.querySelector('.select-estado');
+            const estado = select ? select.value : '';
+
+            const metodoMatch = txt.match(/(?:Metodo|Método)[^\w]*([A-Za-z_]+)/i);
+            const metodo = metodoMatch ? metodoMatch[1] : '';
+
+            rows.push([
+                numero, fecha,
+                (clienteMatch ? clienteMatch[1].split('(')[0].trim() : ''),
+                (emailMatch ? emailMatch[1] : ''),
+                estado, metodo,
+                (txt.includes('Click & Collect') ? 'Click & Collect' : 'Domicilio'),
+                '', '', '', '', total, '', '', ''
+            ]);
+        });
+
+        const csv = rows.map(row =>
+            row.map(cell => {
+                const s = String(cell == null ? '' : cell);
+                return '"' + s.replace(/"/g, '""') + '"';
+            }).join(',')
+        ).join('\r\n');
+
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const hoy = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `orion-pedidos-${hoy}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        btn.disabled = false;
+        showToast('✅ CSV descargado correctamente', 'success');
+    }
+
+    // ============================================================
+    // COPIAR NÚMERO DE PEDIDO
+    // ============================================================
+    function copiarNumero(btn, numero) {
+        const texto = String(numero || '');
+        const done = () => {
+            const original = btn.innerHTML;
+            btn.classList.add('copied');
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = original;
+            }, 1500);
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(texto).then(done).catch(() => {
+                _fallbackCopy(texto);
+                done();
+            });
+        } else {
+            _fallbackCopy(texto);
+            done();
+        }
+        showToast(`📋 Copiado: ${texto}`, 'info');
+    }
+
+    function _fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+    }
+
+    // ============================================================
+    // TOGGLE VER MÁS
+    // ============================================================
+    function toggleExtra(id, btn) {
+        const el = document.getElementById('extra-' + id);
+        if (!el) return;
+        el.classList.toggle('show');
+        const isOpen = el.classList.contains('show');
+        btn.innerHTML = isOpen
+            ? '<i class="fas fa-chevron-up"></i> Ver menos'
+            : '<i class="fas fa-chevron-down"></i> Ver más';
+    }
+
+    // ============================================================
+    // RECARGAR
+    // ============================================================
+    function recargarPagina() {
+        showLoading('Recargando...');
+        setTimeout(() => location.reload(), 300);
+    }
 
     // ============================================================
     // ACTUALIZAR ESTADO
@@ -1090,14 +1482,10 @@
             }
             return;
         }
-        
-        showLoading();
-        
+        showLoading('Actualizando...');
         fetch('/api/admin/pedidos/estado/' + id, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ estado: estado })
         })
         .then(response => response.json())
@@ -1115,6 +1503,7 @@
                     select.value = estado;
                 }
                 actualizarContadores();
+                aplicarFiltroYPaginar();
             } else {
                 showToast('❌ ' + (data.error || 'Error al actualizar el estado'), 'error');
                 setTimeout(() => location.reload(), 1500);
@@ -1132,22 +1521,17 @@
     // ============================================================
     function eliminarPedido(id) {
         if (!confirm('¿Estás seguro de eliminar este pedido?\nEsta acción no se puede deshacer.')) return;
-        
-        showLoading();
-        
-        fetch('/api/admin/pedidos/eliminar/' + id, {
-            method: 'DELETE'
-        })
+        showLoading('Eliminando...');
+        fetch('/api/admin/pedidos/eliminar/' + id, { method: 'DELETE' })
         .then(response => response.json())
         .then(data => {
             hideLoading();
             if (data.success) {
                 showToast('✅ Pedido eliminado correctamente', 'success');
                 const card = document.querySelector(`.pedido-card[data-pedido-id="${id}"]`);
-                if (card) {
-                    card.remove();
-                }
+                if (card) card.remove();
                 actualizarContadores();
+                aplicarFiltroYPaginar();
                 const remainingCards = document.querySelectorAll('.pedido-card');
                 if (remainingCards.length === 0) {
                     const container = document.getElementById('pedidosList');
@@ -1158,6 +1542,7 @@
                             <p style="color: #888;">Aún no se han registrado pedidos en el sistema.</p>
                         </div>
                     `;
+                    document.getElementById('paginationWrapper').style.display = 'none';
                 }
             } else {
                 showToast('❌ ' + (data.error || 'Error al eliminar el pedido'), 'error');
@@ -1170,33 +1555,42 @@
     }
 
     // ============================================================
-    // ACTUALIZAR CONTADORES
+    // CONTADORES (STATS + INGRESOS)
     // ============================================================
     function actualizarContadores() {
         const cards = document.querySelectorAll('.pedido-card');
         const total = cards.length;
-        
         let pendientes = 0, confirmados = 0, entregados = 0;
-        
+        let ingresos = 0;
+
         cards.forEach(card => {
             const estado = card.dataset.estado;
             if (estado === 'pendiente') pendientes++;
             else if (estado === 'confirmado') confirmados++;
             else if (estado === 'entregado') entregados++;
+
+            if (estado !== 'cancelado') {
+                const txt = card.innerText || '';
+                const m = txt.match(/\$([0-9,]+\.\d{2})/);
+                if (m) ingresos += parseFloat(m[1].replace(',', '')) || 0;
+            }
         });
-        
+
         document.getElementById('totalPedidos').textContent = total;
         document.getElementById('pendientesCount').textContent = pendientes;
         document.getElementById('confirmadosCount').textContent = confirmados;
         document.getElementById('entregadosCount').textContent = entregados;
+        document.getElementById('ingresosTotales').textContent = '$' + ingresos.toFixed(2);
     }
 
     // ============================================================
-    // INICIALIZACIÓN
+    // INIT
     // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('✅ Página de pedidos cargada');
-        console.log('📦 Total de pedidos:', document.querySelectorAll('.pedido-card').length);
+        tamPagina = parseInt(document.getElementById('pageSizeSelect').value) || 5;
+        aplicarFiltroYPaginar();
+        actualizarContadores();
+        console.log('✅ Pedidos cargados:', document.querySelectorAll('.pedido-card').length);
     });
 </script>
 

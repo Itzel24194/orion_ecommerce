@@ -6,31 +6,1035 @@
     <title>ORION | Servicios Exclusivos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/pagina.css') }}">
     <style>
+        :root {
+            --orion-brand:      #e10098;
+            --orion-brand-dark: #b4006c;
+            --orion-brand-deep: #8a0052;
+            --orion-ink:        #0a0a0f;
+            --orion-ink-2:      #1a1a2e;
+            --orion-muted:      #6b7280;
+            --orion-line:       #e8e8ee;
+            --orion-soft:       #fdf0f7;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--orion-ink);
+            background: #ffffff;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+           NAVBAR
+           ============================================================ */
         .dropdown-submenu { position: relative; }
         .dropdown-submenu > .dropdown-menu { top: 0; left: 100%; margin-top: -6px; }
         .dropdown-submenu:hover > .dropdown-menu { display: block; }
-        /* Estilos específicos de servicios */
-        .premium-card { background: rgba(255, 255, 255, 0.9); border-radius: 30px; border: 1px solid rgba(225, 0, 152, 0.1); transition: 0.5s; }
-        .premium-card:hover { border-color: #e10098; transform: translateY(-10px); }
-        .badge-exclusive { background: #e10098; color: white; font-size: 0.7rem; padding: 5px 15px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .icon-wrapper { width: 90px; height: 90px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 25px; box-shadow: 0 15px 25px rgba(0,0,0,0.05); font-size: 2.5rem; color: #e10098; }
-        .trust-section { background: #fff; padding: 2rem; border-radius: 30px; border-left: 5px solid #e10098; }
+
+        .top-utility-bar {
+            background: #fff;
+            font-size: 0.78rem;
+        }
+        .top-utility-bar a {
+            color: var(--orion-muted) !important;
+            font-weight: 500;
+            transition: color .15s ease;
+        }
+        .top-utility-bar a:hover {
+            color: var(--orion-brand) !important;
+        }
+
+        .main-navbar {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255,255,255,.92) !important;
+        }
+        .brand-logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            color: var(--orion-brand) !important;
+        }
+
+        /* ============================================================
+           HERO CINEMATOGRÁFICO
+           ============================================================ */
+        .hero {
+            position: relative;
+            padding: 100px 0 120px;
+            background: radial-gradient(ellipse at top, #1a1a2e 0%, #0a0a0f 60%, #000 100%);
+            overflow: hidden;
+            color: #fff;
+        }
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(225,0,152,.35), transparent 70%);
+            filter: blur(60px);
+            animation: floatA 12s ease-in-out infinite;
+        }
+        .hero::after {
+            content: "";
+            position: absolute;
+            bottom: -40%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(225,0,152,.25), transparent 70%);
+            filter: blur(80px);
+            animation: floatB 14s ease-in-out infinite;
+        }
+        @keyframes floatA {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50%      { transform: translate(40px, 30px) scale(1.1); }
+        }
+        @keyframes floatB {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50%      { transform: translate(-30px, -40px) scale(1.15); }
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 50px;
+            background: rgba(225,0,152,.12);
+            border: 1px solid rgba(225,0,152,.35);
+            color: #ff8ac9;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            animation: fadeUp .8s ease both;
+        }
+        .hero-eyebrow i {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%      { opacity: .6; transform: scale(1.15); }
+        }
+
+        .hero-title {
+            font-size: clamp(2.6rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.02;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            animation: fadeUp .8s ease .1s both;
+        }
+        .hero-title .gradient {
+            background: linear-gradient(135deg, #ff4db8 0%, #e10098 40%, #ff8ac9 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .hero-desc {
+            font-size: clamp(1rem, 1.4vw, 1.15rem);
+            color: rgba(255,255,255,.7);
+            max-width: 620px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            animation: fadeUp .8s ease .2s both;
+        }
+
+        .hero-cta {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            animation: fadeUp .8s ease .3s both;
+        }
+        .btn-hero {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all .25s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-hero-primary {
+            background: linear-gradient(135deg, #e10098, #b4006c);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(225,0,152,.35);
+        }
+        .btn-hero-primary:hover {
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(225,0,152,.55);
+        }
+        .btn-hero-ghost {
+            background: rgba(255,255,255,.06);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.2);
+            backdrop-filter: blur(10px);
+        }
+        .btn-hero-ghost:hover {
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            border-color: rgba(255,255,255,.4);
+        }
+        .btn-hero i { transition: transform .25s ease; }
+        .btn-hero:hover i { transform: translateX(3px); }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 70px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+            animation: fadeUp .8s ease .4s both;
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat-num {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+        .hero-stat-num span { color: var(--orion-brand); }
+        .hero-stat-lbl {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================================
+           SECCIÓN DE SERVICIOS
+           ============================================================ */
+        .services-section {
+            padding: 100px 0 60px;
+            background: linear-gradient(180deg, #ffffff 0%, #fafafc 100%);
+            position: relative;
+        }
+
+        .section-head {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .section-head-eyebrow {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--orion-brand);
+            margin-bottom: 12px;
+        }
+        .section-head h2 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 14px;
+            color: var(--orion-ink);
+        }
+        .section-head p {
+            color: var(--orion-muted);
+            font-size: 1rem;
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ===== CARD PRO ===== */
+        .service-card {
+            position: relative;
+            background: #fff;
+            border-radius: 24px;
+            padding: 36px 32px 32px;
+            height: 100%;
+            border: 1px solid var(--orion-line);
+            transition: all .35s cubic-bezier(.4,0,.2,1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .service-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--orion-brand), #ff8ac9);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .4s ease;
+        }
+        .service-card::after {
+            content: "";
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(225,0,152,.08), transparent 70%);
+            opacity: 0;
+            transition: opacity .4s ease;
+            pointer-events: none;
+        }
+        .service-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(225,0,152,.25);
+            box-shadow: 0 30px 60px -20px rgba(225,0,152,.2);
+        }
+        .service-card:hover::before { transform: scaleX(1); }
+        .service-card:hover::after  { opacity: 1; }
+
+        .service-tag {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .tag-brand  { background: var(--orion-soft); color: var(--orion-brand-dark); }
+        .tag-dark   { background: #1a1a2e; color: #fff; }
+        .tag-gray   { background: #f3f4f6; color: #4b5563; }
+
+        .service-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--orion-soft) 0%, #fff 100%);
+            border: 1px solid rgba(225,0,152,.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--orion-brand);
+            margin-bottom: 24px;
+            position: relative;
+            transition: all .4s ease;
+        }
+        .service-card:hover .service-icon {
+            transform: scale(1.08) rotate(-5deg);
+            background: linear-gradient(135deg, var(--orion-brand) 0%, var(--orion-brand-dark) 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 12px 30px -8px rgba(225,0,152,.5);
+        }
+
+        .service-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+            color: var(--orion-ink);
+        }
+        .service-desc {
+            font-size: 0.9rem;
+            color: var(--orion-muted);
+            line-height: 1.65;
+            margin-bottom: 22px;
+            flex: 1;
+        }
+
+        .service-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .service-features li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        .service-features li i {
+            color: var(--orion-brand);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .service-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--orion-brand);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.82rem;
+            letter-spacing: 0.3px;
+            transition: gap .25s ease;
+            margin-top: auto;
+        }
+        .service-cta:hover {
+            color: var(--orion-brand-dark);
+            gap: 12px;
+        }
+
+        /* ============================================================
+           TRUST SECTION
+           ============================================================ */
+        .trust-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, #fafafc 0%, #fff 100%);
+        }
+
+        .trust-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 48px 44px;
+            border: 1px solid var(--orion-line);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px -30px rgba(0,0,0,.15);
+        }
+        .trust-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: linear-gradient(180deg, var(--orion-brand), var(--orion-brand-deep));
+        }
+
+        .trust-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .trust-icon-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #fff5e1, #fff);
+            border: 1px solid #fde68a;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #f59e0b;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .trust-header h3 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+        .trust-desc {
+            font-size: 1rem;
+            color: var(--orion-muted);
+            line-height: 1.7;
+            margin: 0;
+        }
+        .trust-desc strong { color: var(--orion-ink); font-weight: 700; }
+
+        /* ============================================================
+           ORION CLUB  —  FONDO NEGRO
+           ============================================================ */
+        .orion-club {
+            padding: 60px 0;
+            background: #fff;
+        }
+        .club-inner {
+            position: relative;
+            border-radius: 32px;
+            padding: 70px 50px;
+            background:
+                radial-gradient(ellipse at top left, rgba(225,0,152,.22), transparent 55%),
+                radial-gradient(ellipse at bottom right, rgba(225,0,152,.14), transparent 55%),
+                linear-gradient(135deg, #1a1a2e 0%, #0a0a0f 60%, #000 100%);
+            overflow: hidden;
+            color: #fff;
+            box-shadow: 0 30px 80px -30px rgba(0,0,0,.7);
+        }
+        .club-inner::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                repeating-linear-gradient(45deg, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px, transparent 1px, transparent 20px);
+            pointer-events: none;
+        }
+        .club-inner::after {
+            content: "";
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(225,0,152,.35), transparent 70%);
+            filter: blur(50px);
+            pointer-events: none;
+        }
+
+        .club-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 50px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        @media (max-width: 900px) {
+            .club-grid { grid-template-columns: 1fr; gap: 32px; }
+            .club-inner { padding: 50px 30px; }
+        }
+
+        .club-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 50px;
+            background: rgba(225,0,152,.15);
+            border: 1px solid rgba(225,0,152,.4);
+            color: #ff8ac9;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            backdrop-filter: blur(8px);
+        }
+
+        .club-title {
+            font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .club-desc {
+            font-size: 1rem;
+            color: rgba(255,255,255,.75);
+            line-height: 1.6;
+            margin-bottom: 28px;
+            max-width: 480px;
+        }
+
+        .club-benefits {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .club-benefits li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255,255,255,.9);
+        }
+        .club-benefits li i {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(225,0,152,.25);
+            color: #ff8ac9;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .club-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-club {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all .25s ease;
+        }
+        .btn-club-light {
+            background: #fff;
+            color: var(--orion-brand-dark);
+            box-shadow: 0 10px 30px rgba(0,0,0,.35);
+        }
+        .btn-club-light:hover {
+            transform: translateY(-3px);
+            color: var(--orion-brand-deep);
+            box-shadow: 0 15px 40px rgba(225,0,152,.4);
+        }
+        .btn-club-ghost {
+            background: transparent;
+            color: #fff;
+            border: 1.5px solid rgba(255,255,255,.35);
+            backdrop-filter: blur(10px);
+        }
+        .btn-club-ghost:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.7);
+            color: #fff;
+        }
+        .btn-club i { transition: transform .25s ease; }
+        .btn-club:hover i { transform: translateX(3px); }
+
+        /* ===== Tarjeta visual (lado derecho) ===== */
+        .club-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .club-card-visual {
+            width: 100%;
+            max-width: 340px;
+            aspect-ratio: 1.586;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #fff 0%, #faf0f6 100%);
+            box-shadow:
+                0 30px 60px -20px rgba(0,0,0,.6),
+                0 0 0 1px rgba(255,255,255,.08),
+                inset 0 0 0 1px rgba(255,255,255,.6);
+            padding: 26px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: var(--orion-ink);
+            position: relative;
+            overflow: hidden;
+            transform: rotate(-4deg);
+            transition: transform .4s ease;
+        }
+        .club-card-visual:hover {
+            transform: rotate(-2deg) scale(1.02);
+        }
+        .club-card-visual::before {
+            content: "";
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(225,0,152,.2), transparent 70%);
+        }
+        .club-card-visual::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(225,0,152,.04) 0px,
+                rgba(225,0,152,.04) 4px,
+                transparent 4px,
+                transparent 12px
+            );
+            pointer-events: none;
+        }
+
+        .club-card-brand {
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--orion-brand-dark);
+            position: relative;
+            z-index: 2;
+        }
+        .club-card-brand small {
+            display: block;
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            color: var(--orion-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .club-card-tier {
+            position: relative;
+            z-index: 2;
+        }
+        .club-card-tier-emoji {
+            font-size: 2.4rem;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .club-card-tier-name {
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--orion-brand-dark), var(--orion-brand));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .club-card-tier-sub {
+            font-size: 0.7rem;
+            color: var(--orion-muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .club-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            position: relative;
+            z-index: 2;
+        }
+        .club-card-points-lbl {
+            font-size: 0.6rem;
+            color: var(--orion-muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .club-card-points-num {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--orion-brand-dark);
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        /* ============================================================
+           NEWSLETTER / PROMOCIONES
+           ============================================================ */
+        .newsletter {
+            padding: 80px 0;
+            background: linear-gradient(180deg, #fff 0%, #fafafc 100%);
+        }
+        .newsletter-inner {
+            background: #fff;
+            border-radius: 28px;
+            padding: 60px 50px;
+            border: 1px solid var(--orion-line);
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            box-shadow: 0 20px 60px -30px rgba(0,0,0,.12);
+            position: relative;
+            overflow: hidden;
+        }
+        .newsletter-inner::before {
+            content: "";
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(225,0,152,.08), transparent 70%);
+            pointer-events: none;
+        }
+        @media (max-width: 900px) {
+            .newsletter-inner {
+                grid-template-columns: 1fr;
+                padding: 40px 30px;
+            }
+        }
+
+        .newsletter-head {
+            position: relative;
+            z-index: 2;
+        }
+        .newsletter-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            border-radius: 50px;
+            background: var(--orion-soft);
+            color: var(--orion-brand-dark);
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .newsletter-title {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            margin-bottom: 12px;
+        }
+        .newsletter-title .accent {
+            background: linear-gradient(135deg, var(--orion-brand) 0%, #ff8ac9 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .newsletter-desc {
+            color: var(--orion-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+            max-width: 460px;
+        }
+
+        .newsletter-form-wrap {
+            position: relative;
+            z-index: 2;
+        }
+        .newsletter-form {
+            display: flex;
+            gap: 10px;
+            padding: 6px;
+            background: #f7f7f9;
+            border-radius: 50px;
+            border: 1px solid var(--orion-line);
+            transition: border-color .2s ease;
+        }
+        .newsletter-form:focus-within {
+            border-color: var(--orion-brand);
+            box-shadow: 0 0 0 4px rgba(225,0,152,.08);
+        }
+        .newsletter-form input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--orion-ink);
+            outline: none;
+            min-width: 0;
+        }
+        .newsletter-form input::placeholder { color: #9ca3af; }
+        .newsletter-form button {
+            padding: 12px 26px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, var(--orion-brand), var(--orion-brand-dark));
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all .25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            box-shadow: 0 6px 18px rgba(225,0,152,.35);
+        }
+        .newsletter-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(225,0,152,.5);
+        }
+        .newsletter-form button i { transition: transform .25s ease; }
+        .newsletter-form button:hover i { transform: translateX(3px); }
+
+        .newsletter-note {
+            font-size: 0.72rem;
+            color: var(--orion-muted);
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-left: 12px;
+        }
+        .newsletter-note i { color: #22c55e; }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .orion-footer {
+            background: #0a0a0f;
+            color: rgba(255,255,255,.6);
+            padding: 60px 0 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .orion-footer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--orion-brand), transparent);
+        }
+        .footer-brand {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .footer-brand span { color: var(--orion-brand); }
+        .footer-tagline {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,.5);
+            line-height: 1.6;
+            max-width: 320px;
+            margin-bottom: 24px;
+        }
+        .footer-heading {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .footer-links a {
+            color: rgba(255,255,255,.55);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all .2s ease;
+        }
+        .footer-links a:hover {
+            color: var(--orion-brand);
+            padding-left: 4px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+            transition: all .25s ease;
+        }
+        .footer-social a:hover {
+            background: var(--orion-brand);
+            border-color: var(--orion-brand);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            margin-top: 50px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.78rem;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 768px) {
+            .hero { padding: 70px 0 90px; }
+            .hero-stats { gap: 32px; margin-top: 50px; }
+            .hero-stat-num { font-size: 1.5rem; }
+            .services-section { padding: 60px 0 30px; }
+            .section-head { margin-bottom: 40px; }
+            .service-card { padding: 28px 24px 24px; }
+            .service-icon { width: 64px; height: 64px; font-size: 1.6rem; }
+            .trust-card { padding: 32px 26px; }
+            .club-inner { padding: 40px 24px; border-radius: 24px; }
+            .club-card-visual { max-width: 280px; transform: rotate(-3deg); }
+            .newsletter-inner { padding: 32px 22px; border-radius: 22px; }
+            .newsletter-form { flex-direction: column; border-radius: 16px; padding: 8px; }
+            .newsletter-form input { padding: 12px 16px; }
+            .newsletter-form button { width: 100%; justify-content: center; }
+            .footer-bottom { flex-direction: column; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- ===== TOP UTILITY BAR ===== -->
     <div class="top-utility-bar py-2 d-none d-lg-block border-bottom">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex gap-3">
-                <a href="#" class="text-decoration-none text-muted small"><i class="bi bi-geo-alt me-1"></i>Encuentra tu tienda</a>
+                <a href="#" class="text-decoration-none"><i class="bi bi-geo-alt me-1"></i>Encuentra tu tienda</a>
             </div>
-            <div class="d-flex gap-3"><a href="#" class="text-decoration-none text-muted small"><i class="bi bi-gift me-1"></i>Mesa de regalos</a></div>
+            <div class="d-flex gap-3">
+                <a href="#" class="text-decoration-none"><i class="bi bi-gift me-1"></i>Mesa de regalos</a>
+            </div>
         </div>
     </div>
 
-    <nav class="navbar navbar-expand-lg navbar-light main-navbar py-2 py-lg-3 sticky-top shadow-sm bg-white">
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar navbar-expand-lg navbar-light main-navbar py-2 py-lg-3 sticky-top shadow-sm">
         <div class="container">
             <div class="d-flex w-100 justify-content-between align-items-center d-lg-none mb-2">
                 <button class="navbar-toggler border-0 ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#orionNavbar">
@@ -39,7 +1043,7 @@
                 <a class="navbar-brand brand-logo m-0 mx-auto" href="/">ORION</a>
             </div>
             <a class="navbar-brand brand-logo d-none d-lg-inline-block m-0 pe-4" href="/">ORION</a>
-            
+
             <div class="collapse navbar-collapse" id="orionNavbar">
                 <div class="dropdown my-2 my-lg-0">
                     <button class="btn btn-white fw-bold text-dark dropdown-toggle border-0" type="button" data-bs-toggle="dropdown">Categorías</button>
@@ -85,57 +1089,362 @@
         </div>
     </nav>
 
-    <main class="container py-5">
-        <div class="text-center mb-5">
-            <h2 class="display-3 fw-bold">ORION <span style="color: #e10098;">Experience</span></h2>
-            <p class="text-muted">Servicios diseñados para quienes exigen más que una simple compra.</p>
-        </div>
+    <!-- ============================================================
+         HERO
+         ============================================================ -->
+    <section class="hero">
+        <div class="hero-grid"></div>
+        <div class="container hero-content">
+            <div class="hero-eyebrow">
+                <i class="bi bi-circle-fill" style="font-size:.4rem; color:#22c55e;"></i>
+                <span>Experiencias disponibles ahora</span>
+            </div>
 
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="premium-card p-4 text-center">
-                    <span class="badge-exclusive">Disponible</span>
-                    <div class="icon-wrapper mt-3"><i class="bi bi-rocket-takeoff"></i></div>
-                    <h4 class="fw-bold mt-4">Click & Collect Pro</h4>
-                    <p class="text-muted small">Prioridad de preparación en tienda. Tu pedido listo en tiempo récord.</p>
+            <h1 class="hero-title">
+                ORION<br>
+                <span class="gradient">Experience</span>
+            </h1>
+
+            <p class="hero-desc">
+                Servicios diseñados para quienes exigen más que una simple compra.
+                Prioridad, protección y logística inteligente en cada pedido.
+            </p>
+
+            <div class="hero-cta">
+                <a href="#servicios" class="btn-hero btn-hero-primary">
+                    Explorar servicios <i class="bi bi-arrow-right"></i>
+                </a>
+                <a href="#club" class="btn-hero btn-hero-ghost">
+                    <i class="bi bi-stars"></i> Únete al Club ORION
+                </a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-num">50<span>K+</span></div>
+                    <div class="hero-stat-lbl">Clientes activos</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-num">4.9<span>/5</span></div>
+                    <div class="hero-stat-lbl">Satisfacción</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-num">24<span>/7</span></div>
+                    <div class="hero-stat-lbl">Compra en línea</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="premium-card p-4 text-center">
-                    <span class="badge-exclusive" style="background:#222;">Protección</span>
-                    <div class="icon-wrapper mt-3"><i class="bi bi-shield-lock"></i></div>
-                    <h4 class="fw-bold mt-4">Garantía Origen</h4>
-                    <p class="text-muted small">Sustitución inmediata por equipo nuevo. Cero reparaciones.</p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SERVICIOS
+         ============================================================ -->
+    <section class="services-section" id="servicios">
+        <div class="container">
+            <div class="section-head">
+                <span class="section-head-eyebrow">Servicios Exclusivos</span>
+                <h2>Diseñados para tu comodidad</h2>
+                <p>Tres pilares que convierten cada compra en una experiencia sin fricción.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card">
+                        <span class="service-tag tag-brand">Disponible</span>
+                        <div class="service-icon">
+                            <i class="bi bi-rocket-takeoff"></i>
+                        </div>
+                        <h3 class="service-title">Click &amp; Collect Pro</h3>
+                        <p class="service-desc">
+                            Prioridad absoluta en la preparación de tu pedido. Recíbelo en tienda
+                            sin esperas, sin colas y en tiempo récord.
+                        </p>
+                        <ul class="service-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Preparación en menos de 30 min</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Acceso a caja preferente</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Notificaciones en tiempo real</li>
+                        </ul>
+                        <a href="#" class="service-cta">
+                            Activar servicio <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card">
+                        <span class="service-tag tag-dark">Protección</span>
+                        <div class="service-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3 class="service-title">Garantía Origen</h3>
+                        <p class="service-desc">
+                            Sustitución inmediata por equipo completamente nuevo ante cualquier
+                            defecto de fábrica. Cero reparaciones, cero trámites.
+                        </p>
+                        <ul class="service-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Reemplazo en 24 horas</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Cobertura nacional</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Sin costo adicional</li>
+                        </ul>
+                        <a href="#" class="service-cta">
+                            Conocer más <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mx-auto">
+                    <div class="service-card">
+                        <span class="service-tag tag-gray">Logística</span>
+                        <div class="service-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <h3 class="service-title">Rastreo GPS Live</h3>
+                        <p class="service-desc">
+                            Visualiza a tu repartidor en tiempo real con precisión milimétrica.
+                            Sabe exactamente cuándo llega tu pedido.
+                        </p>
+                        <ul class="service-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Mapa en vivo</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Tiempo estimado al segundo</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Historial de rutas</li>
+                        </ul>
+                        <a href="#" class="service-cta">
+                            Ver demo <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="premium-card p-4 text-center">
-                    <span class="badge-exclusive" style="background:#555;">Logística</span>
-                    <div class="icon-wrapper mt-3"><i class="bi bi-map"></i></div>
-                    <h4 class="fw-bold mt-4">Rastreo GPS Live</h4>
-                    <p class="text-muted small">Visualiza a tu repartidor en tiempo real con precisión milimétrica.</p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         TRUST SECTION
+         ============================================================ -->
+    <section class="trust-section">
+        <div class="container">
+            <div class="trust-card">
+                <div class="trust-header">
+                    <div class="trust-icon-badge">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <h3>¿Por qué somos diferentes?</h3>
+                </div>
+                <p class="trust-desc">
+                    A diferencia de otras tiendas, en <strong>ORION tú controlas la logística</strong>.
+                    Si tu producto llega tarde, tu siguiente envío es <strong>totalmente gratis</strong>.
+                    Sin letras chiquitas, sin excusas.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         ORION CLUB  —  FONDO NEGRO
+         ============================================================ -->
+    <section class="orion-club" id="club">
+        <div class="container">
+            <div class="club-inner">
+                <div class="club-grid">
+
+                    <!-- Lado izquierdo: copy -->
+                    <div>
+                        <span class="club-eyebrow">
+                            <i class="bi bi-crown-fill"></i> Programa de lealtad
+                        </span>
+
+                        <h2 class="club-title">Únete al Club ORION</h2>
+
+                        <p class="club-desc">
+                            Acumula puntos en cada compra y desbloquea beneficios reales:
+                            envíos gratis, descuentos exclusivos, acceso anticipado a
+                            lanzamientos y atención prioritaria.
+                        </p>
+
+                        <ul class="club-benefits">
+                            <li>
+                                <i class="bi bi-check2"></i>
+                                <span>Puntos canjeables por descuento en tu siguiente pedido</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check2"></i>
+                                <span>Envío gratis a partir del nivel Plata</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check2"></i>
+                                <span>Cupones personalizados según tu historial de compra</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check2"></i>
+                                <span>Acceso anticipado a rebajas y nuevos productos</span>
+                            </li>
+                        </ul>
+
+                        <div class="club-actions">
+                            <a href="/perfil#tab-consentido" class="btn-club btn-club-light">
+                                <i class="bi bi-stars"></i> Ver mis beneficios
+                            </a>
+                            <a href="/registro" class="btn-club btn-club-ghost">
+                                <i class="bi bi-person-plus"></i> Crear cuenta
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Lado derecho: tarjeta visual -->
+                    <div class="club-visual">
+                        <div class="club-card-visual">
+                            <div>
+                                <div class="club-card-brand">
+                                    ORION
+                                    <small>CLUB · MEMBER CARD</small>
+                                </div>
+                            </div>
+
+                            <div class="club-card-tier">
+                                <div class="club-card-tier-emoji">🥇</div>
+                                <div class="club-card-tier-name">Oro</div>
+                                <div class="club-card-tier-sub">Multiplicador 2x</div>
+                            </div>
+
+                            <div class="club-card-footer">
+                                <div>
+                                    <div class="club-card-points-lbl">Puntos</div>
+                                    <div class="club-card-points-num">2,450</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div class="club-card-points-lbl">Siguiente</div>
+                                    <div style="font-size:1.3rem; font-weight:900; color:#8a0052;">💎</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="trust-section shadow-sm mb-5">
-            <h5 class="fw-bold"><i class="bi bi-star-fill text-warning me-2"></i>¿Por qué somos diferentes?</h5>
-            <p class="text-muted">A diferencia de otras tiendas, en ORION tú controlas la logística. Si tu producto llega tarde, tu siguiente envío es totalmente gratis.</p>
+    <!-- ============================================================
+         NEWSLETTER / PROMOCIONES
+         ============================================================ -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-inner">
+
+                <div class="newsletter-head">
+                    <span class="newsletter-eyebrow">
+                        <i class="bi bi-envelope-heart"></i> Promociones
+                    </span>
+                    <h2 class="newsletter-title">
+                        Ofertas <span class="accent">que valen la pena</span>
+                    </h2>
+                    <p class="newsletter-desc">
+                        Recibe lanzamientos, descuentos exclusivos y acceso anticipado
+                        a las mejores promociones de ORION. Solo lo importante, cero spam.
+                    </p>
+                </div>
+
+                <div class="newsletter-form-wrap">
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); mostrarGracias();">
+                        <input type="email" placeholder="tu@email.com" required aria-label="Correo electrónico">
+                        <button type="submit">
+                            Suscribirme <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </form>
+                    <div class="newsletter-note">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Sin spam. Cancela cuando quieras.</span>
+                    </div>
+                </div>
+
+            </div>
         </div>
+    </section>
 
-        <div class="p-5 text-white text-center shadow-lg rounded-5" style="background: radial-gradient(circle, #e10098, #940065);">
-            <h2 class="fw-bold">Conexión Humana</h2>
-            <p class="opacity-75">No usamos bots. Habla con un especialista técnico de ORION ahora mismo.</p>
-            <button class="btn btn-outline-light rounded-pill px-5 py-3 fw-bold mt-3">Iniciar Conversación</button>
-        </div>
-    </main>
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    <footer class="orion-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-5 col-md-12">
+                    <div class="footer-brand">ORION<span>.</span></div>
+                    <p class="footer-tagline">
+                        Redefiniendo la experiencia de compra con tecnología, cercanía y diseño.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
+                    </div>
+                </div>
 
-    <footer class="pt-5 pb-3 mt-5 bg-light border-top">
-        <div class="container text-center text-muted">
-            <p>© 2026 ORION System / Todos los derechos reservados.</p>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <h6 class="footer-heading">Tienda</h6>
+                    <ul class="footer-links">
+                        <li><a href="/catalogo">Catálogo</a></li>
+                        <li><a href="#">Novedades</a></li>
+                        <li><a href="#">Ofertas</a></li>
+                        <li><a href="#">Marcas</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-4 col-6">
+                    <h6 class="footer-heading">Servicios</h6>
+                    <ul class="footer-links">
+                        <li><a href="#servicios">Click &amp; Collect</a></li>
+                        <li><a href="#servicios">Garantía Origen</a></li>
+                        <li><a href="#servicios">Rastreo GPS</a></li>
+                        <li><a href="#club">Club ORION</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-4">
+                    <h6 class="footer-heading">Soporte</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Centro de ayuda</a></li>
+                        <li><a href="#">Encuentra tu tienda</a></li>
+                        <li><a href="#">Términos y condiciones</a></li>
+                        <li><a href="#">Aviso de privacidad</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <span>© 2026 ORION System · Todos los derechos reservados.</span>
+                <span>Hecho con <i class="bi bi-heart-fill" style="color: var(--orion-brand);"></i> en México</span>
+            </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function mostrarGracias() {
+            const form = document.querySelector('.newsletter-form');
+            const note = document.querySelector('.newsletter-note');
+            if (!form || !note) return;
+
+            form.innerHTML = `
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 12px 20px;
+                    color: #16a34a;
+                    font-weight: 700;
+                    font-size: 0.9rem;
+                    width: 100%;
+                    justify-content: center;
+                ">
+                    <i class="bi bi-check-circle-fill" style="font-size: 1.2rem;"></i>
+                    ¡Listo! Revisa tu correo para confirmar.
+                </div>
+            `;
+            note.innerHTML = `
+                <i class="bi bi-stars" style="color: var(--orion-brand);"></i>
+                <span>Bienvenido a las promociones exclusivas de ORION.</span>
+            `;
+        }
+    </script>
 </body>
 </html>

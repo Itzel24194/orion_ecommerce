@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiendas · Liverpool Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--lp-magenta:#e1007a;--lp-magenta-dark:#b80064;--lp-border:#e5e5e5;--lp-border-soft:#f0f0f0;--lp-bg-alt:#f7f7f7;--lp-text:#1a1a1a;--lp-text-soft:#666;--lp-text-mute:#999;--lp-radius:3px;--lp-danger:#d32f2f;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--lp-bg-alt);color:var(--lp-text);font-size:14px;line-height:1.5;}
+.lp-header{background:#fff;border-bottom:1px solid var(--lp-border);position:sticky;top:0;z-index:100;}
+.lp-header__inner{max-width:1200px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.lp-header__brand{font-size:22px;font-weight:300;letter-spacing:8px;color:var(--lp-magenta);text-transform:uppercase;}
+.lp-header__brand strong{font-weight:700;letter-spacing:0;}
+.lp-header__breadcrumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--lp-text-mute);letter-spacing:.3px;text-transform:uppercase;}
+.lp-header__breadcrumb a{color:var(--lp-text-soft);text-decoration:none;}
+.lp-header__breadcrumb a:hover{color:var(--lp-magenta);}
+.lp-header__breadcrumb i{font-size:8px;}
+.lp-main{max-width:1100px;margin:0 auto;padding:40px 24px 60px;}
+.lp-title{font-size:26px;font-weight:300;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.lp-subtitle{font-size:13px;color:var(--lp-text-soft);margin-bottom:36px;}
+.lp-card{background:#fff;border:1px solid var(--lp-border);border-radius:var(--lp-radius);padding:36px 40px;}
+
+/* FILA DE TIENDA */
+.lp-tienda-row{display:grid;grid-template-columns:1.2fr 2fr 1.2fr auto;gap:12px;margin-bottom:12px;align-items:center;}
+.lp-tienda-row input{padding:12px 14px;border:1px solid var(--lp-border);border-radius:var(--lp-radius);font-size:14px;font-family:inherit;color:var(--lp-text);background:#fff;transition:border-color .15s,box-shadow .15s;}
+.lp-tienda-row input:focus{outline:none;border-color:var(--lp-magenta);box-shadow:0 0 0 3px rgba(225,0,122,.08);}
+
+/* BOTÓN ELIMINAR */
+.lp-btn-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:#fff;border:1px solid var(--lp-border);border-radius:var(--lp-radius);color:var(--lp-text-soft);cursor:pointer;transition:all .15s;font-size:14px;}
+.lp-btn-icon:hover{border-color:var(--lp-danger);color:var(--lp-danger);background:#fdeaea;}
+
+.lp-add-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:#fff;border:1px dashed var(--lp-border);border-radius:var(--lp-radius);color:var(--lp-text-soft);cursor:pointer;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;transition:all .15s;margin-top:8px;font-family:inherit;}
+.lp-add-btn:hover{border-color:var(--lp-magenta);color:var(--lp-magenta);background:#fce4f0;}
+
+.lp-actions{display:flex;gap:12px;justify-content:flex-end;padding-top:24px;border-top:1px solid var(--lp-border-soft);flex-wrap:wrap;margin-top:24px;}
+.lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 32px;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;border:1px solid transparent;border-radius:var(--lp-radius);cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit;}
+.lp-btn--primary{background:var(--lp-magenta);color:#fff;}
+.lp-btn--primary:hover{background:var(--lp-magenta-dark);}
+.lp-btn--ghost{background:#fff;color:var(--lp-text-soft);border-color:var(--lp-border);}
+.lp-btn--ghost:hover{border-color:var(--lp-text);color:var(--lp-text);}
+@media(max-width:900px){.lp-tienda-row{grid-template-columns:1fr;}.lp-btn-icon{width:100%;}}
+@media(max-width:640px){.lp-header__inner{padding:14px 20px;}.lp-header__brand{font-size:18px;letter-spacing:4px;}.lp-header__breadcrumb{display:none;}.lp-main{padding:24px 16px 40px;}.lp-title{font-size:20px;}.lp-card{padding:24px 20px;}.lp-actions{flex-direction:column-reverse;}.lp-btn{width:100%;}}
+</style>
+</head>
+<body>
+
+<header class="lp-header">
+  <div class="lp-header__inner">
+    <div class="lp-header__brand">ORION<strong>.</strong></div>
+    <nav class="lp-header__breadcrumb">
+      <a href="{{ url_for('web.dashboard') }}">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{{ url_for('web.configuracion') }}">Configuración</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Tiendas</span>
+    </nav>
+  </div>
+</header>
+
+<main class="lp-main">
+
+  <h1 class="lp-title">Tiendas físicas</h1>
+  <p class="lp-subtitle">Sucursales, direcciones y teléfonos de contacto.</p>
+
+  <div class="lp-card">
+    <form method="POST">
+      <div id="tiendas-lista">
+        {% if tiendas %}
+          {% for t in tiendas %}
+          <div class="lp-tienda-row">
+            <input type="text" name="tienda_nombre[]" value="{{ t.nombre }}" placeholder="Nombre" required>
+            <input type="text" name="tienda_direccion[]" value="{{ t.direccion }}" placeholder="Dirección">
+            <input type="tel"  name="tienda_telefono[]" value="{{ t.telefono }}" placeholder="Teléfono">
+            <button type="button" class="lp-btn-icon" onclick="this.parentElement.remove()" title="Eliminar">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="lp-tienda-row">
+            <input type="text" name="tienda_nombre[]" placeholder="Nombre" required>
+            <input type="text" name="tienda_direccion[]" placeholder="Dirección">
+            <input type="tel"  name="tienda_telefono[]" placeholder="Teléfono">
+            <button type="button" class="lp-btn-icon" onclick="this.parentElement.remove()" title="Eliminar">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        {% endif %}
+      </div>
+
+      <button type="button" class="lp-add-btn" onclick="agregarTienda()">
+        <i class="fas fa-plus"></i> Agregar tienda
+      </button>
+
+      <div class="lp-actions">
+        <a href="{{ url_for('web.dashboard') }}" class="lp-btn lp-btn--ghost">Cancelar</a>
+        <button type="submit" class="lp-btn lp-btn--primary">
+          <i class="fas fa-check"></i> Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+
+</main>
+
+<script>
+function agregarTienda() {
+    const lista = document.getElementById('tiendas-lista');
+    const row = document.createElement('div');
+    row.className = 'lp-tienda-row';
+    row.innerHTML = `
+        <input type="text" name="tienda_nombre[]" placeholder="Nombre" required>
+        <input type="text" name="tienda_direccion[]" placeholder="Dirección">
+        <input type="tel"  name="tienda_telefono[]" placeholder="Teléfono">
+        <button type="button" class="lp-btn-icon" onclick="this.parentElement.remove()" title="Eliminar">
+          <i class="fas fa-times"></i>
+        </button>`;
+    lista.appendChild(row);
+}
+</script>
+
+</body>
+</html>

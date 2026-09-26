@@ -1,7 +1,8 @@
 # models/productos_model.py
 from app.config.database_config import db 
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, date
+
 
 class Producto:
     """Modelo de Producto para MongoDB"""
@@ -22,10 +23,12 @@ class Producto:
     @staticmethod
     def crear(data):
         """Crear un nuevo producto"""
-        if 'categoria_id' in data:
+        if 'categoria_id' in data and data['categoria_id']:
             data['categoria_id'] = str(data['categoria_id'])
-        if 'empresa_id' in data:
-            data['empresa_id'] = str(data['empresa_id'])
+        if 'marca_id' in data and data['marca_id']:
+            data['marca_id'] = str(data['marca_id'])
+        if 'temporada_id' in data and data['temporada_id']:
+            data['temporada_id'] = str(data['temporada_id'])
         
         data['created_at'] = datetime.now()
         data['updated_at'] = datetime.now()
@@ -35,10 +38,14 @@ class Producto:
     @staticmethod
     def actualizar(id, data):
         """Actualizar un producto existente"""
-        if 'categoria_id' in data:
+        if 'categoria_id' in data and data['categoria_id']:
             data['categoria_id'] = str(data['categoria_id'])
-        if 'empresa_id' in data:
-            data['empresa_id'] = str(data['empresa_id'])
+        if 'marca_id' in data and data['marca_id']:
+            data['marca_id'] = str(data['marca_id'])
+        if 'temporada_id' in data and data['temporada_id']:
+            data['temporada_id'] = str(data['temporada_id'])
+        elif 'temporada_id' in data and not data['temporada_id']:
+            data['temporada_id'] = None
         
         data['updated_at'] = datetime.now()
         
@@ -66,22 +73,57 @@ class Producto:
     
     @staticmethod
     def obtener_activos():
-        """Obtener productos activos"""
+        """
+        Obtener productos activos.
+        Usa el campo 'activo' (booleano) para filtrar.
+        
+        ⭐ IMPORTANTE: NO filtra por vendedor_id, así que INCLUYE
+        los productos del marketplace automáticamente.
+        """
+        return list(db.productos.find({"activo": True}).sort("created_at", -1))
+
+    @staticmethod
+    def obtener_activos_por_estado():
+        """
+        Obtener productos por campo 'estado' (legado).
+        Se mantiene por compatibilidad.
+        """
         return list(db.productos.find({"estado": "activo"}))
     
     @staticmethod
-    def obtener_por_empresa(empresa_id):
-        """Obtener productos por empresa"""
+    def obtener_por_marca(marca_id):
+        """
+        Obtener productos por marca (soporta string y ObjectId).
+        ⭐ Fix: busca tanto en string como en ObjectId.
+        """
         try:
-            return list(db.productos.find({"empresa_id": str(empresa_id)}))
+            marca_str = str(marca_id)
+            filtro = {
+                '$or': [
+                    {'marca_id': marca_str},
+                    {'marca_id': ObjectId(marca_str)} if ObjectId.is_valid(marca_str) else {'marca_id': marca_str},
+                ]
+            }
+            return list(db.productos.find(filtro))
         except:
             return []
     
     @staticmethod
     def filtrar_por_categoria(categoria_id):
-        """Filtrar productos por categoría"""
+        """
+        Filtrar productos por categoría (solo activos).
+        ⭐ Fix: soporta string y ObjectId.
+        """
         try:
-            return list(db.productos.find({"categoria_id": str(categoria_id)}))
+            cat_str = str(categoria_id)
+            filtro = {
+                '$or': [
+                    {'categoria_id': cat_str},
+                    {'categoria_id': ObjectId(cat_str)} if ObjectId.is_valid(cat_str) else {'categoria_id': cat_str},
+                ],
+                'activo': True
+            }
+            return list(db.productos.find(filtro))
         except:
             return []
     
@@ -89,6 +131,11 @@ class Producto:
     def filtrar_por_categoria_y_descendientes(categoria_id):
         """
         Busca productos en la categoría seleccionada y sus descendientes (hijos y nietos).
+        Solo devuelve productos activos (activo=True).
+        
+        ⭐ FIX CRÍTICO: Los productos del marketplace guardan categoria_id como
+        ObjectId, mientras que los del admin lo guardan como string. Esta función
+        ahora busca en AMBOS formatos para que ambos aparezcan.
         """
         from app.models.categorias_model import Categoria
         
@@ -102,31 +149,45 @@ class Producto:
                     ids.extend(obtener_ids_hijos(cat.get('_id'), lista_categorias))
             return ids
 
-        lista_ids = obtener_ids_hijos(categoria_id_str, todas_las_categorias)
+        lista_ids_str = obtener_ids_hijos(categoria_id_str, todas_las_categorias)
+        
+        # ⭐ Crear también la lista como ObjectId
+        lista_ids_oid = []
+        for i in lista_ids_str:
+            if ObjectId.is_valid(i):
+                lista_ids_oid.append(ObjectId(i))
         
         try:
-            return list(db.productos.find({'categoria_id': {'$in': lista_ids}}))
+            # ⭐ Buscar en AMBOS formatos (string y ObjectId)
+            return list(db.productos.find({
+                '$or': [
+                    {'categoria_id': {'$in': lista_ids_str}},
+                    {'categoria_id': {'$in': lista_ids_oid}},
+                ],
+                'activo': True
+            }).sort("created_at", -1))
         except:
             return []
     
     @staticmethod
     def buscar(termino):
-        """Buscar productos por nombre o descripción"""
+        """Buscar productos por nombre o descripción (solo activos)"""
         try:
             return list(db.productos.find({
                 '$or': [
                     {'nombre': {'$regex': termino, '$options': 'i'}},
                     {'descripcion': {'$regex': termino, '$options': 'i'}}
-                ]
+                ],
+                'activo': True
             }))
         except:
             return []
     
     @staticmethod
     def obtener_destacados(limite=8):
-        """Obtener productos destacados (los más vendidos)"""
+        """Obtener productos destacados (los más vendidos) - solo activos"""
         try:
-            return list(db.productos.find({"estado": "activo"}).limit(limite))
+            return list(db.productos.find({"activo": True}).limit(limite))
         except:
             return []
     
@@ -140,7 +201,15 @@ class Producto:
     
     @staticmethod
     def contar_activos():
-        """Contar productos activos"""
+        """Contar productos activos (campo activo=True)"""
+        try:
+            return db.productos.count_documents({"activo": True})
+        except:
+            return 0
+
+    @staticmethod
+    def contar_activos_por_estado():
+        """Contar productos activos por campo 'estado' (legado)"""
         try:
             return db.productos.count_documents({"estado": "activo"})
         except:
@@ -175,16 +244,17 @@ class Producto:
     
     @staticmethod
     def obtener_por_rango_precios(min_precio, max_precio):
-        """Obtener productos en un rango de precios"""
+        """Obtener productos en un rango de precios (solo activos)"""
         try:
             return list(db.productos.find({
-                "variables.precio": {"$gte": float(min_precio), "$lte": float(max_precio)}
+                "variables.precio": {"$gte": float(min_precio), "$lte": float(max_precio)},
+                "activo": True
             }))
         except:
             return []
 
     # ================================================================
-    # NUEVO MÉTODO: Obtener productos por lista de IDs
+    # Obtener productos por lista de IDs
     # ================================================================
     @staticmethod
     def obtener_por_ids(ids):
@@ -207,3 +277,78 @@ class Producto:
             return list(db.productos.find({'_id': {'$in': object_ids}}))
         except:
             return []
+
+    # ================================================================
+    # Obtener productos por temporada
+    # ================================================================
+    @staticmethod
+    def obtener_por_temporada(temporada_id):
+        """
+        Obtener productos asociados a una temporada.
+        ⭐ Fix: soporta string y ObjectId.
+        """
+        try:
+            temp_str = str(temporada_id)
+            filtro = {
+                '$or': [
+                    {'temporada_id': temp_str},
+                    {'temporada_id': ObjectId(temp_str)} if ObjectId.is_valid(temp_str) else {'temporada_id': temp_str},
+                ]
+            }
+            return list(db.productos.find(filtro))
+        except:
+            return []
+
+    # ================================================================
+    # ACTUALIZACIÓN AUTOMÁTICA DE ESTADOS (SCHEDULER)
+    # ================================================================
+    @staticmethod
+    def actualizar_estado_segun_temporadas():
+        """
+        Actualiza el campo 'activo' de todos los productos según las temporadas vigentes.
+        Se ejecuta automáticamente con el scheduler (diariamente a las 00:00).
+        
+        Un producto está activo si:
+        - Tiene temporada_id asignado
+        - Su temporada está activa (activa=True)
+        - La fecha actual está dentro del rango [fecha_inicio, fecha_fin]
+        
+        Si un producto no tiene temporada_id, su estado NO se modifica.
+        """
+        from app.models.temporada_model import Temporada
+        
+        hoy = datetime.now().date()
+        
+        # Obtener temporadas activas en la fecha actual
+        temporadas_vigentes = Temporada.obtener_por_fecha(hoy)
+        ids_temporadas_vigentes_str = [str(t['_id']) for t in temporadas_vigentes]
+        ids_temporadas_vigentes_oid = [t['_id'] for t in temporadas_vigentes]
+
+        # 1. ACTIVAR productos cuyas temporadas están vigentes
+        if ids_temporadas_vigentes_str:
+            db.productos.update_many(
+                {'$or': [
+                    {"temporada_id": {"$in": ids_temporadas_vigentes_str}},
+                    {"temporada_id": {"$in": ids_temporadas_vigentes_oid}},
+                ]},
+                {"$set": {"activo": True, "updated_at": datetime.now()}}
+            )
+        
+        # 2. DESACTIVAR productos cuyas temporadas NO están vigentes
+        db.productos.update_many(
+            {'$or': [
+                {"temporada_id": {"$nin": ids_temporadas_vigentes_str + [None, '']}},
+                {"temporada_id": {"$nin": ids_temporadas_vigentes_oid + [None, '']}},
+            ], "temporada_id": {"$exists": True, "$ne": None}},
+            {"$set": {"activo": False, "updated_at": datetime.now()}}
+        )
+
+        return True
+
+    # ================================================================
+    # Alias de obtener_por_temporada
+    # ================================================================
+    @staticmethod
+    def obtener_por_temporada_id(temporada_id):
+        """Alias de obtener_por_temporada"""
+        return Producto.obtener_por_temporada(temporada_id)

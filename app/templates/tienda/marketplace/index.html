@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-primary-soft: #fff0f8;
+            --orion-dark: #1a1a2e;
+            --orion-gray: #64748b;
+            --orion-border: #ececf1;
+        }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { background: #ffffff; color: var(--orion-dark); min-height: 100vh; padding-bottom: 60px; }
+
+        .top-nav { background: #ffffff; font-size: .75rem; padding: 6px 0; border-bottom: 1px solid #eee; }
+        .top-nav a { color: #666; text-decoration: none; }
+        .top-nav a:hover { color: var(--orion-primary); }
+        .top-nav i { color: var(--orion-primary); }
+        .main-navbar { background: #ffffff; border-bottom: 2px solid #f0f0f0; padding: 12px 0; }
+        .brand-logo { font-weight: 900; font-size: 2.3rem; letter-spacing: -1.5px; color: var(--orion-primary) !important; text-decoration: none; }
+        .brand-border { height: 4px; background: linear-gradient(90deg, var(--orion-primary), var(--orion-primary-dark)); width: 100%; }
+
+        /* HERO */
+        .mkt-hero {
+            background: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary-dark) 100%);
+            color: #fff;
+            padding: 64px 0 72px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .mkt-hero::before {
+            content: '';
+            position: absolute;
+            top: -60%; right: -10%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%);
+        }
+        .mkt-hero h1 { font-weight: 900; font-size: 2.6rem; margin-bottom: 12px; color: #fff; }
+        .mkt-hero p { font-size: 1.05rem; opacity: .95; max-width: 620px; margin: 0 auto 24px; }
+        .mkt-hero .mkt-cta {
+            background: #FFD700; color: var(--orion-dark);
+            border: none; padding: 14px 34px;
+            border-radius: 50px; font-weight: 800; font-size: .95rem;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+            transition: all .25s;
+            box-shadow: 0 8px 24px rgba(0,0,0,.15);
+        }
+        .mkt-hero .mkt-cta:hover {
+            background: #ffed4e; color: var(--orion-dark);
+            transform: translateY(-3px);
+        }
+        .mkt-hero .mkt-cta-outline {
+            background: rgba(255,255,255,.15); color: #fff;
+            border: 2px solid rgba(255,255,255,.35);
+            padding: 13px 30px; border-radius: 50px;
+            font-weight: 700; font-size: .9rem;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+            margin-left: 12px;
+            transition: all .25s;
+        }
+        .mkt-hero .mkt-cta-outline:hover {
+            background: rgba(255,255,255,.25); color: #fff;
+        }
+
+        /* BENEFICIOS */
+        .mkt-benefits {
+            background: #fff;
+            padding: 48px 0;
+        }
+        .benefit-card {
+            background: #fff;
+            border: 1px solid var(--orion-border);
+            border-radius: 16px;
+            padding: 28px 24px;
+            text-align: center;
+            transition: all .25s;
+            height: 100%;
+        }
+        .benefit-card:hover {
+            border-color: var(--orion-primary);
+            box-shadow: 0 12px 32px rgba(225,0,152,.1);
+            transform: translateY(-4px);
+        }
+        .benefit-card .ico {
+            width: 60px; height: 60px;
+            background: var(--orion-primary-soft);
+            color: var(--orion-primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.6rem;
+        }
+        .benefit-card h4 { font-size: 1.05rem; font-weight: 800; color: var(--orion-dark); margin-bottom: 8px; }
+        .benefit-card p { font-size: .85rem; color: var(--orion-gray); margin: 0; line-height: 1.5; }
+
+        /* STATS */
+        .mkt-stats {
+            background: var(--orion-primary-soft);
+            padding: 32px 0;
+            margin: 40px 0;
+            border-radius: 20px;
+        }
+        .mkt-stat {
+            text-align: center;
+        }
+        .mkt-stat .num { font-size: 2.2rem; font-weight: 900; color: var(--orion-primary); line-height: 1; }
+        .mkt-stat .lbl { font-size: .78rem; color: var(--orion-gray); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-top: 6px; }
+
+        /* VENDEDORES DESTACADOS */
+        .section-title {
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--orion-dark);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title i { color: var(--orion-primary); }
+        .section-sub { font-size: .85rem; color: var(--orion-gray); margin-bottom: 28px; }
+
+        .vendedor-card {
+            background: #fff;
+            border: 1px solid var(--orion-border);
+            border-radius: 14px;
+            padding: 22px;
+            text-align: center;
+            transition: all .25s;
+            height: 100%;
+        }
+        .vendedor-card:hover {
+            border-color: var(--orion-primary);
+            box-shadow: 0 10px 28px rgba(225,0,152,.1);
+            transform: translateY(-3px);
+        }
+        .vendedor-avatar {
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--orion-primary), var(--orion-primary-dark));
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; font-weight: 900;
+            margin: 0 auto 14px;
+            border: 3px solid var(--orion-primary-soft);
+        }
+        .vendedor-nombre { font-weight: 800; font-size: 1rem; color: var(--orion-dark); margin-bottom: 4px; }
+        .vendedor-desc { font-size: .78rem; color: var(--orion-gray); margin-bottom: 12px; min-height: 34px; }
+        .vendedor-metricas { display: flex; justify-content: center; gap: 18px; padding-top: 12px; border-top: 1px solid var(--orion-border); }
+        .vendedor-metricas .m { font-size: .72rem; color: var(--orion-gray); }
+        .vendedor-metricas .m strong { display: block; color: var(--orion-dark); font-weight: 800; font-size: .88rem; }
+
+        /* PASOS */
+        .steps-list { counter-reset: step; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .step-card {
+            background: #fff;
+            border: 1px solid var(--orion-border);
+            border-radius: 14px;
+            padding: 24px 20px 24px 64px;
+            position: relative;
+        }
+        .step-card::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            top: 22px; left: 20px;
+            width: 32px; height: 32px;
+            background: var(--orion-primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: .9rem;
+        }
+        .step-card h5 { font-size: .95rem; font-weight: 800; color: var(--orion-dark); margin-bottom: 6px; }
+        .step-card p { font-size: .8rem; color: var(--orion-gray); margin: 0; line-height: 1.5; }
+
+        /* CTA FINAL */
+        .mkt-final-cta {
+            background: linear-gradient(135deg, var(--orion-primary), var(--orion-primary-dark));
+            border-radius: 24px;
+            padding: 56px 40px;
+            text-align: center;
+            color: #fff;
+            margin: 60px 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .mkt-final-cta h2 { font-weight: 900; font-size: 2rem; margin-bottom: 12px; color: #fff; }
+        .mkt-final-cta p { font-size: 1rem; opacity: .95; max-width: 520px; margin: 0 auto 24px; }
+
+        footer {
+            background: linear-gradient(135deg, #e10098 0%, #c00080 100%) !important;
+            color: #ffffff !important;
+            padding: 30px 0 !important;
+            text-align: center !important;
+            font-size: .8rem !important;
+            margin-top: 60px !important;
+        }
+        footer p { margin: 0 !important; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; color: #ffffff !important; }
+        footer i { color: #FFD700 !important; }
+
+        @media (max-width: 768px) {
+            .mkt-hero h1 { font-size: 1.7rem; }
+            .mkt-hero .mkt-cta, .mkt-hero .mkt-cta-outline { display: flex; margin: 8px auto; justify-content: center; }
+            .mkt-hero .mkt-cta-outline { margin-left: 0; }
+            .mkt-final-cta { padding: 36px 24px; }
+            .mkt-final-cta h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <div class="container d-flex justify-content-end gap-4">
+            <a href="/servicios"><i class="bi bi-truck"></i> Servicios</a>
+            <a href="#"><i class="bi bi-question-circle"></i> Ayuda</a>
+            <a href="{{ url_for('web.perfil') }}"><i class="bi bi-person"></i> Mi Cuenta</a>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light main-navbar">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
+            <a href="{{ url_for('web.raiz_tienda') }}" style="text-decoration:none; color:var(--orion-gray); font-size:.8rem; font-weight:600;">
+                <i class="bi bi-arrow-left"></i> Volver a la tienda
+            </a>
+        </div>
+    </nav>
+    <div class="brand-border"></div>
+
+    <!-- HERO -->
+    <section class="mkt-hero">
+        <div class="container">
+            <h1>Vende en ORION Marketplace</h1>
+            <p>Llega a miles de clientes, gestiona tu inventario y recibe pagos automáticos. Tú te encargas del producto, nosotros de la plataforma.</p>
+            <a href="{{ url_for('web.marketplace_registro') }}" class="mkt-cta">
+                <i class="bi bi-shop-window"></i> Abrir mi tienda
+            </a>
+            <a href="#como-funciona" class="mkt-cta-outline">
+                <i class="bi bi-info-circle"></i> Cómo funciona
+            </a>
+        </div>
+    </section>
+
+    <!-- BENEFICIOS -->
+    <section class="mkt-benefits">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="benefit-card">
+                        <div class="ico"><i class="bi bi-people-fill"></i></div>
+                        <h4>Miles de clientes</h4>
+                        <p>Accede a toda la audiencia de ORION desde el día uno.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="benefit-card">
+                        <div class="ico"><i class="bi bi-graph-up-arrow"></i></div>
+                        <h4>Panel en vivo</h4>
+                        <p>Ve tus ventas, stock y comisiones en tiempo real.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="benefit-card">
+                        <div class="ico"><i class="bi bi-credit-card-2-front"></i></div>
+                        <h4>Pagos automáticos</h4>
+                        <p>Recibe tus ganancias por transferencia cada semana.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="benefit-card">
+                        <div class="ico"><i class="bi bi-shield-check"></i></div>
+                        <h4>Sin inversión</h4>
+                        <p>Registro gratis. Solo pagas comisión por venta.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS — ⭐ Defensivo con defaults -->
+    <div class="container">
+        <div class="mkt-stats">
+            <div class="row">
+                <div class="col-6 col-md-3">
+                    <div class="mkt-stat">
+                        <div class="num">{{ (stats.vendedores if stats else 0) or 0 }}</div>
+                        <div class="lbl">Vendedores activos</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="mkt-stat">
+                        <div class="num">{{ (stats.productos if stats else 0) or 0 }}</div>
+                        <div class="lbl">Productos disponibles</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="mkt-stat">
+                        <div class="num">10-20%</div>
+                        <div class="lbl">Comisión</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="mkt-stat">
+                        <div class="num">24/7</div>
+                        <div class="lbl">Soporte</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASOS -->
+    <section class="container my-5" id="como-funciona">
+        <h2 class="section-title"><i class="bi bi-list-check"></i> Cómo funciona</h2>
+        <p class="section-sub">Abrir tu tienda toma 5 minutos. El proceso es simple.</p>
+
+        <div class="steps-list">
+            <div class="step-card">
+                <h5>Regístrate gratis</h5>
+                <p>Llena el formulario con los datos de tu tienda y datos fiscales.</p>
+            </div>
+            <div class="step-card">
+                <h5>Espera aprobación</h5>
+                <p>Nuestro equipo revisa tu solicitud en menos de 24 horas.</p>
+            </div>
+            <div class="step-card">
+                <h5>Sube productos</h5>
+                <p>Publica tu catálogo con fotos, precios y stock desde tu panel.</p>
+            </div>
+            <div class="step-card">
+                <h5>Empieza a vender</h5>
+                <p>Recibe pedidos, envíalos y cobra automáticamente cada semana.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- VENDEDORES DESTACADOS — ⭐ Defensivo con defaults -->
+    {% if vendedores and vendedores|length > 0 %}
+    <section class="container my-5">
+        <h2 class="section-title"><i class="bi bi-stars"></i> Vendedores destacados</h2>
+        <p class="section-sub">Conoce algunas de las tiendas que ya están vendiendo en ORION.</p>
+
+        <div class="row g-4">
+            {% for v in vendedores[:8] %}
+                {# ⭐ Extraer valores con defaults seguros #}
+                {% set nombre_t = (v.nombre_tienda if v.nombre_tienda is defined and v.nombre_tienda else 'Vendedor') %}
+                {% set desc_t   = (v.descripcion if v.descripcion is defined and v.descripcion else '') %}
+                {% set m        = (v.metricas if v.metricas is defined and v.metricas else {}) %}
+                {% set m_prod   = (m.productos if m.productos is defined else (m.get('productos', 0) if m.get is defined else 0)) or 0 %}
+                {% set m_ventas = (m.ventas if m.ventas is defined else (m.get('ventas', 0) if m.get is defined else 0)) or 0 %}
+                {% set slug_t   = (v.slug if v.slug is defined and v.slug else '') %}
+
+                <div class="col-md-3 col-6">
+                    <div class="vendedor-card">
+                        <div class="vendedor-avatar">
+                            {{ nombre_t[0]|upper }}
+                        </div>
+                        <div class="vendedor-nombre">{{ nombre_t }}</div>
+                        <div class="vendedor-desc">
+                            {{ desc_t[:70] }}{% if desc_t|length > 70 %}...{% endif %}
+                        </div>
+                        <div class="vendedor-metricas">
+                            <div class="m"><strong>{{ m_prod }}</strong>Productos</div>
+                            <div class="m"><strong>{{ m_ventas }}</strong>Ventas</div>
+                        </div>
+
+                        {# ⭐ Link a la tienda pública si tiene slug #}
+                        {% if slug_t %}
+                        <div class="mt-3 pt-2" style="border-top: 1px solid var(--orion-border);">
+                            <a href="{{ url_for('web.marketplace_ver_tienda', slug=slug_t) }}"
+                               target="_blank"
+                               class="btn btn-sm w-100"
+                               style="background: var(--orion-primary-soft); color: var(--orion-primary); border: none; border-radius: 50px; font-weight: 700; font-size: .78rem;">
+                                <i class="bi bi-eye"></i> Ver tienda
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- CTA FINAL -->
+    <div class="container">
+        <div class="mkt-final-cta">
+            <h2>¿Listo para empezar?</h2>
+            <p>Únete a los vendedores que ya están creciendo con ORION. Registro gratuito, sin mensualidades.</p>
+            <a href="{{ url_for('web.marketplace_registro') }}" class="mkt-cta">
+                <i class="bi bi-shop-window"></i> Abrir mi tienda ahora
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p><i class="bi bi-shop"></i> ORION Marketplace · © 2026 · Todos los derechos reservados <i class="bi bi-heart-fill"></i></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

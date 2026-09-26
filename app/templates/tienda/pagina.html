@@ -184,12 +184,303 @@
         }
         .banner-promo:hover { transform: scale(1.02); }
 
+        /* ============================================================
+           ⭐ MESA DE REGALOS — HOME
+           ============================================================ */
+        .registry-section {
+            background: linear-gradient(135deg, #e10098 0%, #c00080 100%);
+            border-radius: 24px;
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+            margin: 40px 0;
+        }
+        .registry-section::before {
+            content: '';
+            position: absolute;
+            top: -60%; right: -10%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%);
+            pointer-events: none;
+        }
+        .registry-section::after {
+            content: '';
+            position: absolute;
+            bottom: -80%; left: -5%;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(255,255,255,.1), transparent 70%);
+            pointer-events: none;
+        }
+        .registry-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .registry-text { flex: 1; min-width: 280px; }
+        .registry-text h2 {
+            font-weight: 900;
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .registry-text h2 i { color: #FFD700; }
+        .registry-text p {
+            font-size: 1rem;
+            opacity: .95;
+            line-height: 1.6;
+            max-width: 620px;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+        .registry-text p strong { color: #FFD700; }
+        .registry-cta {
+            background: #FFD700;
+            color: #1a1a2e;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: .95rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all .25s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,.15);
+        }
+        .registry-cta:hover {
+            background: #ffed4e;
+            color: #1a1a2e;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0,0,0,.25);
+        }
+        .registry-benefits {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255,255,255,.12);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 20px;
+            padding: 24px 28px;
+            min-width: 260px;
+        }
+        .registry-benefit {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .88rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .registry-benefit i {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            color: #FFD700;
+            flex-shrink: 0;
+        }
+
+        /* Event type chips (mini) */
+        .event-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        .event-chip {
+            background: rgba(255,255,255,.2);
+            border: 1px solid rgba(255,255,255,.3);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: .75rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all .2s;
+        }
+        .event-chip:hover {
+            background: rgba(255,255,255,.35);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* ============================================================
+           ⭐ MARKETPLACE — HOME (NUEVO)
+           ============================================================ */
+        .marketplace-section {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            border-radius: 24px;
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+            margin: 40px 0;
+        }
+        .marketplace-section::before {
+            content: '';
+            position: absolute;
+            top: -60%; right: -10%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%);
+            pointer-events: none;
+        }
+        .marketplace-section::after {
+            content: '';
+            position: absolute;
+            bottom: -80%; left: -5%;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(255,255,255,.1), transparent 70%);
+            pointer-events: none;
+        }
+        .marketplace-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .marketplace-text { flex: 1; min-width: 280px; }
+        .marketplace-text h2 {
+            font-weight: 900;
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .marketplace-text h2 i { color: #fbbf24; }
+        .marketplace-text p {
+            font-size: 1rem;
+            opacity: .95;
+            line-height: 1.6;
+            max-width: 620px;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+        .marketplace-text p strong { color: #fbbf24; }
+        .marketplace-cta {
+            background: #fbbf24;
+            color: #1a1a2e;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: .95rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all .25s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,.15);
+        }
+        .marketplace-cta:hover {
+            background: #fcd34d;
+            color: #1a1a2e;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0,0,0,.25);
+        }
+        .marketplace-cta.secondary {
+            background: rgba(255,255,255,.2);
+            color: #fff;
+            box-shadow: none;
+        }
+        .marketplace-cta.secondary:hover {
+            background: rgba(255,255,255,.35);
+            color: #fff;
+        }
+        .marketplace-benefits {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255,255,255,.12);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 20px;
+            padding: 24px 28px;
+            min-width: 260px;
+        }
+        .marketplace-benefit {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: .88rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .marketplace-benefit i {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            color: #fbbf24;
+            flex-shrink: 0;
+        }
+        .marketplace-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        .marketplace-chip {
+            background: rgba(255,255,255,.2);
+            border: 1px solid rgba(255,255,255,.3);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: .75rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all .2s;
+        }
+        .marketplace-chip:hover {
+            background: rgba(255,255,255,.35);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        /* Link top-nav marketplace */
+        .top-nav .mkt-link {
+            color: #0284c7 !important;
+            font-weight: 700;
+        }
+        .top-nav .mkt-link:hover {
+            color: #0369a1 !important;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .hero-slide { height: 350px; }
             .trend-grid { height: 350px; }
             .banner-full { margin: 20px 0; height: 250px; }
             .promo-card .promo-img { height: 150px; }
+            .registry-section { padding: 32px 24px; border-radius: 18px; }
+            .registry-text h2 { font-size: 1.6rem; }
+            .registry-text p { font-size: .9rem; }
+            .registry-cta { width: 100%; justify-content: center; }
+            .marketplace-section { padding: 32px 24px; border-radius: 18px; }
+            .marketplace-text h2 { font-size: 1.6rem; }
+            .marketplace-text p { font-size: .9rem; }
+            .marketplace-cta { width: 100%; justify-content: center; }
         }
         @media (max-width: 576px) {
             .hero-slide { height: 250px; }
@@ -198,6 +489,10 @@
             .trend-item:last-child { grid-column: span 2; }
             .trend-item { height: 150px; }
             .banner-promo { padding: 20px; min-height: 150px; }
+            .registry-section { padding: 24px 18px; }
+            .registry-text h2 { font-size: 1.3rem; }
+            .marketplace-section { padding: 24px 18px; }
+            .marketplace-text h2 { font-size: 1.3rem; }
         }
 
         /* ===== BADGE CARRITO ===== */
@@ -224,6 +519,180 @@
             top: -8px;
             right: -10px;
         }
+        /* ============================================================
+   AUTOCOMPLETADO DE BÚSQUEDA — ORION
+   ============================================================ */
+.search-wrapper {
+    max-width: 680px;
+    min-width: 260px;
+    position: relative;
+}
+
+.search-container {
+    border: 2px solid #eee !important;
+    border-radius: 50px;
+    overflow: hidden;
+    background: #f8f9fa;
+    transition: all 0.25s ease;
+}
+
+.search-wrapper:focus-within .search-container {
+    border-color: var(--orion-primary, #e10098) !important;
+    box-shadow: 0 0 0 4px rgba(225, 0, 152, 0.08);
+    background: #fff;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid #f0f0f0;
+    max-height: 480px;
+    overflow-y: auto;
+    z-index: 1050;
+    animation: acFadeIn 0.18s ease;
+}
+
+@keyframes acFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.autocomplete-dropdown::-webkit-scrollbar { width: 6px; }
+.autocomplete-dropdown::-webkit-scrollbar-thumb {
+    background: #e10098;
+    border-radius: 10px;
+}
+
+.autocomplete-loading,
+.autocomplete-empty {
+    padding: 18px 20px;
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+}
+.autocomplete-loading i,
+.autocomplete-empty i {
+    color: #e10098;
+    margin-right: 6px;
+}
+
+.autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.15s ease;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+    background: #fdf2f8;
+}
+
+.autocomplete-item.active {
+    box-shadow: inset 3px 0 0 #e10098;
+}
+
+.autocomplete-item-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #f8f8f8;
+    border: 1px solid #eee;
+    flex-shrink: 0;
+}
+
+.autocomplete-item-img.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 1.2rem;
+}
+
+.autocomplete-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.autocomplete-item-name {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #1a1a2e;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 2px;
+}
+
+.autocomplete-item-name mark {
+    background: rgba(225, 0, 152, 0.15);
+    color: #e10098;
+    font-weight: 800;
+    padding: 0 2px;
+    border-radius: 3px;
+}
+
+.autocomplete-item-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 0.72rem;
+    color: #888;
+    flex-wrap: wrap;
+}
+
+.autocomplete-item-meta .marca {
+    color: #e10098;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.autocomplete-item-price {
+    font-weight: 800;
+    color: #e10098;
+    font-size: 0.92rem;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.autocomplete-footer {
+    padding: 10px 16px;
+    border-top: 1px solid #f0f0f0;
+    text-align: center;
+    background: #fafafa;
+    border-radius: 0 0 16px 16px;
+}
+
+.autocomplete-footer a {
+    color: #e10098 !important;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+
+.autocomplete-footer a:hover {
+    text-decoration: underline !important;
+}
+
+@media (max-width: 767px) {
+    .search-wrapper { max-width: 100%; }
+    .autocomplete-dropdown { max-height: 60vh; }
+    .autocomplete-item-name { font-size: 0.82rem; }
+    .autocomplete-item-img { width: 40px; height: 40px; }
+}
     </style>
 </head>
 <body>
@@ -240,6 +709,24 @@
             <a href="{{ url_for('web.mis_cupones') }}" class="text-secondary text-decoration-none">
                 <i class="bi bi-ticket-perforated me-1"></i>Mis cupones
             </a>
+            <!-- ⭐ MESA DE REGALOS -->
+            <a href="{{ url_for('web.mis_mesas_regalos') }}" class="text-secondary text-decoration-none fw-semibold" style="color:var(--orion-primary) !important;">
+                <i class="bi bi-gift-fill me-1"></i>Mesa de Regalos
+            </a>
+            <!-- ⭐ NUEVO: MARKETPLACE (condicional según sesión) -->
+            {% if session.get('es_vendedor') %}
+                <a href="{{ url_for('web.marketplace_dashboard') }}" class="text-decoration-none mkt-link">
+                    <i class="bi bi-shop-window me-1"></i>Mi tienda
+                </a>
+            {% elif session.get('user_id') %}
+                <a href="{{ url_for('web.marketplace_registro') }}" class="text-decoration-none mkt-link">
+                    <i class="bi bi-shop me-1"></i>Vender en ORION
+                </a>
+            {% else %}
+                <a href="{{ url_for('web.marketplace') }}" class="text-decoration-none mkt-link">
+                    <i class="bi bi-shop me-1"></i>Marketplace
+                </a>
+            {% endif %}
         </div>
     </div>
 
@@ -268,9 +755,33 @@
                         {% endif %}
                     </ul>
                 </div>
-                <form class="d-flex flex-grow-1" action="/catalogo" method="GET">
-                    <input class="form-control rounded-pill bg-light" type="search" name="q" placeholder="Buscar productos...">
-                </form>
+                <div class="search-wrapper flex-grow-1">
+    <form action="/catalogo" method="GET" autocomplete="off" id="searchForm">
+        <div class="input-group search-container">
+            <input class="form-control border-0 bg-light ps-4"
+                   type="search" name="q" id="searchInput"
+                   placeholder="Buscar productos..." autocomplete="off">
+            <button class="btn btn-light border-0 text-muted px-3" type="submit">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </form>
+
+    <div id="autocompleteResults" class="autocomplete-dropdown" style="display:none;">
+        <div id="autocompleteLoading" class="autocomplete-loading" style="display:none;">
+            <i class="bi bi-hourglass-split"></i> Buscando...
+        </div>
+        <div id="autocompleteList"></div>
+        <div id="autocompleteFooter" class="autocomplete-footer" style="display:none;">
+            <a href="#" id="autocompleteVerTodos">
+                Ver todos los resultados <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        <div id="autocompleteEmpty" class="autocomplete-empty" style="display:none;">
+            <i class="bi bi-search"></i> No encontramos productos
+        </div>
+    </div>
+</div>
 
                 <div class="ms-3 d-flex align-items-center gap-3">
                     {% if session.get('nombre') %}
@@ -298,6 +809,13 @@
                     <a href="{{ url_for('web.listar_promociones_cliente') }}" class="btn btn-sm btn-outline-primary rounded-pill d-none d-md-inline-block" style="border-color:var(--orion-primary); color:var(--orion-primary);">
                         <i class="bi bi-gift"></i> Promos
                     </a>
+
+                    <!-- ⭐ NUEVO: Botón Marketplace (visible en navbar) -->
+                    {% if session.get('es_vendedor') %}
+                    <a href="{{ url_for('web.marketplace_dashboard') }}" class="btn btn-sm rounded-pill d-none d-md-inline-block" style="background:#0284c7; color:#fff; font-weight:700;">
+                        <i class="bi bi-shop-window"></i> Mi tienda
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -305,7 +823,7 @@
 
     <!-- ===== MARQUEE ===== -->
     <div class="marquee-banner">
-        <div class="marquee-text">¡ENVÍOS GRATIS A TODO MÉXICO! • OFERTAS ESPECIALES POR TIEMPO LIMITADO • ¡DESCUBRE LO NUEVO DE ORION!</div>
+        <div class="marquee-text">¡ENVÍOS GRATIS A TODO MÉXICO! • OFERTAS ESPECIALES POR TIEMPO LIMITADO • ¡DESCUBRE LO NUEVO DE ORION! • 🎁 CREA TU MESA DE REGALOS Y RECIBE 10% DE BONIFICACIÓN • 🏪 VENDE EN ORION Y LLEGA A MILES DE CLIENTES</div>
     </div>
 
     <!-- ===== HERO CAROUSEL ===== -->
@@ -327,6 +845,115 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== ⭐ MESA DE REGALOS ===== -->
+    <section class="container">
+        <div class="registry-section">
+            <div class="registry-inner">
+                <div class="registry-text">
+                    <h2><i class="bi bi-gift-fill"></i> Mesa de Regalos ORION</h2>
+                    <p>
+                        Crea tu lista de regalos para bodas, baby showers, XV años y más.
+                        Compártela con tus invitados y recibe
+                        <strong>10% de bonificación</strong> en tu monedero electrónico.
+                    </p>
+                    <div class="event-chips">
+                        <span class="event-chip"><i class="bi bi-heart-fill"></i> Boda</span>
+                        <span class="event-chip"><i class="bi bi-balloon-fill"></i> Baby Shower</span>
+                        <span class="event-chip"><i class="bi bi-stars"></i> XV Años</span>
+                        <span class="event-chip"><i class="bi bi-cake2-fill"></i> Cumpleaños</span>
+                        <span class="event-chip"><i class="bi bi-droplet-fill"></i> Bautizo</span>
+                    </div>
+                    <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
+                        <a href="{{ url_for('web.crear_mesa_regalos') }}" class="registry-cta">
+                            <i class="bi bi-plus-circle-fill"></i> Crear mi Mesa de Regalos
+                        </a>
+                        <a href="{{ url_for('web.mis_mesas_regalos') }}" class="registry-cta" style="background:rgba(255,255,255,.2); color:#fff; box-shadow:none;">
+                            <i class="bi bi-list-ul"></i> Ver mis mesas
+                        </a>
+                    </div>
+                </div>
+                <div class="registry-benefits">
+                    <div class="registry-benefit">
+                        <i class="bi bi-percent"></i>
+                        <span>10% de bonificación en monedero</span>
+                    </div>
+                    <div class="registry-benefit">
+                        <i class="bi bi-share-fill"></i>
+                        <span>Link personalizado para invitados</span>
+                    </div>
+                    <div class="registry-benefit">
+                        <i class="bi bi-wallet2"></i>
+                        <span>Fondo de efectivo o regalos físicos</span>
+                    </div>
+                    <div class="registry-benefit">
+                        <i class="bi bi-truck"></i>
+                        <span>Envío gratis a tu casa</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ⭐ NUEVO: SECCIÓN MARKETPLACE ===== -->
+    <section class="container">
+        <div class="marketplace-section">
+            <div class="marketplace-inner">
+                <div class="marketplace-text">
+                    <h2><i class="bi bi-shop-window"></i> Marketplace ORION</h2>
+                    <p>
+                        Descubre tiendas de emprendedores y marcas independientes.
+                        ¿Tienes un negocio? <strong>Vende en ORION</strong> y llega a miles de clientes
+                        con nuestro sistema de comisiones transparente.
+                    </p>
+                    <div class="marketplace-chips">
+                        <span class="marketplace-chip"><i class="bi bi-bag-heart-fill"></i> Moda</span>
+                        <span class="marketplace-chip"><i class="bi bi-phone-fill"></i> Electrónica</span>
+                        <span class="marketplace-chip"><i class="bi bi-house-heart-fill"></i> Hogar</span>
+                        <span class="marketplace-chip"><i class="bi bi-bicycle"></i> Deportes</span>
+                        <span class="marketplace-chip"><i class="bi bi-flower1"></i> Belleza</span>
+                        <span class="marketplace-chip"><i class="bi bi-controller"></i> Gaming</span>
+                    </div>
+                    <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
+                        <a href="{{ url_for('web.marketplace') }}" class="marketplace-cta">
+                            <i class="bi bi-shop"></i> Explorar Marketplace
+                        </a>
+                        {% if session.get('es_vendedor') %}
+                            <a href="{{ url_for('web.marketplace_dashboard') }}" class="marketplace-cta secondary">
+                                <i class="bi bi-speedometer2"></i> Mi panel de vendedor
+                            </a>
+                        {% elif session.get('user_id') %}
+                            <a href="{{ url_for('web.marketplace_registro') }}" class="marketplace-cta secondary">
+                                <i class="bi bi-plus-circle-fill"></i> Vender en ORION
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('web.marketplace_registro') }}" class="marketplace-cta secondary">
+                                <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión y vender
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="marketplace-benefits">
+                    <div class="marketplace-benefit">
+                        <i class="bi bi-percent"></i>
+                        <span>Comisión desde 15% por venta</span>
+                    </div>
+                    <div class="marketplace-benefit">
+                        <i class="bi bi-bar-chart-fill"></i>
+                        <span>Panel con métricas en tiempo real</span>
+                    </div>
+                    <div class="marketplace-benefit">
+                        <i class="bi bi-credit-card-2-front-fill"></i>
+                        <span>Pagos seguros con Conekta</span>
+                    </div>
+                    <div class="marketplace-benefit">
+                        <i class="bi bi-truck"></i>
+                        <span>Logística y envíos ORION</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- ===== PROMOCIONES DESTACADAS ===== -->
     {% if promociones_home and promociones_home|length > 0 %}
@@ -516,6 +1143,14 @@
                         <li><a href="#" class="text-secondary text-decoration-none">Nuevo</a></li>
                         <li><a href="#" class="text-secondary text-decoration-none">Más vendidos</a></li>
                         <li><a href="#" class="text-secondary text-decoration-none">Categorías</a></li>
+                        <!-- ⭐ MESA DE REGALOS -->
+                        <li><a href="{{ url_for('web.crear_mesa_regalos') }}" class="text-secondary text-decoration-none" style="color:#e10098 !important;">
+                            <i class="bi bi-gift-fill"></i> Mesa de Regalos
+                        </a></li>
+                        <!-- ⭐ NUEVO: MARKETPLACE -->
+                        <li><a href="{{ url_for('web.marketplace') }}" class="text-secondary text-decoration-none" style="color:#0284c7 !important;">
+                            <i class="bi bi-shop"></i> Marketplace
+                        </a></li>
                     </ul>
                 </div>
                 <div class="col-md-2 text-start">
@@ -541,6 +1176,12 @@
                         <span class="badge bg-secondary me-1"><i class="bi bi-paypal"></i> PayPal</span>
                         <span class="badge bg-secondary"><i class="bi bi-shield-check"></i> Seguro</span>
                     </div>
+                    <!-- ⭐ NUEVO: Link para vender -->
+                    <div class="mt-3">
+                        <a href="{{ url_for('web.marketplace_registro') }}" class="text-decoration-none" style="color:#fbbf24; font-weight:700;">
+                            <i class="bi bi-shop-window"></i> ¿Quieres vender en ORION? Únete →
+                        </a>
+                    </div>
                 </div>
             </div>
             <hr class="border-secondary mt-4">
@@ -561,7 +1202,7 @@
             <!-- Cabecera -->
             <div style="background:linear-gradient(135deg, #e10098, #c00080); color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                    <strong style="font-size:1.1rem;">ORION Chat</strong>
+                    <strong style="font-size:1.1rem;">ORION</strong>
                     <div style="font-size:0.7rem; opacity:0.8;">Atención al cliente</div>
                 </div>
                 <button id="chatClose" style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;">&times;</button>
@@ -714,9 +1355,12 @@
         });
 
         // ================================================================
-        //  CHAT WIDGET - ORION
+        //  CHAT WIDGET - ORION (con limpieza al cerrar sesión)
         // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
+            // 🔒 VARIABLE DE AUTENTICACIÓN DESDE EL SERVIDOR
+            const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+
             const toggleBtn = document.getElementById('chatToggle');
             const chatWindow = document.getElementById('chatWindow');
             const closeBtn = document.getElementById('chatClose');
@@ -733,44 +1377,45 @@
             let pollingInterval = null;
             let isOpen = false;
 
-            // Cargar conversación guardada en localStorage
-            const storedConv = localStorage.getItem('orion_chat_conversacion');
-            if (storedConv) {
-                conversacionId = storedConv;
-                // Verificar si la conversación sigue activa
-                fetch(`/api/chat/obtener?conversacion_id=${conversacionId}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.success && data.mensajes) {
-                            // La conversación existe, mostrar interfaz de chat
-                            loginDiv.style.display = 'none';
-                            inputArea.style.display = 'flex';
-                            renderMessages(data.mensajes);
-                            startPolling();
-                            // Si la sesión está cerrada, deshabilitar input
-                            if (data.estado === 'cerrado') {
-                                chatInput.disabled = true;
-                                sendBtn.disabled = true;
-                            }
-                        } else {
-                            // No válida, limpiar
-                            localStorage.removeItem('orion_chat_conversacion');
-                            conversacionId = null;
-                            // Mostrar login nuevamente
-                            loginDiv.style.display = 'block';
-                            inputArea.style.display = 'none';
-                        }
-                    })
-                    .catch(() => {
-                        localStorage.removeItem('orion_chat_conversacion');
-                        conversacionId = null;
-                        loginDiv.style.display = 'block';
-                        inputArea.style.display = 'none';
-                    });
-            } else {
-                // No hay conversación guardada, mostrar login
+            // ===== SI EL USUARIO NO ESTÁ LOGUEADO, LIMPIAR TODO =====
+            if (!isLoggedIn) {
+                localStorage.removeItem('orion_chat_conversacion');
                 loginDiv.style.display = 'block';
                 inputArea.style.display = 'none';
+                conversacionId = null;
+            } else {
+                const storedConv = localStorage.getItem('orion_chat_conversacion');
+                if (storedConv) {
+                    conversacionId = storedConv;
+                    fetch(`/api/chat/obtener?conversacion_id=${conversacionId}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success && data.mensajes) {
+                                loginDiv.style.display = 'none';
+                                inputArea.style.display = 'flex';
+                                renderMessages(data.mensajes);
+                                startPolling();
+                                if (data.estado === 'cerrado') {
+                                    chatInput.disabled = true;
+                                    sendBtn.disabled = true;
+                                }
+                            } else {
+                                localStorage.removeItem('orion_chat_conversacion');
+                                conversacionId = null;
+                                loginDiv.style.display = 'block';
+                                inputArea.style.display = 'none';
+                            }
+                        })
+                        .catch(() => {
+                            localStorage.removeItem('orion_chat_conversacion');
+                            conversacionId = null;
+                            loginDiv.style.display = 'block';
+                            inputArea.style.display = 'none';
+                        });
+                } else {
+                    loginDiv.style.display = 'block';
+                    inputArea.style.display = 'none';
+                }
             }
 
             // Abrir/cerrar ventana
@@ -778,7 +1423,6 @@
                 if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
                     chatWindow.style.display = 'flex';
                     if (conversacionId) {
-                        // Si ya hay conversación, cargar mensajes
                         cargarMensajes();
                     }
                 } else {
@@ -818,7 +1462,6 @@
                         localStorage.setItem('orion_chat_conversacion', conversacionId);
                         loginDiv.style.display = 'none';
                         inputArea.style.display = 'flex';
-                        // Cargar mensajes iniciales
                         cargarMensajes();
                         startPolling();
                     } else {
@@ -841,7 +1484,7 @@
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
-                        cargarMensajes(); // refrescar
+                        cargarMensajes();
                     } else {
                         alert('Error al enviar mensaje.');
                     }
@@ -861,11 +1504,9 @@
                     .then(data => {
                         if (data.success && data.mensajes) {
                             renderMessages(data.mensajes);
-                            // Si la conversación fue cerrada por el admin, deshabilitar input
                             if (data.estado === 'cerrado') {
                                 chatInput.disabled = true;
                                 sendBtn.disabled = true;
-                                // Mostrar mensaje de cerrado
                                 if (pollingInterval) clearInterval(pollingInterval);
                             } else {
                                 chatInput.disabled = false;
@@ -895,15 +1536,200 @@
                 if (pollingInterval) clearInterval(pollingInterval);
                 pollingInterval = setInterval(() => {
                     if (conversacionId) cargarMensajes();
-                }, 3000); // cada 3 segundos
+                }, 3000);
             }
 
-            // Si el chat está abierto, iniciar polling
             if (conversacionId) {
                 startPolling();
             }
         });
     </script>
+    <!-- ===== AUTOCOMPLETADO DE BÚSQUEDA — ORION ===== -->
+<script>
+(function () {
+    const input    = document.getElementById('searchInput');
+    const dropdown = document.getElementById('autocompleteResults');
+    const list     = document.getElementById('autocompleteList');
+    const loading  = document.getElementById('autocompleteLoading');
+    const empty    = document.getElementById('autocompleteEmpty');
+    const footer   = document.getElementById('autocompleteFooter');
+    const verTodos = document.getElementById('autocompleteVerTodos');
+    const form     = document.getElementById('searchForm');
+
+    if (!input || !dropdown) return;
+
+    let debounceTimer = null;
+    let controller    = null;
+    let items         = [];
+    let activeIndex   = -1;
+    let currentQuery  = '';
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+    function escapeRegex(str) {
+        return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    function highlight(text, query) {
+        if (!query) return escapeHtml(text);
+        const regex = new RegExp('(' + escapeRegex(query) + ')', 'gi');
+        return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+    }
+    function fmtPrecio(n) { return '$' + Number(n || 0).toFixed(2); }
+
+    function showDropdown() { dropdown.style.display = 'block'; }
+    function hideDropdown() { dropdown.style.display = 'none'; activeIndex = -1; }
+
+    function renderResults(resultados, query) {
+        list.innerHTML = '';
+        items = [];
+        activeIndex = -1;
+
+        if (!resultados || resultados.length === 0) {
+            loading.style.display = 'none';
+            empty.style.display   = 'block';
+            footer.style.display  = 'none';
+            list.style.display    = 'none';
+            showDropdown();
+            return;
+        }
+
+        loading.style.display = 'none';
+        empty.style.display   = 'none';
+        list.style.display    = 'block';
+        footer.style.display  = 'block';
+        list.innerHTML = '';
+
+        resultados.forEach(function (p, idx) {
+            const a = document.createElement('a');
+            a.className = 'autocomplete-item';
+            a.href = p.url;
+            a.setAttribute('role', 'option');
+            a.dataset.index = idx;
+
+            const imgHtml = p.foto
+                ? '<img src="' + escapeHtml(p.foto) + '" class="autocomplete-item-img" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
+                : '<div class="autocomplete-item-img placeholder"><i class="bi bi-image"></i></div>';
+
+            const meta = [];
+            if (p.marca)     meta.push('<span class="marca">' + escapeHtml(p.marca) + '</span>');
+            if (p.categoria) meta.push('<span>' + escapeHtml(p.categoria) + '</span>');
+
+            a.innerHTML =
+                imgHtml +
+                '<div class="autocomplete-item-info">' +
+                    '<div class="autocomplete-item-name">' + highlight(p.nombre, query) + '</div>' +
+                    '<div class="autocomplete-item-meta">' + meta.join('') + '</div>' +
+                '</div>' +
+                '<div class="autocomplete-item-price">' + fmtPrecio(p.precio) + '</div>';
+
+            list.appendChild(a);
+            items.push(a);
+        });
+
+        showDropdown();
+    }
+
+    function setActive(idx) {
+        items.forEach(function (el) { el.classList.remove('active'); });
+        if (idx < 0) { activeIndex = -1; return; }
+        if (idx >= items.length) idx = 0;
+        if (idx < 0) idx = items.length - 1;
+        items[idx].classList.add('active');
+        items[idx].scrollIntoView({ block: 'nearest' });
+        activeIndex = idx;
+    }
+
+    input.addEventListener('keydown', function (e) {
+        const isOpen = dropdown.style.display === 'block';
+        if (e.key === 'ArrowDown') {
+            if (!isOpen && currentQuery.length >= 2) {
+                fetchSuggestions(currentQuery);
+                e.preventDefault();
+                return;
+            }
+            e.preventDefault();
+            setActive(activeIndex + 1);
+        } else if (e.key === 'ArrowUp') {
+            if (isOpen) { e.preventDefault(); setActive(activeIndex - 1); }
+        } else if (e.key === 'Enter') {
+            if (isOpen && activeIndex >= 0 && items[activeIndex]) {
+                e.preventDefault();
+                window.location.href = items[activeIndex].href;
+            }
+        } else if (e.key === 'Escape') {
+            hideDropdown();
+        }
+    });
+
+    function fetchSuggestions(query) {
+        currentQuery = query;
+        if (controller) { try { controller.abort(); } catch (e) {} }
+        controller = new AbortController();
+
+        loading.style.display = 'block';
+        empty.style.display   = 'none';
+        list.style.display    = 'none';
+        footer.style.display  = 'none';
+        showDropdown();
+
+        const url = '/api/productos/autocompletar?q=' + encodeURIComponent(query);
+
+        fetch(url, { signal: controller.signal })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (!data || !data.success) throw new Error('Bad response');
+                renderResults(data.resultados || [], query);
+            })
+            .catch(function (err) {
+                if (err.name === 'AbortError') return;
+                console.warn('Autocompletar error:', err);
+                loading.style.display = 'none';
+                empty.style.display   = 'block';
+            });
+    }
+
+    input.addEventListener('input', function () {
+        const q = input.value.trim();
+        clearTimeout(debounceTimer);
+        if (q.length < 2) { hideDropdown(); return; }
+        if (verTodos) verTodos.href = '/catalogo?q=' + encodeURIComponent(q);
+        debounceTimer = setTimeout(function () { fetchSuggestions(q); }, 220);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!dropdown.contains(e.target) && e.target !== input) hideDropdown();
+    });
+
+    input.addEventListener('blur', function () {
+        setTimeout(function () {
+            if (!dropdown.matches(':hover')) hideDropdown();
+        }, 180);
+    });
+
+    input.addEventListener('focus', function () {
+        const q = input.value.trim();
+        if (q.length >= 2 && items.length > 0) showDropdown();
+    });
+
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            const isOpen = dropdown.style.display === 'block';
+            if (isOpen && activeIndex >= 0 && items[activeIndex]) {
+                e.preventDefault();
+                window.location.href = items[activeIndex].href;
+            }
+        });
+    }
+})();
+</script>
+
+    <!-- ===== WIDGET DE LEALTAD (Cliente Consentido) ===== -->
+    {% include 'tienda/widget_lealtad.html' %}
 
 </body>
 </html>

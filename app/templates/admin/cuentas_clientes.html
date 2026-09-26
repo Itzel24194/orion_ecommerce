@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuentas de Clientes | ORION Admin</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* ===== ESTILOS BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: #f5f6f8;
+            color: #1a1a2e;
+        }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 2px solid #e8e8e8;
+            padding: 0;
+            height: 100vh;
+            position: fixed;
+            left: 0; top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px; height: 80px;
+            border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name {
+            font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px;
+        }
+        .sidebar .admin-profile .email {
+            font-size: 0.75rem; color: rgba(255,255,255,0.8);
+        }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem; color: #fff;
+            text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.8rem; font-weight: 900;
+            color: #e10098; text-align: center;
+            padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase;
+            color: #888; padding: 10px 25px 5px;
+            letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 25px; color: #555;
+            text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover {
+            background: #f8f0f5; color: #e10098;
+            border-left-color: #e10098;
+        }
+        .sidebar a:hover i { color: #e10098; }
+        .sidebar a.active {
+            background: #f8f0f5; color: #e10098;
+            border-left-color: #e10098;
+        }
+        .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 25px; color: #dc3545;
+            text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent;
+            border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover {
+            background: #fdf0f0; border-left-color: #dc3545; color: #dc3545;
+        }
+        .sidebar .logout-btn:hover i { color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px;
+            padding: 30px 35px 20px;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-bar {
+            display: flex; justify-content: space-between;
+            align-items: center; padding-bottom: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px; flex-wrap: wrap;
+            gap: 15px; flex-shrink: 0;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem; font-weight: 800;
+            color: #1a1a2e; display: flex;
+            align-items: center; gap: 10px;
+        }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag {
+            background: #e10098; color: #fff;
+            padding: 5px 18px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, #fff, #faf0f5);
+            padding: 25px 30px; border-radius: 16px;
+            border: 1px solid #e8e8e8; margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0;
+        }
+        .hero h2 {
+            color: #1a1a2e; margin-bottom: 8px;
+            font-weight: 800; font-size: 1.3rem;
+        }
+        .hero h2 i { color: #e10098; }
+        .hero p {
+            color: #666; margin-bottom: 15px;
+            font-size: 0.95rem; line-height: 1.6;
+        }
+        .hero strong { color: #e10098; }
+        .btn-primary-custom {
+            background: #e10098; color: white;
+            padding: 10px 25px; border-radius: 50px;
+            text-decoration: none; font-weight: 700;
+            font-size: 0.85rem; display: inline-block;
+            transition: all 0.3s ease; border: none; cursor: pointer;
+        }
+        .btn-primary-custom:hover {
+            background: #c00080; color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
+        }
+
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px; margin-bottom: 25px; flex-shrink: 0;
+        }
+        .stat-card {
+            background: #ffffff; padding: 20px 25px;
+            border-radius: 16px; border: 1px solid #e8e8e8;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #e10098, #00d4ff);
+        }
+        .stat-card:hover {
+            border-color: #e10098; transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(225, 0, 152, 0.1);
+        }
+        .stat-card .number {
+            font-size: 2.2rem; font-weight: 900;
+            color: #1a1a2e; display: block;
+        }
+        .stat-card .number span { color: #e10098; }
+        .stat-card .label {
+            color: #888; font-size: 0.8rem;
+            text-transform: uppercase; font-weight: 600;
+            letter-spacing: 0.5px; margin-top: 3px; display: block;
+        }
+        .stat-card .icon {
+            font-size: 1.8rem; color: #e10098;
+            opacity: 0.3; float: right; margin-top: -5px;
+        }
+
+        /* ===== SECTION BOX ===== */
+        .section-box {
+            background: #ffffff; border-radius: 16px;
+            padding: 25px; border: 1px solid #e8e8e8;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            flex-shrink: 0;
+        }
+        .section-box h2 {
+            font-size: 1.1rem; font-weight: 800;
+            margin-bottom: 20px; color: #1a1a2e;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-box h2 i { color: #e10098; }
+
+        /* ============================================================
+           FILTROS
+           ============================================================ */
+        .filters-box {
+            background: linear-gradient(135deg, #fafbfc, #f5f6f8);
+            border: 1px solid #e8e8e8;
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .filters-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filters-row > * { flex-shrink: 0; }
+
+        .filter-search {
+            flex: 1;
+            min-width: 260px;
+            position: relative;
+        }
+        .filter-search input {
+            width: 100%;
+            padding: 11px 42px 11px 44px;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 0.86rem;
+            color: #1a1a2e;
+            background: #fff;
+            transition: all 0.2s ease;
+        }
+        .filter-search input::placeholder { color: #aaa; }
+        .filter-search input:focus {
+            outline: none;
+            border-color: #e10098;
+            box-shadow: 0 0 0 4px rgba(225,0,152,.08);
+        }
+        .filter-search > .fa-search {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #e10098;
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+        .filter-search .clear-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f6f8;
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: all 0.15s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .filter-search .clear-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .filter-search .clear-btn:hover {
+            background: #e10098;
+            color: #fff;
+        }
+
+        .filter-select {
+            position: relative;
+        }
+        .filter-select select {
+            padding: 11px 38px 11px 16px;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e10098' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 11px;
+            min-width: 165px;
+        }
+        .filter-select select:hover {
+            border-color: #e10098;
+            box-shadow: 0 0 0 3px rgba(225,0,152,.06);
+        }
+        .filter-select select:focus {
+            outline: none;
+            border-color: #e10098;
+            box-shadow: 0 0 0 4px rgba(225,0,152,.1);
+        }
+
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 22px;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .filter-btn-primary {
+            background: linear-gradient(135deg, #e10098, #c00080);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(225,0,152,.25);
+        }
+        .filter-btn-primary:hover {
+            background: linear-gradient(135deg, #c00080, #a00060);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(225,0,152,.35);
+        }
+        .filter-btn-ghost {
+            background: #fff;
+            color: #666;
+            border: 1.5px solid #e8e8e8;
+        }
+        .filter-btn-ghost:hover {
+            border-color: #e10098;
+            color: #e10098;
+            background: #fdf5fa;
+        }
+
+        /* Chips de filtros activos */
+        .active-filters {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding-top: 6px;
+            border-top: 1px dashed #e0e0e5;
+        }
+        .active-filters-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 12px;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: #fdf0f7;
+            color: #b4006c;
+            border: 1px solid #f0c8de;
+        }
+        .filter-chip i { font-size: 0.7rem; }
+        .filter-chip .remove {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(180,0,108,.15);
+            color: #b4006c;
+            text-decoration: none;
+            font-size: 0.6rem;
+            transition: all 0.15s ease;
+        }
+        .filter-chip .remove:hover {
+            background: #b4006c;
+            color: #fff;
+        }
+        .clear-all-btn {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #dc3545;
+            text-decoration: none;
+            padding: 4px 10px;
+            border-radius: 50px;
+            transition: all 0.15s ease;
+        }
+        .clear-all-btn:hover {
+            background: #fdf0f0;
+            color: #dc3545;
+        }
+
+        /* ===== TOOLBAR INFO ===== */
+        .list-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed #e8e8e8;
+        }
+        .list-toolbar-info {
+            font-size: 0.82rem;
+            color: #888;
+            font-weight: 600;
+        }
+        .list-toolbar-info strong { color: #e10098; font-weight: 800; }
+        .per-page-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: #666;
+            font-weight: 600;
+        }
+        .per-page-selector select {
+            padding: 7px 32px 7px 14px;
+            border: 1px solid #e8e8e8;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e10098' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+        }
+        .per-page-selector select:hover {
+            border-color: #e10098;
+            box-shadow: 0 0 0 3px rgba(225,0,152,.08);
+        }
+        .per-page-selector select:focus {
+            outline: none;
+            border-color: #e10098;
+            box-shadow: 0 0 0 3px rgba(225,0,152,.15);
+        }
+
+        /* ===== TARJETA CLIENTE ===== */
+        .cliente-card {
+            background: #ffffff; border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            padding: 18px 22px; margin-bottom: 12px;
+            transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 18px;
+            text-decoration: none; color: inherit;
+            position: relative; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .cliente-card::before {
+            content: ''; position: absolute;
+            left: 0; top: 0; bottom: 0; width: 4px;
+            background: #e10098;
+            transform: scaleY(0);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+        }
+        .cliente-card:hover {
+            border-color: #e10098; transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(225, 0, 152, 0.1);
+            color: inherit; text-decoration: none;
+        }
+        .cliente-card:hover::before { transform: scaleY(1); }
+
+        .cliente-avatar-wrap { position: relative; flex-shrink: 0; }
+        .cliente-avatar {
+            width: 60px; height: 60px;
+            border-radius: 50%; object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #f8f0f5, 0 4px 12px rgba(0,0,0,0.06);
+            background: #f0f0f0; display: block;
+            transition: box-shadow 0.3s ease;
+        }
+        .cliente-card:hover .cliente-avatar {
+            box-shadow: 0 0 0 2px #e10098, 0 6px 16px rgba(225,0,152,.2);
+        }
+        .cliente-avatar-status {
+            position: absolute; bottom: 2px; right: 2px;
+            width: 14px; height: 14px;
+            border-radius: 50%; border: 2px solid #fff;
+        }
+        .cliente-avatar-status.on  { background: #28a745; }
+        .cliente-avatar-status.off { background: #d1d5db; }
+
+        .cliente-info { flex: 1; min-width: 0; }
+        .cliente-nombre {
+            font-weight: 800; font-size: 1rem;
+            margin-bottom: 3px; color: #1a1a2e;
+            letter-spacing: -0.2px;
+        }
+        .cliente-email {
+            color: #888; font-size: 0.82rem;
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 8px;
+        }
+        .cliente-email i { color: #e10098; font-size: 0.72rem; }
+        .cliente-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 10px; border-radius: 50px;
+            font-size: 0.68rem; font-weight: 700;
+            letter-spacing: 0.2px; background: #f3f4f6;
+            color: #4b5563; border: 1px solid transparent;
+        }
+        .chip i { font-size: 0.68rem; }
+        .chip-verified {
+            background: #e8f5e9; color: #2e7d32;
+            border-color: #c8e6c9;
+        }
+        .chip-pending {
+            background: #fff8e1; color: #b45309;
+            border-color: #ffe082;
+        }
+        .chip-brand {
+            background: #fdf0f7; color: #b4006c;
+            border-color: #f0c8de;
+        }
+        .chip-neutral {
+            background: #f3f4f6; color: #4b5563;
+            border-color: #e5e7eb;
+        }
+
+        .btn-ver {
+            flex-shrink: 0;
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 22px; border-radius: 50px;
+            font-size: 0.82rem; font-weight: 700;
+            text-decoration: none; color: #fff;
+            background: #e10098; transition: all 0.3s ease;
+            border: none; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(225, 0, 152, 0.2);
+        }
+        .btn-ver:hover {
+            background: #c00080; color: #fff;
+            transform: translateX(2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.35);
+        }
+        .btn-ver i { transition: transform 0.2s ease; }
+        .btn-ver:hover i { transform: translateX(2px); }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            background: #f8f9fa; padding: 70px 24px;
+            border-radius: 16px; text-align: center;
+            color: #888; border: 1px dashed #e8e8e8;
+        }
+        .empty-state-icon {
+            width: 90px; height: 90px; border-radius: 50%;
+            background: #f8f0f5; display: inline-flex;
+            align-items: center; justify-content: center;
+            margin-bottom: 20px;
+        }
+        .empty-state-icon i { font-size: 2.2rem; color: #e10098; }
+        .empty-state h4 {
+            font-weight: 800; color: #1a1a2e;
+            font-size: 1.1rem; margin-bottom: 6px;
+        }
+        .empty-state p { font-size: 0.88rem; margin: 0 0 16px; color: #888; }
+
+        /* ===== PAGINACIÓN ===== */
+        .pagination-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 22px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f3;
+            flex-wrap: wrap;
+        }
+        .pagination-info {
+            font-size: 0.82rem;
+            color: #888;
+            font-weight: 600;
+        }
+        .pagination-info strong { color: #1a1a2e; font-weight: 800; }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-wrap: wrap;
+        }
+        .pagination li { display: inline-block; }
+        .pagination .page-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            background: #fff;
+            color: #555;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .pagination .page-link:hover {
+            border-color: #e10098;
+            color: #e10098;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(225,0,152,.12);
+        }
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #e10098, #c00080);
+            border-color: #e10098;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(225,0,152,.35);
+        }
+        .pagination .page-item.disabled .page-link {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            background: #fafafa;
+        }
+        .pagination .page-item.dots .page-link {
+            border: none;
+            background: transparent;
+            cursor: default;
+            pointer-events: none;
+            color: #bbb;
+            letter-spacing: 2px;
+        }
+        .pagination .page-item.dots .page-link:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ===== ANIMACIÓN ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .cliente-card { animation: fadeUp 0.35s ease both; }
+        .cliente-card:nth-child(1) { animation-delay: 0.02s; }
+        .cliente-card:nth-child(2) { animation-delay: 0.05s; }
+        .cliente-card:nth-child(3) { animation-delay: 0.08s; }
+        .cliente-card:nth-child(4) { animation-delay: 0.11s; }
+        .cliente-card:nth-child(5) { animation-delay: 0.14s; }
+
+        /* ===== FOOTER ===== */
+        .footer-info {
+            background: #ffffff; padding: 15px 25px;
+            border-radius: 16px; border: 1px solid #e8e8e8;
+            text-align: center; margin-top: auto;
+            flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+        }
+        .footer-info p {
+            color: #888; font-size: 0.75rem;
+            margin: 0; display: flex; align-items: center;
+            justify-content: center; gap: 15px;
+            flex-wrap: wrap;
+        }
+        .footer-info p .separator { color: #ddd; }
+        .footer-info i { color: #e10098; }
+        .footer-info .heart {
+            color: #e10098;
+            animation: heartbeat 1.5s infinite;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo,
+            .sidebar .panel-title,
+            .sidebar a span,
+            .sidebar .admin-profile .name,
+            .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol,
+            .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn {
+                padding: 15px; justify-content: center;
+            }
+            .sidebar .logout-btn i { font-size: 1.3rem; margin: 0; }
+            .main { margin-left: 70px; padding: 15px; }
+            .footer-info p { font-size: 0.65rem; gap: 8px; }
+            .filter-select select { min-width: 140px; }
+        }
+        @media (max-width: 640px) {
+            .cliente-card {
+                flex-direction: column; align-items: flex-start;
+                gap: 14px; padding: 18px;
+            }
+            .btn-ver {
+                align-self: stretch; justify-content: center;
+            }
+            .cliente-avatar { width: 54px; height: 54px; }
+            .pagination-wrap {
+                flex-direction: column; align-items: stretch;
+            }
+            .pagination-info { text-align: center; }
+            .pagination { justify-content: center; }
+            .filter-search { min-width: 100%; }
+            .filter-select { flex: 1; }
+            .filter-select select { width: 100%; }
+            .filter-btn { flex: 1; justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .top-bar h1 { font-size: 1.2rem; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .hero { padding: 20px; }
+            .hero h2 { font-size: 1.1rem; }
+            .hero p { font-size: 0.85rem; }
+            .section-box { padding: 15px; }
+            .pagination .page-link {
+                min-width: 34px; height: 34px;
+                padding: 0 8px; font-size: 0.78rem;
+                border-radius: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+
+            <a href="{{ url_for('web.dashboard') }}">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('web.lista_usuarios') }}">
+                <i class="fas fa-users"></i> <span>Usuarios</span>
+            </a>
+
+            <!-- ⭐ CUENTAS DE CLIENTES (ACTIVO) -->
+            <a href="{{ url_for('web.admin_cuentas_clientes') }}" class="active">
+                <i class="fas fa-id-card" style="color: #7c3aed;"></i> <span>Cuentas de Clientes</span>
+            </a>
+
+            <a href="{{ url_for('web.lista_categorias') }}">
+                <i class="fas fa-tags"></i> <span>Categorías</span>
+            </a>
+            <a href="{{ url_for('web.lista_marcas') }}">
+                <i class="fas fa-building"></i> <span>Marcas</span>
+            </a>
+            <a href="{{ url_for('web.lista_productos') }}">
+                <i class="fas fa-box"></i> <span>Productos</span>
+            </a>
+            <a href="{{ url_for('web.admin_combos') }}">
+                <i class="fas fa-layer-group" style="color: #fd7e14;"></i> <span>Combos</span>
+            </a>
+            <a href="{{ url_for('web.admin_resenas') }}">
+                <i class="fas fa-star" style="color: #ffc107;"></i> <span>Reseñas</span>
+            </a>
+            <a href="{{ url_for('web.admin_chat_panel') }}">
+                <i class="fas fa-comment-dots" style="color: #00d4ff;"></i> <span>Chat en vivo</span>
+            </a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}">
+                <i class="fas fa-shopping-cart"></i> <span>Pedidos</span>
+            </a>
+            <a href="{{ url_for('web.lista_atributos') }}">
+                <i class="fas fa-list-ul"></i> <span>Atributos</span>
+            </a>
+            <a href="{{ url_for('web.listar_temporadas') }}">
+                <i class="fas fa-calendar-alt" style="color: #f9a825;"></i> <span>Temporadas</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}">
+                <i class="fas fa-chart-line"></i> <span>Ventas</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}">
+                <i class="fas fa-gift"></i> <span>Promociones</span>
+            </a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}">
+                <i class="fas fa-ticket-alt"></i> <span>Cupones</span>
+            </a>
+            <a href="{{ url_for('web.admin_lealtad_panel') }}">
+                <i class="fas fa-crown" style="color: #e10098;"></i> <span>Cliente Consentido</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}">
+                <i class="fas fa-brain" style="color: #6f42c1;"></i> <span>Análisis Supervisado</span>
+            </a>
+            <a href="{{ url_for('web.segmentacion_clientes') }}">
+                <i class="fas fa-pie-chart"></i> <span>Segmentación</span>
+            </a>
+            <a href="{{ url_for('web.clasificacion_binaria') }}">
+                <i class="fas fa-toggle-on" style="color: #17a2b8;"></i> <span>Clasificación Binaria</span>
+            </a>
+            <a href="{{ url_for('web.admin_dashboard_auditoria') }}">
+                <i class="fas fa-shield-check" style="color: #0d47a1;"></i> <span>Auditoría</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.analisis') }}">
+                <i class="fas fa-chart-pie"></i> <span>Análisis</span>
+            </a>
+            <a href="{{ url_for('web.inteligencia') }}">
+                <i class="fas fa-brain"></i> <span>Inteligencia</span>
+            </a>
+            <a href="{{ url_for('web.reportes') }}">
+                <i class="fas fa-file-alt"></i> <span>Reportes</span>
+            </a>
+            <a href="{{ url_for('web.configuracion') }}">
+                <i class="fas fa-cog"></i> <span>Configuración</span>
+            </a>
+
+            <div class="divider"></div>
+
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== CONTENIDO ===== -->
+    <main class="main">
+
+        <!-- ===== TOP BAR ===== -->
+        <header class="top-bar">
+            <h1>
+                <i class="fas fa-id-card"></i> Cuentas de Clientes
+            </h1>
+            <div class="tag">
+                <i class="fas fa-users"></i>
+                {% if paginacion %}
+                    {{ paginacion.total }}
+                    cliente{{ 's' if paginacion.total != 1 else '' }}
+                {% else %}
+                    {{ clientes|length if clientes else 0 }}
+                    cliente{{ 's' if clientes and clientes|length != 1 else '' }}
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- ===== CONTENT WRAPPER ===== -->
+        <div class="content-wrapper">
+
+            <!-- ===== HERO ===== -->
+            <section class="hero">
+                <p>
+                    Consulta la información completa de cada cliente registrado:
+                    <strong>datos básicos</strong>, <strong>comunicación</strong>,
+                    <strong>privacidad</strong>, <strong>datos fiscales</strong>,
+                    <strong>métodos de pago</strong> y <strong>complexión</strong>.
+                </p>
+            </section>
+
+            <!-- ===== STATS ===== -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    <div class="number">
+                        <span>
+                            {% if total_global is defined %}{{ total_global }}
+                            {% elif paginacion %}{{ paginacion.total }}
+                            {% else %}{{ clientes|length if clientes else 0 }}{% endif %}
+                        </span>
+                    </div>
+                    <div class="label">Clientes registrados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon"><i class="fas fa-check-circle" style="color: #28a745;"></i></div>
+                    <div class="number">
+                        <span>
+                            {% if total_verificados is defined %}{{ total_verificados }}
+                            {% elif clientes %}{{ clientes|selectattr('confirmado')|list|length }}
+                            {% else %}0{% endif %}
+                        </span>
+                    </div>
+                    <div class="label">Verificados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon"><i class="fas fa-clock" style="color: #f9a825;"></i></div>
+                    <div class="number">
+                        <span style="color: #f9a825;">
+                            {% if total_sin_verificar is defined %}{{ total_sin_verificar }}
+                            {% elif clientes %}{{ clientes|length - (clientes|selectattr('confirmado')|list|length) }}
+                            {% else %}0{% endif %}
+                        </span>
+                    </div>
+                    <div class="label">Sin verificar</div>
+                </div>
+            </div>
+
+            <!-- ===== LISTA CON FILTROS ===== -->
+            <div class="section-box" id="lista">
+                <h2><i class="fas fa-list"></i> Listado de clientes</h2>
+
+                <!-- ===== FILTROS ===== -->
+                <form method="GET"
+                      action="{{ url_for('web.admin_cuentas_clientes') }}"
+                      class="filters-box"
+                      id="filtersForm">
+
+                    <div class="filters-row">
+                        <!-- Búsqueda -->
+                        <div class="filter-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text"
+                                   name="q"
+                                   id="inputSearch"
+                                   value="{{ filtros.q if filtros else '' }}"
+                                   placeholder="Buscar por nombre, email o teléfono..."
+                                   autocomplete="off">
+                            <button type="button"
+                                    class="clear-btn {% if filtros and filtros.q %}visible{% endif %}"
+                                    id="btnClearSearch"
+                                    title="Limpiar búsqueda">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="filter-select">
+                            <select name="estado" onchange="document.getElementById('filtersForm').submit()">
+                                <option value="">Todos los estados</option>
+                                <option value="verificado"    {% if filtros and filtros.estado == 'verificado'    %}selected{% endif %}>✓ Verificados</option>
+                                <option value="sin_verificar" {% if filtros and filtros.estado == 'sin_verificar' %}selected{% endif %}>⏳ Sin verificar</option>
+                            </select>
+                        </div>
+
+                        <!-- Métodos de pago -->
+                        <div class="filter-select">
+                            <select name="pago" onchange="document.getElementById('filtersForm').submit()">
+                                <option value="">Métodos de pago</option>
+                                <option value="con"    {% if filtros and filtros.pago == 'con'    %}selected{% endif %}>💳 Con métodos</option>
+                                <option value="sin"    {% if filtros and filtros.pago == 'sin'    %}selected{% endif %}>Sin métodos</option>
+                            </select>
+                        </div>
+
+                        <!-- Orden -->
+                        <div class="filter-select">
+                            <select name="orden" onchange="document.getElementById('filtersForm').submit()">
+                                <option value="recientes" {% if not filtros or filtros.orden == 'recientes' %}selected{% endif %}>↓ Más recientes</option>
+                                <option value="antiguos"  {% if filtros and filtros.orden == 'antiguos'  %}selected{% endif %}>↑ Más antiguos</option>
+                                <option value="nombre_asc"  {% if filtros and filtros.orden == 'nombre_asc'  %}selected{% endif %}>A → Z nombre</option>
+                                <option value="nombre_desc" {% if filtros and filtros.orden == 'nombre_desc' %}selected{% endif %}>Z → A nombre</option>
+                                <option value="email_asc"   {% if filtros and filtros.orden == 'email_asc'   %}selected{% endif %}>A → Z email</option>
+                            </select>
+                        </div>
+
+                        <!-- Per page -->
+                        <div class="filter-select">
+                            <select name="per_page" onchange="document.getElementById('filtersForm').submit()">
+                                <option value="10"  {% if paginacion and paginacion.per_page == 10  %}selected{% endif %}>10 por pág</option>
+                                <option value="20"  {% if not paginacion or paginacion.per_page == 20 %}selected{% endif %}>20 por pág</option>
+                                <option value="50"  {% if paginacion and paginacion.per_page == 50  %}selected{% endif %}>50 por pág</option>
+                                <option value="100" {% if paginacion and paginacion.per_page == 100 %}selected{% endif %}>100 por pág</option>
+                            </select>
+                        </div>
+
+                        <!-- Botón buscar -->
+                        <button type="submit" class="filter-btn filter-btn-primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+
+                    <!-- Chips de filtros activos -->
+                    {% set has_filters = filtros and (filtros.q or filtros.estado or filtros.pago or (filtros.orden and filtros.orden != 'recientes')) %}
+                    {% if has_filters %}
+                    <div class="active-filters">
+                        <span class="active-filters-label">Filtros activos:</span>
+
+                        {% if filtros.q %}
+                        <span class="filter-chip">
+                            <i class="fas fa-search"></i> "{{ filtros.q }}"
+                            <a href="{{ url_for('web.admin_cuentas_clientes',
+                                                 estado=filtros.estado,
+                                                 pago=filtros.pago,
+                                                 orden=filtros.orden,
+                                                 per_page=paginacion.per_page if paginacion else 20) }}#lista"
+                               class="remove" title="Quitar filtro">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </span>
+                        {% endif %}
+
+                        {% if filtros.estado == 'verificado' %}
+                        <span class="filter-chip">
+                            <i class="fas fa-check-circle"></i> Verificados
+                            <a href="{{ url_for('web.admin_cuentas_clientes',
+                                                 q=filtros.q,
+                                                 pago=filtros.pago,
+                                                 orden=filtros.orden,
+                                                 per_page=paginacion.per_page if paginacion else 20) }}#lista"
+                               class="remove"><i class="fas fa-times"></i></a>
+                        </span>
+                        {% elif filtros.estado == 'sin_verificar' %}
+                        <span class="filter-chip">
+                            <i class="fas fa-clock"></i> Sin verificar
+                            <a href="{{ url_for('web.admin_cuentas_clientes',
+                                                 q=filtros.q,
+                                                 pago=filtros.pago,
+                                                 orden=filtros.orden,
+                                                 per_page=paginacion.per_page if paginacion else 20) }}#lista"
+                               class="remove"><i class="fas fa-times"></i></a>
+                        </span>
+                        {% endif %}
+
+                        {% if filtros.pago == 'con' %}
+                        <span class="filter-chip">
+                            <i class="fas fa-credit-card"></i> Con métodos de pago
+                            <a href="{{ url_for('web.admin_cuentas_clientes',
+                                                 q=filtros.q,
+                                                 estado=filtros.estado,
+                                                 orden=filtros.orden,
+                                                 per_page=paginacion.per_page if paginacion else 20) }}#lista"
+                               class="remove"><i class="fas fa-times"></i></a>
+                        </span>
+                        {% elif filtros.pago == 'sin' %}
+                        <span class="filter-chip">
+                            <i class="fas fa-ban"></i> Sin métodos de pago
+                            <a href="{{ url_for('web.admin_cuentas_clientes',
+                                                 q=filtros.q,
+                                                 estado=filtros.estado,
+                                                 orden=filtros.orden,
+                                                 per_page=paginacion.per_page if paginacion else 20) }}#lista"
+                               class="remove"><i class="fas fa-times"></i></a>
+                        </span>
+                        {% endif %}
+
+                        {% if filtros.orden and filtros.orden != 'recientes' %}
+                        <span class="filter-chip">
+                            <i class="fas fa-sort"></i>
+                            {% if filtros.orden == 'antiguos' %}Más antiguos
+                            {% elif filtros.orden == 'nombre_asc' %}A → Z nombre
+                            {% elif filtros.orden == 'nombre_desc' %}Z → A nombre
+                            {% elif filtros.orden == 'email_asc' %}A → Z email
+                            {% endif %}
+                            <a href="{{ url_for('web.admin_cuentas_clientes',
+                                                 q=filtros.q,
+                                                 estado=filtros.estado,
+                                                 pago=filtros.pago,
+                                                 per_page=paginacion.per_page if paginacion else 20) }}#lista"
+                               class="remove"><i class="fas fa-times"></i></a>
+                        </span>
+                        {% endif %}
+
+                        <a href="{{ url_for('web.admin_cuentas_clientes') }}#lista" class="clear-all-btn">
+                            <i class="fas fa-times-circle"></i> Limpiar todo
+                        </a>
+                    </div>
+                    {% endif %}
+                </form>
+
+                <!-- ===== TOOLBAR INFO ===== -->
+                {% if clientes and clientes|length > 0 %}
+                <div class="list-toolbar">
+                    <div class="list-toolbar-info">
+                        {% if paginacion %}
+                            Mostrando
+                            <strong>{{ (paginacion.page - 1) * paginacion.per_page + 1 }}</strong>
+                            –
+                            <strong>{{ [(paginacion.page * paginacion.per_page), paginacion.total]|min }}</strong>
+                            de <strong>{{ paginacion.total }}</strong>
+                            resultado{{ 's' if paginacion.total != 1 else '' }}
+                        {% else %}
+                            Total: <strong>{{ clientes|length }}</strong>
+                            cliente{{ 's' if clientes|length != 1 else '' }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ===== LISTA DE TARJETAS ===== -->
+                {% if clientes and clientes|length > 0 %}
+                    {% for c in clientes %}
+                    <a href="{{ url_for('web.admin_ver_cuenta', usuario_id=c._id) }}" class="cliente-card">
+                        <div class="cliente-avatar-wrap">
+                            {% if c.foto %}
+                                <img src="{{ url_for('static', filename='uploads/' + c.foto) }}"
+                                     class="cliente-avatar" alt="{{ c.nombre }}">
+                            {% else %}
+                                <img src="https://ui-avatars.com/api/?name={{ c.nombre }}&background=e10098&color=fff&size=60&bold=true"
+                                     class="cliente-avatar" alt="{{ c.nombre }}">
+                            {% endif %}
+                            <span class="cliente-avatar-status {{ 'on' if c.confirmado else 'off' }}"></span>
+                        </div>
+
+                        <div class="cliente-info">
+                            <div class="cliente-nombre">
+                                {{ c.nombre }} {{ c.apellido_paterno or '' }}
+                            </div>
+                            <div class="cliente-email">
+                                <i class="fas fa-envelope"></i>
+                                {{ c.email }}
+                            </div>
+                            <div class="cliente-meta">
+                                {% if c.confirmado %}
+                                    <span class="chip chip-verified">
+                                        <i class="fas fa-check-circle"></i> Verificado
+                                    </span>
+                                {% else %}
+                                    <span class="chip chip-pending">
+                                        <i class="fas fa-clock"></i> Sin verificar
+                                    </span>
+                                {% endif %}
+
+                                <span class="chip chip-brand">
+                                    <i class="fas fa-credit-card"></i>
+                                    {{ (c.metodos_pago or [])|length }} método{{ 's' if (c.metodos_pago or [])|length != 1 else '' }} de pago
+                                </span>
+
+                                <span class="chip chip-neutral">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ (c.direcciones or [])|length }} dirección{{ 'es' if (c.direcciones or [])|length != 1 else '' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <span class="btn-ver">
+                            Ver cuenta
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </a>
+                    {% endfor %}
+
+                    <!-- ===== PAGINACIÓN ===== -->
+                    {% if paginacion and paginacion.pages > 1 %}
+                    <div class="pagination-wrap">
+                        <div class="pagination-info">
+                            Página <strong>{{ paginacion.page }}</strong>
+                            de <strong>{{ paginacion.pages }}</strong>
+                        </div>
+
+                        <ul class="pagination">
+                            {# Anterior #}
+                            {% if paginacion.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="{{ url_for('web.admin_cuentas_clientes',
+                                                         page=paginacion.prev_num,
+                                                         per_page=paginacion.per_page,
+                                                         q=filtros.q if filtros else '',
+                                                         estado=filtros.estado if filtros else '',
+                                                         pago=filtros.pago if filtros else '',
+                                                         orden=filtros.orden if filtros else 'recientes') }}#lista"
+                                       title="Anterior">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                                </li>
+                            {% endif %}
+
+                            {# Helper de URL #}
+                            {% macro page_url(p) -%}
+                                {{ url_for('web.admin_cuentas_clientes',
+                                            page=p,
+                                            per_page=paginacion.per_page,
+                                            q=filtros.q if filtros else '',
+                                            estado=filtros.estado if filtros else '',
+                                            pago=filtros.pago if filtros else '',
+                                            orden=filtros.orden if filtros else 'recientes') }}#lista
+                            {%- endmacro %}
+
+                            {% set rango = paginacion.pages %}
+                            {% set actual = paginacion.page %}
+
+                            {% if rango <= 7 %}
+                                {% for p in range(1, rango + 1) %}
+                                    <li class="page-item {% if p == actual %}active{% endif %}">
+                                        <a class="page-link" href="{{ page_url(p) }}">{{ p }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="page-item {% if actual == 1 %}active{% endif %}">
+                                    <a class="page-link" href="{{ page_url(1) }}">1</a>
+                                </li>
+
+                                {% if actual > 4 %}
+                                    <li class="page-item dots"><span class="page-link">…</span></li>
+                                {% endif %}
+
+                                {% for p in range([2, actual - 2]|max, [rango - 1, actual + 2]|min + 1) %}
+                                    <li class="page-item {% if p == actual %}active{% endif %}">
+                                        <a class="page-link" href="{{ page_url(p) }}">{{ p }}</a>
+                                    </li>
+                                {% endfor %}
+
+                                {% if actual < rango - 3 %}
+                                    <li class="page-item dots"><span class="page-link">…</span></li>
+                                {% endif %}
+
+                                <li class="page-item {% if actual == rango %}active{% endif %}">
+                                    <a class="page-link" href="{{ page_url(rango) }}">{{ rango }}</a>
+                                </li>
+                            {% endif %}
+
+                            {# Siguiente #}
+                            {% if paginacion.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="{{ url_for('web.admin_cuentas_clientes',
+                                                         page=paginacion.next_num,
+                                                         per_page=paginacion.per_page,
+                                                         q=filtros.q if filtros else '',
+                                                         estado=filtros.estado if filtros else '',
+                                                         pago=filtros.pago if filtros else '',
+                                                         orden=filtros.orden if filtros else 'recientes') }}#lista"
+                                       title="Siguiente">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                {% else %}
+                    <!-- Empty state -->
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-{% if filtros and (filtros.q or filtros.estado or filtros.pago) %}search{% else %}users{% endif %}"></i>
+                        </div>
+                        {% if filtros and (filtros.q or filtros.estado or filtros.pago) %}
+                            <h4>No se encontraron clientes</h4>
+                            <p>Prueba ajustando los filtros o limpiando la búsqueda.</p>
+                            <a href="{{ url_for('web.admin_cuentas_clientes') }}#lista" class="btn-primary-custom">
+                                <i class="fas fa-times-circle"></i> Limpiar filtros
+                            </a>
+                        {% else %}
+                            <h4>No hay clientes registrados</h4>
+                            <p>Cuando un cliente se registre en la tienda aparecerá aquí automáticamente.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- ===== FOOTER ===== -->
+            <div class="footer-info">
+                <p>
+                    <i class="fas fa-clock"></i>
+                    {{ datetime.now().strftime('%d/%m/%Y %H:%M') if datetime else 'Ahora' }}
+                    <span class="separator">|</span>
+                    <i class="fas fa-shield-alt"></i> ORION System v2.0
+                    <span class="separator">|</span>
+                    <i class="fas fa-copyright"></i> Todos los derechos reservados
+                    <span class="separator">|</span>
+                    <span class="heart"><i class="fas fa-heart"></i></span>
+                </p>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scroll a #lista al llegar con filtros/paginación
+        if (window.location.hash === '#lista') {
+            const el = document.getElementById('lista');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Botón limpiar búsqueda
+        const inputSearch = document.getElementById('inputSearch');
+        const btnClear = document.getElementById('btnClearSearch');
+        if (inputSearch && btnClear) {
+            inputSearch.addEventListener('input', function() {
+                btnClear.classList.toggle('visible', this.value.length > 0);
+            });
+
+            btnClear.addEventListener('click', function() {
+                inputSearch.value = '';
+                btnClear.classList.remove('visible');
+                document.getElementById('filtersForm').submit();
+            });
+
+            // Enter en búsqueda = submit
+            inputSearch.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('filtersForm').submit();
+                }
+            });
+        }
+
+        // Hover stats
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

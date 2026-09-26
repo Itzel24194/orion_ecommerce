@@ -48,6 +48,180 @@
             border-radius: 10px;
             padding: 10px 14px;
         }
+        /* ============================================================
+   AUTOCOMPLETADO DE BÚSQUEDA — ORION
+   ============================================================ */
+.search-wrapper {
+    max-width: 680px;
+    min-width: 260px;
+    position: relative;
+}
+
+.search-container {
+    border: 2px solid #eee !important;
+    border-radius: 50px;
+    overflow: hidden;
+    background: #f8f9fa;
+    transition: all 0.25s ease;
+}
+
+.search-wrapper:focus-within .search-container {
+    border-color: var(--orion-primary, #e10098) !important;
+    box-shadow: 0 0 0 4px rgba(225, 0, 152, 0.08);
+    background: #fff;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid #f0f0f0;
+    max-height: 480px;
+    overflow-y: auto;
+    z-index: 1050;
+    animation: acFadeIn 0.18s ease;
+}
+
+@keyframes acFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.autocomplete-dropdown::-webkit-scrollbar { width: 6px; }
+.autocomplete-dropdown::-webkit-scrollbar-thumb {
+    background: #e10098;
+    border-radius: 10px;
+}
+
+.autocomplete-loading,
+.autocomplete-empty {
+    padding: 18px 20px;
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+}
+.autocomplete-loading i,
+.autocomplete-empty i {
+    color: #e10098;
+    margin-right: 6px;
+}
+
+.autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.15s ease;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+    background: #fdf2f8;
+}
+
+.autocomplete-item.active {
+    box-shadow: inset 3px 0 0 #e10098;
+}
+
+.autocomplete-item-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #f8f8f8;
+    border: 1px solid #eee;
+    flex-shrink: 0;
+}
+
+.autocomplete-item-img.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 1.2rem;
+}
+
+.autocomplete-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.autocomplete-item-name {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #1a1a2e;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 2px;
+}
+
+.autocomplete-item-name mark {
+    background: rgba(225, 0, 152, 0.15);
+    color: #e10098;
+    font-weight: 800;
+    padding: 0 2px;
+    border-radius: 3px;
+}
+
+.autocomplete-item-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 0.72rem;
+    color: #888;
+    flex-wrap: wrap;
+}
+
+.autocomplete-item-meta .marca {
+    color: #e10098;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.autocomplete-item-price {
+    font-weight: 800;
+    color: #e10098;
+    font-size: 0.92rem;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.autocomplete-footer {
+    padding: 10px 16px;
+    border-top: 1px solid #f0f0f0;
+    text-align: center;
+    background: #fafafa;
+    border-radius: 0 0 16px 16px;
+}
+
+.autocomplete-footer a {
+    color: #e10098 !important;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+
+.autocomplete-footer a:hover {
+    text-decoration: underline !important;
+}
+
+@media (max-width: 767px) {
+    .search-wrapper { max-width: 100%; }
+    .autocomplete-dropdown { max-height: 60vh; }
+    .autocomplete-item-name { font-size: 0.82rem; }
+    .autocomplete-item-img { width: 40px; height: 40px; }
+}
     </style>
 </head>
 <body>
@@ -368,5 +542,188 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ===== AUTOCOMPLETADO DE BÚSQUEDA — ORION ===== -->
+<script>
+(function () {
+    const input    = document.getElementById('searchInput');
+    const dropdown = document.getElementById('autocompleteResults');
+    const list     = document.getElementById('autocompleteList');
+    const loading  = document.getElementById('autocompleteLoading');
+    const empty    = document.getElementById('autocompleteEmpty');
+    const footer   = document.getElementById('autocompleteFooter');
+    const verTodos = document.getElementById('autocompleteVerTodos');
+    const form     = document.getElementById('searchForm');
+
+    if (!input || !dropdown) return;
+
+    let debounceTimer = null;
+    let controller    = null;
+    let items         = [];
+    let activeIndex   = -1;
+    let currentQuery  = '';
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+    function escapeRegex(str) {
+        return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    function highlight(text, query) {
+        if (!query) return escapeHtml(text);
+        const regex = new RegExp('(' + escapeRegex(query) + ')', 'gi');
+        return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+    }
+    function fmtPrecio(n) { return '$' + Number(n || 0).toFixed(2); }
+
+    function showDropdown() { dropdown.style.display = 'block'; }
+    function hideDropdown() { dropdown.style.display = 'none'; activeIndex = -1; }
+
+    function renderResults(resultados, query) {
+        list.innerHTML = '';
+        items = [];
+        activeIndex = -1;
+
+        if (!resultados || resultados.length === 0) {
+            loading.style.display = 'none';
+            empty.style.display   = 'block';
+            footer.style.display  = 'none';
+            list.style.display    = 'none';
+            showDropdown();
+            return;
+        }
+
+        loading.style.display = 'none';
+        empty.style.display   = 'none';
+        list.style.display    = 'block';
+        footer.style.display  = 'block';
+        list.innerHTML = '';
+
+        resultados.forEach(function (p, idx) {
+            const a = document.createElement('a');
+            a.className = 'autocomplete-item';
+            a.href = p.url;
+            a.setAttribute('role', 'option');
+            a.dataset.index = idx;
+
+            const imgHtml = p.foto
+                ? '<img src="' + escapeHtml(p.foto) + '" class="autocomplete-item-img" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
+                : '<div class="autocomplete-item-img placeholder"><i class="bi bi-image"></i></div>';
+
+            const meta = [];
+            if (p.marca)     meta.push('<span class="marca">' + escapeHtml(p.marca) + '</span>');
+            if (p.categoria) meta.push('<span>' + escapeHtml(p.categoria) + '</span>');
+
+            a.innerHTML =
+                imgHtml +
+                '<div class="autocomplete-item-info">' +
+                    '<div class="autocomplete-item-name">' + highlight(p.nombre, query) + '</div>' +
+                    '<div class="autocomplete-item-meta">' + meta.join('') + '</div>' +
+                '</div>' +
+                '<div class="autocomplete-item-price">' + fmtPrecio(p.precio) + '</div>';
+
+            list.appendChild(a);
+            items.push(a);
+        });
+
+        showDropdown();
+    }
+
+    function setActive(idx) {
+        items.forEach(function (el) { el.classList.remove('active'); });
+        if (idx < 0) { activeIndex = -1; return; }
+        if (idx >= items.length) idx = 0;
+        if (idx < 0) idx = items.length - 1;
+        items[idx].classList.add('active');
+        items[idx].scrollIntoView({ block: 'nearest' });
+        activeIndex = idx;
+    }
+
+    input.addEventListener('keydown', function (e) {
+        const isOpen = dropdown.style.display === 'block';
+        if (e.key === 'ArrowDown') {
+            if (!isOpen && currentQuery.length >= 2) {
+                fetchSuggestions(currentQuery);
+                e.preventDefault();
+                return;
+            }
+            e.preventDefault();
+            setActive(activeIndex + 1);
+        } else if (e.key === 'ArrowUp') {
+            if (isOpen) { e.preventDefault(); setActive(activeIndex - 1); }
+        } else if (e.key === 'Enter') {
+            if (isOpen && activeIndex >= 0 && items[activeIndex]) {
+                e.preventDefault();
+                window.location.href = items[activeIndex].href;
+            }
+        } else if (e.key === 'Escape') {
+            hideDropdown();
+        }
+    });
+
+    function fetchSuggestions(query) {
+        currentQuery = query;
+        if (controller) { try { controller.abort(); } catch (e) {} }
+        controller = new AbortController();
+
+        loading.style.display = 'block';
+        empty.style.display   = 'none';
+        list.style.display    = 'none';
+        footer.style.display  = 'none';
+        showDropdown();
+
+        const url = '/api/productos/autocompletar?q=' + encodeURIComponent(query);
+
+        fetch(url, { signal: controller.signal })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (!data || !data.success) throw new Error('Bad response');
+                renderResults(data.resultados || [], query);
+            })
+            .catch(function (err) {
+                if (err.name === 'AbortError') return;
+                console.warn('Autocompletar error:', err);
+                loading.style.display = 'none';
+                empty.style.display   = 'block';
+            });
+    }
+
+    input.addEventListener('input', function () {
+        const q = input.value.trim();
+        clearTimeout(debounceTimer);
+        if (q.length < 2) { hideDropdown(); return; }
+        if (verTodos) verTodos.href = '/catalogo?q=' + encodeURIComponent(q);
+        debounceTimer = setTimeout(function () { fetchSuggestions(q); }, 220);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!dropdown.contains(e.target) && e.target !== input) hideDropdown();
+    });
+
+    input.addEventListener('blur', function () {
+        setTimeout(function () {
+            if (!dropdown.matches(':hover')) hideDropdown();
+        }, 180);
+    });
+
+    input.addEventListener('focus', function () {
+        const q = input.value.trim();
+        if (q.length >= 2 && items.length > 0) showDropdown();
+    });
+
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            const isOpen = dropdown.style.display === 'block';
+            if (isOpen && activeIndex >= 0 && items[activeIndex]) {
+                e.preventDefault();
+                window.location.href = items[activeIndex].href;
+            }
+        });
+    }
+})();
+</script>
 </body>
 </html>

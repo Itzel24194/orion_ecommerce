@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monedero · Configuración · ORION Admin</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            padding: 0; height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px; text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            margin-bottom: 10px; flex-shrink: 0;
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .admin-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a:hover i, .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main { margin-left: 280px; padding: 30px 35px 20px; width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #e8e8e8; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0; }
+        .top-bar h1 { font-size: 1.6rem; font-weight: 800; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag { background: #e10098; color: #fff; padding: 5px 18px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .top-bar__right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .top-bar__crumb { font-size: 0.72rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .top-bar__crumb a { color: #666; text-decoration: none; font-weight: 600; }
+        .top-bar__crumb a:hover { color: #e10098; }
+        .top-bar__crumb i { font-size: 0.6rem; margin: 0 6px; }
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; }
+
+        /* ===== HERO ===== */
+        .hero { background: linear-gradient(135deg, #fff, #faf0f5); padding: 25px 30px; border-radius: 16px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); flex-shrink: 0; }
+        .hero h2 { color: #1a1a2e; margin-bottom: 8px; font-weight: 800; font-size: 1.3rem; }
+        .hero h2 i { color: #e10098; }
+        .hero p { color: #666; margin-bottom: 0; font-size: 0.95rem; line-height: 1.6; }
+        .hero strong { color: #e10098; }
+        .hero__actions { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ===== BOTONES ===== */
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border: 1px solid #e8e8e8; background: #fff; border-radius: 50px; font-family: inherit; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #666; text-decoration: none; cursor: pointer; transition: all 0.3s ease; }
+        .btn:hover { border-color: #e10098; color: #e10098; transform: translateY(-2px); }
+        .btn--primary { background: #e10098; border-color: #e10098; color: #fff; }
+        .btn--primary:hover { background: #c00080; border-color: #c00080; color: #fff; box-shadow: 0 4px 15px rgba(225,0,152,.3); }
+        .btn--ghost { background: #fff; color: #666; }
+
+        /* ===== SECTION BOX ===== */
+        .section-box { background: #ffffff; border-radius: 16px; padding: 25px 28px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0; }
+        .section-box h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .section-box h2 i { color: #e10098; }
+        .section-box .sub { font-size: 0.78rem; color: #999; margin-bottom: 22px; }
+
+        /* ===== GRID ===== */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+
+        /* ===== FIELD ===== */
+        .field label { display: block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: #666; margin-bottom: 8px; }
+        .field input[type="number"],
+        .field input[type="text"] {
+            width: 100%; padding: 12px 15px; border: 1px solid #e8e8e8; border-radius: 12px;
+            font-family: inherit; font-size: 0.9rem; background: #fafafa; color: #1a1a2e;
+            transition: all 0.2s ease; outline: none;
+        }
+        .field input:focus { border-color: #e10098; background: #fff; box-shadow: 0 0 0 3px rgba(225,0,152,.08); }
+        .field .hint { font-size: 0.72rem; color: #999; margin-top: 6px; }
+
+        /* ===== SWITCH ===== */
+        .switch {
+            display: flex; align-items: center; justify-content: space-between; gap: 20px;
+            padding: 18px 20px; background: #fafafa; border: 1px solid #f0f0f0;
+            border-radius: 12px; transition: all 0.2s ease;
+        }
+        .switch:hover { border-color: #e10098; background: #fdf5fa; }
+        .switch__body h4 { font-size: 0.85rem; font-weight: 800; color: #1a1a2e; margin-bottom: 4px; }
+        .switch__body p { font-size: 0.75rem; color: #888; line-height: 1.4; }
+        .switch input[type="checkbox"] {
+            position: relative; width: 48px; height: 26px; -webkit-appearance: none; appearance: none;
+            background: #ccc; border-radius: 26px; cursor: pointer; transition: background .25s;
+            flex-shrink: 0; outline: none;
+        }
+        .switch input[type="checkbox"]::after {
+            content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px;
+            border-radius: 50%; background: #fff; transition: transform .25s;
+            box-shadow: 0 1px 3px rgba(0,0,0,.2);
+        }
+        .switch input[type="checkbox"]:checked { background: linear-gradient(135deg, #e10098, #b80064); }
+        .switch input[type="checkbox"]:checked::after { transform: translateX(22px); }
+
+        /* ===== ACTIONS ===== */
+        .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+
+        /* ===== FLASH ===== */
+        .flash { padding: 14px 18px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 600; border-left: 4px solid #16a34a; background: #dcfce7; color: #166534; }
+        .flash.warn { background: #fef3c7; color: #92400e; border-left-color: #f59e0b; }
+        .flash.err { background: #fee2e2; color: #991b1b; border-left-color: #dc2626; }
+        .flash i { font-size: 1rem; }
+
+        /* ===== FOOTER ===== */
+        .footer-info { background: #ffffff; padding: 15px 25px; border-radius: 16px; border: 1px solid #e8e8e8; text-align: center; margin-top: auto; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+        .footer-info p { color: #888; font-size: 0.75rem; margin: 0; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .footer-info p .separator { color: #ddd; }
+        .footer-info i { color: #e10098; }
+        .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .sidebar .logout-btn i { font-size: 1.3rem; margin: 0; }
+            .main { margin-left: 70px; padding: 15px; }
+            .footer-info p { font-size: 0.65rem; gap: 8px; }
+        }
+        @media (max-width: 480px) {
+            .top-bar h1 { font-size: 1.2rem; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .hero { padding: 20px; }
+            .hero h2 { font-size: 1.1rem; }
+            .hero p { font-size: 0.85rem; }
+            .section-box { padding: 18px; }
+            .grid { grid-template-columns: 1fr; }
+            .form-actions { flex-direction: column; }
+            .form-actions .btn { width: 100%; justify-content: center; }
+            .footer-info p { flex-direction: column; gap: 5px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <nav class="sidebar">
+
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_marcas') }}"><i class="fas fa-building"></i> <span>Marcas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_combos') }}"><i class="fas fa-layer-group" style="color: #fd7e14;"></i> <span>Combos</span></a>
+            <a href="{{ url_for('web.admin_marketplace_vendedores') }}"><i class="fas fa-store" style="color: #0284c7;"></i> <span>Marketplace</span></a>
+            <a href="{{ url_for('web.admin_resenas') }}"><i class="fas fa-star" style="color: #ffc107;"></i> <span>Reseñas</span></a>
+            <a href="{{ url_for('web.admin_chat_panel') }}"><i class="fas fa-comment-dots" style="color: #00d4ff;"></i> <span>Chat en vivo</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
+            <a href="{{ url_for('web.listar_temporadas') }}"><i class="fas fa-calendar-alt" style="color: #f9a825;"></i> <span>Temporadas</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}"><i class="fas fa-gift"></i> <span>Promociones</span></a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+            <a href="{{ url_for('web.admin_lealtad_panel') }}"><i class="fas fa-crown" style="color: #e10098;"></i> <span>Cliente Consentido</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">FINANZAS</div>
+            <a href="{{ url_for('web.admin_monedero_panel') }}" class="active"><i class="fas fa-wallet" style="color: #e10098;"></i> <span>Monedero ORION</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}"><i class="fas fa-brain" style="color: #6f42c1;"></i> <span>Análisis Supervisado</span></a>
+            <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
+            <a href="{{ url_for('web.clasificacion_binaria') }}"><i class="fas fa-toggle-on" style="color: #17a2b8;"></i> <span>Clasificación Binaria</span></a>
+            <a href="{{ url_for('web.admin_dashboard_auditoria') }}"><i class="fas fa-shield-check" style="color: #0d47a1;"></i> <span>Auditoría</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
+            <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
+            <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+            <div class="divider"></div>
+
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+
+        </div>
+
+    </nav>
+
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-sliders-h"></i> Configuración del Monedero</h1>
+            <div class="top-bar__right">
+                <div class="top-bar__crumb">
+                    <a href="{{ url_for('web.admin_monedero_panel') }}">Monedero</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Configuración</span>
+                </div>
+                <div class="tag"><i class="fas fa-shield-alt"></i> Admin</div>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <!-- HERO -->
+            <section class="hero">
+                <h2><i class="fas fa-sliders-h"></i> Reglas del Monedero ORION</h2>
+                <p>
+                    Ajusta los <strong>límites de saldo</strong>, las reglas de
+                    <strong>transferencias entre usuarios</strong>, la
+                    <strong>comisión por envío</strong> y el porcentaje de
+                    <strong>cashback</strong> que se abona en cada compra.
+                    Estos valores aplican a todos los monederos del sistema.
+                </p>
+                <div class="hero__actions">
+                    <a href="{{ url_for('web.admin_monedero_panel') }}" class="btn"><i class="fas fa-arrow-left"></i> Volver al panel</a>
+                    <a href="{{ url_for('web.admin_monedero_clientes') }}" class="btn btn--ghost"><i class="fas fa-users"></i> Ver clientes</a>
+                </div>
+            </section>
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for cat, msg in messages %}
+                        <div class="flash {{ 'err' if cat=='danger' else 'warn' if cat=='warning' else '' }}">
+                            <i class="fas fa-circle-info"></i> {{ msg }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('web.admin_monedero_config') }}">
+
+                <!-- LÍMITES DE SALDO -->
+                <div class="section-box">
+                    <h2><i class="fas fa-sliders-h"></i> Límites de saldo</h2>
+                    <p class="sub">Montos máximos y mínimos permitidos en el monedero.</p>
+
+                    <div class="grid">
+                        <div class="field">
+                            <label>Saldo máximo por monedero</label>
+                            <input type="number" step="0.01" min="0" name="saldo_maximo"
+                                   value="{{ config.saldo_maximo }}" required>
+                            <div class="hint">Monto tope que puede acumular un usuario.</div>
+                        </div>
+
+                        <div class="field">
+                            <label>Recarga mínima</label>
+                            <input type="number" step="0.01" min="0" name="saldo_minimo_recarga"
+                                   value="{{ config.saldo_minimo_recarga }}" required>
+                            <div class="hint">Monto mínimo por operación de recarga.</div>
+                        </div>
+
+                        <div class="field">
+                            <label>Recarga máxima</label>
+                            <input type="number" step="0.01" min="0" name="recarga_maxima"
+                                   value="{{ config.recarga_maxima }}" required>
+                            <div class="hint">Monto máximo por operación de recarga.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TRANSFERENCIAS -->
+                <div class="section-box">
+                    <h2><i class="fas fa-exchange-alt"></i> Transferencias</h2>
+                    <p class="sub">Reglas para transferencias entre monederos.</p>
+
+                    <div class="grid">
+                        <div class="field" style="grid-column:1/-1;">
+                            <div class="switch">
+                                <div class="switch__body">
+                                    <h4>Permitir transferencias entre usuarios</h4>
+                                    <p>Si se desactiva, los clientes no podrán enviar saldo a otros monederos.</p>
+                                </div>
+                                <input type="checkbox" name="permitir_transferencias"
+                                       {{ 'checked' if config.permitir_transferencias else '' }}>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label>Comisión por transferencia (%)</label>
+                            <input type="number" step="0.01" min="0" max="100" name="comision_transferencia"
+                                   value="{{ config.comision_transferencia }}">
+                            <div class="hint">Porcentaje que se descuenta al emisor.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECOMPENSAS -->
+                <div class="section-box">
+                    <h2><i class="fas fa-gift"></i> Recompensas</h2>
+                    <p class="sub">Programas de cashback y beneficios automáticos.</p>
+
+                    <div class="grid">
+                        <div class="field">
+                            <label>Cashback por compra (%)</label>
+                            <input type="number" step="0.01" min="0" max="100" name="cashback_porcentaje"
+                                   value="{{ config.cashback_porcentaje }}">
+                            <div class="hint">Porcentaje que se abona al monedero en cada compra.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCIONES -->
+                <div class="form-actions">
+                    <a href="{{ url_for('web.admin_monedero_panel') }}" class="btn">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn--primary">
+                        <i class="fas fa-save"></i> Guardar configuración
+                    </button>
+                </div>
+
+            </form>
+
+            <!-- FOOTER -->
+            <div class="footer-info">
+                <p>
+                    <i class="fas fa-clock"></i>
+                    {{ datetime.now().strftime('%d/%m/%Y %H:%M') if datetime else 'Ahora' }}
+                    <span class="separator">|</span>
+                    <i class="fas fa-shield-alt"></i> ORION System v2.0
+                    <span class="separator">|</span>
+                    <i class="fas fa-copyright"></i> Todos los derechos reservados
+                    <span class="separator">|</span>
+                    <span class="heart"><i class="fas fa-heart"></i></span>
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            if (link.getAttribute('href') === currentPath) link.classList.add('active');
+        });
+    });
+</script>
+
+</body>
+</html>

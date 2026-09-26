@@ -1,0 +1,17 @@
+﻿.env
+.env.*
+!.env.example
+
+__pycache__/
+*.py[cod]
+
+.venv/
+venv/
+env/
+
+.vscode/
+.idea/
+
+*.log
+
+app/static/debug_impi/

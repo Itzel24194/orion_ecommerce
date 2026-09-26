@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar mi tienda | ORION Marketplace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-primary-soft: #fff0f8;
+            --orion-dark: #1a1a2e;
+            --orion-gray: #64748b;
+            --orion-border: #ececf1;
+        }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { background: #f8f9fa; color: var(--orion-dark); min-height: 100vh; padding-bottom: 60px; }
+
+        .main-navbar { background: #fff; border-bottom: 2px solid #f0f0f0; padding: 12px 0; }
+        .brand-logo { font-weight: 900; font-size: 2.3rem; letter-spacing: -1.5px; color: var(--orion-primary) !important; text-decoration: none; }
+        .brand-border { height: 4px; background: linear-gradient(90deg, var(--orion-primary), var(--orion-primary-dark)); width: 100%; }
+
+        .wizard-header {
+            background: linear-gradient(135deg, var(--orion-primary), var(--orion-primary-dark));
+            padding: 40px 0;
+            color: #fff;
+            margin-bottom: 40px;
+        }
+        .wizard-header h1 { font-weight: 900; font-size: 1.8rem; margin-bottom: 8px; color: #fff; }
+        .wizard-header p { font-size: .92rem; opacity: .95; margin: 0; }
+
+        .form-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.06);
+            border: 1px solid var(--orion-border);
+            margin-bottom: 24px;
+        }
+        .form-section-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--orion-dark);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--orion-primary-soft);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-section-title i { color: var(--orion-primary); }
+
+        .form-label { font-size: .78rem; font-weight: 700; color: var(--orion-dark); margin-bottom: 6px; }
+        .form-control, .form-select {
+            padding: 11px 16px;
+            border: 2px solid var(--orion-border);
+            border-radius: 10px;
+            font-size: .88rem;
+            font-family: inherit;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--orion-primary);
+            box-shadow: 0 0 0 3px rgba(225,0,152,.1);
+        }
+
+        /* ============================================================
+           ⭐ CHIPS DE CATEGORÍAS — CORREGIDO
+           Usamos :has() para que el estilo siga el estado real del checkbox.
+           Sin JS, sin conflictos con el toggle nativo del <label>.
+           ============================================================ */
+        .cat-chip {
+            display: inline-block;
+            padding: 8px 16px;
+            border: 2px solid var(--orion-border);
+            border-radius: 50px;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: all .2s;
+            margin: 0 6px 6px 0;
+        }
+        .cat-chip input { display: none; }
+        /* El estilo sigue el estado real del checkbox */
+        .cat-chip:has(input:checked) {
+            background: var(--orion-primary);
+            border-color: var(--orion-primary);
+            color: #fff;
+        }
+        .cat-chip:hover { border-color: var(--orion-primary); }
+
+        /* Fallback para navegadores antiguos que no soportan :has() */
+        .cat-chip.checked {
+            background: var(--orion-primary);
+            border-color: var(--orion-primary);
+            color: #fff;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--orion-primary), var(--orion-primary-dark));
+            color: #fff;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: .95rem;
+            transition: all .25s;
+            box-shadow: 0 6px 20px rgba(225,0,152,.3);
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(225,0,152,.4);
+            color: #fff;
+        }
+
+        .info-box {
+            background: var(--orion-primary-soft);
+            border-left: 4px solid var(--orion-primary);
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-size: .82rem;
+            color: var(--orion-dark);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #e10098 0%, #c00080 100%) !important;
+            color: #fff !important;
+            padding: 24px 0 !important;
+            text-align: center !important;
+            font-size: .8rem !important;
+            margin-top: 60px !important;
+        }
+        footer p { margin: 0 !important; color: #fff !important; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light main-navbar">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
+            <a href="{{ url_for('web.marketplace') }}" style="text-decoration:none; color:var(--orion-gray); font-size:.8rem; font-weight:600;">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </nav>
+    <div class="brand-border"></div>
+
+    <section class="wizard-header">
+        <div class="container">
+            <h1>Registra tu tienda</h1>
+            <p>Completa el formulario. Revisaremos tu solicitud en menos de 24 horas.</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for cat, msg in messages %}
+                            <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+                                {{ msg }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="info-box">
+                    <i class="bi bi-info-circle-fill" style="color:var(--orion-primary);"></i>
+                    <strong>Antes de empezar:</strong> Ten a la mano tu RFC, CLABE interbancaria (18 dígitos)
+                    y datos de contacto de tu tienda. El registro es gratuito, solo pagas comisión por venta.
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <!-- SECCIÓN 1: DATOS DE LA TIENDA -->
+                    <div class="form-card">
+                        <div class="form-section-title">
+                            <i class="bi bi-shop"></i> Datos de la tienda
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Nombre de la tienda *</label>
+                                <input type="text" name="nombre_tienda" class="form-control" required
+                                       value="{{ form.get('nombre_tienda','') }}"
+                                       placeholder="Ej: Mi Tienda Fitness">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Comisión propuesta (%)</label>
+                                <input type="number" name="comision_pct" class="form-control"
+                                       value="{{ form.get('comision_pct', 15) }}"
+                                       min="5" max="30" step="0.5">
+                                <small class="text-muted" style="font-size:.7rem;">Se negocia con el admin</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Descripción de tu tienda *</label>
+                                <textarea name="descripcion" class="form-control" rows="3" required
+                                          placeholder="¿Qué vendes? ¿Cuál es tu propuesta?">{{ form.get('descripcion','') }}</textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Categorías que vas a vender</label>
+                                <div>
+                                    {% set cats = ['Moda', 'Electrónica', 'Hogar', 'Belleza', 'Deportes', 'Juguetes', 'Libros', 'Mascotas', 'Automotriz', 'Herramientas', 'Videojuegos'] %}
+                                    {% for c in cats %}
+                                    {# ⭐ SIN onclick: el <label> ya activa el <input> nativamente #}
+                                    <label class="cat-chip">
+                                        <input type="checkbox" name="categorias" value="{{ c }}"
+                                               {% if c in form.get('categorias', []) %}checked{% endif %}>
+                                        {{ c }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 2: DATOS FISCALES -->
+                    <div class="form-card">
+                        <div class="form-section-title">
+                            <i class="bi bi-receipt"></i> Datos fiscales
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">RFC *</label>
+                                <input type="text" name="rfc" class="form-control" required
+                                       value="{{ form.get('rfc','') }}"
+                                       maxlength="13" placeholder="XAXX010101000"
+                                       style="text-transform: uppercase;">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Razón social *</label>
+                                <input type="text" name="razon_social" class="form-control" required
+                                       value="{{ form.get('razon_social','') }}"
+                                       placeholder="Nombre legal o empresa">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Teléfono de contacto *</label>
+                                <input type="tel" name="telefono" class="form-control" required
+                                       value="{{ form.get('telefono','') }}"
+                                       placeholder="+52 55 1234 5678">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email de contacto *</label>
+                                <input type="email" name="email_contacto" class="form-control" required
+                                       value="{{ form.get('email_contacto','') }}"
+                                       placeholder="contacto@mitienda.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 3: DATOS BANCARIOS -->
+                    <div class="form-card">
+                        <div class="form-section-title">
+                            <i class="bi bi-bank"></i> Datos bancarios (para recibir pagos)
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Banco *</label>
+                                <input type="text" name="banco_nombre" class="form-control" required
+                                       value="{{ form.get('banco_nombre','') }}"
+                                       placeholder="Ej: BBVA">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">CLABE interbancaria (18 dígitos) *</label>
+                                <input type="text" name="banco_clabe" class="form-control" required
+                                       value="{{ form.get('banco_clabe','') }}"
+                                       maxlength="18" pattern="\d{18}"
+                                       placeholder="012345678901234567">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Titular de la cuenta *</label>
+                                <input type="text" name="banco_titular" class="form-control" required
+                                       value="{{ form.get('banco_titular','') }}"
+                                       placeholder="Como aparece en el banco">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 4: DIRECCIÓN -->
+                    <div class="form-card">
+                        <div class="form-section-title">
+                            <i class="bi bi-geo-alt"></i> Dirección de la tienda
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Calle *</label>
+                                <input type="text" name="dir_calle" class="form-control" required
+                                       value="{{ form.get('dir_calle','') }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Número *</label>
+                                <input type="text" name="dir_numero" class="form-control" required
+                                       value="{{ form.get('dir_numero','') }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Colonia *</label>
+                                <input type="text" name="dir_colonia" class="form-control" required
+                                       value="{{ form.get('dir_colonia','') }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">CP *</label>
+                                <input type="text" name="dir_cp" class="form-control" required
+                                       value="{{ form.get('dir_cp','') }}"
+                                       maxlength="5" pattern="\d{5}">
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Ciudad *</label>
+                                <input type="text" name="dir_ciudad" class="form-control" required
+                                       value="{{ form.get('dir_ciudad','') }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Estado *</label>
+                                <input type="text" name="dir_estado" class="form-control" required
+                                       value="{{ form.get('dir_estado','') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-5">
+                        <button type="submit" class="btn-submit">
+                            <i class="bi bi-check-circle-fill"></i> Enviar solicitud
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 ORION Marketplace. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ⭐ Fallback para navegadores sin :has() -->
+    <script>
+        (function() {
+            // Sincronizar clase 'checked' con el estado del checkbox
+            function syncChip(input) {
+                const chip = input.closest('.cat-chip');
+                if (!chip) return;
+                chip.classList.toggle('checked', input.checked);
+            }
+            // Al cargar, sincronizar los que vengan premarcados
+            document.querySelectorAll('.cat-chip input[type="checkbox"]').forEach(syncChip);
+            // Escuchar cambios para mantener sincronización
+            document.querySelectorAll('.cat-chip input[type="checkbox"]').forEach(function(inp) {
+                inp.addEventListener('change', function() { syncChip(this); });
+            });
+        })();
+    </script>
+</body>
+</html>

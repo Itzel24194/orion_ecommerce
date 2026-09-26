@@ -1,0 +1,184 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ORION\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mi Perfil"
+msgstr "Mein Profil"
+
+msgid "Seguridad"
+msgstr "Sicherheit"
+
+msgid "Mis Pedidos"
+msgstr "Meine Bestellungen"
+
+msgid "Direcciones"
+msgstr "Adressen"
+
+msgid "Favoritos"
+msgstr "Favoriten"
+
+msgid "Comunicaciones"
+msgstr "Kommunikation"
+
+msgid "Privacidad"
+msgstr "Datenschutz"
+
+msgid "Facturación"
+msgstr "Abrechnung"
+
+msgid "Métodos de Pago"
+msgstr "Zahlungsmethoden"
+
+msgid "Idioma"
+msgstr "Sprache"
+
+msgid "Cerrar Sesión"
+msgstr "Abmelden"
+
+msgid "Información Personal"
+msgstr "Persönliche Informationen"
+
+msgid "Nombre(s)"
+msgstr "Vorname(n)"
+
+msgid "Apellido Paterno"
+msgstr "Nachname"
+
+msgid "Apellido Materno"
+msgstr "Zweiter Nachname"
+
+msgid "Teléfono"
+msgstr "Telefon"
+
+msgid "Fecha de Nacimiento"
+msgstr "Geburtsdatum"
+
+msgid "Género"
+msgstr "Geschlecht"
+
+msgid "Guardar Cambios"
+msgstr "Änderungen Speichern"
+
+msgid "Seguridad de la Cuenta"
+msgstr "Kontosicherheit"
+
+msgid "Verificación en dos pasos"
+msgstr "Zwei-Faktor-Authentifizierung"
+
+msgid "Cambiar contraseña"
+msgstr "Passwort ändern"
+
+msgid "Contraseña actual"
+msgstr "Aktuelles Passwort"
+
+msgid "Nueva contraseña"
+msgstr "Neues Passwort"
+
+msgid "Confirmar nueva contraseña"
+msgstr "Neues Passwort bestätigen"
+
+msgid "Actualizar contraseña"
+msgstr "Passwort aktualisieren"
+
+msgid "Ver todos"
+msgstr "Alle anzeigen"
+
+msgid "Todos"
+msgstr "Alle"
+
+msgid "Pendientes"
+msgstr "Ausstehend"
+
+msgid "Confirmados"
+msgstr "Bestätigt"
+
+msgid "Enviados"
+msgstr "Versandt"
+
+msgid "Entregados"
+msgstr "Geliefert"
+
+msgid "Cancelados"
+msgstr "Storniert"
+
+msgid "Ver detalle"
+msgstr "Details anzeigen"
+
+msgid "No tienes pedidos realizados"
+msgstr "Sie haben keine Bestellungen"
+
+msgid "Mis Direcciones"
+msgstr "Meine Adressen"
+
+msgid "Editar"
+msgstr "Bearbeiten"
+
+msgid "Eliminar"
+msgstr "Löschen"
+
+msgid "Agregar dirección"
+msgstr "Adresse hinzufügen"
+
+msgid "Nueva Dirección"
+msgstr "Neue Adresse"
+
+msgid "Calle"
+msgstr "Straße"
+
+msgid "Colonia"
+msgstr "Viertel"
+
+msgid "Ciudad"
+msgstr "Stadt"
+
+msgid "Estado"
+msgstr "Bundesland"
+
+msgid "Guardar dirección"
+msgstr "Adresse speichern"
+
+msgid "Mis Favoritos"
+msgstr "Meine Favoriten"
+
+msgid "Ver producto"
+msgstr "Produkt ansehen"
+
+msgid "Explorar productos"
+msgstr "Produkte erkunden"
+
+msgid "Preferencias de Comunicación"
+msgstr "Kommunikationseinstellungen"
+
+msgid "Guardar preferencias"
+msgstr "Einstellungen speichern"
+
+msgid "Privacidad y Datos"
+msgstr "Datenschutz und Daten"
+
+msgid "Eliminar mi cuenta"
+msgstr "Mein Konto löschen"
+
+msgid "Datos fiscales"
+msgstr "Steuerdaten"
+
+msgid "Historial de facturas"
+msgstr "Rechnungsverlauf"
+
+msgid "Idioma y Región"
+msgstr "Sprache und Region"
+
+msgid "Moneda"
+msgstr "Währung"
+
+msgid "Región / País"
+msgstr "Region / Land"
+
+msgid "Vista previa"
+msgstr "Vorschau"
+
+msgid "Guardar cambios"
+msgstr "Änderungen speichern"

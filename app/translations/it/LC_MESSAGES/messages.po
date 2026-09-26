@@ -1,0 +1,184 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ORION\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mi Perfil"
+msgstr "Il Mio Profilo"
+
+msgid "Seguridad"
+msgstr "Sicurezza"
+
+msgid "Mis Pedidos"
+msgstr "I Miei Ordini"
+
+msgid "Direcciones"
+msgstr "Indirizzi"
+
+msgid "Favoritos"
+msgstr "Preferiti"
+
+msgid "Comunicaciones"
+msgstr "Comunicazioni"
+
+msgid "Privacidad"
+msgstr "Privacy"
+
+msgid "Facturación"
+msgstr "Fatturazione"
+
+msgid "Métodos de Pago"
+msgstr "Metodi di Pagamento"
+
+msgid "Idioma"
+msgstr "Lingua"
+
+msgid "Cerrar Sesión"
+msgstr "Esci"
+
+msgid "Información Personal"
+msgstr "Informazioni Personali"
+
+msgid "Nombre(s)"
+msgstr "Nome"
+
+msgid "Apellido Paterno"
+msgstr "Cognome"
+
+msgid "Apellido Materno"
+msgstr "Secondo Cognome"
+
+msgid "Teléfono"
+msgstr "Telefono"
+
+msgid "Fecha de Nacimiento"
+msgstr "Data di Nascita"
+
+msgid "Género"
+msgstr "Genere"
+
+msgid "Guardar Cambios"
+msgstr "Salva Modifiche"
+
+msgid "Seguridad de la Cuenta"
+msgstr "Sicurezza dell'Account"
+
+msgid "Verificación en dos pasos"
+msgstr "Autenticazione a due fattori"
+
+msgid "Cambiar contraseña"
+msgstr "Cambia password"
+
+msgid "Contraseña actual"
+msgstr "Password attuale"
+
+msgid "Nueva contraseña"
+msgstr "Nuova password"
+
+msgid "Confirmar nueva contraseña"
+msgstr "Conferma nuova password"
+
+msgid "Actualizar contraseña"
+msgstr "Aggiorna password"
+
+msgid "Ver todos"
+msgstr "Vedi tutti"
+
+msgid "Todos"
+msgstr "Tutti"
+
+msgid "Pendientes"
+msgstr "In Attesa"
+
+msgid "Confirmados"
+msgstr "Confermati"
+
+msgid "Enviados"
+msgstr "Spediti"
+
+msgid "Entregados"
+msgstr "Consegnati"
+
+msgid "Cancelados"
+msgstr "Annullati"
+
+msgid "Ver detalle"
+msgstr "Vedi dettagli"
+
+msgid "No tienes pedidos realizados"
+msgstr "Non hai ordini"
+
+msgid "Mis Direcciones"
+msgstr "I Miei Indirizzi"
+
+msgid "Editar"
+msgstr "Modifica"
+
+msgid "Eliminar"
+msgstr "Elimina"
+
+msgid "Agregar dirección"
+msgstr "Aggiungi indirizzo"
+
+msgid "Nueva Dirección"
+msgstr "Nuovo Indirizzo"
+
+msgid "Calle"
+msgstr "Via"
+
+msgid "Colonia"
+msgstr "Quartiere"
+
+msgid "Ciudad"
+msgstr "Città"
+
+msgid "Estado"
+msgstr "Stato"
+
+msgid "Guardar dirección"
+msgstr "Salva indirizzo"
+
+msgid "Mis Favoritos"
+msgstr "I Miei Preferiti"
+
+msgid "Ver producto"
+msgstr "Vedi prodotto"
+
+msgid "Explorar productos"
+msgstr "Esplora prodotti"
+
+msgid "Preferencias de Comunicación"
+msgstr "Preferenze di Comunicazione"
+
+msgid "Guardar preferencias"
+msgstr "Salva preferenze"
+
+msgid "Privacidad y Datos"
+msgstr "Privacy e Dati"
+
+msgid "Eliminar mi cuenta"
+msgstr "Elimina il mio account"
+
+msgid "Datos fiscales"
+msgstr "Dati Fiscali"
+
+msgid "Historial de facturas"
+msgstr "Storico Fatture"
+
+msgid "Idioma y Región"
+msgstr "Lingua e Regione"
+
+msgid "Moneda"
+msgstr "Valuta"
+
+msgid "Región / País"
+msgstr "Regione / Paese"
+
+msgid "Vista previa"
+msgstr "Anteprima"
+
+msgid "Guardar cambios"
+msgstr "Salva modifiche"

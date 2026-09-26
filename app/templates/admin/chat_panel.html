@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ORION Admin · Chat en vivo</title>
+    <title>ORION Admin · Chat Inteligente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
-        /* ===== VARIABLES ===== */
         :root {
             --orion-primary: #e10098;
             --orion-primary-dark: #c00080;
@@ -17,6 +17,7 @@
             --orion-gray: #f5f6f8;
             --orion-shadow: 0 8px 30px rgba(0,0,0,0.08);
             --orion-radius: 16px;
+            --ia-gradient: linear-gradient(135deg, #6c5ce7, #a29bfe);
         }
 
         * {
@@ -26,17 +27,8 @@
             box-sizing: border-box;
         }
 
-        html, body {
-            height: 100%;
-            background: #f0f2f5;
-        }
-
-        /* ===== LAYOUT ===== */
-        .chat-layout {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+        html, body { height: 100%; background: #f0f2f5; }
+        .chat-layout { display: flex; height: 100vh; overflow: hidden; }
 
         /* ===== SIDEBAR ===== */
         .chat-sidebar {
@@ -64,9 +56,7 @@
             gap: 10px;
         }
 
-        .chat-sidebar .sidebar-header h5 i {
-            color: var(--orion-primary);
-        }
+        .chat-sidebar .sidebar-header h5 i { color: var(--orion-primary); }
 
         .chat-sidebar .sidebar-header .badge-total {
             background: var(--orion-primary);
@@ -89,28 +79,39 @@
             text-decoration: none;
         }
 
-        .chat-sidebar .sidebar-header .btn-dashboard:hover {
-            background: #e0e0e0;
-            color: #1a1a2e;
+        .chat-sidebar .sidebar-header .btn-dashboard:hover { background: #e0e0e0; color: #1a1a2e; }
+
+        .chat-sidebar .filtros-sesiones {
+            display: flex;
+            gap: 6px;
+            padding: 10px 16px;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        /* Lista de sesiones */
-        .chat-sidebar .session-list {
+        .chat-sidebar .filtros-sesiones .btn-filtro {
             flex: 1;
-            overflow-y: auto;
-            padding: 8px 12px;
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            color: #666;
+            cursor: pointer;
+            transition: 0.2s;
         }
 
-        .chat-sidebar .session-list::-webkit-scrollbar {
-            width: 4px;
+        .chat-sidebar .filtros-sesiones .btn-filtro.active {
+            background: var(--orion-primary);
+            color: #fff;
+            border-color: var(--orion-primary);
         }
-        .chat-sidebar .session-list::-webkit-scrollbar-track {
-            background: #f5f6f8;
-        }
-        .chat-sidebar .session-list::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 4px;
-        }
+
+        .chat-sidebar .session-list { flex: 1; overflow-y: auto; padding: 8px 12px; }
+        .chat-sidebar .session-list::-webkit-scrollbar { width: 4px; }
+        .chat-sidebar .session-list::-webkit-scrollbar-track { background: #f5f6f8; }
+        .chat-sidebar .session-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
         .session-item {
             display: flex;
@@ -125,16 +126,10 @@
             position: relative;
         }
 
-        .session-item:hover {
-            background: #f8f0f5;
-            border-color: #f0e0e8;
-        }
-
-        .session-item.active {
-            background: #f8f0f5;
-            border-color: var(--orion-primary);
-            box-shadow: 0 0 0 1px var(--orion-primary);
-        }
+        .session-item:hover { background: #f8f0f5; border-color: #f0e0e8; }
+        .session-item.active { background: #f8f0f5; border-color: var(--orion-primary); box-shadow: 0 0 0 1px var(--orion-primary); }
+        .session-item.archivada { opacity: 0.65; }
+        .session-item.archivada .avatar { background: linear-gradient(135deg, #9e9e9e, #757575); }
 
         .session-item .avatar {
             width: 44px;
@@ -148,32 +143,26 @@
             font-weight: 700;
             font-size: 1rem;
             flex-shrink: 0;
+            position: relative;
         }
 
-        .session-item .info {
-            flex: 1;
-            min-width: 0;
+        .session-item .avatar .estado-indicador {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid #fff;
         }
 
-        .session-item .info .nombre {
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #1a1a2e;
-        }
+        .session-item .avatar .estado-indicador.online { background: #28a745; }
+        .session-item .avatar .estado-indicador.offline { background: #9e9e9e; }
 
-        .session-item .info .ultimo-msg {
-            font-size: 0.72rem;
-            color: #888;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .session-item .info .fecha {
-            font-size: 0.6rem;
-            color: #aaa;
-            margin-top: 2px;
-        }
+        .session-item .info { flex: 1; min-width: 0; }
+        .session-item .info .nombre { font-weight: 700; font-size: 0.85rem; color: #1a1a2e; }
+        .session-item .info .ultimo-msg { font-size: 0.72rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .session-item .info .fecha { font-size: 0.6rem; color: #aaa; margin-top: 2px; }
 
         .session-item .badge-unread {
             background: #dc3545;
@@ -183,36 +172,13 @@
             border-radius: 50px;
             font-weight: 700;
             flex-shrink: 0;
+            animation: pulse 1.5s infinite;
         }
 
-        .session-item .estado {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #28a745;
-            border: 2px solid #fff;
-            box-shadow: 0 0 0 2px #28a745;
-            flex-shrink: 0;
-        }
-
-        .session-item .estado.inactivo {
-            background: #dc3545;
-            box-shadow: 0 0 0 2px #dc3545;
-        }
-
-        .session-item .estado.ausente {
-            background: #ffc107;
-            box-shadow: 0 0 0 2px #ffc107;
-        }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
         /* ===== ÁREA DE CHAT ===== */
-        .chat-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #ffffff;
-            position: relative;
-        }
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #ffffff; position: relative; }
 
         .chat-main .chat-header {
             padding: 16px 24px;
@@ -222,13 +188,11 @@
             align-items: center;
             background: #fafafa;
             flex-shrink: 0;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
-        .chat-main .chat-header .usuario-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .chat-main .chat-header .usuario-info { display: flex; align-items: center; gap: 12px; }
 
         .chat-main .chat-header .usuario-info .avatar-grande {
             width: 40px;
@@ -243,45 +207,113 @@
             font-size: 1rem;
         }
 
-        .chat-main .chat-header .usuario-info .nombre-usuario {
+        .chat-main .chat-header .usuario-info .nombre-usuario { font-weight: 700; font-size: 0.95rem; color: #1a1a2e; }
+        .chat-main .chat-header .usuario-info .estado-usuario { font-size: 0.7rem; color: #28a745; display: flex; align-items: center; gap: 4px; }
+        .chat-main .chat-header .usuario-info .estado-usuario i { font-size: 0.4rem; }
+
+        .chat-main .chat-header .acciones { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+        .chat-main .chat-header .acciones .btn-ia {
+            background: var(--ia-gradient);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.68rem;
             font-weight: 700;
-            font-size: 0.95rem;
-            color: #1a1a2e;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .chat-main .chat-header .usuario-info .estado-usuario {
-            font-size: 0.7rem;
-            color: #28a745;
+        .chat-main .chat-header .acciones .btn-ia:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(108,92,231,0.4); }
+
+        .chat-main .chat-header .acciones .btn-nlp {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chat-main .chat-header .acciones .btn-nlp:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,184,148,0.4); }
+
+        .chat-main .chat-header .acciones .btn-nlp-outline {
+            background: transparent;
+            border: 1px solid #00b894;
+            color: #00b894;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            transition: 0.3s;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 4px;
         }
 
-        .chat-main .chat-header .usuario-info .estado-usuario i {
-            font-size: 0.4rem;
-        }
+        .chat-main .chat-header .acciones .btn-nlp-outline:hover { background: #00b894; color: white; }
 
-        .chat-main .chat-header .acciones {
-            display: flex;
-            gap: 8px;
-        }
-
-        .chat-main .chat-header .acciones .btn-cerrar {
+        .chat-main .chat-header .acciones .btn-archivar {
             background: transparent;
-            border: 1px solid #dc3545;
-            color: #dc3545;
-            padding: 4px 14px;
+            border: 1px solid #6c757d;
+            color: #6c757d;
+            padding: 4px 10px;
             border-radius: 50px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             transition: 0.3s;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .chat-main .chat-header .acciones .btn-cerrar:hover {
-            background: #dc3545;
-            color: #fff;
+        .chat-main .chat-header .acciones .btn-archivar:hover { background: #6c757d; color: #fff; }
+
+        .chat-main .chat-header .acciones .btn-pdf {
+            background: transparent;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            transition: 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
+
+        .chat-main .chat-header .acciones .btn-pdf:hover { background: #dc3545; color: #fff; }
+
+        .chat-main .chat-header .acciones .btn-anonimizar {
+            background: transparent;
+            border: 1px solid #6c5ce7;
+            color: #6c5ce7;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            transition: 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chat-main .chat-header .acciones .btn-anonimizar:hover { background: #6c5ce7; color: #fff; }
 
         .chat-main .chat-header .acciones .btn-volver {
             background: #f0f0f0;
@@ -295,10 +327,7 @@
             text-decoration: none;
         }
 
-        .chat-main .chat-header .acciones .btn-volver:hover {
-            background: #e0e0e0;
-            color: #1a1a2e;
-        }
+        .chat-main .chat-header .acciones .btn-volver:hover { background: #e0e0e0; color: #1a1a2e; }
 
         /* ===== MENSAJES ===== */
         .chat-main .chat-messages {
@@ -311,16 +340,9 @@
             background: #f8f9fa;
         }
 
-        .chat-main .chat-messages::-webkit-scrollbar {
-            width: 4px;
-        }
-        .chat-main .chat-messages::-webkit-scrollbar-track {
-            background: #f5f6f8;
-        }
-        .chat-main .chat-messages::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 4px;
-        }
+        .chat-main .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-main .chat-messages::-webkit-scrollbar-track { background: #f5f6f8; }
+        .chat-main .chat-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
         .chat-message {
             max-width: 72%;
@@ -349,42 +371,79 @@
             box-shadow: 0 2px 8px rgba(225,0,152,0.15);
         }
 
-        .chat-message .hora {
-            font-size: 0.6rem;
-            opacity: 0.6;
-            margin-left: 8px;
+        .chat-message.ia {
+            align-self: flex-end;
+            background: var(--ia-gradient);
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 8px rgba(108,92,231,0.3);
+        }
+
+        .chat-message.ia .badge-ia {
+            font-size: 0.55rem;
+            opacity: 0.85;
             display: inline-block;
+            margin-left: 6px;
+            background: rgba(255,255,255,0.25);
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-weight: 700;
         }
 
-        .chat-message.cliente .hora {
-            color: #999;
+        .chat-message .hora { font-size: 0.6rem; opacity: 0.6; margin-left: 8px; display: inline-block; }
+        .chat-message.cliente .hora { color: #999; }
+        .chat-message.admin .hora, .chat-message.ia .hora { color: rgba(255,255,255,0.7); }
+
+        .chat-message .remitente { font-size: 0.65rem; font-weight: 600; margin-bottom: 4px; display: block; }
+        .chat-message.cliente .remitente { color: var(--orion-primary); }
+        .chat-message.admin .remitente { color: rgba(255,255,255,0.8); }
+        .chat-message.ia .remitente { color: rgba(255,255,255,0.9); }
+
+        .chat-empty { color: #bbb; text-align: center; padding: 40px 0; font-size: 0.9rem; }
+
+        .chat-message.temporal {
+            opacity: 0.8;
+            background: var(--orion-primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-message.temporal .hora { color: rgba(255,255,255,0.6); }
+
+        /* ===== RESPUESTAS RÁPIDAS ===== */
+        .respuestas-rapidas {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 80px;
+            overflow-y: auto;
         }
 
-        .chat-message.admin .hora {
-            color: rgba(255,255,255,0.7);
+        .respuestas-rapidas .btn-rapida {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.7rem;
+            color: #555;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
         }
 
-        .chat-message .remitente {
-            font-size: 0.65rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            display: block;
+        .respuestas-rapidas .btn-rapida:hover {
+            background: var(--orion-primary);
+            color: white;
+            border-color: var(--orion-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(225,0,152,0.3);
         }
 
-        .chat-message.cliente .remitente {
-            color: var(--orion-primary);
-        }
-
-        .chat-message.admin .remitente {
-            color: rgba(255,255,255,0.8);
-        }
-
-        .chat-empty {
-            color: #bbb;
-            text-align: center;
-            padding: 40px 0;
-            font-size: 0.9rem;
-        }
+        .respuestas-rapidas .btn-rapida .icon-ia { color: #6c5ce7; margin-right: 4px; }
+        .respuestas-rapidas .btn-rapida:hover .icon-ia { color: white; }
 
         /* ===== FOOTER CHAT ===== */
         .chat-main .chat-footer {
@@ -413,12 +472,9 @@
             box-shadow: 0 0 0 4px rgba(225,0,152,0.05);
         }
 
-        .chat-main .chat-footer input:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .chat-main .chat-footer input:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .chat-main .chat-footer button {
+        .chat-main .chat-footer .btn-enviar {
             background: var(--orion-primary);
             border: none;
             border-radius: 50%;
@@ -433,99 +489,152 @@
             justify-content: center;
         }
 
-        .chat-main .chat-footer button:hover {
-            background: var(--orion-primary-dark);
-            transform: scale(1.05);
+        .chat-main .chat-footer .btn-enviar:hover:not(:disabled) { background: var(--orion-primary-dark); transform: scale(1.05); }
+        .chat-main .chat-footer .btn-enviar:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        .chat-main .chat-footer .btn-ia-footer {
+            background: var(--ia-gradient);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .chat-main .chat-footer button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
+        .chat-main .chat-footer .btn-ia-footer:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 4px 15px rgba(108,92,231,0.4); }
+        .chat-main .chat-footer .btn-ia-footer:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* ===== TYPING INDICATOR ===== */
+        .typing-indicator {
+            align-self: flex-start;
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border-radius: 16px 16px 16px 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            color: #888;
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .chat-sidebar {
-                width: 100%;
-                height: 40vh;
-                border-right: none;
-                border-bottom: 1px solid #e8e8e8;
-            }
-            .chat-layout {
-                flex-direction: column;
-            }
-            .chat-main {
-                height: 60vh;
-            }
-            .chat-message {
-                max-width: 85%;
-            }
-            .chat-main .chat-header {
-                padding: 12px 16px;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-            .chat-main .chat-messages {
-                padding: 12px 16px;
-            }
-            .chat-main .chat-footer {
-                padding: 8px 16px;
-            }
-            .chat-sidebar .session-list {
-                max-height: 100%;
-            }
+        .typing-indicator .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #888;
+            animation: typingBounce 1.4s infinite ease-in-out;
         }
 
-        @media (max-width: 480px) {
-            .session-item {
-                padding: 8px 10px;
-            }
-            .session-item .avatar {
-                width: 32px;
-                height: 32px;
-                font-size: 0.8rem;
-            }
-            .chat-message {
-                font-size: 0.8rem;
-                padding: 8px 12px;
-            }
-            .chat-main .chat-header .usuario-info .nombre-usuario {
-                font-size: 0.8rem;
-            }
+        .typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
         }
 
-        /* ===== ANIMACIONES ===== */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== SCROLLBAR PERSONALIZADA ===== */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
+        /* ===== MODALES ===== */
+        .modal-nlp .modal-content { border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        .modal-nlp .modal-header {
+            background: var(--ia-gradient);
+            color: white;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            border-bottom: none;
         }
-        ::-webkit-scrollbar-track {
-            background: #f5f6f8;
+        .modal-nlp .modal-header .btn-close { filter: invert(1); }
+        .modal-nlp .modal-body { padding: 24px; }
+        .nlp-result {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            border-left: 4px solid var(--orion-primary);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 4px;
+        .nlp-result .intencion {
+            display: inline-block;
+            background: var(--ia-gradient);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ccc;
+        .nlp-result .confianza {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 6px;
+            margin-bottom: 8px;
         }
+        .nlp-result .respuesta-texto { font-size: 0.9rem; color: #1a1a2e; margin-top: 8px; line-height: 1.5; }
+        .nlp-result .entidades { font-size: 0.75rem; color: #666; margin-top: 8px; }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.85rem;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .info-item .label { font-weight: 600; color: #555; }
+        .info-item .value { font-weight: 700; color: #1a1a2e; }
+        .badge-ok { background: #d4edda; color: #155724; padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+        .badge-no { background: #f8d7da; color: #721c24; padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .chat-main .chat-header .acciones .btn-nlp span,
+            .chat-main .chat-header .acciones .btn-ia span { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .chat-sidebar { width: 100%; height: 35vh; border-right: none; border-bottom: 1px solid #e8e8e8; }
+            .chat-layout { flex-direction: column; }
+            .chat-main { height: 65vh; }
+            .chat-message { max-width: 85%; }
+            .chat-main .chat-header { padding: 12px 16px; }
+            .chat-main .chat-messages { padding: 12px 16px; }
+            .chat-main .chat-footer { padding: 8px 16px; }
+            .chat-sidebar .session-list { max-height: 100%; }
+            .respuestas-rapidas { max-height: 50px; padding: 4px 12px; }
+            .respuestas-rapidas .btn-rapida { font-size: 0.6rem; padding: 2px 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .session-item { padding: 8px 10px; }
+            .session-item .avatar { width: 32px; height: 32px; font-size: 0.8rem; }
+            .chat-message { font-size: 0.8rem; padding: 8px 12px; }
+            .chat-main .chat-header .usuario-info .nombre-usuario { font-size: 0.8rem; }
+        }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f5f6f8; }
+        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ccc; }
     </style>
 </head>
 <body>
 
-    <!-- ===== CONTENEDOR PRINCIPAL ===== -->
     <div class="chat-layout">
-
         <!-- ===== SIDEBAR ===== -->
         <aside class="chat-sidebar" id="chatSidebar">
-            <!-- Header del sidebar -->
             <div class="sidebar-header d-flex justify-content-between align-items-center">
                 <h5>
                     <i class="bi bi-chat-dots"></i> Conversaciones
@@ -536,12 +645,21 @@
                 </a>
             </div>
 
-            <!-- Lista de sesiones -->
+            <div class="filtros-sesiones">
+                <button class="btn-filtro active" data-filtro="activas" onclick="cambiarFiltro('activas')">
+                    <i class="bi bi-chat-dots"></i> Activas
+                </button>
+                <button class="btn-filtro" data-filtro="archivadas" onclick="cambiarFiltro('archivadas')">
+                    <i class="bi bi-archive"></i> Archivadas
+                </button>
+            </div>
+
             <div class="session-list" id="sesionesList">
                 {% for ses in sesiones %}
                 <div class="session-item" data-session="{{ ses._id_str }}" onclick="abrirSesion('{{ ses._id_str }}')">
                     <div class="avatar">
                         {{ ses.nombre_usuario[0]|upper if ses.nombre_usuario else '?' }}
+                        <span class="estado-indicador online"></span>
                     </div>
                     <div class="info">
                         <div class="nombre">{{ ses.nombre_usuario }}</div>
@@ -551,7 +669,6 @@
                     {% if ses.no_leidos > 0 %}
                         <span class="badge-unread">{{ ses.no_leidos }}</span>
                     {% endif %}
-                    <span class="estado"></span>
                 </div>
                 {% else %}
                 <div class="session-item" style="justify-content:center; color:#999; font-size:0.85rem; cursor:default;">
@@ -561,10 +678,8 @@
             </div>
         </aside>
 
-        <!-- ===== ÁREA PRINCIPAL DE CHAT ===== -->
+        <!-- ===== ÁREA PRINCIPAL ===== -->
         <main class="chat-main" id="chatMain">
-
-            <!-- ===== HEADER ===== -->
             <header class="chat-header">
                 <div class="usuario-info">
                     <div class="avatar-grande" id="chatAvatar">?</div>
@@ -576,8 +691,32 @@
                     </div>
                 </div>
                 <div class="acciones">
-                    <button class="btn-cerrar" id="btnCerrarSesion" style="display:none;" onclick="cerrarSesion()">
-                        <i class="bi bi-x-circle"></i> Cerrar
+                    <button class="btn-nlp" onclick="abrirModalEntrenarNLP()" title="Reentrenar el modelo NLP">
+                        <i class="bi bi-cpu"></i> <span>Entrenar</span>
+                    </button>
+                    <button class="btn-nlp-outline" onclick="abrirModalProbarNLP()" title="Probar el modelo con una frase">
+                        <i class="bi bi-bug"></i> <span>Probar</span>
+                    </button>
+                    <button class="btn-nlp-outline" onclick="abrirModalInfoNLP()" title="Información del modelo NLP">
+                        <i class="bi bi-info-circle"></i> <span>Info</span>
+                    </button>
+                    <button class="btn-ia" id="btnGenerarIA" onclick="generarRespuestaIA()" title="Generar respuesta con IA">
+                        <i class="bi bi-magic"></i> <span>IA</span>
+                    </button>
+                    <button class="btn-pdf" id="btnExportarPDF" onclick="exportarPDF()" title="Exportar historial a PDF" style="display:none;">
+                        <i class="bi bi-file-pdf"></i> <span>PDF</span>
+                    </button>
+                    <button class="btn-anonimizar" id="btnAnonimizar" onclick="anonimizarSesion()" title="Anonimizar datos personales" style="display:none;">
+                        <i class="bi bi-incognito"></i> <span>Anonimizar</span>
+                    </button>
+                    <button class="btn-archivar" id="btnArchivarSesion" style="display:none;" onclick="archivarSesion()" title="Archivar conversación">
+                        <i class="bi bi-archive"></i> <span>Archivar</span>
+                    </button>
+                    <button class="btn-nlp-outline" onclick="previsualizarRetencion()" title="Ejecutar política de retención">
+                        <i class="bi bi-trash"></i> <span>Retención</span>
+                    </button>
+                    <button class="btn-nlp-outline" onclick="verAuditoria()" title="Ver auditoría de accesos">
+                        <i class="bi bi-shield-check"></i> <span>Auditoría</span>
                     </button>
                     <a href="{{ url_for('web.dashboard') }}" class="btn-volver">
                         <i class="bi bi-arrow-left"></i> Volver
@@ -585,210 +724,653 @@
                 </div>
             </header>
 
-            <!-- ===== MENSAJES ===== -->
             <div class="chat-messages" id="chatMessagesAdmin">
                 <div class="chat-empty">Selecciona una conversación para comenzar</div>
             </div>
 
-            <!-- ===== FOOTER ===== -->
-            <div class="chat-footer">
-                <input type="text" id="chatInputAdmin" placeholder="Escribe un mensaje..." disabled>
-                <button id="btnEnviarAdmin" disabled><i class="bi bi-send"></i></button>
+            <div class="respuestas-rapidas" id="respuestasRapidas">
+                <span style="font-size:0.6rem; color:#999; font-weight:600; margin-right:4px;">⚡ Rápidas:</span>
+                {% for respuesta in respuestas_rapidas %}
+                <button class="btn-rapida" onclick="insertarRespuestaRapida('{{ respuesta }}')">
+                    <i class="bi bi-lightning-fill icon-ia"></i> {{ respuesta[:30] }}{% if respuesta|length > 30 %}...{% endif %}
+                </button>
+                {% endfor %}
             </div>
 
+            <div class="chat-footer">
+                <input type="text" id="chatInputAdmin" placeholder="Escribe un mensaje..." disabled>
+                <button class="btn-ia-footer" id="btnIAFooter" onclick="generarRespuestaIA()" disabled title="Generar respuesta con IA">
+                    <i class="bi bi-magic"></i>
+                </button>
+                <button class="btn-enviar" id="btnEnviarAdmin" disabled><i class="bi bi-send"></i></button>
+            </div>
         </main>
-
     </div>
 
-    <!-- ===== SCRIPTS ===== -->
+    <!-- ===== MODAL: ENTRENAR NLP ===== -->
+    <div class="modal fade modal-nlp" id="modalEntrenarNLP" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-cpu"></i> Entrenar modelo NLP</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size:0.9rem; color:#666;">
+                        Reentrenar el modelo con los datos de <code>intents.json</code>.
+                        Esto puede tardar unos segundos.
+                    </p>
+                    <div id="resultadoEntrenarNLP"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="entrenarNLP()">
+                        <i class="bi bi-play-fill"></i> Entrenar ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL: PROBAR NLP ===== -->
+    <div class="modal fade modal-nlp" id="modalProbarNLP" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-bug"></i> Probar modelo NLP</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size:0.9rem; color:#666;">
+                        Escribe una frase como lo haría un cliente y el modelo detectará la intención.
+                    </p>
+                    <input type="text" id="inputProbarNLP" class="form-control mb-3"
+                           placeholder="Ej: ¿Cuánto tarda el envío a mi casa?"
+                           onkeypress="if(event.key==='Enter') probarNLP()">
+                    <button class="btn btn-primary w-100" onclick="probarNLP()">
+                        <i class="bi bi-search"></i> Analizar frase
+                    </button>
+                    <div id="resultadoProbarNLP"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL: INFO NLP ===== -->
+    <div class="modal fade modal-nlp" id="modalInfoNLP" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-info-circle"></i> Información del modelo NLP</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="infoNLPBody">
+                    <p class="text-muted">Cargando información...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL: AUDITORÍA ===== -->
+    <div class="modal fade modal-nlp" id="modalAuditoria" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-shield-check"></i> Auditoría de accesos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="auditoriaBody">
+                    <p class="text-muted">Cargando registros...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         (function() {
+            // ===== ESTADO =====
             var sesionActual = null;
-            var adminIntervalo = null;
-            var adminUltimoMensaje = null;
+            var filtroActual = 'activas';
+            var adminIntervaloMensajes = null;
+            var adminIntervaloSesiones = null;
+            var adminUltimoTimestamp = null;
+            var cargandoMensajes = false;
+            var mensajesCargados = false;
+            var sesionActualArchivada = false;
+
+            // ===== REFERENCIAS DOM =====
+            var domMessages = document.getElementById('chatMessagesAdmin');
+            var domInput = document.getElementById('chatInputAdmin');
+            var domBtnEnviar = document.getElementById('btnEnviarAdmin');
+            var domBtnIA = document.getElementById('btnIAFooter');
+            var domChatUsuario = document.getElementById('chatUsuario');
+            var domChatEstado = document.getElementById('chatEstado');
+            var domChatAvatar = document.getElementById('chatAvatar');
+            var domBtnArchivar = document.getElementById('btnArchivarSesion');
+            var domBtnPDF = document.getElementById('btnExportarPDF');
+            var domBtnAnonimizar = document.getElementById('btnAnonimizar');
+            var domTotalSesiones = document.getElementById('totalSesiones');
+            var domSesionesList = document.getElementById('sesionesList');
+
+            // ============================================================
+            // CONTROL DE POLLING
+            // ============================================================
+            function detenerPollingMensajes() {
+                if (adminIntervaloMensajes) {
+                    clearInterval(adminIntervaloMensajes);
+                    adminIntervaloMensajes = null;
+                }
+            }
+
+            function iniciarPollingMensajes() {
+                detenerPollingMensajes();
+                if (!sesionActual || sesionActualArchivada) return;
+                adminIntervaloMensajes = setInterval(function() {
+                    if (document.hidden) return;
+                    cargarMensajesAdmin(false);
+                }, 15000);
+            }
+
+            function detenerPollingSesiones() {
+                if (adminIntervaloSesiones) {
+                    clearInterval(adminIntervaloSesiones);
+                    adminIntervaloSesiones = null;
+                }
+            }
+
+            function iniciarPollingSesiones() {
+                detenerPollingSesiones();
+                adminIntervaloSesiones = setInterval(function() {
+                    if (document.hidden) return;
+                    actualizarSesiones();
+                }, 45000);
+            }
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    detenerPollingMensajes();
+                    detenerPollingSesiones();
+                } else {
+                    if (sesionActual) cargarMensajesAdmin(false);
+                    actualizarSesiones();
+                    iniciarPollingMensajes();
+                    iniciarPollingSesiones();
+                }
+            });
+
+            // ===== FILTROS =====
+            window.cambiarFiltro = function(filtro) {
+                filtroActual = filtro;
+                document.querySelectorAll('.btn-filtro').forEach(function(b) {
+                    b.classList.toggle('active', b.dataset.filtro === filtro);
+                });
+                actualizarSesiones();
+            };
 
             // ===== ABRIR SESIÓN =====
             window.abrirSesion = function(sessionId) {
+                if (sesionActual === sessionId) return;
+                detenerPollingMensajes();
+
                 sesionActual = sessionId;
-                // Resaltar en sidebar
-                document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'));
-                var item = document.querySelector(`.session-item[data-session="${sessionId}"]`);
+                adminUltimoTimestamp = null;
+                mensajesCargados = false;
+
+                document.querySelectorAll('.session-item').forEach(function(el) { el.classList.remove('active'); });
+                var item = document.querySelector('.session-item[data-session="' + sessionId + '"]');
                 if (item) item.classList.add('active');
 
-                // Habilitar input
-                document.getElementById('chatInputAdmin').disabled = false;
-                document.getElementById('btnEnviarAdmin').disabled = false;
-                document.getElementById('btnCerrarSesion').style.display = 'inline-block';
+                sesionActualArchivada = item ? item.classList.contains('archivada') : false;
 
-                // Cargar mensajes
+                domInput.disabled = sesionActualArchivada;
+                domBtnEnviar.disabled = sesionActualArchivada;
+                domBtnIA.disabled = sesionActualArchivada;
+                domBtnArchivar.style.display = sesionActualArchivada ? 'none' : 'inline-flex';
+
+                // Mostrar botones PDF y Anonimizar siempre que haya sesión
+                domBtnPDF.style.display = 'inline-flex';
+                domBtnAnonimizar.style.display = 'inline-flex';
+
+                var nombre = item ? (item.querySelector('.nombre') ? item.querySelector('.nombre').textContent : 'Usuario') : 'Usuario';
+                domChatUsuario.textContent = nombre;
+                domChatAvatar.textContent = nombre.charAt(0).toUpperCase();
+
+                if (sesionActualArchivada) {
+                    domChatEstado.innerHTML = '<i class="bi bi-circle-fill" style="color:#9e9e9e;"></i> Archivada (solo lectura)';
+                } else {
+                    domChatEstado.innerHTML = '<i class="bi bi-circle-fill" style="color:#28a745;"></i> En línea';
+                }
+
+                domMessages.innerHTML = '<div class="chat-empty">Cargando mensajes...</div>';
                 cargarMensajesAdmin(true);
 
-                // Iniciar polling
-                if (adminIntervalo) clearInterval(adminIntervalo);
-                adminIntervalo = setInterval(function() {
-                    cargarMensajesAdmin(false);
-                }, 3000);
-
-                // Actualizar header
-                var nombre = item ? item.querySelector('.nombre')?.textContent || 'Usuario' : 'Usuario';
-                document.getElementById('chatUsuario').textContent = nombre;
-                document.getElementById('chatEstado').innerHTML = '<i class="bi bi-circle-fill" style="color:#28a745;"></i> En línea';
-                document.getElementById('chatAvatar').textContent = nombre.charAt(0).toUpperCase();
+                if (!sesionActualArchivada) {
+                    iniciarPollingMensajes();
+                }
             };
 
             // ===== CARGAR MENSAJES =====
-            function cargarMensajesAdmin(force = false) {
+            function cargarMensajesAdmin(force) {
                 if (!sesionActual) return;
+                if (cargandoMensajes) return;
+                if (!force && document.hidden) return;
+
+                cargandoMensajes = true;
+                var timestampPrevio = adminUltimoTimestamp;
+
                 var url = "{{ url_for('web.admin_chat_mensajes_sesion') }}?session_id=" + sesionActual;
-                if (adminUltimoMensaje && !force) {
-                    url += "&ultimo=" + encodeURIComponent(adminUltimoMensaje);
+                if (!force && timestampPrevio && mensajesCargados) {
+                    url += "&ultimo=" + encodeURIComponent(timestampPrevio);
                 }
+
+                var estabaAlFondo = (domMessages.scrollHeight - domMessages.scrollTop - domMessages.clientHeight) < 50;
+
                 fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.mensajes) {
-                        var container = document.getElementById('chatMessagesAdmin');
-                        if (force || !adminUltimoMensaje) {
-                            container.innerHTML = '';
-                            data.mensajes.forEach(function(m) {
-                                agregarMensajeAdminDOM(m);
-                            });
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success && data.mensajes && data.mensajes.length > 0) {
+                        adminUltimoTimestamp = data.mensajes[data.mensajes.length - 1].fecha;
+                        if (force || !mensajesCargados) {
+                            domMessages.innerHTML = '';
+                            data.mensajes.forEach(agregarMensajeAdminDOM);
+                            mensajesCargados = true;
                         } else {
-                            data.mensajes.forEach(function(m) {
-                                if (m.fecha !== adminUltimoMensaje) {
-                                    agregarMensajeAdminDOM(m);
-                                }
-                            });
+                            data.mensajes.forEach(agregarMensajeAdminDOM);
                         }
-                        if (data.mensajes.length > 0) {
-                            adminUltimoMensaje = data.mensajes[data.mensajes.length-1].fecha;
+                        if (estabaAlFondo || force) {
+                            domMessages.scrollTop = domMessages.scrollHeight;
                         }
-                        container.scrollTop = container.scrollHeight;
                     }
                 })
-                .catch(err => console.warn('Error cargando mensajes:', err));
+                .catch(function(err) { console.warn('Error:', err); })
+                .finally(function() { cargandoMensajes = false; });
             }
 
             function agregarMensajeAdminDOM(mensaje) {
-                var container = document.getElementById('chatMessagesAdmin');
-                var empty = container.querySelector('.chat-empty');
+                var empty = domMessages.querySelector('.chat-empty');
                 if (empty) empty.remove();
 
                 var div = document.createElement('div');
-                div.className = 'chat-message ' + (mensaje.es_admin ? 'admin' : 'cliente');
+                var clase = mensaje.es_admin ? 'admin' : 'cliente';
+                if (mensaje.es_ia) clase = 'ia';
+                div.className = 'chat-message ' + clase;
+
                 var hora = new Date(mensaje.fecha);
                 var horaStr = hora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-
-                var remitente = mensaje.es_admin ? 'Tú' : 'Cliente';
-                var html = '<span class="remitente">' + remitente + '</span>';
-                html += mensaje.texto;
-                html += ' <span class="hora">' + horaStr + '</span>';
-                div.innerHTML = html;
-                container.appendChild(div);
+                var remitente = mensaje.es_admin ? (mensaje.es_ia ? 'Asistente Orion ' : 'Tú') : 'Cliente';
+                var badgeIA = mensaje.es_ia ? ' <span class="badge-ia">🤖</span>' : '';
+                div.innerHTML = '<span class="remitente">' + remitente + badgeIA + '</span>' + mensaje.texto + ' <span class="hora">' + horaStr + '</span>';
+                domMessages.appendChild(div);
             }
 
-            // ===== ENVIAR MENSAJE ADMIN =====
+            // ===== ENVIAR MENSAJE =====
             window.adminEnviarMensaje = function() {
-                var input = document.getElementById('chatInputAdmin');
-                var texto = input.value.trim();
-                if (!texto || !sesionActual) return;
+                var texto = domInput.value.trim();
+                if (!texto || !sesionActual || sesionActualArchivada) return;
+
+                domInput.disabled = true;
+                domBtnEnviar.disabled = true;
+                domBtnIA.disabled = true;
+
+                agregarMensajeLocal(texto);
+                var textoEnviado = texto;
+                domInput.value = '';
 
                 fetch("{{ url_for('web.admin_chat_enviar') }}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ session_id: sesionActual, mensaje: texto })
+                    body: JSON.stringify({ session_id: sesionActual, mensaje: textoEnviado, auto_respuesta: false })
                 })
-                .then(res => res.json())
-                .then(data => {
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
                     if (data.success) {
-                        input.value = '';
-                        cargarMensajesAdmin(true);
+                        mensajesCargados = false;
+                        setTimeout(function() { cargarMensajesAdmin(true); }, 500);
                     } else {
                         alert('Error: ' + (data.error || ''));
                     }
                 })
-                .catch(err => console.error(err));
+                .catch(function(err) { console.error(err); })
+                .finally(function() {
+                    domInput.disabled = false;
+                    domBtnEnviar.disabled = false;
+                    domBtnIA.disabled = false;
+                    domInput.focus();
+                });
             };
 
-            // ===== CERRAR SESIÓN =====
-            window.cerrarSesion = function() {
-                if (!sesionActual || !confirm('¿Cerrar esta conversación?')) return;
-                fetch("{{ url_for('web.admin_chat_cerrar') }}", {
+            function agregarMensajeLocal(texto) {
+                var div = document.createElement('div');
+                div.className = 'chat-message admin temporal';
+                var ahora = new Date();
+                var horaStr = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                div.innerHTML = '<span class="remitente">Tú</span>' + texto + ' <span class="hora">' + horaStr + '</span>';
+                domMessages.appendChild(div);
+                domMessages.scrollTop = domMessages.scrollHeight;
+            }
+
+            // ===== GENERAR RESPUESTA CON IA =====
+            window.generarRespuestaIA = function() {
+                if (!sesionActual || sesionActualArchivada) return;
+
+                var mensajes = domMessages.querySelectorAll('.chat-message.cliente');
+                if (!mensajes.length) { alert('No hay mensaje del cliente.'); return; }
+
+                var ultimo = mensajes[mensajes.length - 1];
+                var textoCompleto = ultimo.textContent || '';
+                var partes = textoCompleto.split('Cliente');
+                var ultimoMensajeCliente = partes.length > 1
+                    ? partes[1].trim().split(' · ')[0].trim()
+                    : textoCompleto.trim();
+
+                if (!ultimoMensajeCliente) { alert('No hay mensaje del cliente.'); return; }
+
+                mostrarTypingIndicator();
+
+                fetch("{{ url_for('web.admin_generar_respuesta_ia') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mensaje: ultimoMensajeCliente, session_id: sesionActual })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    ocultarTypingIndicator();
+                    if (data.success && data.respuesta) {
+                        domInput.value = data.respuesta;
+                        window.adminEnviarMensaje();
+                    } else {
+                        alert('Error: ' + (data.error || ''));
+                    }
+                })
+                .catch(function(err) { ocultarTypingIndicator(); console.error(err); });
+            };
+
+            var typingElement = null;
+            function mostrarTypingIndicator() {
+                ocultarTypingIndicator();
+                typingElement = document.createElement('div');
+                typingElement.className = 'typing-indicator';
+                typingElement.innerHTML = 'IA pensando<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+                domMessages.appendChild(typingElement);
+                domMessages.scrollTop = domMessages.scrollHeight;
+            }
+            function ocultarTypingIndicator() {
+                if (typingElement) { typingElement.remove(); typingElement = null; }
+            }
+
+            // ===== RESPUESTAS RÁPIDAS =====
+            window.insertarRespuestaRapida = function(texto) {
+                if (sesionActualArchivada) { alert('Conversación archivada.'); return; }
+                domInput.value = texto;
+                domInput.focus();
+            };
+
+            // ===== ARCHIVAR SESIÓN =====
+            window.archivarSesion = function() {
+                if (!sesionActual || sesionActualArchivada) return;
+                if (!confirm('¿Archivar esta conversación?')) return;
+
+                fetch("{{ url_for('web.admin_chat_archivar') }}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ session_id: sesionActual })
                 })
-                .then(res => res.json())
-                .then(data => {
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
                     if (data.success) {
-                        alert('Sesión cerrada');
-                        location.reload();
+                        detenerPollingMensajes();
+                        sesionActual = null;
+                        mensajesCargados = false;
+                        adminUltimoTimestamp = null;
+                        domMessages.innerHTML = '<div class="chat-empty">Selecciona una conversación para comenzar</div>';
+                        domInput.disabled = true;
+                        domBtnEnviar.disabled = true;
+                        domBtnIA.disabled = true;
+                        domBtnArchivar.style.display = 'none';
+                        domBtnPDF.style.display = 'none';
+                        domBtnAnonimizar.style.display = 'none';
+                        actualizarSesiones();
                     }
                 })
-                .catch(err => console.error(err));
+                .catch(function(err) { console.error(err); });
             };
 
-            // ===== EVENTOS =====
-            document.addEventListener('DOMContentLoaded', function() {
-                var input = document.getElementById('chatInputAdmin');
-                var btn = document.getElementById('btnEnviarAdmin');
+            // ===== EXPORTAR PDF =====
+            window.exportarPDF = function() {
+                if (!sesionActual) return;
+                window.open('/api/admin/chat/exportar-pdf?session_id=' + sesionActual, '_blank');
+            };
 
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') window.adminEnviarMensaje();
-                });
-                btn.addEventListener('click', window.adminEnviarMensaje);
+            // ===== ANONIMIZAR =====
+            window.anonimizarSesion = function() {
+                if (!sesionActual) return;
+                if (!confirm('⚠️ ¿Anonimizar esta conversación?\n\nSe reemplazarán el nombre y email del cliente por datos genéricos. Los mensajes se conservarán para análisis.')) return;
 
-                // Abrir primera sesión automáticamente
-                var first = document.querySelector('.session-item[data-session]');
-                if (first) {
-                    var sessionId = first.dataset.session;
-                    window.abrirSesion(sessionId);
-                }
+                fetch("{{ url_for('web.admin_chat_anonimizar') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sesionActual })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        alert('✅ Conversación anonimizada');
+                        actualizarSesiones();
+                    } else {
+                        alert('Error: ' + (data.error || ''));
+                    }
+                })
+                .catch(function(err) { alert('Error de red: ' + err.message); });
+            };
 
-                // Polling para actualizar lista de sesiones (cada 5s)
-                setInterval(function() {
-                    fetch("{{ url_for('web.admin_chat_sesiones') }}")
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            var list = document.getElementById('sesionesList');
-                            var currentActive = document.querySelector('.session-item.active');
-                            var activeId = currentActive ? currentActive.dataset.session : null;
+            // ===== RETENCIÓN =====
+            window.previsualizarRetencion = function() {
+                fetch('/api/admin/chat/retencion/previsualizar')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (!data.success) return alert('Error: ' + data.error);
 
-                            list.innerHTML = '';
-                            data.sesiones.forEach(function(s) {
-                                var div = document.createElement('div');
-                                div.className = 'session-item' + (s._id === activeId ? ' active' : '');
-                                div.dataset.session = s._id;
-                                div.onclick = function() { window.abrirSesion(s._id); };
+                        var msg = '📋 Política de retención:\n\n' +
+                            'Días de retención: ' + data.dias_retencion + '\n' +
+                            'Conversaciones a eliminar: ' + data.total_a_eliminar + '\n' +
+                            'Fecha límite: ' + data.limite_fecha + '\n\n' +
+                            (data.total_a_eliminar > 0 ? '¿Ejecutar ahora?' : 'No hay conversaciones para eliminar.');
 
-                                var badge = s.no_leidos > 0 ? '<span class="badge-unread">'+s.no_leidos+'</span>' : '';
-                                div.innerHTML = `
-                                    <div class="avatar">${s.nombre_usuario.charAt(0).toUpperCase()}</div>
-                                    <div class="info">
-                                        <div class="nombre">${s.nombre_usuario}</div>
-                                        <div class="ultimo-msg">${s.ultimo_mensaje || 'Sin mensajes'}</div>
-                                        <div class="fecha">${s.fecha_ultimo ? new Date(s.fecha_ultimo).toLocaleString('es-MX', { hour: '2-digit', minute: '2-digit' }) : ''}</div>
-                                    </div>
-                                    ${badge}
-                                    <span class="estado"></span>
-                                `;
-                                list.appendChild(div);
-                            });
-
-                            // Actualizar total
-                            document.getElementById('totalSesiones').textContent = data.sesiones.length;
-
-                            // Si no hay sesiones, mostrar mensaje
-                            if (data.sesiones.length === 0) {
-                                list.innerHTML = '<div class="session-item" style="justify-content:center; color:#999; font-size:0.85rem; cursor:default;">No hay conversaciones activas</div>';
-                            }
+                        if (data.total_a_eliminar > 0 && confirm(msg)) {
+                            fetch('/api/admin/chat/retencion/ejecutar', { method: 'POST' })
+                                .then(function(r) { return r.json(); })
+                                .then(function(res) {
+                                    if (res.success) {
+                                        alert('✅ ' + res.eliminadas + ' conversaciones eliminadas');
+                                        actualizarSesiones();
+                                    } else {
+                                        alert('Error: ' + res.error);
+                                    }
+                                });
+                        } else if (data.total_a_eliminar === 0) {
+                            alert(msg);
                         }
                     })
-                    .catch(err => console.warn(err));
-                }, 5000);
+                    .catch(function(err) { alert('Error de red: ' + err.message); });
+            };
+
+            // ===== AUDITORÍA =====
+            window.verAuditoria = function() {
+                var modal = new bootstrap.Modal(document.getElementById('modalAuditoria'));
+                modal.show();
+
+                var body = document.getElementById('auditoriaBody');
+                body.innerHTML = '<p class="text-muted">Cargando registros...</p>';
+
+                fetch('/api/admin/chat/auditoria?limite=50')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (!data.success || !data.registros || data.registros.length === 0) {
+                            body.innerHTML = '<p class="text-muted">No hay registros de auditoría.</p>';
+                            return;
+                        }
+
+                        var html = '<div style="max-height: 500px; overflow-y: auto;">';
+                        html += '<table class="table table-sm" style="font-size: 0.8rem;">';
+                        html += '<thead><tr><th>Fecha</th><th>Admin</th><th>Acción</th><th>Conversación</th><th>IP</th></tr></thead><tbody>';
+
+                        data.registros.forEach(function(r) {
+                            var fecha = r.fecha ? new Date(r.fecha).toLocaleString('es-MX') : '-';
+                            var sesion = r.session_id ? r.session_id.substring(0, 8) + '...' : '-';
+                            html += '<tr>' +
+                                '<td>' + fecha + '</td>' +
+                                '<td>' + (r.usuario_nombre || '-') + '</td>' +
+                                '<td><span class="badge bg-secondary">' + (r.accion_label || r.accion) + '</span></td>' +
+                                '<td><code>' + sesion + '</code></td>' +
+                                '<td>' + (r.ip || '-') + '</td>' +
+                                '</tr>';
+                        });
+
+                        html += '</tbody></table></div>';
+                        body.innerHTML = html;
+                    })
+                    .catch(function(err) {
+                        body.innerHTML = '<p class="text-danger">Error: ' + err.message + '</p>';
+                    });
+            };
+
+            // ===== ACTUALIZAR SESIONES =====
+            function actualizarSesiones() {
+                if (document.hidden) return;
+
+                var endpoint = filtroActual === 'archivadas'
+                    ? "{{ url_for('web.admin_chat_sesiones_archivadas') }}"
+                    : "{{ url_for('web.admin_chat_sesiones') }}";
+
+                fetch(endpoint)
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (!data.success) return;
+                    var sesiones = data.sesiones || [];
+                    var activeId = sesionActual;
+                    var list = domSesionesList;
+                    list.innerHTML = '';
+
+                    if (!sesiones.length) {
+                        list.innerHTML = '<div class="session-item" style="justify-content:center; color:#999; font-size:0.85rem; cursor:default;">' +
+                            (filtroActual === 'archivadas' ? 'No hay archivadas' : 'No hay activas') + '</div>';
+                        domTotalSesiones.textContent = '0';
+                        return;
+                    }
+
+                    sesiones.forEach(function(s) {
+                        var div = document.createElement('div');
+                        div.className = 'session-item' + (s._id === activeId ? ' active' : '');
+                        if (filtroActual === 'archivadas') div.classList.add('archivada');
+                        div.dataset.session = s._id;
+                        div.onclick = function() { window.abrirSesion(s._id); };
+
+                        var badge = s.no_leidos > 0 ? '<span class="badge-unread">' + s.no_leidos + '</span>' : '';
+                        var fecha = s.fecha_ultimo ? new Date(s.fecha_ultimo) : null;
+                        var fechaStr = fecha ? fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : '';
+                        var estadoClase = filtroActual === 'archivadas' ? 'offline' : 'online';
+
+                        div.innerHTML =
+                            '<div class="avatar">' + (s.nombre_usuario || '?').charAt(0).toUpperCase() +
+                                '<span class="estado-indicador ' + estadoClase + '"></span></div>' +
+                            '<div class="info"><div class="nombre">' + (s.nombre_usuario || 'Cliente') + '</div>' +
+                                '<div class="ultimo-msg">' + (s.ultimo_mensaje || 'Sin mensajes') + '</div>' +
+                                '<div class="fecha">' + fechaStr + '</div></div>' + badge;
+                        list.appendChild(div);
+                    });
+
+                    domTotalSesiones.textContent = sesiones.length;
+                })
+                .catch(function(err) { console.warn('Error:', err); });
+            }
+
+            // ===== MODALES NLP =====
+            window.abrirModalEntrenarNLP = function() {
+                new bootstrap.Modal(document.getElementById('modalEntrenarNLP')).show();
+            };
+            window.abrirModalProbarNLP = function() {
+                new bootstrap.Modal(document.getElementById('modalProbarNLP')).show();
+                setTimeout(function() { document.getElementById('inputProbarNLP').focus(); }, 300);
+            };
+            window.abrirModalInfoNLP = function() {
+                new bootstrap.Modal(document.getElementById('modalInfoNLP')).show();
+                cargarInfoNLP();
+            };
+
+            window.entrenarNLP = function() {
+                var cont = document.getElementById('resultadoEntrenarNLP');
+                cont.innerHTML = '<p class="text-muted">Entrenando...</p>';
+                fetch('/api/admin/nlp/entrenar', { method: 'POST' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            var acc = data.accuracy ? (data.accuracy * 100).toFixed(1) + '%' : 'N/A';
+                            cont.innerHTML = '<div class="nlp-result"><div class="intencion">✅ Entrenado</div>' +
+                                '<div class="info-item"><span class="label">Accuracy:</span><span class="value">' + acc + '</span></div>' +
+                                '<div class="info-item"><span class="label">Intenciones:</span><span class="value">' + (data.n_intents || '-') + '</span></div>' +
+                                '<div class="info-item"><span class="label">Ejemplos:</span><span class="value">' + (data.n_ejemplos || '-') + '</span></div></div>';
+                        } else {
+                            cont.innerHTML = '<div class="alert alert-danger">❌ ' + (data.message || 'Error') + '</div>';
+                        }
+                    })
+                    .catch(function(err) { cont.innerHTML = '<div class="alert alert-danger">❌ ' + err.message + '</div>'; });
+            };
+
+            window.probarNLP = function() {
+                var mensaje = document.getElementById('inputProbarNLP').value.trim();
+                if (!mensaje) return;
+                var cont = document.getElementById('resultadoProbarNLP');
+                cont.innerHTML = '<p class="text-muted">Analizando...</p>';
+                fetch('/api/admin/nlp/probar', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mensaje: mensaje })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        var conf = (data.confianza * 100).toFixed(1) + '%';
+                        cont.innerHTML = '<div class="nlp-result"><span class="intencion">🎯 ' + data.intencion + '</span>' +
+                            '<span class="confianza">' + conf + '</span>' +
+                            '<div class="respuesta-texto"><strong>Respuesta:</strong> ' + data.respuesta + '</div></div>';
+                    } else {
+                        cont.innerHTML = '<div class="alert alert-danger">❌ ' + (data.error || 'Error') + '</div>';
+                    }
+                });
+            };
+
+            function cargarInfoNLP() {
+                var body = document.getElementById('infoNLPBody');
+                body.innerHTML = '<p class="text-muted">Cargando...</p>';
+                fetch('/api/admin/nlp/info')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            var info = data.info || {};
+                            body.innerHTML = '<div class="info-item"><span class="label">Modelo:</span><span class="value">' +
+                                (info.modelo_existe ? 'Sí' : 'No') + '</span></div>' +
+                                '<div class="info-item"><span class="label">spaCy:</span><span class="value">' +
+                                (info.spacy_disponible ? 'Sí' : 'No') + '</span></div>' +
+                                '<div class="info-item"><span class="label">Intenciones:</span><span class="value">' +
+                                (info.intents_cargados || 0) + '</span></div>';
+                        }
+                    });
+            }
+
+            // ===== INICIALIZACIÓN =====
+            document.addEventListener('DOMContentLoaded', function() {
+                domInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') window.adminEnviarMensaje();
+                });
+                domBtnEnviar.addEventListener('click', window.adminEnviarMensaje);
+
+                var first = document.querySelector('.session-item[data-session]');
+                if (first) window.abrirSesion(first.dataset.session);
+
+                iniciarPollingSesiones();
+                setTimeout(function() { domInput.focus(); }, 500);
             });
+
         })();
     </script>
 

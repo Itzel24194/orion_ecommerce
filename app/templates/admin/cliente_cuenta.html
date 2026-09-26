@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuenta del Cliente | ORION Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lv-brand:      #e10098;
+            --lv-brand-dark: #c00080;
+            --lv-soft:       #fdf0f7;
+            --lv-line:       #e8e8e8;
+            --lv-ink:        #1a1a2e;
+            --lv-muted:      #888;
+            --lv-bg:         #f5f6f8;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: var(--lv-bg);
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            color: var(--lv-ink);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrap {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 28px 22px 60px;
+        }
+
+        /* ===== BACK LINK ===== */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--lv-muted);
+            text-decoration: none;
+            font-size: .84rem;
+            font-weight: 700;
+            padding: 8px 16px;
+            background: #fff;
+            border: 1px solid var(--lv-line);
+            border-radius: 50px;
+            margin-bottom: 18px;
+            transition: all .2s ease;
+        }
+        .back-link:hover {
+            color: var(--lv-brand);
+            border-color: var(--lv-brand);
+            transform: translateX(-2px);
+            box-shadow: 0 4px 12px rgba(225,0,152,.1);
+        }
+        .back-link i { transition: transform .2s ease; }
+        .back-link:hover i { transform: translateX(-2px); }
+
+        /* ===== PERFIL HEADER ===== */
+        .profile-header {
+            background: linear-gradient(135deg, #e10098 0%, #c00080 55%, #8a0052 100%);
+            border-radius: 18px;
+            padding: 26px 30px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(180,0,108,.2);
+        }
+        .profile-header::after {
+            content: "";
+            position: absolute;
+            right: -60px; top: -60px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.08);
+        }
+        .profile-header::before {
+            content: "";
+            position: absolute;
+            right: 30px; bottom: -50px;
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.06);
+        }
+
+        .profile-avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+        .profile-avatar {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 6px 20px rgba(0,0,0,.2);
+            background: #f0f0f0;
+            display: block;
+        }
+        .profile-avatar-status {
+            position: absolute;
+            bottom: 4px; right: 4px;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+        }
+        .profile-avatar-status.on  { background: #28a745; }
+        .profile-avatar-status.off { background: #d1d5db; }
+
+        .profile-info { flex: 1; min-width: 0; z-index: 2; position: relative; }
+        .profile-name {
+            font-size: 1.35rem;
+            font-weight: 900;
+            margin: 0 0 4px;
+            letter-spacing: -.3px;
+        }
+        .profile-email {
+            font-size: .86rem;
+            opacity: .9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .profile-email i { font-size: .78rem; opacity: .85; }
+
+        .profile-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .profile-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: .68rem;
+            font-weight: 700;
+            background: rgba(255,255,255,.2);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.25);
+            backdrop-filter: blur(6px);
+        }
+        .profile-chip.verified { background: rgba(40,167,69,.3); border-color: rgba(40,167,69,.5); }
+        .profile-chip.pending  { background: rgba(255,193,7,.3);  border-color: rgba(255,193,7,.5); }
+        .profile-chip.danger   { background: rgba(220,53,69,.3);  border-color: rgba(220,53,69,.5); }
+
+        /* ===== CARDS ===== */
+        .card-blk {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid var(--lv-line);
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,.03);
+            animation: fadeUp .35s ease both;
+        }
+        .card-blk:nth-child(2) { animation-delay: .04s; }
+        .card-blk:nth-child(3) { animation-delay: .08s; }
+        .card-blk:nth-child(4) { animation-delay: .12s; }
+        .card-blk:nth-child(5) { animation-delay: .16s; }
+        .card-blk:nth-child(6) { animation-delay: .20s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header-custom {
+            padding: 16px 22px;
+            border-bottom: 1px solid var(--lv-line);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(180deg, #fff, #fafafc);
+        }
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--lv-soft);
+            color: var(--lv-brand-dark);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            flex-shrink: 0;
+        }
+        .card-title {
+            font-size: .95rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--lv-ink);
+            letter-spacing: -.2px;
+        }
+        .card-body-custom {
+            padding: 10px 22px 16px;
+        }
+
+        /* ===== KV ROWS ===== */
+        .kv {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--lv-line);
+            gap: 16px;
+            font-size: .86rem;
+        }
+        .kv:last-child { border-bottom: none; }
+        .kv-key {
+            color: var(--lv-muted);
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: .8rem;
+            letter-spacing: .2px;
+        }
+        .kv-val {
+            text-align: right;
+            color: var(--lv-ink);
+            font-weight: 600;
+            word-break: break-word;
+            font-size: .86rem;
+        }
+        .kv-val.mono {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+
+        /* Sub-grupo (para objetos anidados como medidas) */
+        .kv-subgroup {
+            background: #fafafc;
+            border-radius: 10px;
+            padding: 4px 14px;
+            margin: 8px 0;
+            border: 1px solid #f0f0f5;
+        }
+        .kv-subgroup-title {
+            font-size: .72rem;
+            font-weight: 800;
+            color: var(--lv-brand-dark);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 0 4px;
+        }
+        .kv-subgroup .kv { border-bottom-color: #e8e8ee; }
+        .kv-subgroup .kv:last-child { border-bottom: none; }
+        .kv-subgroup .kv-key { color: #6b7280; }
+
+        /* ===== BOOLEANOS ===== */
+        .badge-yes {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: .7rem;
+            font-weight: 700;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .badge-no {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: .7rem;
+            font-weight: 700;
+            background: #fdecea;
+            color: #c0392b;
+            border: 1px solid #f5c6cb;
+        }
+        .badge-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: .68rem;
+            font-weight: 800;
+            background: var(--lv-soft);
+            color: var(--lv-brand-dark);
+            border: 1px solid #f0c8de;
+        }
+
+        /* ===== CHIPS DE LISTA (colores, estilos, etc.) ===== */
+        .chips-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 6px 0;
+        }
+        .chip-lite {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: .72rem;
+            font-weight: 700;
+            background: var(--lv-soft);
+            color: var(--lv-brand-dark);
+            border: 1px solid #f0c8de;
+            text-transform: capitalize;
+        }
+
+        /* ===== FISCALES ===== */
+        .fiscal-box {
+            background: linear-gradient(135deg, #fdf0f7, #fff);
+            border: 1px solid #f0c8de;
+            border-radius: 12px;
+            padding: 8px 16px;
+            margin: 6px 0;
+        }
+        .fiscal-box .kv { border-bottom-color: #f5d8e6; }
+        .fiscal-box .kv:last-child { border-bottom: none; }
+
+        /* ===== MÉTODOS DE PAGO ===== */
+        .pago-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px dashed var(--lv-line);
+        }
+        .pago-item:last-child { border-bottom: none; }
+        .pago-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--lv-soft);
+            color: var(--lv-brand-dark);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .pago-info { flex: 1; min-width: 0; }
+        .pago-titulo {
+            font-weight: 800;
+            font-size: .9rem;
+            color: var(--lv-ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .pago-detalle {
+            font-size: .78rem;
+            color: var(--lv-muted);
+            margin-top: 3px;
+        }
+
+        /* ===== EMPTY STATES ===== */
+        .empty-inline {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 16px;
+            background: #fafafa;
+            border-radius: 10px;
+            border: 1px dashed var(--lv-line);
+            margin: 8px 0;
+            color: var(--lv-muted);
+            font-size: .84rem;
+            font-weight: 600;
+        }
+        .empty-inline i {
+            font-size: 1.1rem;
+            color: #d1d5db;
+        }
+
+        /* ===== LOADER ===== */
+        .loader-box {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--lv-muted);
+            font-size: .9rem;
+        }
+        .loader-box .spinner {
+            width: 42px;
+            height: 42px;
+            border: 3px solid var(--lv-soft);
+            border-top-color: var(--lv-brand);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 0 auto 14px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .wrap { padding: 20px 14px 40px; }
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px 20px;
+                gap: 16px;
+            }
+            .profile-chips { justify-content: center; }
+            .profile-name { font-size: 1.15rem; }
+            .kv {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .kv-val { text-align: left; }
+            .pago-item { align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <!-- VOLVER -->
+    <a href="{{ url_for('web.admin_cuentas_clientes') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Volver a la lista
+    </a>
+
+    <!-- LOADER -->
+    <div id="cargando" class="loader-box">
+        <div class="spinner"></div>
+        Cargando información del cliente...
+    </div>
+
+    <!-- CONTENIDO -->
+    <div id="contenido" style="display:none;">
+
+        <!-- PERFIL HEADER -->
+        <div class="profile-header">
+            <div class="profile-avatar-wrap">
+                <img id="cl_avatar" src="" alt="Avatar" class="profile-avatar"
+                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=?&background=e10098&color=fff&size=90&bold=true';">
+                <span id="cl_avatar_status" class="profile-avatar-status off"></span>
+            </div>
+            <div class="profile-info">
+                <h1 class="profile-name" id="cl_nombre">—</h1>
+                <div class="profile-email">
+                    <i class="fas fa-envelope"></i>
+                    <span id="cl_email">—</span>
+                </div>
+                <div class="profile-chips" id="cl_chips"></div>
+            </div>
+        </div>
+
+        <!-- COMUNICACIÓN -->
+        <div class="card-blk">
+            <div class="card-header-custom">
+                <div class="card-icon"><i class="fas fa-bell"></i></div>
+                <h5 class="card-title">Comunicación</h5>
+            </div>
+            <div class="card-body-custom">
+                <div id="cl_comunicacion"></div>
+            </div>
+        </div>
+
+        <!-- PRIVACIDAD -->
+        <div class="card-blk">
+            <div class="card-header-custom">
+                <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                <h5 class="card-title">Privacidad</h5>
+            </div>
+            <div class="card-body-custom">
+                <div id="cl_privacidad"></div>
+            </div>
+        </div>
+
+        <!-- DATOS FISCALES -->
+        <div class="card-blk">
+            <div class="card-header-custom">
+                <div class="card-icon"><i class="fas fa-receipt"></i></div>
+                <h5 class="card-title">Datos fiscales</h5>
+            </div>
+            <div class="card-body-custom">
+                <div id="cl_fiscales"></div>
+            </div>
+        </div>
+
+        <!-- MÉTODOS DE PAGO -->
+        <div class="card-blk">
+            <div class="card-header-custom">
+                <div class="card-icon"><i class="fas fa-credit-card"></i></div>
+                <h5 class="card-title">Métodos de pago</h5>
+            </div>
+            <div class="card-body-custom">
+                <div id="cl_pagos"></div>
+            </div>
+        </div>
+
+        <!-- COMPLEXIÓN -->
+        <div class="card-blk">
+            <div class="card-header-custom">
+                <div class="card-icon"><i class="fas fa-ruler-combined"></i></div>
+                <h5 class="card-title">Complexión</h5>
+            </div>
+            <div class="card-body-custom">
+                <div id="cl_complexion"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const uid = {{ usuario_id | tojson }};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function capKey(k) {
+    return String(k)
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function renderBoolean(v) {
+    return v
+        ? '<span class="badge-yes"><i class="fas fa-check-circle"></i> Sí</span>'
+        : '<span class="badge-no"><i class="fas fa-times-circle"></i> No</span>';
+}
+
+function emptyInline(texto, icono) {
+    return `<div class="empty-inline">
+                <i class="fas ${icono || 'fa-inbox'}"></i>
+                <span>${texto || 'Sin información registrada'}</span>
+            </div>`;
+}
+
+function isPlainObject(v) {
+    return v !== null && typeof v === 'object' && !Array.isArray(v);
+}
+
+function isPrimitiveValue(v) {
+    if (v === null || v === undefined || v === '') return false;
+    if (Array.isArray(v)) return v.length > 0;
+    if (isPlainObject(v)) return Object.keys(v).length > 0;
+    return true;
+}
+
+/* ============================================================
+   RENDER KV con soporte para objetos anidados
+   ============================================================ */
+function renderKV(containerId, obj, emptyText, emptyIcon) {
+    const el = document.getElementById(containerId);
+
+    if (!obj || typeof obj !== 'object' || !Object.keys(obj).length) {
+        el.innerHTML = emptyInline(emptyText, emptyIcon);
+        return;
+    }
+
+    // Filtrar valores vacíos
+    const entries = Object.entries(obj).filter(([k, v]) => {
+        if (k === 'updated_at' || k === 'actualizado') return false;
+        return isPrimitiveValue(v);
+    });
+
+    if (!entries.length) {
+        el.innerHTML = emptyInline(emptyText, emptyIcon);
+        return;
+    }
+
+    let html = '';
+
+    // 1) Primero los primitivos y arrays
+    entries.forEach(([k, v]) => {
+        if (isPlainObject(v)) return; // los procesamos después
+
+        let val;
+        if (typeof v === 'boolean') {
+            val = renderBoolean(v);
+        } else if (Array.isArray(v)) {
+            val = `<div class="chips-wrap">${
+                v.map(item => `<span class="chip-lite">${item}</span>`).join('')
+            }</div>`;
+        } else {
+            val = String(v);
+        }
+
+        html += `<div class="kv">
+                    <span class="kv-key">${capKey(k)}</span>
+                    <span class="kv-val">${val}</span>
+                 </div>`;
+    });
+
+    // 2) Luego los objetos anidados (subgrupos)
+    entries.forEach(([k, v]) => {
+        if (!isPlainObject(v)) return;
+
+        const subEntries = Object.entries(v).filter(([sk, sv]) =>
+            isPrimitiveValue(sv)
+        );
+
+        if (!subEntries.length) return;
+
+        html += `<div class="kv-subgroup">
+                    <div class="kv-subgroup-title">${capKey(k)}</div>`;
+
+        subEntries.forEach(([sk, sv]) => {
+            let subVal;
+            if (typeof sv === 'boolean') {
+                subVal = renderBoolean(sv);
+            } else if (Array.isArray(sv)) {
+                subVal = `<div class="chips-wrap">${
+                    sv.map(item => `<span class="chip-lite">${item}</span>`).join('')
+                }</div>`;
+            } else {
+                subVal = String(sv);
+            }
+
+            html += `<div class="kv">
+                        <span class="kv-key">${capKey(sk)}</span>
+                        <span class="kv-val">${subVal}</span>
+                     </div>`;
+        });
+
+        html += `</div>`;
+    });
+
+    el.innerHTML = html;
+}
+
+/* ============================================================
+   DATOS FISCALES con etiquetas amigables
+   ============================================================ */
+function renderFiscales(containerId, obj) {
+    const el = document.getElementById(containerId);
+
+    const tieneDatos = obj && typeof obj === 'object' && (
+        (obj.rfc && String(obj.rfc).trim()) ||
+        (obj.razon_social && String(obj.razon_social).trim()) ||
+        (obj.regimen_fiscal && String(obj.regimen_fiscal).trim()) ||
+        (obj.uso_cfdi && String(obj.uso_cfdi).trim())
+    );
+
+    if (!tieneDatos) {
+        el.innerHTML = emptyInline('Sin datos fiscales registrados', 'fa-file-invoice');
+        return;
+    }
+
+    const campos = [
+        { key: 'rfc',            label: 'RFC',            mono: true  },
+        { key: 'razon_social',   label: 'Razón Social',   mono: false },
+        { key: 'regimen_fiscal', label: 'Régimen Fiscal', mono: false },
+        { key: 'uso_cfdi',       label: 'Uso de CFDI',    mono: false },
+    ];
+
+    let html = '<div class="fiscal-box">';
+
+    campos.forEach(c => {
+        const val = obj[c.key];
+        if (!val || !String(val).trim()) return;
+        html += `<div class="kv">
+                    <span class="kv-key">${c.label}</span>
+                    <span class="kv-val ${c.mono ? 'mono' : ''}">${val}</span>
+                 </div>`;
+    });
+
+    if (obj.updated_at) {
+        let fechaTxt = obj.updated_at;
+        try {
+            const d = new Date(obj.updated_at);
+            if (!isNaN(d.getTime())) {
+                fechaTxt = d.toLocaleString('es-MX', {
+                    day: '2-digit', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            }
+        } catch (e) {}
+        html += `<div class="kv">
+                    <span class="kv-key">Última actualización</span>
+                    <span class="kv-val">${fechaTxt}</span>
+                 </div>`;
+    }
+
+    html += '</div>';
+    el.innerHTML = html;
+}
+
+/* ============================================================
+   MÉTODOS DE PAGO con iconos
+   ============================================================ */
+function renderPagos(pagos) {
+    const el = document.getElementById('cl_pagos');
+
+    if (!pagos || !pagos.length) {
+        el.innerHTML = emptyInline('Sin métodos de pago guardados', 'fa-credit-card');
+        return;
+    }
+
+    el.innerHTML = pagos.map(m => {
+        const pred = m.predeterminado
+            ? '<span class="badge-info"><i class="fas fa-star"></i> Predeterminado</span>'
+            : '';
+
+        if (m.tipo === 'tarjeta') {
+            const marca = m.marca || 'Tarjeta';
+            const titular = m.titular ? `Titular: ${m.titular}` : '';
+            const expira  = m.expira  ? `Vence: ${m.expira}` : '';
+            const detalles = [titular, expira].filter(Boolean).join(' · ');
+
+            return `<div class="pago-item">
+                        <div class="pago-icon"><i class="fas fa-credit-card"></i></div>
+                        <div class="pago-info">
+                            <div class="pago-titulo">
+                                ${marca} •••• ${m.ultimos4 || ''}
+                                ${pred}
+                            </div>
+                            ${detalles ? `<div class="pago-detalle">${detalles}</div>` : ''}
+                        </div>
+                    </div>`;
+        }
+        if (m.tipo === 'paypal') {
+            return `<div class="pago-item">
+                        <div class="pago-icon"><i class="fab fa-paypal"></i></div>
+                        <div class="pago-info">
+                            <div class="pago-titulo">PayPal ${pred}</div>
+                            ${m.email ? `<div class="pago-detalle">${m.email}</div>` : ''}
+                        </div>
+                    </div>`;
+        }
+        if (m.tipo === 'oxxo') {
+            return `<div class="pago-item">
+                        <div class="pago-icon"><i class="fas fa-store"></i></div>
+                        <div class="pago-info">
+                            <div class="pago-titulo">OXXO ${pred}</div>
+                            ${m.referencia ? `<div class="pago-detalle">Ref: ${m.referencia}</div>` : ''}
+                        </div>
+                    </div>`;
+        }
+        return `<div class="pago-item">
+                    <div class="pago-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="pago-info">
+                        <div class="pago-titulo">${m.tipo || 'Método'} ${pred}</div>
+                    </div>
+                </div>`;
+    }).join('');
+}
+
+/* ============================================================
+   CHIPS DEL PERFIL
+   ============================================================ */
+function renderChips(confirmado, activo) {
+    const el = document.getElementById('cl_chips');
+    const chips = [];
+
+    if (confirmado) {
+        chips.push('<span class="profile-chip verified"><i class="fas fa-check-circle"></i> Verificado</span>');
+    } else {
+        chips.push('<span class="profile-chip pending"><i class="fas fa-clock"></i> Sin verificar</span>');
+    }
+
+    if (activo !== false) {
+        chips.push('<span class="profile-chip"><i class="fas fa-circle" style="font-size:.45rem;"></i> Cuenta activa</span>');
+    } else {
+        chips.push('<span class="profile-chip danger"><i class="fas fa-ban"></i> Inactiva</span>');
+    }
+
+    el.innerHTML = chips.join('');
+}
+
+/* ============================================================
+   FETCH
+   ============================================================ */
+fetch('/api/admin/clientes/' + uid + '/cuenta', {
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    credentials: 'same-origin'
+})
+.then(r => r.json())
+.then(data => {
+    document.getElementById('cargando').style.display = 'none';
+
+    if (!data.success) {
+        document.getElementById('cargando').innerHTML =
+            '<div class="text-danger">Error: ' + (data.error || data.message || 'desconocido') + '</div>';
+        document.getElementById('cargando').style.display = 'block';
+        return;
+    }
+
+    document.getElementById('contenido').style.display = 'block';
+    const c = data.cliente || {};
+
+    /* --- Avatar + nombre --- */
+    const av = document.getElementById('cl_avatar');
+    if (c.foto) {
+        av.src = '/static/uploads/' + c.foto;
+    } else {
+        av.src = 'https://ui-avatars.com/api/?name=' +
+                 encodeURIComponent(c.nombre || '?') +
+                 '&background=e10098&color=fff&size=90&bold=true';
+    }
+
+    const statusDot = document.getElementById('cl_avatar_status');
+    statusDot.className = 'profile-avatar-status ' + (c.confirmado ? 'on' : 'off');
+
+    document.getElementById('cl_nombre').textContent = c.nombre || '—';
+    document.getElementById('cl_email').textContent  = c.email || '—';
+
+    renderChips(c.confirmado, c.activo);
+
+    /* --- Secciones --- */
+    renderKV('cl_comunicacion', c.preferencias_comunicacion,
+             'Sin preferencias de comunicación', 'fa-bell');
+
+    renderKV('cl_privacidad', c.preferencias_privacidad,
+             'Sin preferencias de privacidad', 'fa-shield-alt');
+
+    renderFiscales('cl_fiscales', c.datos_fiscales || c.fiscales || null);
+
+    renderPagos(c.metodos_pago || []);
+
+    renderKV('cl_complexion', c.complexion,
+             'Sin datos de complexión', 'fa-ruler-combined');
+})
+.catch(err => {
+    console.error('Error cargando cuenta:', err);
+    document.getElementById('cargando').innerHTML =
+        '<div class="text-danger">Error de conexión</div>';
+});
+</script>
+
+</body>
+</html>

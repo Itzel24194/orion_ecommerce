@@ -7,824 +7,762 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detalle_pedido.css') }}">
+
     <style>
         :root {
             --orion-primary: #e10098;
             --orion-primary-dark: #c00080;
-            --orion-secondary: #00d4ff;
+            --orion-primary-soft: #fff0f8;
+            --orion-primary-soft2: #ffe0f2;
             --orion-dark: #1a1a2e;
-            --orion-gray: #f5f6f8;
-            --orion-shadow: 0 2px 20px rgba(0,0,0,0.06);
-            --orion-radius: 16px;
+            --orion-gray: #64748b;
+            --orion-light: #ffffff;
+            --orion-border: #ececf1;
+            --orion-success: #10b981;
+            --orion-warning: #f59e0b;
+            --orion-danger: #ef4444;
+            --orion-info: #0284c7;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.05);
+            --shadow-pink: 0 4px 14px rgba(225,0,152,.18);
+            --radius: 14px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { font-family: 'Inter', sans-serif; }
 
+        /* ⭐ TODO BLANCO PURO */
         html, body {
-            height: 100%;
-            margin: 0;
-            background-color: var(--orion-gray);
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            color: #1a1a2e;
-        }
-
-        .wrapper {
-            display: flex;
-            flex-direction: column;
+            background: #ffffff !important;
+            color: var(--orion-dark);
             min-height: 100vh;
+            padding-bottom: 60px;
         }
 
-        .content {
-            flex: 1;
-        }
-
-        /* ===== TOP NAV ===== */
+        /* ============ TOP NAV (BLANCO) ============ */
         .top-nav {
-            font-size: 0.75rem;
-            background: #f8f9fa;
-            border-bottom: 1px solid #eee;
+            background: #ffffff !important;
+            color: #666;
+            font-size: .75rem;
             padding: 6px 0;
+            border-bottom: 1px solid #eee;
         }
-
         .top-nav a {
             color: #666;
             text-decoration: none;
-            transition: color 0.3s ease;
+            transition: color .2s;
         }
+        .top-nav a:hover { color: var(--orion-primary); }
+        .top-nav i { color: var(--orion-primary); }
 
-        .top-nav a:hover {
-            color: var(--orion-primary);
-        }
-
-        /* ===== NAVBAR ===== */
         .main-navbar {
-            background: #ffffff;
+            background: #ffffff !important;
             border-bottom: 2px solid #f0f0f0;
-            padding: 12px 0 !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            padding: 12px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,.03);
         }
-
         .brand-logo {
             font-weight: 900;
             font-size: 2.3rem;
-            color: var(--orion-primary) !important;
             letter-spacing: -1.5px;
+            color: var(--orion-primary) !important;
             text-decoration: none;
         }
+        .brand-logo:hover { color: var(--orion-primary-dark) !important; }
 
-        .brand-logo:hover {
-            color: var(--orion-primary-dark) !important;
-        }
-
-        .navbar .dropdown-toggle {
-            font-weight: 700;
-            color: #1a1a2e;
-            background: transparent;
-            border: none;
-            padding: 8px 12px;
-        }
-
-        .navbar .dropdown-toggle:hover {
-            color: var(--orion-primary);
-        }
-
-        .search-container {
-            border: 2px solid #eee !important;
-            border-radius: 50px;
-            overflow: hidden;
-            width: 100%;
-        }
-
-        .search-container input {
-            border: none;
-            padding: 8px 20px;
-            font-size: 0.9rem;
-            background: #f8f9fa;
-        }
-
-        .search-container input:focus {
-            box-shadow: none;
-            background: #fff;
-        }
-
-        .search-container .btn-search {
-            background: #f8f9fa;
-            border: none;
-            padding: 8px 15px;
-        }
-
-        .search-container .btn-search:hover {
-            background: #eee;
-        }
-
-        .user-avatar {
-            width: 38px;
-            height: 38px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid var(--orion-primary);
-        }
-
+        /* Línea rosa */
         .brand-border {
             height: 4px;
-            background: linear-gradient(90deg, var(--orion-primary), #1a1a2e);
+            background: linear-gradient(90deg, var(--orion-primary), var(--orion-primary-dark));
             width: 100%;
         }
 
-        /* ===== DROPDOWN CATEGORÍAS ===== */
-        .dropdown-submenu {
-            position: relative;
+        .search-container .form-control {
+            border-radius: 50px 0 0 50px !important;
+            border: 2px solid #eee;
+            border-right: none;
+            padding: 10px 18px;
+            font-size: .85rem;
+            background: #ffffff;
         }
-        .dropdown-submenu>.dropdown-menu {
-            top: 0;
-            left: 100%;
-            margin-top: -6px;
-            display: none;
+        .search-container .form-control:focus {
+            background: #ffffff;
+            box-shadow: none;
+            border-color: var(--orion-primary-soft2);
         }
-        .dropdown-submenu:hover>.dropdown-menu {
-            display: block;
-        }
-        .dropdown-submenu>a::after {
-            content: " ▶";
-            font-size: 0.6rem;
-            float: right;
-            margin-top: 5px;
-        }
-        .dropdown-menu {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
-        }
-        .dropdown-item {
-            padding: 8px 20px;
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-        .dropdown-item:hover {
-            background: rgba(225, 0, 152, 0.05);
-            color: var(--orion-primary);
-        }
-
-        /* ===== BOTÓN CARRITO ===== */
-        .btn-cart {
-            position: relative;
-            color: #1a1a2e;
-            font-size: 1.4rem;
-            text-decoration: none;
-        }
-        .btn-cart:hover {
-            color: var(--orion-primary);
-        }
-        .btn-cart .badge-cart {
-            position: absolute;
-            top: -8px;
-            right: -10px;
+        .btn-search {
+            border-radius: 0 50px 50px 0 !important;
             background: var(--orion-primary);
+            border: 2px solid var(--orion-primary);
             color: #fff;
-            font-size: 0.55rem;
-            padding: 2px 6px;
-            border-radius: 50%;
-            font-weight: 700;
+            padding: 10px 20px;
+            transition: all .2s;
         }
-
-        /* ===== TEXTO USUARIO ===== */
+        .btn-search:hover { background: var(--orion-primary-dark); border-color: var(--orion-primary-dark); }
         .user-link {
-            color: #1a1a2e;
-            font-weight: 700;
+            color: var(--orion-dark);
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.9rem;
+            font-size: .75rem;
+            font-weight: 700;
+            transition: color .2s;
         }
-        .user-link:hover {
-            color: var(--orion-primary);
+        .user-link:hover { color: var(--orion-primary); }
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--orion-primary-soft);
+        }
+        .btn-cart {
+            position: relative;
+            color: var(--orion-dark);
+            font-size: 1.3rem;
+            text-decoration: none;
+            transition: color .2s, transform .2s;
+        }
+        .btn-cart:hover { color: var(--orion-primary); transform: scale(1.05); }
+        .badge-cart {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background: var(--orion-primary);
+            color: #fff;
+            font-size: .62rem;
+            font-weight: 800;
+            padding: 3px 7px;
+            border-radius: 50px;
+            min-width: 20px;
+            text-align: center;
         }
 
-        /* ===== HERO LIVERPOOL STYLE - MÁS DELGADO ===== */
+        /* ============ HERO ROSA ORION ============ */
         .hero-pedidos {
-            background: linear-gradient(135deg, #0033A0 0%, #002277 100%);
-            padding: 20px 0;
-            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary-dark) 100%) !important;
+            color: #fff;
+            padding: 48px 0 56px;
             position: relative;
             overflow: hidden;
         }
-
         .hero-pedidos::before {
             content: '';
             position: absolute;
-            top: -60%;
-            right: -5%;
-            width: 250px;
-            height: 250px;
-            background: rgba(227, 24, 55, 0.06);
-            border-radius: 50%;
+            top: -60%; right: -10%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%);
+            pointer-events: none;
         }
-
         .hero-pedidos::after {
             content: '';
             position: absolute;
-            bottom: -50%;
-            left: -3%;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 215, 0, 0.04);
-            border-radius: 50%;
+            bottom: -80%; left: -5%;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(255,255,255,.1), transparent 70%);
+            pointer-events: none;
         }
-
-        .hero-pedidos .container {
+        .hero-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
             position: relative;
             z-index: 1;
         }
-
-        .hero-pedidos .hero-content {
+        .hero-title {
+            font-weight: 900;
+            font-size: 2rem;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
+            color: #fff;
         }
-
-        .hero-pedidos .hero-text {
-            flex: 1;
-        }
-
-        .hero-pedidos .hero-title {
-            font-weight: 800;
-            font-size: 1.8rem;
-            color: #FFFFFF;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
+        .hero-title i { color: #FFD700; }
+        .hero-subtitle {
+            font-size: .95rem;
+            opacity: .95;
+            margin-bottom: 0;
             display: flex;
             align-items: center;
-            gap: 10px;
+            color: #fff;
         }
-
-        .hero-pedidos .hero-title .bi {
-            color: #FFD700;
-            font-size: 1.6rem;
-        }
-
-        .hero-pedidos .hero-subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-            font-weight: 400;
-            max-width: 500px;
-        }
-
-        .hero-pedidos .hero-subtitle .bi {
-            color: #FFD700;
-        }
-
-        .hero-pedidos .hero-stats {
+        .hero-subtitle i { color: #FFD700; }
+        .hero-stats {
             display: flex;
             align-items: center;
-            gap: 16px;
-            background: rgba(255, 255, 255, 0.10);
-            backdrop-filter: blur(8px);
-            padding: 8px 22px;
+            gap: 24px;
+            background: rgba(255,255,255,.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,.25);
+            padding: 14px 24px;
             border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
         }
-
-        .hero-pedidos .hero-stats .stat-item {
+        .hero-stats .stat-item {
             display: flex;
             align-items: center;
-            gap: 6px;
-            color: #FFFFFF;
-            font-weight: 600;
-            font-size: 0.85rem;
+            gap: 8px;
+            font-weight: 700;
+            font-size: .92rem;
+            color: #fff;
         }
+        .hero-stats .stat-item i { color: #FFD700; font-size: 1.1rem; }
+        .stat-divider { width: 1px; height: 24px; background: rgba(255,255,255,.35); }
 
-        .hero-pedidos .hero-stats .stat-item .bi {
-            color: #FFD700;
-            font-size: 1rem;
-        }
+        /* ============ CONTENT ============ */
+        .content { margin-top: -32px; position: relative; z-index: 2; }
 
-        .hero-pedidos .hero-stats .stat-divider {
-            width: 1px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* ===== DETAIL CARDS ===== */
-        .detail-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 28px 30px;
-            box-shadow: var(--orion-shadow);
-            margin-bottom: 20px;
-            border: 1px solid #f0f0f0;
-            transition: all 0.3s ease;
-        }
-
-        .detail-card:hover {
-            border-color: #e0e0e0;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-        }
-
-        .detail-card h4 {
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: #1a1a2e;
-            border-bottom: 2px solid var(--orion-primary);
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .detail-card h4 i {
-            color: var(--orion-primary);
-        }
-
-        /* ===== STATUS BADGES ===== */
-        .status-badge {
-            font-size: 0.65rem;
-            padding: 5px 16px;
+        /* ============ BOTONES ============ */
+        .btn-orion {
+            background: var(--orion-primary);
+            color: #fff;
+            border: none;
+            padding: 11px 22px;
             border-radius: 50px;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: .82rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .2s;
+            box-shadow: var(--shadow-pink);
+        }
+        .btn-orion:hover {
+            background: var(--orion-primary-dark);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(225,0,152,.35);
+        }
+        .btn-orion-outline {
+            background: #ffffff;
+            color: var(--orion-dark);
+            border: 1.5px solid var(--orion-border);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: .82rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .2s;
+        }
+        .btn-orion-outline:hover {
+            border-color: var(--orion-primary);
+            color: var(--orion-primary);
+            background: var(--orion-primary-soft);
+        }
+        .btn-cancelar {
+            background: #ffffff;
+            color: var(--orion-danger);
+            border: 1.5px solid #fecaca;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: .82rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .2s;
+        }
+        .btn-cancelar:hover {
+            background: var(--orion-danger);
+            color: #fff;
+            border-color: var(--orion-danger);
+        }
+
+        /* ============ TARJETAS (BLANCO PURO) ============ */
+        .detail-card {
+            background: #ffffff !important;
+            border-radius: var(--radius);
+            padding: 26px 28px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(236,236,241,.7);
+        }
+        .detail-card h4 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--orion-dark);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--orion-primary-soft);
+        }
+        .detail-card h4 i {
+            color: var(--orion-primary);
+            font-size: 1.15rem;
+        }
+
+        /* ============ STATUS BADGES ============ */
+        .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            padding: 7px 16px;
+            border-radius: 50px;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .4px;
+            text-transform: uppercase;
         }
-
-        .status-pendiente { background: #fff3cd; color: #856404; }
-        .status-pendiente::before { content: '⏳'; }
-        .status-confirmado { background: #cce5ff; color: #004085; }
-        .status-confirmado::before { content: '✅'; }
-        .status-preparando { background: #fff3cd; color: #856404; }
-        .status-preparando::before { content: '📦'; }
-        .status-enviado { background: #d1ecf1; color: #0c5460; }
-        .status-enviado::before { content: '🚚'; }
-        .status-entregado { background: #d4edda; color: #155724; }
-        .status-entregado::before { content: '✅'; }
-        .status-cancelado { background: #f8d7da; color: #721c24; }
-        .status-cancelado::before { content: '❌'; }
+        .status-badge::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .status-pendiente { background: #fef3c7; color: #b45309; }
+        .status-confirmado { background: #dbeafe; color: #1e40af; }
+        .status-preparando { background: #e0e7ff; color: #4338ca; }
+        .status-enviado { background: #e0f2fe; color: #0369a1; }
+        .status-entregado { background: #d1fae5; color: #065f46; }
+        .status-cancelado { background: #fee2e2; color: #991b1b; }
 
         .badge-click-collect {
-            background: var(--orion-primary);
-            color: #fff;
-            padding: 4px 12px;
+            background: #ede9fe;
+            color: #5b21b6;
+            padding: 6px 14px;
             border-radius: 50px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            margin-left: 6px;
+            font-size: .68rem;
+            font-weight: 800;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
-
-        .badge-click-collect .bi {
-            margin-right: 4px;
-        }
-
         .badge-recogida {
-            background: #28a745;
-            color: #fff;
-            padding: 4px 12px;
+            background: var(--orion-primary-soft);
+            color: var(--orion-primary);
+            padding: 6px 14px;
             border-radius: 50px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            margin-left: 6px;
+            font-size: .68rem;
+            font-weight: 800;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .badge-recogida .bi {
-            margin-right: 4px;
-        }
-
-        /* ===== INFO ROWS ===== */
+        /* ============ INFO ROWS ============ */
         .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f8;
+            gap: 16px;
         }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
+        .info-row:last-child { border-bottom: none; }
         .info-row .label {
-            color: #888;
-            font-size: 0.85rem;
-        }
-
-        .info-row .value {
+            font-size: .8rem;
+            color: var(--orion-gray);
             font-weight: 600;
-            font-size: 0.9rem;
+        }
+        .info-row .value {
+            font-size: .88rem;
+            font-weight: 700;
+            color: var(--orion-dark);
+            text-align: right;
         }
 
-        /* ===== PRODUCTOS ===== */
+        /* ============ FECHA ESTIMADA ============ */
+        .fecha-estimada-wrap {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .fecha-estimada-badge {
+            font-size: .62rem;
+            font-weight: 700;
+            background: var(--orion-primary-soft);
+            color: var(--orion-primary);
+            padding: 2px 8px;
+            border-radius: 50px;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+        .fecha-estimada-real {
+            color: var(--orion-success);
+        }
+
+        /* ============ PRODUCTOS (BLANCO) ============ */
         .producto-item-detail {
             display: flex;
             align-items: center;
             gap: 16px;
-            padding: 12px 16px;
-            background: #fafafa;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+            padding: 16px;
+            border-radius: 12px;
+            background: #ffffff !important;
+            margin-bottom: 10px;
+            transition: all .2s;
+            border: 1px solid #f5f5f8;
         }
-
-        .producto-item-detail:last-child {
-            margin-bottom: 0;
-        }
-
         .producto-item-detail:hover {
-            background: #f5f5f5;
-            border-color: #eee;
+            background: var(--orion-primary-soft) !important;
+            border-color: var(--orion-primary-soft2);
+            box-shadow: 0 4px 12px rgba(225,0,152,.06);
+            transform: translateX(2px);
         }
-
+        .producto-item-detail:last-child { margin-bottom: 0; }
         .producto-img-detail {
             width: 72px;
             height: 72px;
-            object-fit: cover;
             border-radius: 10px;
-            border: 1px solid #eee;
+            object-fit: cover;
+            background: #ffffff;
             flex-shrink: 0;
-            background: #fff;
+            border: 1px solid var(--orion-border);
         }
-
         .producto-info-detail {
             flex: 1;
+            min-width: 0;
         }
-
         .producto-nombre-detail {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #1a1a2e;
-            margin-bottom: 2px;
+            font-weight: 700;
+            font-size: .9rem;
+            color: var(--orion-dark);
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
-
         .producto-atributos-detail {
-            font-size: 0.75rem;
-            color: #888;
+            font-size: .72rem;
+            color: var(--orion-gray);
+            margin-bottom: 4px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
         }
-
-        .producto-atributos-detail .bi {
-            margin-right: 2px;
-        }
-
+        .producto-atributos-detail i { color: var(--orion-primary); margin-right: 2px; }
         .producto-cantidad-detail {
-            font-size: 0.75rem;
-            color: #888;
+            font-size: .75rem;
+            color: var(--orion-gray);
+            font-weight: 600;
         }
-
-        .producto-cantidad-detail .bi {
-            margin-right: 2px;
-        }
-
+        .producto-cantidad-detail i { color: var(--orion-primary); }
         .producto-precio-detail {
+            font-size: .85rem;
             font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--orion-primary);
+            color: var(--orion-gray);
+            text-decoration: line-through;
+            text-align: right;
         }
-
         .producto-subtotal-detail {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #28a745;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--orion-primary);
             text-align: right;
         }
 
-        .producto-item-detail .text-end .small {
-            font-size: 0.65rem;
-            color: #888;
+        /* ============ STATUS ALERT ============ */
+        .status-alert {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+            background: #ffffff;
+            box-shadow: var(--shadow-sm);
+        }
+        .status-alert.pendiente { background: #fffbeb; border-color: var(--orion-warning); }
+        .status-alert.confirmado { background: #eff6ff; border-color: var(--orion-info); }
+        .status-alert.preparando { background: #f5f3ff; border-color: #8b5cf6; }
+        .status-alert.enviado { background: #f0f9ff; border-color: var(--orion-info); }
+        .status-alert.entregado { background: #f0fdf4; border-color: var(--orion-success); }
+        .status-alert.cancelado { background: #fef2f2; border-color: var(--orion-danger); }
+        .status-alert i { font-size: 1.6rem; }
+        .status-alert.pendiente i { color: var(--orion-warning); }
+        .status-alert.confirmado i,
+        .status-alert.enviado i { color: var(--orion-info); }
+        .status-alert.preparando i { color: #8b5cf6; }
+        .status-alert.entregado i { color: var(--orion-success); }
+        .status-alert.cancelado i { color: var(--orion-danger); }
+        .status-alert-text { flex: 1; }
+        .status-alert-title {
+            font-weight: 800;
+            font-size: .9rem;
+            margin-bottom: 2px;
+            color: var(--orion-dark);
+        }
+        .status-alert-sub {
+            font-size: .78rem;
+            color: var(--orion-gray);
         }
 
-        /* ===== BOTONES ===== */
-        .btn-orion {
-            background: linear-gradient(135deg, var(--orion-primary), var(--orion-primary-dark));
+        /* ============ TIMELINE ============ */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            padding: 24px 0;
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 38px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #ededf3;
+            z-index: 0;
+        }
+        .timeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+        .timeline-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #ededf3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            color: var(--orion-gray);
+            font-weight: 800;
+            transition: all .3s;
+        }
+        .timeline-step.done .timeline-circle {
+            background: var(--orion-success);
+            border-color: var(--orion-success);
             color: #fff;
-            border: none;
-            padding: 10px 28px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            font-family: 'Inter', sans-serif;
         }
-
-        .btn-orion:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
-            color: #fff;
-        }
-
-        .btn-orion-outline {
-            background: transparent;
-            border: 2px solid var(--orion-primary);
-            color: var(--orion-primary);
-            padding: 8px 22px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-orion-outline:hover {
+        .timeline-step.active .timeline-circle {
             background: var(--orion-primary);
+            border-color: var(--orion-primary);
             color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(225, 0, 152, 0.2);
+            box-shadow: 0 0 0 5px rgba(225,0,152,.15);
+            animation: pulse 1.8s infinite;
         }
-
-        .btn-cancelar {
-            background: transparent;
-            border: 2px solid #dc3545;
-            color: #dc3545;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 5px rgba(225,0,152,.15); }
+            50% { box-shadow: 0 0 0 9px rgba(225,0,152,.05); }
         }
-
-        .btn-cancelar:hover {
-            background: #dc3545;
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        .timeline-step span {
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--orion-gray);
+            text-align: center;
         }
+        .timeline-step.done span,
+        .timeline-step.active span { color: var(--orion-dark); }
 
-        /* ===== MODAL DE CONFIRMACIÓN ===== */
+        /* ============ MODAL ============ */
         .modal-confirmacion {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(6px);
+            inset: 0;
+            background: rgba(15, 23, 42, .55);
+            backdrop-filter: blur(4px);
             display: none;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             z-index: 9999;
-            animation: fadeIn 0.3s ease;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity .25s;
         }
-
         .modal-confirmacion.show {
             display: flex;
+            opacity: 1;
         }
-
-        .modal-confirmacion .modal-content-custom {
+        .modal-content-custom {
             background: #ffffff;
             border-radius: 20px;
+            padding: 36px 32px 28px;
             max-width: 420px;
-            width: 90%;
-            padding: 35px 30px 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
             text-align: center;
-            animation: slideUp 0.3s ease;
+            box-shadow: 0 24px 60px rgba(0,0,0,.25);
+            animation: modalIn .35s cubic-bezier(.34,1.56,.64,1);
         }
-
-        .modal-confirmacion .modal-icon {
-            width: 70px;
-            height: 70px;
+        @keyframes modalIn {
+            from { transform: scale(.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .modal-icon {
+            width: 72px;
+            height: 72px;
+            background: #fef2f2;
             border-radius: 50%;
-            background: #fff3cd;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
+            margin: 0 auto 18px;
+        }
+        .modal-icon i {
             font-size: 2.2rem;
-            color: #856404;
+            color: var(--orion-danger);
         }
-
-        .modal-confirmacion .modal-title-custom {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 8px;
+        .modal-title-custom {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--orion-dark);
+            margin-bottom: 10px;
         }
-
-        .modal-confirmacion .modal-message {
-            font-size: 0.9rem;
-            color: #666;
+        .modal-message {
+            font-size: .88rem;
+            color: var(--orion-gray);
             margin-bottom: 24px;
-            line-height: 1.5;
+            line-height: 1.55;
         }
-
-        .modal-confirmacion .modal-actions {
+        .modal-actions {
             display: flex;
             gap: 12px;
             justify-content: center;
-            flex-wrap: wrap;
         }
-
-        .modal-confirmacion .btn-modal-cancelar {
-            background: #dc3545;
+        .btn-modal-cerrar,
+        .btn-modal-cancelar {
+            padding: 11px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: .82rem;
+            border: none;
+            cursor: pointer;
+            transition: all .2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 130px;
+        }
+        .btn-modal-cerrar {
+            background: #f1f1f6;
+            color: var(--orion-dark);
+        }
+        .btn-modal-cerrar:hover { background: #e6e6ee; }
+        .btn-modal-cancelar {
+            background: var(--orion-danger);
             color: #fff;
-            border: none;
-            padding: 10px 28px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            min-width: 120px;
+            box-shadow: 0 4px 14px rgba(239,68,68,.3);
+        }
+        .btn-modal-cancelar:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+        .btn-modal-cancelar:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        .modal-confirmacion .btn-modal-cancelar:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
-        }
-
-        .modal-confirmacion .btn-modal-cerrar {
-            background: #e9ecef;
-            color: #495057;
-            border: none;
-            padding: 10px 28px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            min-width: 120px;
-        }
-
-        .modal-confirmacion .btn-modal-cerrar:hover {
-            background: #dee2e6;
-            transform: translateY(-2px);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* ===== TOAST ===== */
+        /* ============ TOAST ============ */
         .toast-container-custom {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 24px;
+            right: 24px;
             z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-
         .toast-custom {
-            background: #28a745;
-            color: #fff;
-            padding: 14px 24px;
+            background: #ffffff;
+            padding: 14px 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 32px rgba(0,0,0,.15);
+            font-size: .85rem;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: slideIn 0.5s ease;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
+            min-width: 260px;
+            animation: slideIn .35s cubic-bezier(.34,1.56,.64,1);
+            border-left: 4px solid;
         }
-
-        .toast-custom.error {
-            background: #dc3545;
-        }
-
-        .toast-custom .bi {
-            font-size: 1.2rem;
-        }
-
+        .toast-custom.success { border-color: var(--orion-success); }
+        .toast-custom.success i { color: var(--orion-success); }
+        .toast-custom.error { border-color: var(--orion-danger); }
+        .toast-custom.error i { color: var(--orion-danger); }
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-
         @keyframes slideOut {
             from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(120%); opacity: 0; }
         }
 
-        /* ===== FOOTER ===== */
-        footer {
-            background: #1a1a2e;
-            color: #fff;
-            padding: 30px 0;
-            text-align: center;
-            margin-top: 40px;
+        /* ============ FOOTER ROSA ORION (FORZADO) ============ */
+        footer,
+        footer.footer,
+        .footer {
+            background: linear-gradient(135deg, #e10098 0%, #c00080 100%) !important;
+            color: #ffffff !important;
+            padding: 30px 0 !important;
+            text-align: center !important;
+            font-size: .8rem !important;
+            margin-top: 40px !important;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        footer::before {
+            content: '';
+            position: absolute;
+            top: -80%; right: -5%;
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(255,255,255,.12), transparent 70%);
+            pointer-events: none;
+        }
+        footer::after {
+            content: '';
+            position: absolute;
+            bottom: -70%; left: -3%;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(255,255,255,.08), transparent 70%);
+            pointer-events: none;
+        }
+        footer p,
+        footer .container,
+        footer .container p {
+            margin: 0 !important;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-weight: 500;
+            letter-spacing: .3px;
+            color: #ffffff !important;
+            background: transparent !important;
+        }
+        footer i {
+            color: #FFD700 !important;
         }
 
-        footer p {
-            margin: 0;
-            font-size: 0.85rem;
-            opacity: 0.6;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .search-container {
-                width: 100% !important;
-            }
-            .brand-logo {
-                font-size: 1.8rem;
-            }
-            .hero-pedidos .hero-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .hero-pedidos .hero-stats {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
+        /* ============ RESPONSIVE ============ */
         @media (max-width: 768px) {
-            .hero-pedidos {
-                padding: 16px 0;
-            }
-            .hero-pedidos .hero-title {
-                font-size: 1.4rem;
-                flex-wrap: wrap;
-            }
-            .hero-pedidos .hero-title .bi {
-                font-size: 1.3rem;
-            }
-            .hero-pedidos .hero-subtitle {
-                font-size: 0.85rem;
-            }
-            .hero-pedidos .hero-stats {
-                flex-wrap: wrap;
-                padding: 8px 16px;
-                gap: 10px;
-            }
-            .hero-pedidos .hero-stats .stat-divider {
-                display: none;
-            }
-            .hero-pedidos .hero-stats .stat-item {
-                font-size: 0.8rem;
-            }
-            .detail-card {
-                padding: 20px;
-            }
-            .producto-item-detail {
-                flex-wrap: wrap;
-                padding: 10px 12px;
-            }
-            .producto-img-detail {
-                width: 56px;
-                height: 56px;
-            }
-            .top-nav {
-                font-size: 0.65rem;
-            }
-            .modal-confirmacion .modal-content-custom {
-                padding: 28px 20px 24px;
-            }
-            .modal-confirmacion .modal-title-custom {
-                font-size: 1.1rem;
-            }
-            .btn-orion,
-            .btn-orion-outline,
-            .btn-cancelar {
-                padding: 8px 18px;
-                font-size: 0.8rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .detail-card {
-                padding: 16px;
-            }
-            .user-link span {
-                display: none;
-            }
-            .hero-pedidos .hero-stats .stat-item {
-                font-size: 0.75rem;
-            }
-            .modal-confirmacion .modal-actions {
-                flex-direction: column;
-            }
-            .modal-confirmacion .btn-modal-cancelar,
-            .modal-confirmacion .btn-modal-cerrar {
-                width: 100%;
-                min-width: unset;
-            }
-            .producto-item-detail .text-end {
-                width: 100%;
-                text-align: left !important;
-                padding-left: 72px;
-            }
-            .producto-subtotal-detail {
-                text-align: left;
-            }
+            .hero-title { font-size: 1.5rem; }
+            .hero-stats { padding: 10px 16px; gap: 12px; width: 100%; justify-content: center; }
+            .hero-stats .stat-item { font-size: .78rem; }
+            .detail-card { padding: 20px; }
+            .producto-item-detail { flex-wrap: wrap; }
+            .producto-item-detail .text-end { width: 100%; text-align: left !important; }
+            .timeline { overflow-x: auto; }
+            .timeline-step span { font-size: .65rem; }
+            footer p { flex-direction: column; gap: 4px; }
         }
     </style>
 </head>
@@ -850,7 +788,6 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="orionNavbar">
-                    <!-- Categorías Dropdown -->
                     <div class="dropdown mx-lg-3">
                         <button class="dropdown-toggle" data-bs-toggle="dropdown">
                             Categorías
@@ -876,7 +813,6 @@
                         </ul>
                     </div>
 
-                    <!-- Buscador -->
                     <form class="d-flex flex-grow-1" action="{{ url_for('web.catalogo') }}" method="GET">
                         <div class="input-group search-container">
                             <input class="form-control" type="search" name="q" placeholder="Buscar productos...">
@@ -886,7 +822,6 @@
                         </div>
                     </form>
 
-                    <!-- Usuario y Carrito -->
                     <div class="ms-3 d-flex align-items-center gap-3">
                         {% if session.get('nombre') %}
                             <a href="{{ url_for('web.perfil') }}" class="user-link">
@@ -950,10 +885,98 @@
             <div class="row">
                 <div class="col-12">
 
-                    <!-- Botón volver -->
                     <a href="{{ url_for('web.mis_pedidos_clientes') }}" class="btn-orion-outline mb-3">
                         <i class="bi bi-arrow-left"></i> Volver a Mis Pedidos
                     </a>
+
+                    {# ============================================================
+                       CÁLCULO DE FECHAS ESTIMADAS
+                    #}
+                    {% set dias_estimados = 5 %}
+                    {% set fecha_estimada = None %}
+                    {% set es_estimada = False %}
+                    {% if pedido.fecha_entrega_estimada %}
+                        {% set fecha_estimada = pedido.fecha_entrega_estimada %}
+                    {% elif pedido.fecha_entrega_real %}
+                        {% set fecha_estimada = pedido.fecha_entrega_real %}
+                    {% elif pedido.created_at %}
+                        {% set fecha_estimada = pedido.created_at + timedelta(days=dias_estimados) %}
+                        {% set es_estimada = True %}
+                    {% endif %}
+
+                    <!-- Alerta de estado -->
+                    {% set estado_actual = pedido.estado if pedido.estado else 'pendiente' %}
+                    <div class="status-alert {{ estado_actual }}">
+                        {% if estado_actual == 'pendiente' %}
+                            <i class="bi bi-clock-history"></i>
+                            <div class="status-alert-text">
+                                <div class="status-alert-title">Pedido pendiente de confirmación</div>
+                                <div class="status-alert-sub">Estamos procesando tu pedido. Te notificaremos pronto.</div>
+                            </div>
+                        {% elif estado_actual == 'confirmado' %}
+                            <i class="bi bi-check2-circle"></i>
+                            <div class="status-alert-text">
+                                <div class="status-alert-title">¡Tu pedido fue confirmado!</div>
+                                <div class="status-alert-sub">Estamos preparando todo para el envío.</div>
+                            </div>
+                        {% elif estado_actual == 'preparando' %}
+                            <i class="bi bi-box-seam"></i>
+                            <div class="status-alert-text">
+                                <div class="status-alert-title">Preparando tu pedido</div>
+                                <div class="status-alert-sub">Estamos empacando tus productos.</div>
+                            </div>
+                        {% elif estado_actual == 'enviado' %}
+                            <i class="bi bi-truck"></i>
+                            <div class="status-alert-text">
+                                <div class="status-alert-title">Tu pedido está en camino</div>
+                                <div class="status-alert-sub">
+                                    {% if fecha_estimada %}
+                                        Llegará aproximadamente el {{ fecha_estimada.strftime('%d/%m/%Y') }}.
+                                    {% else %}
+                                        Llegará en la fecha estimada.
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% elif estado_actual == 'entregado' %}
+                            <i class="bi bi-check-circle-fill"></i>
+                            <div class="status-alert-text">
+                                <div class="status-alert-title">Pedido entregado</div>
+                                <div class="status-alert-sub">¡Gracias por tu compra!</div>
+                            </div>
+                        {% elif estado_actual == 'cancelado' %}
+                            <i class="bi bi-x-octagon"></i>
+                            <div class="status-alert-text">
+                                <div class="status-alert-title">Pedido cancelado</div>
+                                <div class="status-alert-sub">Este pedido ya no está activo.</div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Timeline -->
+                    {% if estado_actual not in ['cancelado'] %}
+                    <div class="detail-card">
+                        <div class="timeline">
+                            {% set pasos = [
+                                ('pendiente', 'Pendiente', 'bi-clock'),
+                                ('confirmado', 'Confirmado', 'bi-check'),
+                                ('enviado', 'Enviado', 'bi-truck'),
+                                ('entregado', 'Entregado', 'bi-check-circle')
+                            ] %}
+                            {% set orden_estados = ['pendiente', 'confirmado', 'enviado', 'entregado'] %}
+                            {% set idx_actual = orden_estados.index(estado_actual) if estado_actual in orden_estados else 0 %}
+                            {% for clave, etiqueta, icono in pasos %}
+                                {% set idx_paso = loop.index0 %}
+                                {% set clase = 'done' if idx_paso < idx_actual else ('active' if idx_paso == idx_actual else '') %}
+                                <div class="timeline-step {{ clase }}">
+                                    <div class="timeline-circle">
+                                        <i class="bi {{ icono }}"></i>
+                                    </div>
+                                    <span>{{ etiqueta }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <!-- Detalle del Pedido -->
                     <div class="detail-card">
@@ -977,36 +1000,57 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="info-row">
-                                    <span class="label">Fecha del pedido</span>
+                                    <span class="label"><i class="bi bi-calendar3 me-2"></i>Fecha del pedido</span>
                                     <span class="value">{{ pedido.created_at.strftime('%d/%m/%Y %H:%M') if pedido.created_at else 'No disponible' }}</span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="label">Método de pago</span>
+                                    <span class="label"><i class="bi bi-credit-card me-2"></i>Método de pago</span>
                                     <span class="value">{{ pedido.metodo_pago|title if pedido.metodo_pago else 'No especificado' }}</span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="label">Tipo de envío</span>
+                                    <span class="label"><i class="bi bi-truck me-2"></i>Tipo de envío</span>
                                     <span class="value">
                                         {% if pedido.tipo_envio == 'click_collect' %}
                                             <i class="bi bi-shop"></i> Recoger en tienda
                                         {% else %}
-                                            <i class="bi bi-truck"></i> Domicilio
+                                            <i class="bi bi-house"></i> Domicilio
                                         {% endif %}
                                     </span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="info-row">
-                                    <span class="label">Total de unidades</span>
+                                    <span class="label"><i class="bi bi-box me-2"></i>Total de unidades</span>
                                     <span class="value">{{ pedido.total_unidades|default(0) }}</span>
                                 </div>
+
                                 <div class="info-row">
-                                    <span class="label">Fecha entrega estimada</span>
-                                    <span class="value">{{ pedido.fecha_entrega_estimada.strftime('%d/%m/%Y') if pedido.fecha_entrega_estimada else 'No disponible' }}</span>
+                                    <span class="label"><i class="bi bi-calendar-check me-2"></i>Fecha entrega estimada</span>
+                                    <span class="value">
+                                        {% if fecha_estimada %}
+                                            {% if pedido.fecha_entrega_real %}
+                                                <span class="fecha-estimada-real">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                                    {{ fecha_estimada.strftime('%d/%m/%Y') }}
+                                                </span>
+                                                <div class="fecha-estimada-badge mt-1" style="background:#d1fae5;color:#065f46;">Entregado</div>
+                                            {% else %}
+                                                <div class="fecha-estimada-wrap">
+                                                    <span>{{ fecha_estimada.strftime('%d/%m/%Y') }}</span>
+                                                    {% if es_estimada %}
+                                                        <span class="fecha-estimada-badge">Estimado</span>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">Por confirmar</span>
+                                        {% endif %}
+                                    </span>
                                 </div>
+
                                 {% if pedido.fecha_entrega_real %}
                                 <div class="info-row">
-                                    <span class="label">Fecha de entrega</span>
+                                    <span class="label"><i class="bi bi-check-circle me-2"></i>Fecha de entrega real</span>
                                     <span class="value text-success">{{ pedido.fecha_entrega_real.strftime('%d/%m/%Y %H:%M') }}</span>
                                 </div>
                                 {% endif %}
@@ -1047,13 +1091,13 @@
                                             {% endif %}
                                         </div>
                                         <div class="producto-cantidad-detail">
-                                            <i class="bi bi-x"></i> Cantidad: {{ item.cantidad|default(1) }}
+                                            <i class="bi bi-x-lg"></i> Cantidad: {{ item.cantidad|default(1) }}
                                         </div>
                                     </div>
                                     <div class="text-end">
                                         <div class="producto-precio-detail">${{ "%.2f"|format(item.precio|default(0)) }}</div>
                                         <div class="producto-subtotal-detail">${{ "%.2f"|format((item.precio|default(0)) * (item.cantidad|default(1))) }}</div>
-                                        <div class="small">c/u</div>
+                                        <div class="small text-muted" style="font-size:.68rem;">c/u</div>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -1077,19 +1121,26 @@
                             <span class="label">IVA (16%)</span>
                             <span class="value">${{ "%.2f"|format(pedido.iva|default(0)) }}</span>
                         </div>
-                        {% if pedido.descuento and pedido.descuento > 0 %}
+                        {% set desc_total = pedido.descuento_total if pedido.descuento_total else (pedido.descuento if pedido.descuento else 0) %}
+                        {% if desc_total and desc_total > 0 %}
                         <div class="info-row">
                             <span class="label text-success">Descuento ({{ pedido.porcentaje_descuento|default(0) }}%)</span>
-                            <span class="value text-success">-${{ "%.2f"|format(pedido.descuento|default(0)) }}</span>
+                            <span class="value text-success">-${{ "%.2f"|format(desc_total) }}</span>
                         </div>
                         {% endif %}
                         <div class="info-row">
                             <span class="label">Envío</span>
-                            <span class="value">${{ "%.2f"|format(pedido.envio|default(0)) }}</span>
+                            <span class="value">
+                                {% if pedido.envio and pedido.envio > 0 %}
+                                    ${{ "%.2f"|format(pedido.envio) }}
+                                {% else %}
+                                    <span class="text-success fw-bold">Gratis</span>
+                                {% endif %}
+                            </span>
                         </div>
-                        <div class="info-row" style="border-bottom: none; padding-top: 12px;">
-                            <span class="label fw-bold">Total</span>
-                            <span class="value fw-bold" style="color: var(--orion-primary); font-size: 1.3rem;">
+                        <div class="info-row" style="border-bottom: none; padding-top: 16px;">
+                            <span class="label fw-bold" style="font-size:1rem;color:var(--orion-dark);">Total</span>
+                            <span class="value fw-bold" style="color: var(--orion-primary); font-size: 1.4rem;">
                                 ${{ "%.2f"|format(pedido.total|default(0)) }}
                             </span>
                         </div>
@@ -1099,12 +1150,13 @@
                     {% if pedido.direccion %}
                     <div class="detail-card">
                         <h4><i class="bi bi-geo-alt"></i> Dirección de envío</h4>
-                        <p class="mb-0">
+                        <p class="mb-0" style="font-size:.88rem;line-height:1.7;">
+                            <i class="bi bi-house-door me-1" style="color:var(--orion-primary);"></i>
                             {{ pedido.direccion.calle }} {{ pedido.direccion.numero }}<br>
                             {{ pedido.direccion.colonia }}, {{ pedido.direccion.ciudad }}, {{ pedido.direccion.estado }}<br>
                             CP: {{ pedido.direccion.cp }}, {{ pedido.direccion.pais|default('México') }}
                             {% if pedido.direccion.referencias %}
-                                <br><span class="text-muted small">Referencias: {{ pedido.direccion.referencias }}</span>
+                                <br><span class="text-muted small"><i class="bi bi-info-circle"></i> Referencias: {{ pedido.direccion.referencias }}</span>
                             {% endif %}
                         </p>
                     </div>
@@ -1114,11 +1166,11 @@
                     {% if pedido.tienda_recogida %}
                     <div class="detail-card">
                         <h4><i class="bi bi-shop"></i> Tienda de recogida</h4>
-                        <p class="mb-0">{{ pedido.tienda_recogida }}</p>
+                        <p class="mb-0" style="font-size:.9rem;font-weight:600;">{{ pedido.tienda_recogida }}</p>
                         {% if pedido.codigo_recogida %}
-                            <div class="mt-2">
-                                <span class="badge-recogida" style="padding: 8px 20px; font-size: 0.9rem;">
-                                    <i class="bi bi-qr-code"></i> Código: <strong>{{ pedido.codigo_recogida }}</strong>
+                            <div class="mt-3">
+                                <span class="badge-recogida" style="padding: 10px 22px; font-size: .9rem;">
+                                    <i class="bi bi-qr-code"></i> Código: <strong style="margin-left:6px;">{{ pedido.codigo_recogida }}</strong>
                                 </span>
                             </div>
                         {% endif %}
@@ -1129,7 +1181,7 @@
                     {% if pedido.notas %}
                     <div class="detail-card">
                         <h4><i class="bi bi-sticky"></i> Notas</h4>
-                        <p class="mb-0 text-muted">{{ pedido.notas }}</p>
+                        <p class="mb-0 text-muted" style="font-size:.88rem;">{{ pedido.notas }}</p>
                     </div>
                     {% endif %}
 
@@ -1162,7 +1214,7 @@
                 <p class="modal-message">¿Estás seguro de que deseas cancelar este pedido? Esta acción no se puede deshacer.</p>
                 <div class="modal-actions">
                     <button class="btn-modal-cerrar" onclick="cerrarModalCancelar()">
-                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                        <i class="bi bi-x-lg me-1"></i> No, volver
                     </button>
                     <button class="btn-modal-cancelar" id="btnConfirmarCancelar">
                         <i class="bi bi-check-lg me-1"></i> Sí, cancelar
@@ -1171,13 +1223,16 @@
             </div>
         </div>
 
-        <!-- ===== TOAST CONTAINER ===== -->
         <div class="toast-container-custom" id="toastContainer"></div>
 
-        <!-- ===== FOOTER ===== -->
+        <!-- ⭐ FOOTER ROSA ORION (FORZADO) -->
         <footer>
             <div class="container">
-                <p>© 2026 ORION SYSTEM. Todos los derechos reservados.</p>
+                <p>
+                    <i class="bi bi-shield-check"></i>
+                    © 2026 ORION SYSTEM · Todos los derechos reservados
+                    <i class="bi bi-heart-fill" style="color:#FFD700;"></i>
+                </p>
             </div>
         </footer>
     </div>
@@ -1217,7 +1272,6 @@
             pedidoIdCancelar = null;
         }
 
-        // Confirmar cancelación
         document.getElementById('btnConfirmarCancelar').addEventListener('click', function() {
             if (pedidoIdCancelar) {
                 cancelarPedido(pedidoIdCancelar);
@@ -1262,7 +1316,7 @@
             toast.className = `toast-custom ${tipo}`;
             toast.innerHTML = `
                 <i class="bi bi-${tipo === 'success' ? 'check-circle-fill' : 'exclamation-circle-fill'}"></i>
-                ${mensaje}
+                <span>${mensaje}</span>
             `;
             container.appendChild(toast);
             
@@ -1274,7 +1328,6 @@
             }, 3000);
         }
 
-        // Cerrar modal al hacer clic fuera
         document.addEventListener('click', function(event) {
             const modal = document.getElementById('modalCancelar');
             if (event.target === modal) {
@@ -1282,7 +1335,6 @@
             }
         });
 
-        // Cerrar modal con tecla ESC
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 cerrarModalCancelar();

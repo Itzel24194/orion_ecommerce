@@ -310,20 +310,17 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .status-pendiente { background: #fff3cd; color: #856404; }
-        .status-pendiente::before { content: '⏳ '; }
         .status-confirmado { background: #cce5ff; color: #004085; }
-        .status-confirmado::before { content: '✅ '; }
         .status-preparando { background: #fff3cd; color: #856404; }
-        .status-preparando::before { content: '📦 '; }
         .status-enviado { background: #d1ecf1; color: #0c5460; }
-        .status-enviado::before { content: '🚚 '; }
         .status-entregado { background: #d4edda; color: #155724; }
-        .status-entregado::before { content: '✅ '; }
         .status-cancelado { background: #f8d7da; color: #721c24; }
-        .status-cancelado::before { content: '❌ '; }
 
         .info-row {
             display: flex;
@@ -357,7 +354,9 @@
             font-size: 0.8rem;
             transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             cursor: pointer;
         }
 
@@ -378,7 +377,9 @@
             font-size: 0.8rem;
             transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-orion-outline:hover {
@@ -397,6 +398,9 @@
             font-size: 0.8rem;
             transition: all 0.3s ease;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-danger-custom:hover {
@@ -423,10 +427,13 @@
             object-fit: cover;
             border-radius: 10px;
             border: 1px solid #e8e8e8;
+            background: #f8f9fa;
+            flex-shrink: 0;
         }
 
         .producto-item .info {
             flex: 1;
+            min-width: 0;
         }
 
         .producto-item .nombre {
@@ -438,6 +445,7 @@
         .producto-item .atributos {
             font-size: 0.75rem;
             color: #888;
+            margin-top: 2px;
         }
 
         .producto-item .precio {
@@ -466,6 +474,7 @@
             font-size: 0.85rem;
             font-weight: 600;
             min-width: 150px;
+            transition: border-color 0.3s;
         }
 
         .select-estado:focus {
@@ -480,6 +489,9 @@
             border-radius: 50px;
             font-size: 0.65rem;
             font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .timeline {
@@ -511,11 +523,13 @@
             position: absolute;
             left: -26px;
             top: 4px;
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background: #e8e8e8;
             border: 2px solid #ffffff;
+            transition: all 0.3s;
+            z-index: 1;
         }
 
         .timeline-item.active::before {
@@ -531,6 +545,7 @@
         .timeline-item .time {
             font-size: 0.7rem;
             color: #888;
+            margin-top: 2px;
         }
 
         .timeline-item .title {
@@ -581,7 +596,7 @@
         }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .sidebar {
                 width: 70px;
             }
@@ -600,6 +615,7 @@
             }
             .sidebar a i {
                 font-size: 1.3rem;
+                margin: 0;
             }
             .sidebar .admin-profile .avatar {
                 width: 40px;
@@ -616,37 +632,69 @@
                 margin-left: 70px;
                 padding: 15px;
             }
+            .top-bar h1 {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .detail-card {
+                padding: 18px;
+            }
             .producto-item {
                 flex-wrap: wrap;
+                gap: 10px;
             }
             .producto-item img {
                 width: 50px;
                 height: 50px;
             }
+            .producto-item .info {
+                flex: 1 1 100%;
+            }
+            .producto-item > div:last-child {
+                text-align: left;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+            .select-estado {
+                min-width: 120px;
+                font-size: 0.75rem;
+            }
+            .timeline-item .title {
+                font-size: 0.8rem;
+            }
         }
 
-        @media (max-width: 480px) {
-            .top-bar h1 {
-                font-size: 1.2rem;
-            }
+        @media (max-width: 576px) {
             .top-bar {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
+                text-align: center;
             }
-            .detail-card {
-                padding: 15px;
+            .top-bar .tag {
+                align-self: center;
             }
-            .producto-item img {
-                width: 40px;
-                height: 40px;
+            .top-bar h1 {
+                font-size: 1.1rem;
+                justify-content: center;
+            }
+            .detail-card h4 {
+                font-size: 0.9rem;
             }
             .footer-info p {
                 flex-direction: column;
                 gap: 5px;
             }
-            .select-estado {
-                min-width: 120px;
-                font-size: 0.75rem;
+            .btn-orion, .btn-orion-outline, .btn-danger-custom {
+                width: 100%;
+                justify-content: center;
+            }
+            .status-badge {
+                font-size: 0.6rem;
+                padding: 4px 12px;
             }
         }
     </style>
@@ -680,10 +728,14 @@
             <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Inicio</span></a>
             <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
             <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
-            <a href="{{ url_for('web.lista_empresas') }}"><i class="fas fa-building"></i> <span>Empresas</span></a>
+            <a href="{{ url_for('web.lista_marcas') }}"><i class="fas fa-building"></i> <span>Marcas</span></a>
             <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
             <a href="{{ url_for('web.admin_listar_pedidos') }}" class="active"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
             <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
 
             <div class="divider"></div>
             <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
@@ -694,7 +746,7 @@
 
             <div class="divider"></div>
             <div class="panel-title">CONFIGURACIÓN</div>
-            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-analytics"></i> <span>Análisis</span></a>
+            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
             <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
             <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
             <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
@@ -720,7 +772,7 @@
         <div class="content-wrapper">
 
             <!-- ===== BOTÓN VOLVER ===== -->
-            <a href="{{ url_for('web.admin_listar_pedidos') }}" class="btn-orion-outline" style="margin-bottom: 20px; display: inline-block; align-self: flex-start;">
+            <a href="{{ url_for('web.admin_listar_pedidos') }}" class="btn-orion-outline" style="margin-bottom: 20px; align-self: flex-start;">
                 <i class="fas fa-arrow-left"></i> Volver a pedidos
             </a>
 
@@ -738,6 +790,7 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                         <span class="status-badge status-{{ pedido.estado if pedido.estado else 'pendiente' }}">
+                            <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
                             {{ pedido.estado|title if pedido.estado else 'Pendiente' }}
                         </span>
                         {% if pedido.tipo_envio == 'click_collect' %}
@@ -771,26 +824,26 @@
                         <h4><i class="fas fa-clock"></i> Línea de tiempo</h4>
                         <div class="timeline">
                             <div class="timeline-item {% if pedido.estado in ['confirmado','preparando','enviado','entregado'] %}done{% elif pedido.estado == 'pendiente' %}active{% endif %}">
-                                <div class="title">Pedido confirmado</div>
+                                <div class="title"><i class="fas fa-check-circle"></i> Pedido confirmado</div>
                                 <div class="time">{{ pedido.created_at.strftime('%d/%m/%Y %H:%M') if pedido.created_at else 'Pendiente' }}</div>
                             </div>
                             <div class="timeline-item {% if pedido.estado in ['preparando','enviado','entregado'] %}done{% elif pedido.estado == 'confirmado' %}active{% endif %}">
-                                <div class="title">En preparación</div>
+                                <div class="title"><i class="fas fa-boxes"></i> En preparación</div>
                                 <div class="time">{{ pedido.fecha_preparacion.strftime('%d/%m/%Y %H:%M') if pedido.fecha_preparacion else 'Pendiente' }}</div>
                             </div>
                             <div class="timeline-item {% if pedido.estado in ['enviado','entregado'] %}done{% elif pedido.estado == 'preparando' %}active{% endif %}">
-                                <div class="title">Enviado</div>
+                                <div class="title"><i class="fas fa-truck"></i> Enviado</div>
                                 <div class="time">{{ pedido.fecha_envio.strftime('%d/%m/%Y %H:%M') if pedido.fecha_envio else 'Pendiente' }}</div>
                             </div>
                             <div class="timeline-item {% if pedido.estado == 'entregado' %}done{% elif pedido.estado == 'enviado' %}active{% endif %}">
-                                <div class="title">Entregado</div>
+                                <div class="title"><i class="fas fa-check-double"></i> Entregado</div>
                                 <div class="time">{{ pedido.fecha_entrega_real.strftime('%d/%m/%Y %H:%M') if pedido.fecha_entrega_real else 'Pendiente' }}</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- ============================================================ -->
-                    <!-- PRODUCTOS - CORREGIDO USANDO items_list                       -->
+                    <!-- PRODUCTOS                                                        -->
                     <!-- ============================================================ -->
                     <div class="detail-card">
                         {% set items_list = pedido.items_list if pedido.items_list is defined else [] %}
@@ -799,8 +852,12 @@
                         {% if items_list and items_list|length > 0 %}
                             {% for item in items_list %}
                             <div class="producto-item">
-                                {% set imagen = item.imagen or item.foto or 'default.jpg' %}
-                                <img src="{{ url_for('static', filename='uploads/productos/' + imagen) }}" alt="{{ item.nombre }}" onerror="this.src='https://via.placeholder.com/60/1a1a2e/666?text=Producto'">
+                                {% set imagen = item.imagen or item.foto or '' %}
+                                {% if imagen %}
+                                    <img src="{{ url_for('static', filename='uploads/productos/' + imagen) }}" alt="{{ item.nombre }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ item.nombre|urlencode }}&background=e10098&color=fff&size=60&bold=true'">
+                                {% else %}
+                                    <img src="https://ui-avatars.com/api/?name={{ item.nombre|urlencode }}&background=e10098&color=fff&size=60&bold=true" alt="{{ item.nombre }}">
+                                {% endif %}
                                 <div class="info">
                                     <div class="nombre">{{ item.nombre }}</div>
                                     <div class="atributos">
@@ -812,7 +869,7 @@
                                     </div>
                                     <div class="cantidad">Cantidad: {{ item.cantidad|default(1) }}</div>
                                 </div>
-                                <div style="text-align: right;">
+                                <div>
                                     <div class="precio">${{ "%.2f"|format(item.precio|default(0)) }}</div>
                                     <div class="subtotal">Subtotal: ${{ "%.2f"|format((item.precio|default(0)) * (item.cantidad|default(1))) }}</div>
                                 </div>
@@ -838,16 +895,28 @@
                             <span class="label">Subtotal</span>
                             <span class="value">${{ "%.2f"|format(pedido.subtotal|default(0)) }}</span>
                         </div>
+                        {% if pedido.descuento_cupon and pedido.descuento_cupon > 0 %}
+                        <div class="info-row" style="color: #28a745;">
+                            <span class="label">Descuento cupón ({{ pedido.codigo_cupon|default('') }})</span>
+                            <span class="value" style="color: #28a745;">-${{ "%.2f"|format(pedido.descuento_cupon|default(0)) }}</span>
+                        </div>
+                        {% endif %}
+                        {% if pedido.descuento_promocion and pedido.descuento_promocion > 0 %}
+                        <div class="info-row" style="color: #28a745;">
+                            <span class="label">Descuento promoción</span>
+                            <span class="value" style="color: #28a745;">-${{ "%.2f"|format(pedido.descuento_promocion|default(0)) }}</span>
+                        </div>
+                        {% endif %}
+                        {% if pedido.descuento_volumen and pedido.descuento_volumen > 0 %}
+                        <div class="info-row" style="color: #28a745;">
+                            <span class="label">Descuento volumen ({{ pedido.porcentaje_descuento|default(0) }}%)</span>
+                            <span class="value" style="color: #28a745;">-${{ "%.2f"|format(pedido.descuento_volumen|default(0)) }}</span>
+                        </div>
+                        {% endif %}
                         <div class="info-row">
                             <span class="label">IVA (16%)</span>
                             <span class="value">${{ "%.2f"|format(pedido.iva|default(0)) }}</span>
                         </div>
-                        {% if pedido.descuento and pedido.descuento > 0 %}
-                        <div class="info-row">
-                            <span class="label" style="color: #28a745;">Descuento ({{ pedido.porcentaje_descuento|default(0) }}%)</span>
-                            <span class="value" style="color: #28a745;">-${{ "%.2f"|format(pedido.descuento|default(0)) }}</span>
-                        </div>
-                        {% endif %}
                         <div class="info-row">
                             <span class="label">Envío</span>
                             <span class="value">${{ "%.2f"|format(pedido.envio|default(0)) }}</span>
@@ -911,7 +980,13 @@
                         <h4><i class="fas fa-info-circle"></i> Información adicional</h4>
                         <div class="info-row">
                             <span class="label">Método de pago</span>
-                            <span class="value">{{ pedido.metodo_pago|title if pedido.metodo_pago else 'No especificado' }}</span>
+                            <span class="value">
+                                {% if pedido.metodo_pago %}
+                                    <i class="fas fa-credit-card"></i> {{ pedido.metodo_pago|title }}
+                                {% else %}
+                                    No especificado
+                                {% endif %}
+                            </span>
                         </div>
                         <div class="info-row">
                             <span class="label">Tipo de envío</span>
@@ -936,9 +1011,12 @@
                     </div>
 
                     <!-- ===== ACCIONES ===== -->
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
                         <button class="btn-orion" onclick="window.print()">
-                            <i class="fas fa-print"></i> Imprimir
+                            <i class="fas fa-print"></i> Imprimir pedido
+                        </button>
+                        <button class="btn-orion-outline" onclick="generarFactura('{{ pedido._id }}')">
+                            <i class="fas fa-file-invoice"></i> Generar factura
                         </button>
                         <button class="btn-danger-custom" onclick="eliminarPedido('{{ pedido._id }}')">
                             <i class="fas fa-trash"></i> Eliminar pedido
@@ -953,7 +1031,7 @@
             <div class="footer-info">
                 <p>
                     <i class="fas fa-clock"></i> 
-                    {{ "Ahora"|format }}
+                    {{ datetime.now().strftime('%d/%m/%Y %H:%M') if datetime else 'Ahora' }}
                     <span class="separator">|</span>
                     <i class="fas fa-shield-alt"></i> ORION System v2.0
                     <span class="separator">|</span>
@@ -972,9 +1050,15 @@
 <script>
     function actualizarEstado(id, estado) {
         if (!confirm('¿Cambiar estado del pedido a "' + estado + '"?')) {
-            location.reload();
+            // Restaurar el valor anterior en el select
+            const select = document.querySelector('.select-estado');
+            select.value = select.getAttribute('data-original') || select.value;
             return;
         }
+        
+        // Guardar el valor original antes de enviar
+        const select = document.querySelector('.select-estado');
+        select.setAttribute('data-original', select.value);
         
         fetch('/api/admin/pedidos/estado/' + id, {
             method: 'POST',
@@ -989,10 +1073,14 @@
                 location.reload();
             } else {
                 alert(data.error || 'Error al actualizar el estado');
+                // Restaurar el valor original
+                select.value = select.getAttribute('data-original');
             }
         })
         .catch(error => {
             alert('Error al actualizar el estado');
+            // Restaurar el valor original
+            select.value = select.getAttribute('data-original');
         });
     }
 
@@ -1013,6 +1101,11 @@
         .catch(error => {
             alert('Error al eliminar el pedido');
         });
+    }
+
+    function generarFactura(id) {
+        // Redirigir a la ruta de generación de factura
+        window.location.href = '/admin/pedidos/factura/' + id;
     }
 </script>
 

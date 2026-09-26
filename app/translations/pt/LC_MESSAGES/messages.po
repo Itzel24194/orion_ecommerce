@@ -1,0 +1,184 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ORION\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mi Perfil"
+msgstr "Meu Perfil"
+
+msgid "Seguridad"
+msgstr "Segurança"
+
+msgid "Mis Pedidos"
+msgstr "Meus Pedidos"
+
+msgid "Direcciones"
+msgstr "Endereços"
+
+msgid "Favoritos"
+msgstr "Favoritos"
+
+msgid "Comunicaciones"
+msgstr "Comunicações"
+
+msgid "Privacidad"
+msgstr "Privacidade"
+
+msgid "Facturación"
+msgstr "Faturamento"
+
+msgid "Métodos de Pago"
+msgstr "Métodos de Pagamento"
+
+msgid "Idioma"
+msgstr "Idioma"
+
+msgid "Cerrar Sesión"
+msgstr "Sair"
+
+msgid "Información Personal"
+msgstr "Informações Pessoais"
+
+msgid "Nombre(s)"
+msgstr "Nome(s)"
+
+msgid "Apellido Paterno"
+msgstr "Sobrenome Paterno"
+
+msgid "Apellido Materno"
+msgstr "Sobrenome Materno"
+
+msgid "Teléfono"
+msgstr "Telefone"
+
+msgid "Fecha de Nacimiento"
+msgstr "Data de Nascimento"
+
+msgid "Género"
+msgstr "Gênero"
+
+msgid "Guardar Cambios"
+msgstr "Salvar Alterações"
+
+msgid "Seguridad de la Cuenta"
+msgstr "Segurança da Conta"
+
+msgid "Verificación en dos pasos"
+msgstr "Verificação em duas etapas"
+
+msgid "Cambiar contraseña"
+msgstr "Alterar senha"
+
+msgid "Contraseña actual"
+msgstr "Senha atual"
+
+msgid "Nueva contraseña"
+msgstr "Nova senha"
+
+msgid "Confirmar nueva contraseña"
+msgstr "Confirmar nova senha"
+
+msgid "Actualizar contraseña"
+msgstr "Atualizar senha"
+
+msgid "Ver todos"
+msgstr "Ver todos"
+
+msgid "Todos"
+msgstr "Todos"
+
+msgid "Pendientes"
+msgstr "Pendentes"
+
+msgid "Confirmados"
+msgstr "Confirmados"
+
+msgid "Enviados"
+msgstr "Enviados"
+
+msgid "Entregados"
+msgstr "Entregues"
+
+msgid "Cancelados"
+msgstr "Cancelados"
+
+msgid "Ver detalle"
+msgstr "Ver detalhes"
+
+msgid "No tienes pedidos realizados"
+msgstr "Você não tem pedidos realizados"
+
+msgid "Mis Direcciones"
+msgstr "Meus Endereços"
+
+msgid "Editar"
+msgstr "Editar"
+
+msgid "Eliminar"
+msgstr "Excluir"
+
+msgid "Agregar dirección"
+msgstr "Adicionar endereço"
+
+msgid "Nueva Dirección"
+msgstr "Novo Endereço"
+
+msgid "Calle"
+msgstr "Rua"
+
+msgid "Colonia"
+msgstr "Bairro"
+
+msgid "Ciudad"
+msgstr "Cidade"
+
+msgid "Estado"
+msgstr "Estado"
+
+msgid "Guardar dirección"
+msgstr "Salvar endereço"
+
+msgid "Mis Favoritos"
+msgstr "Meus Favoritos"
+
+msgid "Ver producto"
+msgstr "Ver produto"
+
+msgid "Explorar productos"
+msgstr "Explorar produtos"
+
+msgid "Preferencias de Comunicación"
+msgstr "Preferências de Comunicação"
+
+msgid "Guardar preferencias"
+msgstr "Salvar preferências"
+
+msgid "Privacidad y Datos"
+msgstr "Privacidade e Dados"
+
+msgid "Eliminar mi cuenta"
+msgstr "Excluir minha conta"
+
+msgid "Datos fiscales"
+msgstr "Dados fiscais"
+
+msgid "Historial de facturas"
+msgstr "Histórico de faturas"
+
+msgid "Idioma y Región"
+msgstr "Idioma e Região"
+
+msgid "Moneda"
+msgstr "Moeda"
+
+msgid "Región / País"
+msgstr "Região / País"
+
+msgid "Vista previa"
+msgstr "Pré-visualização"
+
+msgid "Guardar cambios"
+msgstr "Salvar alterações"

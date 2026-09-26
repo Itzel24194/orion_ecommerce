@@ -206,14 +206,14 @@ def admin_crear_promocion():
 
             productos_aplicables = request.form.getlist('productos_aplicables')
             categorias_aplicables = request.form.getlist('categorias_aplicables')
-            empresas_aplicables = request.form.getlist('empresas_aplicables')
+            marcas_aplicables = request.form.getlist('marcas_aplicables')
             metodos_pago = request.form.getlist('metodos_pago')
             combo_productos = request.form.getlist('combo_productos')
 
             combo_productos = [p for p in combo_productos if p and p.strip()]
             productos_aplicables = [p for p in productos_aplicables if p and p.strip()]
             categorias_aplicables = [c for c in categorias_aplicables if c and c.strip()]
-            empresas_aplicables = [e for e in empresas_aplicables if e and e.strip()]
+            marcas_aplicables = [m for m in marcas_aplicables if m and m.strip()]
 
             fecha_inicio = None
             fecha_fin = None
@@ -245,7 +245,7 @@ def admin_crear_promocion():
                 'combo_descuento': safe_float(request.form.get('combo_descuento', 0)),
                 'productos_aplicables': productos_aplicables,
                 'categorias_aplicables': categorias_aplicables,
-                'empresas_aplicables': empresas_aplicables,
+                'marcas_aplicables': marcas_aplicables,
                 'segmentos': segmentos,
                 'metodos_pago': metodos_pago,
                 'uso_maximo': safe_int(request.form.get('uso_maximo', 0)) or None,
@@ -283,11 +283,11 @@ def admin_crear_promocion():
     try:
         productos = Producto.obtener_todos()
         categorias = Categoria.obtener_todas()
-        empresas = db.empresas.find().sort('nombre', 1)
+        marcas = db.marcas.find().sort('nombre', 1)
         return render_template('admin/promocion_crear.html',
                                productos=productos,
                                categorias=categorias,
-                               empresas=empresas,
+                               marcas=marcas,
                                ahora=datetime.now(timezone.utc).replace(tzinfo=None))
     except Exception as e:
         traceback.print_exc()
@@ -342,14 +342,14 @@ def admin_editar_promocion(promocion_id):
 
             productos_aplicables = request.form.getlist('productos_aplicables')
             categorias_aplicables = request.form.getlist('categorias_aplicables')
-            empresas_aplicables = request.form.getlist('empresas_aplicables')
+            marcas_aplicables = request.form.getlist('marcas_aplicables')
             metodos_pago = request.form.getlist('metodos_pago')
             combo_productos = request.form.getlist('combo_productos')
 
             combo_productos = [p for p in combo_productos if p and p.strip()]
             productos_aplicables = [p for p in productos_aplicables if p and p.strip()]
             categorias_aplicables = [c for c in categorias_aplicables if c and c.strip()]
-            empresas_aplicables = [e for e in empresas_aplicables if e and e.strip()]
+            marcas_aplicables = [m for m in marcas_aplicables if m and m.strip()]
 
             fecha_inicio = None
             fecha_fin = None
@@ -381,7 +381,7 @@ def admin_editar_promocion(promocion_id):
                 'combo_descuento': safe_float(request.form.get('combo_descuento', 0)),
                 'productos_aplicables': productos_aplicables,
                 'categorias_aplicables': categorias_aplicables,
-                'empresas_aplicables': empresas_aplicables,
+                'marcas_aplicables': marcas_aplicables,
                 'segmentos': segmentos,
                 'metodos_pago': metodos_pago,
                 'uso_maximo': safe_int(request.form.get('uso_maximo', 0)) or None,
@@ -402,12 +402,12 @@ def admin_editar_promocion(promocion_id):
     try:
         productos = Producto.obtener_todos()
         categorias = Categoria.obtener_todas()
-        empresas = db.empresas.find().sort('nombre', 1)
+        marcas = db.marcas.find().sort('nombre', 1)
         return render_template('admin/promocion_crear.html',
                                promocion=promocion,
                                productos=productos,
                                categorias=categorias,
-                               empresas=empresas,
+                               marcas=marcas,
                                datetime=datetime,
                                ahora=datetime.now(timezone.utc).replace(tzinfo=None))
     except Exception as e:

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ mesa.event_name }} | Mesa de Regalos ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-primary-soft: #fff0f8;
+            --orion-primary-soft2: #ffe0f2;
+            --orion-dark: #1a1a2e;
+            --orion-gray: #64748b;
+            --orion-border: #ececf1;
+            --orion-success: #10b981;
+            --orion-danger: #ef4444;
+        }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { background: #ffffff; color: var(--orion-dark); min-height: 100vh; padding-bottom: 60px; }
+
+        .registry-nav { background: #ffffff; border-bottom: 2px solid #f0f0f0; padding: 14px 0; }
+        .registry-nav .brand { font-weight: 900; font-size: 2rem; letter-spacing: -1.5px; color: var(--orion-primary); text-decoration: none; }
+        .registry-nav .brand:hover { color: var(--orion-primary-dark); }
+        .registry-nav .nav-right { display: flex; align-items: center; gap: 18px; }
+        .registry-nav .nav-link-top {
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--orion-gray);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color .2s;
+        }
+        .registry-nav .nav-link-top:hover { color: var(--orion-primary); }
+        .registry-nav .nav-link-top i { color: var(--orion-primary); }
+
+        /* ⭐ Flecha de regresar */
+        .back-bar {
+            background: #ffffff;
+            padding: 14px 0 0;
+        }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            color: var(--orion-dark);
+            border: 2px solid var(--orion-border);
+            padding: 10px 20px 10px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: .82rem;
+            text-decoration: none;
+            transition: all .2s;
+        }
+        .btn-back i {
+            font-size: 1rem;
+            color: var(--orion-primary);
+            transition: transform .2s;
+        }
+        .btn-back:hover {
+            border-color: var(--orion-primary);
+            color: var(--orion-primary);
+            background: var(--orion-primary-soft);
+        }
+        .btn-back:hover i { transform: translateX(-4px); }
+
+        .event-hero { background: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary-dark) 100%) !important; color: #fff; padding: 56px 0 64px; text-align: center; position: relative; overflow: hidden; margin-top: 20px; }
+        .event-hero::before { content: ''; position: absolute; top: -60%; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%); }
+        .event-hero .event-icon { width: 80px; height: 80px; background: rgba(255,255,255,.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.2rem; border: 2px solid rgba(255,255,255,.3); }
+        .event-hero h1 { font-weight: 900; font-size: 2.2rem; margin-bottom: 10px; color: #fff; }
+        .event-hero .event-meta { font-size: .95rem; opacity: .95; color: #fff; margin-bottom: 8px; }
+        .event-hero .event-message { font-size: .9rem; opacity: .9; max-width: 560px; margin: 16px auto 0; font-style: italic; color: #fff; line-height: 1.6; }
+
+        .registry-progress { max-width: 600px; margin: -28px auto 40px; background: #fff; border-radius: 50px; padding: 20px 28px; box-shadow: 0 8px 30px rgba(0,0,0,.08); position: relative; z-index: 2; }
+        .registry-progress .progress-labels { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: .78rem; font-weight: 700; color: var(--orion-dark); }
+        .registry-progress .progress-bar-bg { height: 10px; background: #f0f0f5; border-radius: 50px; overflow: hidden; }
+        .registry-progress .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--orion-primary), #ff6bb8); border-radius: 50px; transition: width .5s ease; }
+
+        .gift-section-title { font-weight: 800; font-size: 1.3rem; color: var(--orion-dark); margin-bottom: 6px; }
+        .gift-section-sub { font-size: .85rem; color: var(--orion-gray); margin-bottom: 24px; }
+        .gift-grid-guest { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .gift-card-guest { border: 2px solid var(--orion-border); border-radius: 14px; overflow: hidden; transition: all .2s; background: #fff; position: relative; }
+        .gift-card-guest:hover { border-color: var(--orion-primary-soft2); box-shadow: 0 8px 24px rgba(225,0,152,.08); transform: translateY(-3px); }
+        .gift-card-guest.reservado { opacity: .7; border-color: var(--orion-success); }
+        .gift-card-guest.reservado::after { content: 'RESERVADO'; position: absolute; top: 12px; right: 12px; background: var(--orion-success); color: #fff; padding: 4px 12px; border-radius: 50px; font-size: .65rem; font-weight: 800; letter-spacing: .3px; }
+        .gift-card-guest img { width: 100%; height: 170px; object-fit: cover; background: #fafafa; }
+        .gift-card-guest .gift-info { padding: 16px; }
+        .gift-card-guest .gift-name { font-size: .85rem; font-weight: 700; color: var(--orion-dark); margin-bottom: 4px; line-height: 1.4; display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .gift-card-guest .gift-price { font-size: 1.05rem; font-weight: 900; color: var(--orion-primary); margin-bottom: 12px; }
+        .btn-regalar { width: 100%; background: var(--orion-primary); color: #fff; border: none; padding: 10px; border-radius: 50px; font-weight: 700; font-size: .8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-regalar:hover { background: var(--orion-primary-dark); }
+        .btn-regalar:disabled { background: #ccc; cursor: not-allowed; }
+
+        .cash-fund-guest { background: linear-gradient(135deg, var(--orion-primary-soft) 0%, #fff 100%); border: 2px dashed var(--orion-primary); border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 40px; }
+        .cash-fund-guest .fund-icon-guest { width: 64px; height: 64px; background: var(--orion-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+        .cash-fund-guest .fund-icon-guest i { font-size: 1.6rem; color: #fff; }
+        .cash-fund-guest h4 { font-weight: 800; font-size: 1.2rem; color: var(--orion-dark); margin-bottom: 8px; }
+        .cash-fund-guest p { font-size: .85rem; color: var(--orion-gray); margin-bottom: 20px; max-width: 480px; margin-left: auto; margin-right: auto; }
+        .cash-fund-guest .fund-progress { max-width: 400px; margin: 0 auto 20px; }
+        .cash-fund-guest .fund-bar-bg { height: 12px; background: #fff; border-radius: 50px; overflow: hidden; border: 1px solid var(--orion-primary-soft2); }
+        .cash-fund-guest .fund-bar-fill { height: 100%; background: linear-gradient(90deg, var(--orion-primary), #ff6bb8); border-radius: 50px; width: 0%; transition: width .5s; }
+        .cash-fund-guest .fund-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: .75rem; font-weight: 700; color: var(--orion-gray); }
+        .btn-contribuir { background: var(--orion-primary); color: #fff; border: none; padding: 12px 36px; border-radius: 50px; font-weight: 700; font-size: .88rem; cursor: pointer; box-shadow: 0 4px 14px rgba(225,0,152,.25); }
+        .btn-contribuir:hover { background: var(--orion-primary-dark); transform: translateY(-2px); }
+
+        .guests-list { background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,.05); border: 1px solid rgba(236,236,241,.7); margin-bottom: 40px; }
+        .guests-list h4 { font-size: 1rem; font-weight: 800; color: var(--orion-dark); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--orion-primary-soft); }
+        .guest-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f5f5f8; }
+        .guest-item:last-child { border-bottom: none; }
+        .guest-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--orion-primary-soft); color: var(--orion-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .85rem; flex-shrink: 0; }
+        .guest-info { flex: 1; }
+        .guest-name { font-weight: 700; font-size: .85rem; color: var(--orion-dark); }
+        .guest-gift { font-size: .72rem; color: var(--orion-gray); }
+        .guest-amount { font-weight: 800; font-size: .88rem; color: var(--orion-primary); }
+
+        .modal-regalo { position: fixed; inset: 0; background: rgba(15,23,42,.55); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        .modal-regalo.show { display: flex; }
+        .modal-regalo .modal-box { background: #fff; border-radius: 18px; padding: 32px; max-width: 460px; width: 100%; box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+        .modal-regalo h3 { font-weight: 800; color: var(--orion-dark); margin-bottom: 6px; }
+        .modal-regalo .modal-sub { font-size: .85rem; color: var(--orion-gray); margin-bottom: 20px; }
+        .modal-regalo label { font-size: .78rem; font-weight: 700; color: var(--orion-dark); display: block; margin-bottom: 6px; margin-top: 12px; }
+        .modal-regalo input, .modal-regalo textarea { width: 100%; padding: 11px 14px; border: 2px solid var(--orion-border); border-radius: 10px; font-size: .88rem; font-family: inherit; }
+        .modal-regalo input:focus { outline: none; border-color: var(--orion-primary); }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+        .modal-actions button { padding: 11px 22px; border-radius: 50px; font-weight: 700; font-size: .82rem; cursor: pointer; border: none; }
+        .btn-modal-cancel { background: #f1f1f6; color: var(--orion-dark); }
+        .btn-modal-confirm { background: var(--orion-primary); color: #fff; }
+        .btn-modal-confirm:hover { background: var(--orion-primary-dark); }
+
+        footer { background: linear-gradient(135deg, #e10098 0%, #c00080 100%) !important; color: #ffffff !important; padding: 30px 0 !important; text-align: center !important; font-size: .8rem !important; margin-top: 60px !important; }
+        footer p { margin: 0 !important; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; font-weight: 500; color: #ffffff !important; }
+        footer i { color: #FFD700 !important; }
+
+        @media (max-width: 768px) {
+            .event-hero h1 { font-size: 1.5rem; }
+            .gift-grid-guest { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .gift-card-guest img { height: 120px; }
+            .gift-card-guest .gift-info { padding: 10px; }
+            .btn-regalar { font-size: .7rem; padding: 8px; }
+            .cash-fund-guest { padding: 20px; }
+            .registry-nav .nav-right { gap: 10px; }
+            .registry-nav .nav-link-top span { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="registry-nav">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('web.raiz_tienda') }}" class="brand">ORION</a>
+            <div class="nav-right">
+                <span style="font-size:.8rem; color:var(--orion-gray); font-weight:600;">
+                    <i class="bi bi-gift-fill" style="color:var(--orion-primary);"></i> Mesa de Regalos
+                </span>
+                {% if session.get('nombre') %}
+                <a href="{{ url_for('web.mis_mesas_regalos') }}" class="nav-link-top">
+                    <i class="bi bi-list-ul"></i>
+                    <span>Mis Mesas</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- ⭐ FLECHA DE REGRESAR -->
+    <div class="back-bar">
+        <div class="container">
+            <a href="{{ url_for('web.mis_mesas_regalos') if session.get('nombre') else url_for('web.raiz_tienda') }}" class="btn-back">
+                <i class="bi bi-arrow-left"></i>
+                {% if session.get('nombre') %}Mis Mesas{% else %}Volver a la tienda{% endif %}
+            </a>
+        </div>
+    </div>
+
+    <section class="event-hero">
+        <div class="container">
+            <div class="event-icon">{{ mesa.emoji }}</div>
+            <h1>{{ mesa.event_name }}</h1>
+            <p class="event-meta">
+                <i class="bi bi-calendar3"></i> {{ mesa.event_date_formatted }}
+                &nbsp;·&nbsp;
+                <i class="bi bi-person-fill"></i> {{ mesa.honoree_name }}
+            </p>
+            {% if mesa.message %}
+            <p class="event-message">"{{ mesa.message }}"</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <div class="registry-progress">
+        <div class="progress-labels">
+            <span><i class="bi bi-gift-fill" style="color:var(--orion-primary);"></i> Regalos recibidos</span>
+            <span>{{ mesa.gifts_claimed }}/{{ mesa.gifts_total }}</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width: {{ (mesa.gifts_claimed / mesa.gifts_total * 100) if mesa.gifts_total > 0 else 0 }}%;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <h2 class="gift-section-title">
+            <i class="bi bi-gift-fill" style="color:var(--orion-primary);"></i> Lista de regalos
+        </h2>
+        <p class="gift-section-sub">Elige el regalo que quieras obsequiar. Si ya está reservado, puedes contribuir al fondo de efectivo.</p>
+
+        <div class="gift-grid-guest" id="giftGridGuest">
+            {% for regalo in mesa.gifts %}
+            <div class="gift-card-guest {% if regalo.reservado %}reservado{% endif %}">
+                <img src="{{ url_for('static', filename='uploads/productos/' + (regalo.imagen or 'default.jpg')) }}"
+                     alt="{{ regalo.nombre }}" loading="lazy"
+                    onerror="this.src='https://via.placeholder.com/200/1a1a2e/666?text=Producto'">
+                <div class="gift-info">
+                    <div class="gift-name">{{ regalo.nombre }}</div>
+                    <div class="gift-price">${{ "%.2f"|format(regalo.precio) }}</div>
+                    {% if regalo.reservado %}
+                        <button class="btn-regalar" disabled><i class="bi bi-check-circle-fill"></i> Reservado</button>
+                    {% else %}
+                        <button class="btn-regalar" onclick="abrirModalRegalo({{ loop.index0 }}, {{ regalo.nombre|tojson }})">
+                            <i class="bi bi-gift-fill"></i> Regalar
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if mesa.fund_goal > 0 %}
+        <div class="cash-fund-guest">
+            <div class="fund-icon-guest"><i class="bi bi-piggy-bank-fill"></i></div>
+            <h4>Fondo de efectivo</h4>
+            <p>También puedes contribuir con efectivo para {{ mesa.honoree_name }}. Todo suma a su monedero electrónico ORION.</p>
+            <div class="fund-progress">
+                <div class="fund-bar-bg">
+                    <div class="fund-bar-fill" style="width: {{ (mesa.fund_raised / mesa.fund_goal * 100) if mesa.fund_goal > 0 else 0 }}%;"></div>
+                </div>
+                <div class="fund-labels">
+                    <span>${{ "%.2f"|format(mesa.fund_raised) }} recaudados</span>
+                    <span>Meta: ${{ "%.2f"|format(mesa.fund_goal) }}</span>
+                </div>
+            </div>
+            <button class="btn-contribuir" onclick="abrirModalEfectivo()">
+                <i class="bi bi-wallet2"></i> Contribuir con efectivo
+            </button>
+        </div>
+        {% endif %}
+
+        {% if es_dueno and mesa.guests %}
+        <div class="guests-list">
+            <h4><i class="bi bi-people-fill" style="color:var(--orion-primary);"></i> Invitados que han regalado</h4>
+            {% for invitado in mesa.guests %}
+            <div class="guest-item">
+                <div class="guest-avatar">{{ invitado.nombre[0]|upper }}</div>
+                <div class="guest-info">
+                    <div class="guest-name">{{ invitado.nombre }}</div>
+                    <div class="guest-gift">{{ invitado.regalo }}</div>
+                </div>
+                {% if invitado.monto and invitado.monto > 0 %}
+                <div class="guest-amount">${{ "%.2f"|format(invitado.monto) }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+
+    <div class="modal-regalo" id="modalRegalo">
+        <div class="modal-box">
+            <h3><i class="bi bi-gift-fill" style="color:var(--orion-primary);"></i> Regalar producto</h3>
+            <p class="modal-sub" id="modalRegaloSub">—</p>
+
+            <label>Tu nombre *</label>
+            <input type="text" id="invitadoNombre" placeholder="Ej: María García">
+
+            <label>Tu email (opcional)</label>
+            <input type="email" id="invitadoEmail" placeholder="tu@email.com">
+
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="cerrarModalRegalo()">Cancelar</button>
+                <button class="btn-modal-confirm" onclick="confirmarRegalo()">Confirmar regalo</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-regalo" id="modalEfectivo">
+        <div class="modal-box">
+            <h3><i class="bi bi-piggy-bank-fill" style="color:var(--orion-primary);"></i> Contribuir con efectivo</h3>
+            <p class="modal-sub">Todo suma al monedero electrónico de {{ mesa.honoree_name }}.</p>
+
+            <label>Monto a contribuir *</label>
+            <input type="number" id="efectivoMonto" min="100" step="50" placeholder="$500" value="500">
+
+            <label>Tu nombre *</label>
+            <input type="text" id="efectivoNombre" placeholder="Ej: María García">
+
+            <label>Tu email (opcional)</label>
+            <input type="email" id="efectivoEmail" placeholder="tu@email.com">
+
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="cerrarModalEfectivo()">Cancelar</button>
+                <button class="btn-modal-confirm" onclick="confirmarEfectivo()">Contribuir</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p><i class="bi bi-gift-fill"></i> ORION Mesa de Regalos · © 2026 · Todos los derechos reservados <i class="bi bi-heart-fill" style="color:#FFD700;"></i></p>
+        </div>
+    </footer>
+
+    <script>
+        const MESA_ID = "{{ mesa._id }}";
+        let giftIndexActual = null;
+
+        function abrirModalRegalo(idx, nombre) {
+            giftIndexActual = idx;
+            document.getElementById('modalRegaloSub').textContent = 'Regalo: ' + nombre;
+            document.getElementById('invitadoNombre').value = '';
+            document.getElementById('invitadoEmail').value = '';
+            document.getElementById('modalRegalo').classList.add('show');
+        }
+        function cerrarModalRegalo() { document.getElementById('modalRegalo').classList.remove('show'); }
+
+        async function confirmarRegalo() {
+            const nombre = document.getElementById('invitadoNombre').value.trim();
+            const email  = document.getElementById('invitadoEmail').value.trim();
+            if (!nombre) { alert('Ingresa tu nombre'); return; }
+
+            try {
+                const r = await fetch(`/api/mesa-regalos/${MESA_ID}/reservar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ gift_index: giftIndexActual, nombre, email })
+                });
+                const data = await r.json();
+                if (data.success) {
+                    alert('¡Gracias por tu regalo! Se ha reservado correctamente.');
+                    location.reload();
+                } else {
+                    alert(data.error || 'Error al reservar');
+                }
+            } catch (e) {
+                alert('Error de conexión');
+            }
+        }
+
+        function abrirModalEfectivo() {
+            document.getElementById('efectivoMonto').value = 500;
+            document.getElementById('efectivoNombre').value = '';
+            document.getElementById('efectivoEmail').value = '';
+            document.getElementById('modalEfectivo').classList.add('show');
+        }
+        function cerrarModalEfectivo() { document.getElementById('modalEfectivo').classList.remove('show'); }
+
+        async function confirmarEfectivo() {
+            const monto  = parseFloat(document.getElementById('efectivoMonto').value);
+            const nombre = document.getElementById('efectivoNombre').value.trim();
+            const email  = document.getElementById('efectivoEmail').value.trim();
+
+            if (!monto || monto < 100) { alert('El monto mínimo es $100'); return; }
+            if (!nombre) { alert('Ingresa tu nombre'); return; }
+
+            try {
+                const r = await fetch(`/api/mesa-regalos/${MESA_ID}/contribuir`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ monto, nombre, email })
+                });
+                const data = await r.json();
+                if (data.success) {
+                    alert('¡Gracias por tu contribución!');
+                    location.reload();
+                } else {
+                    alert(data.error || 'Error al contribuir');
+                }
+            } catch (e) {
+                alert('Error de conexión');
+            }
+        }
+
+        document.querySelectorAll('.modal-regalo').forEach(m => {
+            m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+        });
+    </script>
+</body>
+</html>

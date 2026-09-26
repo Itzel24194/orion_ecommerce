@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Mesa de Regalos | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-primary-soft: #fff0f8;
+            --orion-primary-soft2: #ffe0f2;
+            --orion-dark: #1a1a2e;
+            --orion-gray: #64748b;
+            --orion-border: #ececf1;
+            --orion-success: #10b981;
+            --orion-danger: #ef4444;
+            --shadow-md: 0 4px 16px rgba(0,0,0,.05);
+            --shadow-pink: 0 4px 14px rgba(225,0,152,.18);
+            --radius: 14px;
+        }
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { background: #ffffff; color: var(--orion-dark); min-height: 100vh; padding-bottom: 60px; }
+
+        .top-nav { background: #ffffff; font-size: .75rem; padding: 6px 0; border-bottom: 1px solid #eee; }
+        .top-nav a { color: #666; text-decoration: none; }
+        .top-nav a:hover { color: var(--orion-primary); }
+        .top-nav i { color: var(--orion-primary); }
+        .main-navbar { background: #ffffff; border-bottom: 2px solid #f0f0f0; padding: 12px 0; box-shadow: 0 2px 10px rgba(0,0,0,.03); }
+        .brand-logo { font-weight: 900; font-size: 2.3rem; letter-spacing: -1.5px; color: var(--orion-primary) !important; text-decoration: none; }
+        .brand-logo:hover { color: var(--orion-primary-dark) !important; }
+        .brand-border { height: 4px; background: linear-gradient(90deg, var(--orion-primary), var(--orion-primary-dark)); width: 100%; }
+        .user-link { color: var(--orion-dark); text-decoration: none; display: flex; align-items: center; gap: 8px; font-size: .75rem; font-weight: 700; }
+        .user-link:hover { color: var(--orion-primary); }
+
+        .hero-registry { background: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary-dark) 100%) !important; color: #fff; padding: 56px 0 64px; position: relative; overflow: hidden; }
+        .hero-registry::before { content: ''; position: absolute; top: -60%; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%); }
+        .hero-registry::after { content: ''; position: absolute; bottom: -80%; left: -5%; width: 350px; height: 350px; background: radial-gradient(circle, rgba(255,255,255,.1), transparent 70%); }
+        .hero-registry .hero-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; position: relative; z-index: 1; }
+        .hero-registry .hero-title { font-weight: 900; font-size: 2.2rem; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; color: #fff; }
+        .hero-registry .hero-title i { color: #FFD700; }
+        .hero-registry .hero-subtitle { font-size: 1rem; opacity: .95; color: #fff; max-width: 520px; line-height: 1.6; }
+        .hero-registry .hero-subtitle strong { color: #FFD700; }
+        .hero-registry .hero-stats { display: flex; align-items: center; gap: 20px; background: rgba(255,255,255,.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.25); padding: 16px 28px; border-radius: 50px; }
+        .hero-registry .hero-stats .stat-item { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: .9rem; color: #fff; }
+        .hero-registry .hero-stats .stat-item i { color: #FFD700; font-size: 1.1rem; }
+
+        .benefits-strip { background: #fff; border-bottom: 1px solid var(--orion-border); padding: 18px 0; margin-bottom: 40px; }
+        .benefits-strip .benefit-item { display: flex; align-items: center; gap: 10px; font-size: .8rem; color: var(--orion-gray); font-weight: 600; }
+        .benefits-strip .benefit-item i { color: var(--orion-primary); font-size: 1.2rem; }
+        .benefits-strip .benefit-item strong { color: var(--orion-dark); }
+
+        .registry-wizard { max-width: 960px; margin: 0 auto 60px; }
+        .wizard-steps { display: flex; justify-content: center; margin-bottom: 40px; position: relative; }
+        .wizard-steps::before { content: ''; position: absolute; top: 22px; left: 15%; right: 15%; height: 2px; background: #ededf3; }
+        .wizard-step { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1; position: relative; z-index: 1; }
+        .wizard-step .step-circle { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 2px solid #ededf3; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .9rem; color: var(--orion-gray); transition: all .3s; }
+        .wizard-step.active .step-circle { background: var(--orion-primary); border-color: var(--orion-primary); color: #fff; box-shadow: 0 0 0 6px rgba(225,0,152,.12); }
+        .wizard-step.done .step-circle { background: var(--orion-success); border-color: var(--orion-success); color: #fff; }
+        .wizard-step .step-label { font-size: .72rem; font-weight: 700; color: var(--orion-gray); text-transform: uppercase; letter-spacing: .5px; }
+        .wizard-step.active .step-label, .wizard-step.done .step-label { color: var(--orion-dark); }
+
+        .wizard-panel { display: none; background: #fff; border-radius: var(--radius); padding: 40px 44px; box-shadow: var(--shadow-md); border: 1px solid rgba(236,236,241,.7); animation: fadeInUp .4s ease; }
+        .wizard-panel.active { display: block; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .wizard-panel h3 { font-size: 1.3rem; font-weight: 800; color: var(--orion-dark); margin-bottom: 8px; }
+        .wizard-panel .panel-desc { font-size: .88rem; color: var(--orion-gray); margin-bottom: 28px; }
+
+        .form-label-custom { font-size: .8rem; font-weight: 700; color: var(--orion-dark); margin-bottom: 6px; display: block; }
+        .form-control-custom { width: 100%; padding: 12px 16px; border: 2px solid var(--orion-border); border-radius: 10px; font-size: .88rem; font-family: inherit; background: #fff; }
+        .form-control-custom:focus { outline: none; border-color: var(--orion-primary); box-shadow: 0 0 0 3px rgba(225,0,152,.1); }
+
+        .event-type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
+        .event-type-card { border: 2px solid var(--orion-border); border-radius: 12px; padding: 20px 14px; text-align: center; cursor: pointer; transition: all .2s; background: #fff; }
+        .event-type-card:hover { border-color: var(--orion-primary-soft2); background: var(--orion-primary-soft); }
+        .event-type-card.selected { border-color: var(--orion-primary); background: var(--orion-primary-soft); box-shadow: 0 0 0 3px rgba(225,0,152,.1); }
+        .event-type-card i { font-size: 1.8rem; color: var(--orion-primary); margin-bottom: 8px; display: block; }
+        .event-type-card .event-name { font-size: .78rem; font-weight: 700; color: var(--orion-dark); }
+
+        .gift-search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .gift-search-bar input { flex: 1; padding: 12px 18px; border: 2px solid var(--orion-border); border-radius: 50px; font-size: .88rem; }
+        .gift-search-bar input:focus { outline: none; border-color: var(--orion-primary); }
+        .gift-search-bar button { background: var(--orion-primary); color: #fff; border: none; padding: 12px 24px; border-radius: 50px; font-weight: 700; font-size: .85rem; cursor: pointer; }
+        .gift-search-bar button:hover { background: var(--orion-primary-dark); }
+
+        .gift-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; max-height: 520px; overflow-y: auto; padding: 4px; }
+        .gift-card { border: 2px solid var(--orion-border); border-radius: 14px; overflow: hidden; transition: all .2s; background: #fff; cursor: pointer; position: relative; }
+        .gift-card:hover { border-color: var(--orion-primary-soft2); box-shadow: 0 8px 24px rgba(225,0,152,.08); transform: translateY(-3px); }
+        .gift-card.selected { border-color: var(--orion-primary); box-shadow: 0 0 0 3px rgba(225,0,152,.12); }
+        .gift-card.selected::after { content: '✓'; position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; background: var(--orion-primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; z-index: 2; }
+        .gift-card img { width: 100%; height: 160px; object-fit: cover; background: #fafafa; }
+        .gift-card .gift-info { padding: 14px; }
+        .gift-card .gift-name { font-size: .82rem; font-weight: 700; color: var(--orion-dark); margin-bottom: 4px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .gift-card .gift-price { font-size: 1rem; font-weight: 900; color: var(--orion-primary); }
+        .gift-card .gift-store { font-size: .68rem; color: var(--orion-gray); }
+
+        .cash-fund-card { background: linear-gradient(135deg, var(--orion-primary-soft) 0%, #fff 100%); border: 2px dashed var(--orion-primary); border-radius: 14px; padding: 28px; text-align: center; margin-bottom: 24px; }
+        .cash-fund-card .fund-icon { width: 64px; height: 64px; background: var(--orion-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+        .cash-fund-card .fund-icon i { font-size: 1.6rem; color: #fff; }
+        .cash-fund-card h4 { font-weight: 800; font-size: 1.1rem; color: var(--orion-dark); margin-bottom: 6px; }
+        .cash-fund-card p { font-size: .85rem; color: var(--orion-gray); margin-bottom: 16px; }
+        .cash-fund-card .fund-amount { font-size: 2rem; font-weight: 900; color: var(--orion-primary); margin-bottom: 8px; }
+
+        .wizard-actions { display: flex; justify-content: space-between; margin-top: 32px; gap: 12px; flex-wrap: wrap; }
+        .btn-wizard-prev { background: #fff; color: var(--orion-dark); border: 2px solid var(--orion-border); padding: 12px 28px; border-radius: 50px; font-weight: 700; font-size: .85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-wizard-prev:hover { border-color: var(--orion-primary); color: var(--orion-primary); }
+        .btn-wizard-next { background: var(--orion-primary); color: #fff; border: none; padding: 12px 32px; border-radius: 50px; font-weight: 700; font-size: .85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-pink); }
+        .btn-wizard-next:hover { background: var(--orion-primary-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(225,0,152,.35); }
+        .btn-wizard-next:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+        .share-link-box { display: flex; gap: 10px; background: var(--orion-primary-soft); border: 2px solid var(--orion-primary-soft2); border-radius: 12px; padding: 14px 18px; align-items: center; margin: 16px 0; }
+        .share-link-box input { flex: 1; border: none; background: transparent; font-size: .85rem; font-weight: 600; color: var(--orion-dark); font-family: monospace; }
+        .share-link-box button { background: var(--orion-primary); color: #fff; border: none; padding: 8px 18px; border-radius: 50px; font-weight: 700; font-size: .78rem; cursor: pointer; white-space: nowrap; }
+        .share-link-box button:hover { background: var(--orion-primary-dark); }
+
+        .summary-item { display: flex; justify-content: space-between; padding: 8px 0; font-size: .82rem; border-bottom: 1px solid #f5f5f8; }
+        .summary-item:last-child { border-bottom: none; }
+        .summary-item .label { color: var(--orion-gray); font-weight: 600; }
+        .summary-item .value { color: var(--orion-dark); font-weight: 700; }
+
+        .toast-container-custom { position: fixed; bottom: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+        .toast-custom { background: #fff; padding: 14px 20px; border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,.15); font-size: .85rem; font-weight: 600; display: flex; align-items: center; gap: 10px; min-width: 260px; animation: slideIn .35s cubic-bezier(.34,1.56,.64,1); border-left: 4px solid var(--orion-success); }
+        .toast-custom.error { border-color: var(--orion-danger); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        footer { background: linear-gradient(135deg, #e10098 0%, #c00080 100%) !important; color: #ffffff !important; padding: 30px 0 !important; text-align: center !important; font-size: .8rem !important; margin-top: 60px !important; }
+        footer p { margin: 0 !important; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; font-weight: 500; color: #ffffff !important; }
+        footer i { color: #FFD700 !important; }
+
+        @media (max-width: 768px) {
+            .hero-registry .hero-title { font-size: 1.5rem; }
+            .wizard-panel { padding: 24px 20px; }
+            .event-type-grid { grid-template-columns: repeat(2, 1fr); }
+            .gift-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .gift-card img { height: 120px; }
+            .wizard-actions { flex-direction: column; }
+            .wizard-actions button { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <div class="container d-flex justify-content-end gap-4">
+            <a href="#"><i class="bi bi-geo-alt"></i> Encuentra tu tienda</a>
+            <a href="/servicios"><i class="bi bi-truck"></i> Servicios</a>
+            <a href="#"><i class="bi bi-question-circle"></i> Ayuda</a>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light main-navbar">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                {% if session.get('nombre') %}
+                    <a href="{{ url_for('web.perfil') }}" class="user-link">
+                        <i class="bi bi-person-circle fs-4"></i>
+                        <span>HOLA, {{ session['nombre'] }}</span>
+                    </a>
+                {% endif %}
+                <a href="{{ url_for('web.mis_mesas_regalos') }}" class="user-link">
+                    <i class="bi bi-gift-fill fs-4"></i>
+                    <span>Mis Mesas</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    <div class="brand-border"></div>
+
+    <section class="hero-registry">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title"><i class="bi bi-gift-fill"></i> Crea tu Mesa de Regalos</h1>
+                    <p class="hero-subtitle">
+                        <i class="bi bi-stars me-1"></i>
+                        Arma tu lista, compártela con tus invitados y recibe
+                        <strong>10% de bonificación</strong> en tu monedero electrónico ORION.
+                    </p>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item"><i class="bi bi-currency-dollar"></i> 10% de regreso</div>
+                    <div class="stat-item"><i class="bi bi-truck"></i> Envío gratis</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="benefits-strip">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-3 mb-2 mb-md-0"><div class="benefit-item justify-content-center"><i class="bi bi-check-circle-fill"></i><span><strong>Sin costo</strong> · Creación gratuita</span></div></div>
+                <div class="col-md-3 mb-2 mb-md-0"><div class="benefit-item justify-content-center"><i class="bi bi-percent"></i><span><strong>10%</strong> en monedero</span></div></div>
+                <div class="col-md-3 mb-2 mb-md-0"><div class="benefit-item justify-content-center"><i class="bi bi-share"></i><span>Link <strong>personalizado</strong></span></div></div>
+                <div class="col-md-3"><div class="benefit-item justify-content-center"><i class="bi bi-wallet2"></i><span>Fondo de <strong>efectivo</strong></span></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="registry-wizard">
+
+            <div class="wizard-steps">
+                <div class="wizard-step active" data-step="1"><div class="step-circle">1</div><div class="step-label">Evento</div></div>
+                <div class="wizard-step" data-step="2"><div class="step-circle">2</div><div class="step-label">Regalos</div></div>
+                <div class="wizard-step" data-step="3"><div class="step-circle">3</div><div class="step-label">Efectivo</div></div>
+                <div class="wizard-step" data-step="4"><div class="step-circle">4</div><div class="step-label">Compartir</div></div>
+            </div>
+
+            <!-- PASO 1 -->
+            <div class="wizard-panel active" id="panel-step-1">
+                <h3><i class="bi bi-calendar-event" style="color:var(--orion-primary);"></i> Datos del evento</h3>
+                <p class="panel-desc">Cuéntanos sobre tu celebración para personalizar tu mesa.</p>
+
+                <label class="form-label-custom">Tipo de evento</label>
+                <div class="event-type-grid" id="eventTypeGrid">
+                    <div class="event-type-card selected" data-event="boda"><i class="bi bi-heart-fill"></i><div class="event-name">Boda</div></div>
+                    <div class="event-type-card" data-event="baby_shower"><i class="bi bi-balloon-fill"></i><div class="event-name">Baby Shower</div></div>
+                    <div class="event-type-card" data-event="xv_anos"><i class="bi bi-stars"></i><div class="event-name">XV Años</div></div>
+                    <div class="event-type-card" data-event="cumpleanos"><i class="bi bi-cake2-fill"></i><div class="event-name">Cumpleaños</div></div>
+                    <div class="event-type-card" data-event="bautizo"><i class="bi bi-droplet-fill"></i><div class="event-name">Bautizo</div></div>
+                    <div class="event-type-card" data-event="primera_comunion"><i class="bi bi-book-fill"></i><div class="event-name">1ª Comunión</div></div>
+                    <div class="event-type-card" data-event="graduacion"><i class="bi bi-mortarboard-fill"></i><div class="event-name">Graduación</div></div>
+                    <div class="event-type-card" data-event="otro"><i class="bi bi-plus-circle-fill"></i><div class="event-name">Otro</div></div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label-custom">Nombre del evento *</label>
+                        <input type="text" class="form-control-custom" id="eventName" placeholder="Ej: Boda de Ana y Carlos">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">Fecha del evento *</label>
+                        <input type="date" class="form-control-custom" id="eventDate">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">Nombre(s) del festejado(a) *</label>
+                        <input type="text" class="form-control-custom" id="honoreeName" placeholder="Ej: Ana López y Carlos Pérez">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-custom">Tu correo electrónico *</label>
+                        <input type="email" class="form-control-custom" id="ownerEmail" placeholder="tu@email.com" value="{{ session.get('email', '') }}">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label-custom">Mensaje para tus invitados (opcional)</label>
+                        <textarea class="form-control-custom" id="eventMessage" rows="3" placeholder="Ej: ¡Gracias por acompañarnos en este día tan especial!"></textarea>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <div></div>
+                    <button class="btn-wizard-next" onclick="goToStep(2)">Siguiente: Elegir regalos <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- PASO 2 -->
+            <div class="wizard-panel" id="panel-step-2">
+                <h3><i class="bi bi-gift-fill" style="color:var(--orion-primary);"></i> Elige tus regalos</h3>
+                <p class="panel-desc">Selecciona los productos que te gustaría recibir.</p>
+
+                <div class="gift-search-bar">
+                    <input type="text" id="giftSearchInput" placeholder="Buscar productos... (ej: licuadora, toallas)" oninput="filtrarRegalos(this.value)">
+                    <button type="button"><i class="bi bi-search"></i></button>
+                </div>
+
+                <div class="gift-grid" id="giftGrid">
+                    {% for producto in productos_regalo %}
+                    <div class="gift-card" data-id="{{ producto._id }}" data-precio="{{ producto.precio }}" data-nombre="{{ producto.nombre }}" data-imagen="{{ producto.imagen }}" data-search="{{ producto.nombre|lower }}" onclick="toggleGift(this)">
+                        <img src="{{ url_for('static', filename='uploads/productos/' + producto.imagen) }}"
+                             alt="{{ producto.nombre }}" loading="lazy"
+                             onerror="this.src='https://via.placeholder.com/200/1a1a2e/666?text=Producto'">
+                        <div class="gift-info">
+                            <div class="gift-name">{{ producto.nombre }}</div>
+                            <div class="gift-price">${{ "%.2f"|format(producto.precio) }}</div>
+                            {% if producto.marca %}<div class="gift-store">{{ producto.marca }}</div>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div style="margin-top:16px; font-size:.85rem; color:var(--orion-gray);">
+                    <strong id="giftCount">0</strong> regalo(s) seleccionado(s) ·
+                    Total: <strong id="giftTotal" style="color:var(--orion-primary);">$0.00</strong>
+                </div>
+
+                <div class="wizard-actions">
+                    <button class="btn-wizard-prev" onclick="goToStep(1)"><i class="bi bi-arrow-left"></i> Anterior</button>
+                    <button class="btn-wizard-next" onclick="goToStep(3)">Siguiente: Fondo de efectivo <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- PASO 3 -->
+            <div class="wizard-panel" id="panel-step-3">
+                <h3><i class="bi bi-wallet2" style="color:var(--orion-primary);"></i> Fondo de efectivo</h3>
+                <p class="panel-desc">Tus invitados también pueden contribuir con efectivo para tu luna de miel, enganche de casa, etc.</p>
+
+                <div class="cash-fund-card">
+                    <div class="fund-icon"><i class="bi bi-piggy-bank-fill"></i></div>
+                    <h4>Activa tu fondo de efectivo</h4>
+                    <p>Los invitados podrán aportar desde $100 MXN. Todo suma a tu monedero electrónico.</p>
+                    <div class="fund-amount" id="fundAmountDisplay">$0.00</div>
+                    <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:16px;">
+                        <button type="button" class="btn-wizard-next" style="padding:10px 20px; font-size:.8rem;" onclick="addFund(500)">+$500</button>
+                        <button type="button" class="btn-wizard-next" style="padding:10px 20px; font-size:.8rem;" onclick="addFund(1000)">+$1,000</button>
+                        <button type="button" class="btn-wizard-next" style="padding:10px 20px; font-size:.8rem;" onclick="addFund(2000)">+$2,000</button>
+                        <button type="button" class="btn-wizard-prev" style="padding:10px 20px; font-size:.8rem;" onclick="resetFund()">Reset</button>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <label class="form-label-custom" style="text-align:left;">Meta personalizada (opcional)</label>
+                        <input type="number" class="form-control-custom" id="fundGoalInput" placeholder="Ej: 5000" min="0" step="100" oninput="setFundFromInput(this.value)">
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button class="btn-wizard-prev" onclick="goToStep(2)"><i class="bi bi-arrow-left"></i> Anterior</button>
+                    <button class="btn-wizard-next" onclick="goToStep(4)">Siguiente: Compartir <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- PASO 4 -->
+            <div class="wizard-panel" id="panel-step-4">
+                <h3><i class="bi bi-share-fill" style="color:var(--orion-primary);"></i> Comparte tu mesa</h3>
+                <p class="panel-desc">Tu mesa está lista. Comparte el link con tus invitados.</p>
+
+                <div class="share-link-box">
+                    <input type="text" id="shareLinkInput" readonly placeholder="Se generará al crear la mesa...">
+                    <button type="button" onclick="copiarLink()"><i class="bi bi-clipboard"></i> Copiar</button>
+                </div>
+
+                <div style="background:var(--orion-primary-soft); border-radius:12px; padding:20px; margin-top:24px;">
+                    <h4 style="font-size:.95rem; font-weight:800; margin-bottom:12px; color:var(--orion-dark);">
+                        <i class="bi bi-info-circle" style="color:var(--orion-primary);"></i> Resumen
+                    </h4>
+                    <div class="summary-item"><span class="label">Evento</span><span class="value" id="summaryEvent">—</span></div>
+                    <div class="summary-item"><span class="label">Fecha</span><span class="value" id="summaryDate">—</span></div>
+                    <div class="summary-item"><span class="label">Regalos</span><span class="value" id="summaryGiftCount">0</span></div>
+                    <div class="summary-item"><span class="label">Valor regalos</span><span class="value" id="summaryGiftTotal">$0.00</span></div>
+                    <div class="summary-item"><span class="label">Fondo efectivo</span><span class="value" id="summaryFund">$0.00</span></div>
+                    <div class="summary-item" style="border-top:2px solid var(--orion-primary-soft); margin-top:8px; padding-top:12px;">
+                        <span class="label" style="color:var(--orion-primary); font-weight:800;">Bonificación 10%</span>
+                        <span class="value" style="color:var(--orion-primary); font-size:1.1rem;" id="summaryBonus">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button class="btn-wizard-prev" onclick="goToStep(3)"><i class="bi bi-arrow-left"></i> Anterior</button>
+                    <button class="btn-wizard-next" onclick="guardarMesa()" id="btnCrearMesa"><i class="bi bi-check-lg"></i> Crear Mesa de Regalos</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="toast-container-custom" id="toastContainer"></div>
+
+    <footer>
+        <div class="container">
+            <p><i class="bi bi-gift-fill"></i> ORION Mesa de Regalos · © 2026 · Todos los derechos reservados <i class="bi bi-heart-fill" style="color:#FFD700;"></i></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentStep = 1;
+        let selectedGifts = [];
+        let fundGoal = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const d = document.getElementById('eventDate');
+            const today = new Date().toISOString().split('T')[0];
+            d.min = today;
+            d.value = today;
+        });
+
+        document.querySelectorAll('.event-type-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.event-type-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        function goToStep(step) {
+            if (step > currentStep && !validarPaso(currentStep)) return;
+
+            document.querySelectorAll('.wizard-step').forEach(s => {
+                const n = parseInt(s.dataset.step);
+                s.classList.remove('active', 'done');
+                if (n < step) s.classList.add('done');
+                if (n === step) s.classList.add('active');
+            });
+
+            document.querySelectorAll('.wizard-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-step-' + step).classList.add('active');
+            currentStep = step;
+
+            if (step === 4) actualizarResumen();
+            window.scrollTo({ top: document.querySelector('.registry-wizard').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function validarPaso(step) {
+            if (step === 1) {
+                const n = document.getElementById('eventName').value.trim();
+                const f = document.getElementById('eventDate').value;
+                const h = document.getElementById('honoreeName').value.trim();
+                const e = document.getElementById('ownerEmail').value.trim();
+                if (!n || !f || !h || !e) { showToast('Completa los campos obligatorios (*)', 'error'); return false; }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { showToast('Email inválido', 'error'); return false; }
+            }
+            if (step === 2 && selectedGifts.length === 0) { showToast('Selecciona al menos un regalo', 'error'); return false; }
+            return true;
+        }
+
+        function toggleGift(card) {
+            const id     = card.dataset.id;
+            const nombre = card.dataset.nombre;
+            const precio = parseFloat(card.dataset.precio) || 0;
+            const imagen = card.dataset.imagen || 'default.jpg';
+
+            const idx = selectedGifts.findIndex(g => g.id === id);
+            if (idx >= 0) { selectedGifts.splice(idx, 1); card.classList.remove('selected'); }
+            else { selectedGifts.push({ id, nombre, precio, imagen }); card.classList.add('selected'); }
+
+            document.getElementById('giftCount').textContent = selectedGifts.length;
+            const total = selectedGifts.reduce((s, g) => s + g.precio, 0);
+            document.getElementById('giftTotal').textContent = '$' + total.toFixed(2);
+        }
+
+        function filtrarRegalos(q) {
+            q = (q || '').toLowerCase().trim();
+            document.querySelectorAll('#giftGrid .gift-card').forEach(c => {
+                c.style.display = (!q || c.dataset.search.includes(q)) ? '' : 'none';
+            });
+        }
+
+        function addFund(monto) { fundGoal += monto; updateFund(); }
+        function resetFund() { fundGoal = 0; document.getElementById('fundGoalInput').value = ''; updateFund(); }
+        function setFundFromInput(v) { fundGoal = parseFloat(v) || 0; updateFund(); }
+        function updateFund() { document.getElementById('fundAmountDisplay').textContent = '$' + fundGoal.toFixed(2); }
+
+        function actualizarResumen() {
+            const eventName = document.getElementById('eventName').value || '—';
+            const eventDate = document.getElementById('eventDate').value || '—';
+            const totalRegalos = selectedGifts.reduce((s, g) => s + g.precio, 0);
+            const totalMesa = totalRegalos + fundGoal;
+            const bonus = totalMesa * 0.10;
+
+            document.getElementById('summaryEvent').textContent = eventName;
+            document.getElementById('summaryDate').textContent = eventDate;
+            document.getElementById('summaryGiftCount').textContent = selectedGifts.length;
+            document.getElementById('summaryGiftTotal').textContent = '$' + totalRegalos.toFixed(2);
+            document.getElementById('summaryFund').textContent = '$' + fundGoal.toFixed(2);
+            document.getElementById('summaryBonus').textContent = '$' + bonus.toFixed(2);
+        }
+
+        function copiarLink() {
+            const input = document.getElementById('shareLinkInput');
+            if (!input.value) { showToast('Crea primero la mesa para generar el link', 'error'); return; }
+            input.select();
+            document.execCommand('copy');
+            showToast('Link copiado al portapapeles');
+        }
+
+        async function guardarMesa() {
+            const btn = document.getElementById('btnCrearMesa');
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creando...';
+
+            const payload = {
+                event_type:   document.querySelector('.event-type-card.selected')?.dataset.event,
+                event_name:   document.getElementById('eventName').value,
+                event_date:   document.getElementById('eventDate').value,
+                honoree_name: document.getElementById('honoreeName').value,
+                owner_email:  document.getElementById('ownerEmail').value,
+                message:      document.getElementById('eventMessage').value,
+                gifts:        selectedGifts,
+                fund_goal:    fundGoal,
+            };
+
+            try {
+                const r = await fetch('/api/mesa-regalos/crear', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload)
+                });
+                const data = await r.json();
+
+                if (data.success) {
+                    document.getElementById('shareLinkInput').value = data.url;
+                    showToast('¡Mesa creada exitosamente!');
+                    setTimeout(() => window.location.href = data.url, 1800);
+                } else {
+                    showToast(data.error || 'Error al crear la mesa', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = orig;
+                }
+            } catch (e) {
+                showToast('Error de conexión', 'error');
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        function showToast(msg, tipo = 'success') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast-custom' + (tipo === 'error' ? ' error' : '');
+            t.innerHTML = `<i class="bi bi-${tipo === 'error' ? 'exclamation-circle-fill' : 'check-circle-fill'}" style="color:var(--orion-${tipo === 'error' ? 'danger' : 'success'});"></i><span>${msg}</span>`;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3500);
+        }
+    </script>
+</body>
+</html>
