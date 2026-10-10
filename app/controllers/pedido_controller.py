@@ -14,6 +14,7 @@ import random
 import string
 import sys
 import re
+import time
 from app.models.pedidos_model import Pedido
 from app.models.productos_model import Producto
 
@@ -87,6 +88,108 @@ def calcular_descuento_volumen(total_unidades, subtotal):
     elif total_unidades >= 10: porcentaje = 5
     descuento = subtotal * (porcentaje / 100) if porcentaje > 0 else 0
     return descuento, porcentaje
+
+
+# ================================================================
+# ⭐ GENERADOR DE NÚMERO DE PEDIDO ÚNICO (atómico)
+# ================================================================
+
+def _generar_numero_pedido(year=None):
+    """
+    Genera un número de pedido único usando un contador atómico
+    en la colección 'contadores' de MongoDB.
+
+    Esto evita duplicados cuando dos compras se procesan
+    simultáneamente (race condition).
+
+    Formato: ORION-{año}-{secuencia 4 dígitos}
+
+    Si el contador del año no existe, se inicializa a partir del
+    número más alto ya registrado para ese año, para no colisionar
+    con pedidos previos (por ejemplo, ORION-2026-0015).
+
+    Si el contador atómico falla por cualquier motivo, se cae a un
+    método de respaldo que verifica existencia antes de devolver
+    el número.
+    """
+    db = current_app.db
+    if year is None:
+        year = datetime.utcnow().year
+
+    contador_id = f'contador_pedidos_{year}'
+
+    # ------------------------------------------------------------
+    # 1. Inicializar el contador si no existe, partiendo del
+    #    máximo número ya registrado para ese año.
+    # ------------------------------------------------------------
+    try:
+        if not db.contadores.find_one({'_id': contador_id}):
+            ultimo = db.pedidos.find_one(
+                {'numero_pedido': {'$regex': f'^ORION-{year}-'}},
+                sort=[('numero_pedido', -1)]
+            )
+            inicial = 0
+            if ultimo and ultimo.get('numero_pedido'):
+                try:
+                    inicial = int(ultimo['numero_pedido'].rsplit('-', 1)[-1])
+                except (ValueError, IndexError):
+                    inicial = 0
+            db.contadores.update_one(
+                {'_id': contador_id},
+                {'$setOnInsert': {'secuencia': inicial}},
+                upsert=True
+            )
+            print(f"🔢 [Pedido] Contador inicializado en {inicial} para {year}",
+                  file=sys.stderr)
+    except Exception as e:
+        print(f"⚠️ [Pedido] No se pudo inicializar contador: {e}",
+              file=sys.stderr)
+
+    # ------------------------------------------------------------
+    # 2. Incremento atómico del contador
+    # ------------------------------------------------------------
+    try:
+        resultado = db.contadores.find_one_and_update(
+            {'_id': contador_id},
+            {'$inc': {'secuencia': 1}},
+            upsert=True,
+            return_document=True
+        )
+        if resultado and 'secuencia' in resultado:
+            numero = f"ORION-{year}-{str(resultado['secuencia']).zfill(4)}"
+            # Defensa extra: verificar que no exista
+            if not db.pedidos.find_one({'numero_pedido': numero}):
+                return numero
+
+            # Si por alguna razón ya existe, seguir incrementando
+            for _ in range(50):
+                resultado = db.contadores.find_one_and_update(
+                    {'_id': contador_id},
+                    {'$inc': {'secuencia': 1}},
+                    return_document=True
+                )
+                numero = f"ORION-{year}-{str(resultado['secuencia']).zfill(4)}"
+                if not db.pedidos.find_one({'numero_pedido': numero}):
+                    return numero
+    except Exception as e:
+        print(f"⚠️ [Pedido] Error con contador atómico: {e}",
+              file=sys.stderr)
+
+    # ------------------------------------------------------------
+    # 3. Fallback: método clásico con verificación de existencia
+    # ------------------------------------------------------------
+    print("⚠️ [Pedido] Usando fallback para número de pedido",
+          file=sys.stderr)
+    for _ in range(100):
+        count = db.pedidos.count_documents({}) + 1
+        numero = f"ORION-{year}-{str(count).zfill(4)}"
+        if not db.pedidos.find_one({'numero_pedido': numero}):
+            return numero
+
+    # ------------------------------------------------------------
+    # 4. Último recurso: timestamp
+    # ------------------------------------------------------------
+    return f"ORION-{year}-{int(time.time() * 1000) % 1000000:06d}"
 
 
 # ================================================================
@@ -699,9 +802,8 @@ def procesar_checkout():
 
         total = subtotal_con_descuentos + iva + envio
 
-        year = datetime.utcnow().year
-        count = db.pedidos.count_documents({}) + 1
-        numero_pedido = f"ORION-{year}-{str(count).zfill(4)}"
+        # ⭐ NÚMERO DE PEDIDO ÚNICO (contador atómico)
+        numero_pedido = _generar_numero_pedido()
         fecha_entrega = datetime.utcnow() + timedelta(days=1 if total_unidades >= 50 else 5)
 
         pedido = {
@@ -1665,9 +1767,9 @@ def procesar_checkout_msi():
         # Guardar pedido
         # ---------------------------------------------------------
         usuario = db.usuarios.find_one({'_id': ObjectId(session['user_id'])})
-        year = datetime.now(timezone.utc).year
-        count = db.pedidos.count_documents({}) + 1
-        numero_pedido = f"ORION-{year}-{str(count).zfill(4)}"
+
+        # ⭐ NÚMERO DE PEDIDO ÚNICO (contador atómico)
+        numero_pedido = _generar_numero_pedido(datetime.now(timezone.utc).year)
 
         # ⭐ Calcular envío, fecha de entrega y unidades
         total_unidades = sum(int(i.get('cantidad', 0)) for i in items_normalizados)

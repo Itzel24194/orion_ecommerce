@@ -1,11 +1,15 @@
 # ================================================================
 # app/controllers/complexion_controller.py
 # Complexión y Tallas del cliente - Estilo Liverpool
+# Web: sesión (cookie) | Móvil: JWT (Bearer)
 # ================================================================
 
 from flask import jsonify, request, session, current_app, flash, redirect, url_for
 from bson import ObjectId
 from datetime import datetime, timezone
+
+# ⭐ NUEVO: para que la app móvil (JWT Bearer) también sea reconocida
+from app.jwt_utils import get_current_user_from_request
 
 
 # ================================================================
@@ -48,11 +52,25 @@ COLORES = [
 # ================================================================
 
 def _get_usuario_actual():
-    if 'user_id' not in session:
+    """
+    Devuelve el documento del usuario autenticado.
+    1) Web: toma el user_id de la sesión (cookie).
+    2) Móvil: si no hay sesión, lee el JWT del header
+       'Authorization: Bearer <token>' (app.jwt_utils).
+    """
+    uid = session.get('user_id')
+
+    # ⭐ NUEVO: sin sesión → intentar con el token Bearer de la app móvil
+    if not uid:
+        payload = get_current_user_from_request()
+        uid = payload.get('user_id') if payload else None
+
+    if not uid:
         return None
+
     try:
         db = current_app.db
-        return db.usuarios.find_one({'_id': ObjectId(session['user_id'])})
+        return db.usuarios.find_one({'_id': ObjectId(uid)})
     except Exception:
         return None
 

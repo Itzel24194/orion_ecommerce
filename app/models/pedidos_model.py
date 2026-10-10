@@ -6,6 +6,7 @@ from datetime import datetime
 from bson import ObjectId
 import random
 import string
+import time
 from flask import current_app
 
 class Pedido:
@@ -92,19 +93,96 @@ class Pedido:
         """Obtiene pedidos por estado"""
         collection = Pedido.get_collection()
         return list(collection.find({'estado': estado}).sort('created_at', -1))
-    
+
+    # ------------------------------------------------------------
+    # ⭐ GENERADOR DE NÚMERO DE PEDIDO ÚNICO (atómico)
+    # ------------------------------------------------------------
+    # Antes se usaba count_documents(...) + 1, que produce números
+    # duplicados cuando dos compras se procesan simultáneamente.
+    #
+    # Ahora se usa un contador atómico en la colección 'contadores',
+    # con formato: ORION-{año}-{secuencia 4 dígitos}.
+    #
+    # Si el contador del año no existe, se inicializa a partir del
+    # número más alto ya registrado para ese año (por ejemplo,
+    # ORION-2026-0015), evitando colisiones con pedidos previos.
+    # ------------------------------------------------------------
     @staticmethod
     def generar_numero_pedido():
-        """Genera un número de pedido legible (ej: ORION-2024-0001)"""
-        collection = Pedido.get_collection()
+        """Genera un número de pedido legible y ÚNICO (ej: ORION-2024-0001)"""
+        db = current_app.db
         year = datetime.utcnow().year
-        count = collection.count_documents({
-            'created_at': {
-                '$gte': datetime(year, 1, 1),
-                '$lt': datetime(year + 1, 1, 1)
-            }
-        }) + 1
-        return f"ORION-{year}-{str(count).zfill(4)}"
+        contador_id = f'contador_pedidos_{year}'
+
+        # --------------------------------------------------------
+        # 1. Inicializar el contador si no existe, partiendo del
+        #    máximo número ya registrado para ese año.
+        # --------------------------------------------------------
+        try:
+            if not db.contadores.find_one({'_id': contador_id}):
+                ultimo = db.pedidos.find_one(
+                    {'numero_pedido': {'$regex': f'^ORION-{year}-'}},
+                    sort=[('numero_pedido', -1)]
+                )
+                inicial = 0
+                if ultimo and ultimo.get('numero_pedido'):
+                    try:
+                        inicial = int(ultimo['numero_pedido'].rsplit('-', 1)[-1])
+                    except (ValueError, IndexError):
+                        inicial = 0
+                db.contadores.update_one(
+                    {'_id': contador_id},
+                    {'$setOnInsert': {'secuencia': inicial}},
+                    upsert=True
+                )
+        except Exception:
+            # Si falla la inicialización, seguimos con el flujo
+            # normal: el siguiente paso intentará incrementar.
+            pass
+
+        # --------------------------------------------------------
+        # 2. Incremento atómico del contador
+        # --------------------------------------------------------
+        try:
+            resultado = db.contadores.find_one_and_update(
+                {'_id': contador_id},
+                {'$inc': {'secuencia': 1}},
+                upsert=True,
+                return_document=True
+            )
+            if resultado and 'secuencia' in resultado:
+                numero = f"ORION-{year}-{str(resultado['secuencia']).zfill(4)}"
+                # Defensa extra: verificar que no exista
+                if not db.pedidos.find_one({'numero_pedido': numero}):
+                    return numero
+
+                # Si por alguna razón ya existe, seguir incrementando
+                for _ in range(50):
+                    resultado = db.contadores.find_one_and_update(
+                        {'_id': contador_id},
+                        {'$inc': {'secuencia': 1}},
+                        return_document=True
+                    )
+                    numero = f"ORION-{year}-{str(resultado['secuencia']).zfill(4)}"
+                    if not db.pedidos.find_one({'numero_pedido': numero}):
+                        return numero
+        except Exception:
+            # Si falla el contador atómico, caemos al fallback
+            pass
+
+        # --------------------------------------------------------
+        # 3. Fallback: método clásico con verificación de existencia
+        # --------------------------------------------------------
+        for _ in range(100):
+            count = db.pedidos.count_documents({}) + 1
+            numero = f"ORION-{year}-{str(count).zfill(4)}"
+            if not db.pedidos.find_one({'numero_pedido': numero}):
+                return numero
+
+        # --------------------------------------------------------
+        # 4. Último recurso: timestamp
+        # --------------------------------------------------------
+        return f"ORION-{year}-{int(time.time() * 1000) % 1000000:06d}"
     
     @staticmethod
     def generar_codigo_recogida():

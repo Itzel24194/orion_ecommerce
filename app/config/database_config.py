@@ -1,25 +1,69 @@
 # ================================================================
 # app/config/db.py
-# COMPLETO — con metodos_pago, carrito, opiniones, MARKETPLACE,
+# ORION — MongoDB Atlas
+# Métodos de pago, carrito, opiniones, MARKETPLACE,
 # MONEDERO y SISTEMA DE BLOQUEO/DESBLOQUEO DE MONEDEROS
 # ================================================================
 
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 from pymongo import MongoClient, ASCENDING, DESCENDING
 
-# 1. Conexión
-client = MongoClient("mongodb://localhost:27017/")
-db = client["orioon"]
 
-# 2. Definición de colecciones
+# ================================================================
+# 1. CARGAR VARIABLES DE ENTORNO
+# ================================================================
+
+RUTA_ENV = Path(__file__).resolve().parents[2] / ".env"
+load_dotenv(dotenv_path=RUTA_ENV)
+
+# ================================================================
+# 2. CONEXIÓN A MONGODB ATLAS
+# ================================================================
+
+MONGO_URI = os.getenv("MONGO_URI")
+MONGO_DBNAME = os.getenv("MONGO_DBNAME", "orioon")
+
+if not MONGO_URI:
+    raise RuntimeError(
+        f"No se encontró MONGO_URI en el archivo: {RUTA_ENV}"
+    )
+
+client = MongoClient(
+    MONGO_URI,
+    serverSelectionTimeoutMS=10000,
+    connectTimeoutMS=10000,
+)
+
+db = client[MONGO_DBNAME]
+
+try:
+    client.admin.command("ping")
+    print("Conexión con MongoDB Atlas establecida.")
+    print(f"Base de datos: {db.name}")
+
+except Exception as e:
+    client.close()
+    raise RuntimeError(
+        f"No se pudo conectar con MongoDB Atlas: {e}"
+    ) from e
+
+
+# ================================================================
+# 3. DEFINICIÓN DE COLECCIONES
+# ================================================================
+
 usuarios_col = db["usuarios"]
 categorias_col = db["categorias"]
-atributos_col = db['atributos']
-productos_col = db['productos']
-direcciones_col = db['direcciones']
-marcas_col = db['marcas']
-negra_col = db['lista_negra']
-resenas_col = db['resenas']
-ventas_col = db['ventas']
+atributos_col = db["atributos"]
+productos_col = db["productos"]
+direcciones_col = db["direcciones"]
+marcas_col = db["marcas"]
+negra_col = db["lista_negra"]
+resenas_col = db["resenas"]
+ventas_col = db["ventas"]
 pedidos_col = db["pedidos"]
 cupones_col = db["cupones"]
 cupones_usuarios_col = db["cupones_usuarios"]
@@ -29,13 +73,11 @@ chats_col = db["chats"]
 temporadas_col = db["temporadas"]
 monedero_col = db["monedero"]
 
-# ⭐ NUEVA — configuración del monedero (límites, comisiones, cashback)
+# Monedero digital
 monedero_config_col = db["monedero_config"]
-
-# ⭐⭐⭐ NUEVA — historial/auditoría de bloqueos y desbloqueos de monederos
 monedero_bloqueos_col = db["monedero_bloqueos"]
 
-# ⭐ NUEVAS COLECCIONES
+# Colecciones adicionales
 favoritos_col = db["favoritos"]
 mensajes_contacto_col = db["mensajes_contacto"]
 configuracion_col = db["configuracion"]
@@ -46,956 +88,509 @@ lealtad_puntos_col = db["lealtad_puntos"]
 complexion_col = db["complexion"]
 preferencias_col = db["preferencias"]
 
-# ⭐⭐⭐ CRÍTICAS
+# Métodos de pago, carrito y opiniones
 metodos_pago_col = db["metodos_pago"]
 carrito_col = db["carrito"]
 opiniones_col = db["opiniones"]
 
-# ⭐⭐⭐ MESAS DE REGALOS
+# Mesas de regalos
 mesas_regalos_col = db["mesas_regalos"]
 
-# ⭐⭐⭐ MARKETPLACE
+# Marketplace
 vendedores_col = db["vendedores"]
 comisiones_marketplace_col = db["comisiones_marketplace"]
 
-# ⭐ Alias de productos_col para claridad
+# Alias para productos del marketplace
 productos_marketplace_col = db["productos"]
 
 
-# 3. Configuración de índices
+# ================================================================
+# 4. CREACIÓN Y VERIFICACIÓN DE ÍNDICES
+# ================================================================
+
 def crear_indices():
-    """Crear índices de manera segura, eliminando índices duplicados si existen"""
-    try:
-        # --- Usuarios ---
-        try:
-            usuarios_col.create_index([("email", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    usuarios_col.drop_index("email_1")
-                    usuarios_col.create_index([("email", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Usuarios: {e}")
+    """
+    Crea y verifica los índices utilizados por ORION.
 
-        # --- Categorías ---
-        try:
-            categorias_col.create_index([("nombre", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    categorias_col.drop_index("nombre_1")
-                    categorias_col.create_index([("nombre", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Categorías: {e}")
+    Características:
+    - No elimina documentos ni colecciones.
+    - No elimina índices existentes.
+    - Evita crear nuevamente índices con las mismas claves.
+    - Comprueba las opciones de índices existentes.
+    - Informa de los problemas de unicidad sin modificar datos.
+    - Permite que marcas sin nombre_normalizado no entren
+      en el índice único parcial.
+    """
 
-        # ⭐ Jerarquía de categorías
-        try:
-            categorias_col.create_index([("padre_id", ASCENDING)])
-        except:
-            pass
-        try:
-            categorias_col.create_index([("nivel", ASCENDING)])
-        except:
-            pass
-        try:
-            categorias_col.create_index([("activo", ASCENDING)])
-        except:
-            pass
+    indices = [
 
-        # --- Productos ---
-        try:
-            productos_col.create_index([("nombre", ASCENDING)])
-        except:
-            pass
-        try:
-            productos_col.create_index([("categoria_id", ASCENDING)])
-        except:
-            pass
-        try:
-            productos_col.create_index([("precio", ASCENDING)])
-        except:
-            pass
-        try:
-            productos_col.create_index([("marca_id", ASCENDING)])
-        except:
-            pass
-        try:
-            productos_col.create_index([("activo", ASCENDING)])
-        except:
-            pass
-        try:
-            productos_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
-        try:
-            productos_col.create_index([("temporada_id", ASCENDING)], sparse=True)
-        except:
-            pass
-        try:
-            productos_col.create_index([("estado", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # USUARIOS
+        # --------------------------------------------------------
+        (
+            usuarios_col,
+            [("email", ASCENDING)],
+            {"unique": True},
+        ),
 
-        # ⭐⭐⭐ MARKETPLACE: índices para productos del vendedor ⭐⭐⭐
-        try:
-            productos_col.create_index([("vendedor_id", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # CATEGORÍAS
+        # --------------------------------------------------------
+        (
+            categorias_col,
+            [("nombre", ASCENDING)],
+            {"unique": True},
+        ),
+        (categorias_col, [("padre_id", ASCENDING)], {}),
+        (categorias_col, [("nivel", ASCENDING)], {}),
+        (categorias_col, [("activo", ASCENDING)], {}),
 
-        try:
-            productos_col.create_index([
-                ("vendedor_id", ASCENDING),
-                ("activo", ASCENDING)
-            ])
-        except:
-            pass
+        # --------------------------------------------------------
+        # ATRIBUTOS
+        # --------------------------------------------------------
+        (atributos_col, [("nombre", ASCENDING)], {}),
+        (atributos_col, [("categoria_id", ASCENDING)], {}),
 
-        try:
-            productos_col.create_index([
-                ("vendedor_id", ASCENDING),
-                ("estado", ASCENDING)
-            ])
-        except:
-            pass
+        # --------------------------------------------------------
+        # PRODUCTOS
+        # --------------------------------------------------------
+        (productos_col, [("nombre", ASCENDING)], {}),
+        (productos_col, [("categoria_id", ASCENDING)], {}),
+        (productos_col, [("precio", ASCENDING)], {}),
+        (productos_col, [("marca_id", ASCENDING)], {}),
+        (productos_col, [("activo", ASCENDING)], {}),
+        (productos_col, [("created_at", DESCENDING)], {}),
+        (
+            productos_col,
+            [("temporada_id", ASCENDING)],
+            {"sparse": True},
+        ),
+        (productos_col, [("estado", ASCENDING)], {}),
 
-        try:
-            productos_col.create_index([
-                ("vendedor_id", ASCENDING),
-                ("created_at", DESCENDING)
-            ])
-        except:
-            pass
-
-        # ⭐ NUEVOS: filtros del panel del vendedor por categoría/marca
-        try:
-            productos_col.create_index([
-                ("vendedor_id", ASCENDING),
-                ("categoria_id", ASCENDING)
-            ])
-        except:
-            pass
-
-        try:
-            productos_col.create_index([
-                ("vendedor_id", ASCENDING),
-                ("marca_id", ASCENDING)
-            ])
-        except:
-            pass
-
-        # ⭐ NUEVO: vendedor + activo + created_at (listado principal del catálogo del vendedor)
-        try:
-            productos_col.create_index([
+        # --------------------------------------------------------
+        # MARKETPLACE: PRODUCTOS POR VENDEDOR
+        # --------------------------------------------------------
+        (
+            productos_col,
+            [("vendedor_id", ASCENDING)],
+            {"sparse": True},
+        ),
+        (
+            productos_col,
+            [
                 ("vendedor_id", ASCENDING),
                 ("activo", ASCENDING),
-                ("created_at", DESCENDING)
-            ])
-        except:
-            pass
+            ],
+            {},
+        ),
+        (
+            productos_col,
+            [
+                ("vendedor_id", ASCENDING),
+                ("estado", ASCENDING),
+            ],
+            {},
+        ),
+        (
+            productos_col,
+            [
+                ("vendedor_id", ASCENDING),
+                ("created_at", DESCENDING),
+            ],
+            {},
+        ),
+        (
+            productos_col,
+            [
+                ("vendedor_id", ASCENDING),
+                ("categoria_id", ASCENDING),
+            ],
+            {},
+        ),
+        (
+            productos_col,
+            [
+                ("vendedor_id", ASCENDING),
+                ("marca_id", ASCENDING),
+            ],
+            {},
+        ),
+        (
+            productos_col,
+            [
+                ("vendedor_id", ASCENDING),
+                ("activo", ASCENDING),
+                ("created_at", DESCENDING),
+            ],
+            {},
+        ),
 
-        # --- Pedidos ---
-        try:
-            pedidos_col.create_index([("numero_pedido", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    pedidos_col.drop_index("numero_pedido_1")
-                    pedidos_col.create_index([("numero_pedido", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Pedidos (numero_pedido): {e}")
+        # --------------------------------------------------------
+        # DIRECCIONES
+        # --------------------------------------------------------
+        (direcciones_col, [("usuario_id", ASCENDING)], {}),
 
-        try:
-            pedidos_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-        try:
-            pedidos_col.create_index([("estado", ASCENDING)])
-        except:
-            pass
-        try:
-            pedidos_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # MARCAS
+        #
+        # Se utiliza nombre_normalizado porque la aplicación
+        # guarda el nombre comercial y su versión normalizada.
+        #
+        # El índice parcial solo incluye documentos cuyo
+        # nombre_normalizado sea de tipo string.
+        #
+        # IMPORTANTE:
+        # Los valores string duplicados todavía deben revisarse.
+        # --------------------------------------------------------
+        (
+            marcas_col,
+            [("nombre_normalizado", ASCENDING)],
+            {
+                "unique": True,
+                "partialFilterExpression": {
+                    "nombre_normalizado": {"$type": "string"}
+                },
+            },
+        ),
+        (marcas_col, [("estado", ASCENDING)], {}),
+        (marcas_col, [("nombre_comercial", ASCENDING)], {}),
 
-        # ⭐⭐⭐ MARKETPLACE: índices para pedidos del vendedor ⭐⭐⭐
-        try:
-            pedidos_col.create_index([("items.vendedor_id", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # LISTA NEGRA
+        # --------------------------------------------------------
+        (negra_col, [("usuario_id", ASCENDING)], {}),
+        (negra_col, [("email", ASCENDING)], {}),
 
-        try:
-            pedidos_col.create_index([("items_list.vendedor_id", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # RESEÑAS Y OPINIONES
+        # --------------------------------------------------------
+        (resenas_col, [("producto_id", ASCENDING)], {}),
+        (resenas_col, [("usuario_id", ASCENDING)], {}),
+        (opiniones_col, [("producto_id", ASCENDING)], {}),
+        (opiniones_col, [("usuario_id", ASCENDING)], {}),
 
-        try:
-            pedidos_col.create_index([
+        # --------------------------------------------------------
+        # VENTAS
+        # --------------------------------------------------------
+        (ventas_col, [("fecha", ASCENDING)], {}),
+        (ventas_col, [("usuario_id", ASCENDING)], {}),
+        (ventas_col, [("productos.id", ASCENDING)], {}),
+
+        # --------------------------------------------------------
+        # PEDIDOS
+        #
+        # numero_pedido debe ser único.
+        # Si existen pedidos con el mismo número, MongoDB
+        # no podrá crear el índice único hasta resolverlos.
+        # No se borran ni modifican pedidos automáticamente.
+        # --------------------------------------------------------
+        (
+            pedidos_col,
+            [("numero_pedido", ASCENDING)],
+            {"unique": True},
+        ),
+        (pedidos_col, [("usuario_id", ASCENDING)], {}),
+        (pedidos_col, [("estado", ASCENDING)], {}),
+        (pedidos_col, [("created_at", DESCENDING)], {}),
+        (pedidos_col, [("items.vendedor_id", ASCENDING)], {}),
+        (pedidos_col, [("items_list.vendedor_id", ASCENDING)], {}),
+        (
+            pedidos_col,
+            [
                 ("items.vendedor_id", ASCENDING),
-                ("estado", ASCENDING)
-            ])
-        except:
-            pass
+                ("estado", ASCENDING),
+            ],
+            {},
+        ),
 
-        # --- Cupones ---
-        try:
-            cupones_col.create_index([("codigo", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    cupones_col.drop_index("codigo_1")
-                    cupones_col.create_index([("codigo", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Cupones (codigo): {e}")
+        # --------------------------------------------------------
+        # CUPONES
+        # --------------------------------------------------------
+        (
+            cupones_col,
+            [("codigo", ASCENDING)],
+            {"unique": True},
+        ),
+        (cupones_col, [("activo", ASCENDING)], {}),
+        (cupones_col, [("fecha_inicio", ASCENDING)], {}),
+        (cupones_col, [("fecha_fin", ASCENDING)], {}),
 
-        try:
-            cupones_col.create_index([("activo", ASCENDING)])
-        except:
-            pass
-        try:
-            cupones_col.create_index([("fecha_inicio", ASCENDING)])
-        except:
-            pass
-        try:
-            cupones_col.create_index([("fecha_fin", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # CUPONES UTILIZADOS POR USUARIOS
+        # --------------------------------------------------------
+        (cupones_usuarios_col, [("usuario_id", ASCENDING)], {}),
+        (cupones_usuarios_col, [("cupon_codigo", ASCENDING)], {}),
+        (cupones_usuarios_col, [("fecha_uso", ASCENDING)], {}),
 
-        # --- Cupones Usuarios ---
-        try:
-            cupones_usuarios_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-        try:
-            cupones_usuarios_col.create_index([("cupon_codigo", ASCENDING)])
-        except:
-            pass
-        try:
-            cupones_usuarios_col.create_index([("fecha_uso", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # PROMOCIONES
+        # --------------------------------------------------------
+        (
+            promociones_col,
+            [("codigo", ASCENDING)],
+            {"unique": True, "sparse": True},
+        ),
+        (promociones_col, [("activo", ASCENDING)], {}),
+        (promociones_col, [("fecha_inicio", ASCENDING)], {}),
+        (promociones_col, [("fecha_fin", ASCENDING)], {}),
 
-        # --- Marca ---
-        try:
-            marcas_col.create_index([("nombre", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    marcas_col.drop_index("nombre_1")
-                    marcas_col.create_index([("nombre", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Marcas (nombre): {e}")
+        # --------------------------------------------------------
+        # COMBOS
+        # --------------------------------------------------------
+        (
+            combos_col,
+            [("nombre", ASCENDING)],
+            {"unique": True},
+        ),
+        (combos_col, [("activo", ASCENDING)], {}),
 
-        try:
-            marcas_col.create_index([("estado", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # CHATS Y AUDITORÍA
+        # --------------------------------------------------------
+        (chats_col, [("usuario_id", ASCENDING)], {}),
+        (auditoria_chat_col, [("usuario_id", ASCENDING)], {}),
+        (auditoria_chat_col, [("created_at", DESCENDING)], {}),
 
-        try:
-            marcas_col.create_index([("nombre_comercial", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # TEMPORADAS
+        # --------------------------------------------------------
+        (
+            temporadas_col,
+            [("nombre", ASCENDING)],
+            {"unique": True},
+        ),
+        (temporadas_col, [("activo", ASCENDING)], {}),
 
-        # --- Ventas ---
-        try:
-            ventas_col.create_index([("fecha", ASCENDING)])
-        except:
-            pass
-        try:
-            ventas_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # MONEDERO Y AUDITORÍA DE BLOQUEOS
+        # --------------------------------------------------------
+        (
+            monedero_col,
+            [("usuario_id", ASCENDING)],
+            {"unique": True},
+        ),
+        (monedero_config_col, [("activo", ASCENDING)], {}),
+        (monedero_bloqueos_col, [("usuario_id", ASCENDING)], {}),
+        (monedero_bloqueos_col, [("created_at", DESCENDING)], {}),
+        (monedero_bloqueos_col, [("fecha", DESCENDING)], {}),
 
-        try:
-            ventas_col.create_index([("productos.id", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # FAVORITOS
+        # --------------------------------------------------------
+        (favoritos_col, [("usuario_id", ASCENDING)], {}),
+        (favoritos_col, [("producto_id", ASCENDING)], {}),
 
-        # --- PROMOCIONES ---
-        try:
-            promociones_col.create_index([("codigo", ASCENDING)], unique=True, sparse=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    promociones_col.drop_index("codigo_1")
-                    promociones_col.create_index([("codigo", ASCENDING)], unique=True, sparse=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Promociones (codigo): {e}")
-        try:
-            promociones_col.create_index([("activo", ASCENDING)])
-        except:
-            pass
-        try:
-            promociones_col.create_index([("fecha_inicio", ASCENDING)])
-        except:
-            pass
-        try:
-            promociones_col.create_index([("fecha_fin", ASCENDING)])
-        except:
-            pass
-        try:
-            promociones_col.create_index([("tipo", ASCENDING)])
-        except:
-            pass
-        try:
-            promociones_col.create_index([("prioridad", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # CONTACTO, CONFIGURACIÓN Y NOTIFICACIONES
+        # --------------------------------------------------------
+        (mensajes_contacto_col, [("created_at", DESCENDING)], {}),
+        (configuracion_col, [("nombre", ASCENDING)], {}),
+        (notificaciones_col, [("usuario_id", ASCENDING)], {}),
+        (notificaciones_col, [("created_at", DESCENDING)], {}),
 
-        # --- COMBOS ---
-        try:
-            combos_col.create_index([("nombre", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    combos_col.drop_index("nombre_1")
-                    combos_col.create_index([("nombre", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Combos (nombre): {e}")
-        try:
-            combos_col.create_index([("activo", ASCENDING)])
-        except:
-            pass
-        try:
-            combos_col.create_index([("precio", ASCENDING)])
-        except:
-            pass
-        try:
-            combos_col.create_index([("descuento", ASCENDING)])
-        except:
-            pass
-        try:
-            combos_col.create_index([("productos", ASCENDING)])
-        except:
-            pass
+        # --------------------------------------------------------
+        # CONSULTAS IMPI
+        # --------------------------------------------------------
+        (impi_consultas_col, [("usuario_id", ASCENDING)], {}),
+        (impi_consultas_col, [("created_at", DESCENDING)], {}),
 
-        # --- TEMPORADAS ---
-        try:
-            temporadas_col.create_index([("nombre", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    temporadas_col.drop_index("nombre_1")
-                    temporadas_col.create_index([("nombre", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Temporadas (nombre): {e}")
+        # --------------------------------------------------------
+        # LEALTAD, COMPLEXIÓN Y PREFERENCIAS
+        # --------------------------------------------------------
+        (lealtad_puntos_col, [("usuario_id", ASCENDING)], {}),
+        (
+            complexion_col,
+            [("usuario_id", ASCENDING)],
+            {"unique": True},
+        ),
+        (
+            preferencias_col,
+            [("usuario_id", ASCENDING)],
+            {"unique": True},
+        ),
+
+        # --------------------------------------------------------
+        # MÉTODOS DE PAGO
+        # --------------------------------------------------------
+        (metodos_pago_col, [("usuario_id", ASCENDING)], {}),
+
+        # --------------------------------------------------------
+        # CARRITO
+        # --------------------------------------------------------
+        (carrito_col, [("usuario_id", ASCENDING)], {}),
+
+        # --------------------------------------------------------
+        # MESAS DE REGALOS
+        # --------------------------------------------------------
+        (mesas_regalos_col, [("usuario_id", ASCENDING)], {}),
+        (mesas_regalos_col, [("created_at", DESCENDING)], {}),
+
+        # --------------------------------------------------------
+        # MARKETPLACE: VENDEDORES Y COMISIONES
+        # --------------------------------------------------------
+        (vendedores_col, [("usuario_id", ASCENDING)], {}),
+        (vendedores_col, [("estado", ASCENDING)], {}),
+        (
+            comisiones_marketplace_col,
+            [("vendedor_id", ASCENDING)],
+            {},
+        ),
+        (
+            comisiones_marketplace_col,
+            [("created_at", DESCENDING)],
+            {},
+        ),
+    ]
+
+    creados = 0
+    verificados = 0
+    advertencias = 0
+
+    for coleccion, campos, opciones in indices:
+        campos_solicitados = list(campos)
 
         try:
-            temporadas_col.create_index([("fecha_inicio", ASCENDING)])
-        except:
-            pass
-        try:
-            temporadas_col.create_index([("fecha_fin", ASCENDING)])
-        except:
-            pass
-        try:
-            temporadas_col.create_index([("activa", ASCENDING)])
-        except:
-            pass
-        try:
-            temporadas_col.create_index([("fecha_inicio", ASCENDING), ("fecha_fin", ASCENDING)])
-        except:
-            pass
+            indices_existentes = coleccion.index_information()
+            indice_existente = None
 
-        # ============================================================
-        # --- MONEDERO DIGITAL ---
-        # ============================================================
-        try:
-            monedero_col.create_index([("usuario_id", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    monedero_col.drop_index("usuario_id_1")
-                    monedero_col.create_index([("usuario_id", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Monedero (usuario_id): {e}")
-        try:
-            monedero_col.create_index([("numero_tarjeta", ASCENDING)])
-        except:
-            pass
-        try:
-            monedero_col.create_index([("created_at", ASCENDING)])
-        except:
-            pass
-        try:
-            monedero_col.create_index([("updated_at", ASCENDING)])
-        except:
-            pass
+            # Buscar un índice que utilice exactamente las mismas claves.
+            for nombre_indice, informacion in indices_existentes.items():
+                claves_existentes = [
+                    tuple(clave)
+                    for clave in informacion.get("key", [])
+                ]
 
-        # ⭐ NUEVOS índices para el panel admin del monedero
-        try:
-            monedero_col.create_index([("bloqueado", ASCENDING)])
-        except:
-            pass
-        try:
-            monedero_col.create_index([("saldo", DESCENDING)])
-        except:
-            pass
-        try:
-            monedero_col.create_index([("movimientos.fecha", DESCENDING)])
-        except:
-            pass
-
-        # ⭐⭐⭐ NUEVOS índices para el SISTEMA DE BLOQUEO ⭐⭐⭐
-        # Filtro combinado: activos vs bloqueados
-        try:
-            monedero_col.create_index([
-                ("bloqueado", ASCENDING),
-                ("saldo", DESCENDING)
-            ])
-        except:
-            pass
-
-        # Ordenar por fecha de bloqueo (para ver los más recientes)
-        try:
-            monedero_col.create_index([("bloqueado_en", DESCENDING)])
-        except:
-            pass
-
-        # Saber qué admin bloqueó (auditoría rápida)
-        try:
-            monedero_col.create_index([("bloqueado_por", ASCENDING)])
-        except:
-            pass
-
-        # Historial de desbloqueos
-        try:
-            monedero_col.create_index([("desbloqueado_en", DESCENDING)])
-        except:
-            pass
-
-        # Motivo de bloqueo (búsquedas por texto parcial)
-        try:
-            monedero_col.create_index([("motivo_bloqueo", ASCENDING)])
-        except:
-            pass
-
-        # Usuario + estado de bloqueo (para validar si un usuario puede operar)
-        try:
-            monedero_col.create_index([
-                ("usuario_id", ASCENDING),
-                ("bloqueado", ASCENDING)
-            ])
-        except:
-            pass
-
-        # ============================================================
-        # ⭐ CONFIGURACIÓN DEL MONEDERO (admin)
-        # ============================================================
-        # El documento de config usa _id = "global" (singleton)
-        # No necesita índices extra más allá del _id por defecto.
-        try:
-            monedero_config_col.create_index([("updated_at", DESCENDING)])
-        except:
-            pass
-
-        # ============================================================
-        # ⭐⭐⭐ HISTORIAL DE BLOQUEOS DE MONEDERO (AUDITORÍA) ⭐⭐⭐
-        # ============================================================
-        # Cada documento representa un evento: bloqueo o desbloqueo.
-        # Ejemplo de documento:
-        # {
-        #   monedero_id: ObjectId,
-        #   usuario_id: ObjectId,
-        #   accion: "bloqueo" | "desbloqueo",
-        #   motivo: "...",
-        #   admin_id: ObjectId,
-        #   admin_nombre: "...",
-        #   saldo_al_momento: 123.45,
-        #   created_at: datetime
-        # }
-
-        # Buscar eventos por monedero
-        try:
-            monedero_bloqueos_col.create_index([("monedero_id", ASCENDING)])
-        except:
-            pass
-
-        # Buscar eventos por usuario
-        try:
-            monedero_bloqueos_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-
-        # Filtrar por tipo de acción (bloqueo / desbloqueo)
-        try:
-            monedero_bloqueos_col.create_index([("accion", ASCENDING)])
-        except:
-            pass
-
-        # Ver qué admin hizo la acción
-        try:
-            monedero_bloqueos_col.create_index([("admin_id", ASCENDING)])
-        except:
-            pass
-
-        # Ordenar por fecha (los más recientes primero)
-        try:
-            monedero_bloqueos_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
-
-        # Combinado: usuario + fecha (historial completo de un usuario)
-        try:
-            monedero_bloqueos_col.create_index([
-                ("usuario_id", ASCENDING),
-                ("created_at", DESCENDING)
-            ])
-        except:
-            pass
-
-        # Combinado: acción + fecha (todos los bloqueos ordenados)
-        try:
-            monedero_bloqueos_col.create_index([
-                ("accion", ASCENDING),
-                ("created_at", DESCENDING)
-            ])
-        except:
-            pass
-
-        # Combinado: admin + fecha (actividad de un admin)
-        try:
-            monedero_bloqueos_col.create_index([
-                ("admin_id", ASCENDING),
-                ("created_at", DESCENDING)
-            ])
-        except:
-            pass
-
-        # ============================================================
-        # ⭐ DIRECCIONES
-        # ============================================================
-        try:
-            direcciones_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-
-        # ============================================================
-        # ⭐ RESEÑAS
-        # ============================================================
-        try:
-            resenas_col.create_index([("producto_id", ASCENDING)])
-        except:
-            pass
-        try:
-            resenas_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-        try:
-            resenas_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
-
-        # ============================================================
-        # ⭐ FAVORITOS
-        # ============================================================
-        try:
-            favoritos_col.create_index(
-                [("usuario_id", ASCENDING), ("producto_id", ASCENDING)],
-                unique=True
-            )
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    favoritos_col.drop_index("usuario_id_1_producto_id_1")
-                    favoritos_col.create_index(
-                        [("usuario_id", ASCENDING), ("producto_id", ASCENDING)],
-                        unique=True
+                if claves_existentes == campos_solicitados:
+                    indice_existente = (
+                        nombre_indice,
+                        informacion,
                     )
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Favoritos (usuario_id+producto_id): {e}")
-        try:
-            favoritos_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-        try:
-            favoritos_col.create_index([("producto_id", ASCENDING)])
-        except:
-            pass
-        try:
-            favoritos_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
+                    break
 
-        # ============================================================
-        # ⭐ MENSAJES DE CONTACTO
-        # ============================================================
-        try:
-            mensajes_contacto_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
-        try:
-            mensajes_contacto_col.create_index([("email", ASCENDING)])
-        except:
-            pass
+            # Si existe, verificar sus opciones sin modificarlo.
+            if indice_existente:
+                nombre_indice, informacion = indice_existente
+                conflictos = []
 
-        # ============================================================
-        # ⭐ NOTIFICACIONES
-        # ============================================================
-        try:
-            notificaciones_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-        try:
-            notificaciones_col.create_index([("leida", ASCENDING)])
-        except:
-            pass
-        try:
-            notificaciones_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
+                opciones_a_verificar = (
+                    "unique",
+                    "sparse",
+                    "partialFilterExpression",
+                )
 
-        # ============================================================
-        # ⭐ AUDITORÍA CHAT
-        # ============================================================
-        try:
-            auditoria_chat_col.create_index([("sesion_id", ASCENDING)])
-        except:
-            pass
-        try:
-            auditoria_chat_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
-        try:
-            auditoria_chat_col.create_index([("admin_id", ASCENDING)])
-        except:
-            pass
+                for opcion in opciones_a_verificar:
+                    solicitada = opciones.get(opcion)
+                    actual = informacion.get(opcion)
 
-        # ============================================================
-        # ⭐ IMPI CONSULTAS
-        # ============================================================
-        try:
-            impi_consultas_col.create_index([("rfc", ASCENDING)])
-        except:
-            pass
-        try:
-            impi_consultas_col.create_index([("marca_id", ASCENDING)])
-        except:
-            pass
-        try:
-            impi_consultas_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
+                    # MongoDB puede omitir las opciones falsas.
+                    if opcion in ("unique", "sparse"):
+                        solicitada = bool(solicitada)
+                        actual = bool(actual)
 
-        # ============================================================
-        # ⭐ LEALTAD PUNTOS
-        # ============================================================
-        try:
-            lealtad_puntos_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-        try:
-            lealtad_puntos_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
+                    if solicitada != actual:
+                        conflictos.append(
+                            f"{opcion}: existente={actual}, "
+                            f"solicitado={solicitada}"
+                        )
 
-        # ============================================================
-        # ⭐ COMPLEXION
-        # ============================================================
-        try:
-            complexion_col.create_index([("usuario_id", ASCENDING)], unique=True)
+                if conflictos:
+                    advertencias += 1
+                    print(
+                        f"[REVISAR] Índice '{nombre_indice}' "
+                        f"en colección '{coleccion.name}'. "
+                        + "; ".join(conflictos)
+                    )
+                else:
+                    verificados += 1
+
+                continue
+
+            # Si no existe un índice con esas claves, intentar crearlo.
+            coleccion.create_index(
+                campos_solicitados,
+                **opciones,
+            )
+
+            creados += 1
+
         except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    complexion_col.drop_index("usuario_id_1")
-                    complexion_col.create_index([("usuario_id", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Complexion (usuario_id): {e}")
+            advertencias += 1
+            print(
+                f"[ADVERTENCIA] No se pudo crear/verificar el índice "
+                f"en '{coleccion.name}', campos {campos_solicitados}: "
+                f"{e}"
+            )
 
-        # ============================================================
-        # ⭐ PREFERENCIAS
-        # ============================================================
-        try:
-            preferencias_col.create_index([("usuario_id", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    preferencias_col.drop_index("usuario_id_1")
-                    preferencias_col.create_index([("usuario_id", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Preferencias (usuario_id): {e}")
+    # ------------------------------------------------------------
+    # RESUMEN
+    # ------------------------------------------------------------
+    print("\n" + "=" * 60)
+    print("RESUMEN DE ÍNDICES DE ORION")
+    print("=" * 60)
+    print(f"Índices creados: {creados}")
+    print(f"Índices existentes verificados: {verificados}")
+    print(f"Advertencias que requieren revisión: {advertencias}")
 
-        # ============================================================
-        # ⭐⭐⭐ METODOS_PAGO ⭐⭐⭐
-        # ============================================================
-        try:
-            metodos_pago_col.create_index([("id", ASCENDING)], unique=True, sparse=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    metodos_pago_col.drop_index("id_1")
-                    metodos_pago_col.create_index([("id", ASCENDING)], unique=True, sparse=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ metodos_pago (id): {e}")
-
-        try:
-            metodos_pago_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-
-        try:
-            metodos_pago_col.create_index([("usuario_id", ASCENDING), ("predeterminado", ASCENDING)])
-        except:
-            pass
-
-        try:
-            metodos_pago_col.create_index([("conekta_customer_id", ASCENDING)], sparse=True)
-        except:
-            pass
-
-        # ============================================================
-        # ⭐ CARRITO
-        # ============================================================
-        try:
-            carrito_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-
-        # ============================================================
-        # ⭐ OPINIONES
-        # ============================================================
-        try:
-            opiniones_col.create_index([("producto_id", ASCENDING)])
-        except:
-            pass
-        try:
-            opiniones_col.create_index([("usuario_id", ASCENDING)])
-        except:
-            pass
-        try:
-            opiniones_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
-
-        # ============================================================
-        # ⭐⭐⭐ MESAS DE REGALOS ⭐⭐⭐
-        # ============================================================
-        try:
-            mesas_regalos_col.create_index([("slug", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    mesas_regalos_col.drop_index("slug_1")
-                    mesas_regalos_col.create_index([("slug", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Mesas de Regalos (slug): {e}")
-
-        try:
-            mesas_regalos_col.create_index([("owner_id", ASCENDING)])
-        except:
-            pass
-        try:
-            mesas_regalos_col.create_index([("owner_email", ASCENDING)])
-        except:
-            pass
-        try:
-            mesas_regalos_col.create_index([("activa", ASCENDING)])
-        except:
-            pass
-        try:
-            mesas_regalos_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
-        try:
-            mesas_regalos_col.create_index([("event_type", ASCENDING)])
-        except:
-            pass
-        try:
-            mesas_regalos_col.create_index([("event_date", ASCENDING)])
-        except:
-            pass
-        try:
-            mesas_regalos_col.create_index([("owner_id", ASCENDING), ("activa", ASCENDING)])
-        except:
-            pass
-
-        # ============================================================
-        # ⭐⭐⭐ MARKETPLACE — VENDEDORES ⭐⭐⭐
-        # ============================================================
-        try:
-            vendedores_col.create_index([("slug", ASCENDING)], unique=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    vendedores_col.drop_index("slug_1")
-                    vendedores_col.create_index([("slug", ASCENDING)], unique=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Vendedores (slug): {e}")
-
-        try:
-            vendedores_col.create_index([("user_id", ASCENDING)], unique=True, sparse=True)
-        except Exception as e:
-            if "duplicate key error" in str(e) or "Index already exists" in str(e):
-                try:
-                    vendedores_col.drop_index("user_id_1")
-                    vendedores_col.create_index([("user_id", ASCENDING)], unique=True, sparse=True)
-                except:
-                    pass
-            else:
-                print(f"  ⚠️ Vendedores (user_id): {e}")
-
-        try:
-            vendedores_col.create_index([("estado", ASCENDING)])
-        except:
-            pass
-
-        try:
-            vendedores_col.create_index([("activo", ASCENDING)])
-        except:
-            pass
-
-        try:
-            vendedores_col.create_index([("destacado", ASCENDING)])
-        except:
-            pass
-
-        try:
-            vendedores_col.create_index([("categorias", ASCENDING)])
-        except:
-            pass
-
-        try:
-            vendedores_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
-
-        try:
-            vendedores_col.create_index([("estado", ASCENDING), ("activo", ASCENDING)])
-        except:
-            pass
-
-        try:
-            vendedores_col.create_index([
-                ("estado", ASCENDING),
-                ("activo", ASCENDING),
-                ("destacado", ASCENDING)
-            ])
-        except:
-            pass
-
-        try:
-            vendedores_col.create_index([
-                ("estado", ASCENDING),
-                ("destacado", ASCENDING)
-            ])
-        except:
-            pass
-
-        try:
-            vendedores_col.create_index([
-                ("estado", ASCENDING),
-                ("activo", ASCENDING),
-                ("created_at", DESCENDING)
-            ])
-        except:
-            pass
-
-        # ============================================================
-        # ⭐⭐⭐ MARKETPLACE — COMISIONES (AUDITORÍA) ⭐⭐⭐
-        # ============================================================
-        try:
-            comisiones_marketplace_col.create_index([("vendedor_id", ASCENDING)])
-        except:
-            pass
-
-        try:
-            comisiones_marketplace_col.create_index([("pedido_id", ASCENDING)], sparse=True)
-        except:
-            pass
-
-        try:
-            comisiones_marketplace_col.create_index([("numero_pedido", ASCENDING)], sparse=True)
-        except:
-            pass
-
-        try:
-            comisiones_marketplace_col.create_index([("estado", ASCENDING)])
-        except:
-            pass
-
-        try:
-            comisiones_marketplace_col.create_index([("created_at", DESCENDING)])
-        except:
-            pass
-
-        try:
-            comisiones_marketplace_col.create_index([
-                ("vendedor_id", ASCENDING),
-                ("estado", ASCENDING)
-            ])
-        except:
-            pass
-
-        try:
-            comisiones_marketplace_col.create_index([
-                ("vendedor_id", ASCENDING),
-                ("created_at", DESCENDING)
-            ])
-        except:
-            pass
-
-        print("✅ Índices creados correctamente")
-
-    except Exception as e:
-        print(f"⚠️ Nota sobre índices: {e}")
+    if advertencias:
+        print(
+            "\nHay índices o datos que requieren revisión. "
+            "Consulta los mensajes [REVISAR] y [ADVERTENCIA]."
+        )
+    else:
+        print(
+            "\nTodos los índices solicitados se crearon "
+            "o se verificaron correctamente."
+        )
 
 
-# 4. Ejecutar la creación de índices
+# ================================================================
+# 5. EJECUTAR CREACIÓN DE ÍNDICES
+# ================================================================
+
 crear_indices()
 
-# ============================================================
-# 5. EXPORTS PARA USAR EN OTROS MÓDULOS
-# ============================================================
+
+# ================================================================
+# 6. EXPORTS PARA OTROS MÓDULOS
+# ================================================================
+
 __all__ = [
-    'client', 'db',
-    'usuarios_col', 'categorias_col', 'atributos_col', 'productos_col',
-    'direcciones_col', 'marcas_col', 'negra_col', 'resenas_col',
-    'ventas_col', 'pedidos_col', 'cupones_col', 'cupones_usuarios_col',
-    'promociones_col', 'combos_col', 'chats_col', 'temporadas_col',
-    'monedero_col',
-    # ⭐ NUEVA — configuración del monedero
-    'monedero_config_col',
-    # ⭐⭐⭐ NUEVA — historial/auditoría de bloqueos
-    'monedero_bloqueos_col',
-    # ⭐ NUEVAS
-    'favoritos_col', 'mensajes_contacto_col', 'configuracion_col',
-    'notificaciones_col', 'auditoria_chat_col', 'impi_consultas_col',
-    'lealtad_puntos_col', 'complexion_col', 'preferencias_col',
-    # ⭐⭐⭐ NUEVAS CRÍTICAS
-    'metodos_pago_col', 'carrito_col', 'opiniones_col',
-    # ⭐⭐⭐ NUEVA — MESAS DE REGALOS
-    'mesas_regalos_col',
-    # ⭐⭐⭐ NUEVAS — MARKETPLACE
-    'vendedores_col', 'comisiones_marketplace_col',
-    'productos_marketplace_col',
-    'crear_indices',
+    "client",
+    "db",
+    "usuarios_col",
+    "categorias_col",
+    "atributos_col",
+    "productos_col",
+    "direcciones_col",
+    "marcas_col",
+    "negra_col",
+    "resenas_col",
+    "ventas_col",
+    "pedidos_col",
+    "cupones_col",
+    "cupones_usuarios_col",
+    "promociones_col",
+    "combos_col",
+    "chats_col",
+    "temporadas_col",
+    "monedero_col",
+    "monedero_config_col",
+    "monedero_bloqueos_col",
+    "favoritos_col",
+    "mensajes_contacto_col",
+    "configuracion_col",
+    "notificaciones_col",
+    "auditoria_chat_col",
+    "impi_consultas_col",
+    "lealtad_puntos_col",
+    "complexion_col",
+    "preferencias_col",
+    "metodos_pago_col",
+    "carrito_col",
+    "opiniones_col",
+    "mesas_regalos_col",
+    "vendedores_col",
+    "comisiones_marketplace_col",
+    "productos_marketplace_col",
+    "crear_indices",
 ]
