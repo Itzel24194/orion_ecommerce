@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | ORION Admin</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .sidebar {
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            padding: 0; height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+
+        /* ⭐ BLOQUE DEL ADMIN (ROSA INTENSO) — sin clase active */
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px; text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            margin-bottom: 10px; flex-shrink: 0;
+            text-decoration: none; color: inherit; display: block;
+            transition: all 0.3s ease;
+        }
+        .sidebar .admin-profile:hover {
+            background: linear-gradient(135deg, #e10098, #c00080);
+            filter: brightness(1.08);
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .admin-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+
+        .sidebar .logo {
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a:hover i, .sidebar a.active i { color: #e10098; }
+
+        /* ⭐ Regla extra para asegurar que el bloque admin NO se vuelve gris */
+        .sidebar .admin-profile:hover,
+        .sidebar .admin-profile.active {
+            background: linear-gradient(135deg, #e10098, #c00080) !important;
+        }
+        .sidebar .admin-profile:hover .name,
+        .sidebar .admin-profile.active .name,
+        .sidebar .admin-profile:hover .email,
+        .sidebar .admin-profile.active .email,
+        .sidebar .admin-profile:hover .rol,
+        .sidebar .admin-profile.active .rol {
+            color: #fff !important;
+        }
+
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ============================================================
+           MAIN
+           ============================================================ */
+        .main { margin-left: 280px; padding: 30px 35px 20px; width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #e8e8e8; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0; }
+        .top-bar h1 { font-size: 1.6rem; font-weight: 800; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .top-bar .tag { background: #e10098; color: #fff; padding: 5px 18px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .btn-perfil-top {
+            background: #ffffff; color: #e10098; border: 2px solid #e10098;
+            padding: 7px 16px; border-radius: 20px; text-decoration: none;
+            font-size: 0.75rem; font-weight: 700; display: inline-flex;
+            align-items: center; gap: 6px; transition: all 0.25s ease;
+        }
+        .btn-perfil-top:hover { background: #e10098; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 14px rgba(225,0,152,0.3); }
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; }
+
+        /* ============================================================
+           BOTONES
+           ============================================================ */
+        .btn-primary-custom { background: #e10098; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: inline-block; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-primary-custom:hover { background: #c00080; color: white; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3); }
+        .btn-gray-custom { background: #6c757d; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: inline-block; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-gray-custom:hover { background: #5a6268; color: white; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(108, 117, 125, 0.3); }
+
+        /* ============================================================
+           SECTION-BOX
+           ============================================================ */
+        .section-box { background: #ffffff; border-radius: 16px; padding: 25px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0; }
+        .section-box h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .section-box h2 i { color: #e10098; }
+
+        /* ============================================================
+           CABECERA DEL PERFIL (ROSA INTENSO)
+           ============================================================ */
+        .perfil-header {
+            display: flex; align-items: center; gap: 20px;
+            padding: 30px; border-radius: 16px;
+            background: linear-gradient(135deg, #e10098, #c00080) !important;
+            margin-bottom: 25px; flex-wrap: wrap;
+            box-shadow: 0 4px 15px rgba(225, 0, 152, 0.2);
+        }
+        .perfil-header .avatar-grande {
+            width: 110px; height: 110px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            flex-shrink: 0; background: #f5f6f8;
+        }
+        .perfil-header .perfil-info { flex: 1; min-width: 200px; }
+        .perfil-header .perfil-info h3 {
+            font-size: 1.5rem; font-weight: 900; color: #fff !important;
+            margin-bottom: 4px; word-break: break-word;
+        }
+        .perfil-header .perfil-info .email {
+            color: rgba(255,255,255,0.9) !important; font-size: 0.9rem; margin-bottom: 8px;
+            word-break: break-word;
+        }
+        .perfil-header .perfil-info .rol-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.2) !important;
+            color: #fff !important; padding: 5px 14px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* ============================================================
+           FORMULARIO
+           ============================================================ */
+        .form-section { margin-bottom: 28px; }
+        .form-section h3 {
+            font-size: 1rem; font-weight: 800; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px; color: #1a1a2e;
+        }
+        .form-section h3 i { color: #e10098; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px; }
+        .form-row.full { grid-template-columns: 1fr; }
+
+        .form-group label {
+            display: block; font-size: 0.75rem; font-weight: 700;
+            color: #666; text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%; padding: 11px 14px; border-radius: 10px;
+            border: 1px solid #e0e0e0; font-size: 0.92rem; font-family: inherit;
+            background: #fafafa; transition: all 0.2s;
+            -webkit-appearance: none; appearance: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none; border-color: #e10098; background: #fff;
+            box-shadow: 0 0 0 3px rgba(225,0,152,0.1);
+        }
+        .form-group input[type="file"] { padding: 8px; background: #fff; cursor: pointer; }
+        .form-group .hint { font-size: 0.72rem; color: #999; margin-top: 4px; }
+
+        .actions {
+            display: flex; gap: 10px; flex-wrap: wrap;
+            padding-top: 20px; border-top: 1px solid #f0f0f0;
+        }
+
+        /* ============================================================
+           FLASH
+           ============================================================ */
+        .flash {
+            padding: 12px 18px; border-radius: 10px; margin-bottom: 18px;
+            font-weight: 600; font-size: 0.88rem; word-break: break-word;
+        }
+        .flash.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .flash.danger { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .flash.warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .footer-info { background: #ffffff; padding: 15px 25px; border-radius: 16px; border: 1px solid #e8e8e8; text-align: center; margin-top: auto; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+        .footer-info p { color: #888; font-size: 0.75rem; margin: 0; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .footer-info p .separator { color: #ddd; }
+        .footer-info i { color: #e10098; }
+        .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .sidebar .logout-btn i { font-size: 1.3rem; margin: 0; }
+            .main { margin-left: 70px; padding: 15px; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .top-bar-right { width: 100%; justify-content: space-between; }
+            .perfil-header { flex-direction: column; text-align: center; }
+            .form-row { grid-template-columns: 1fr; }
+            .actions { flex-direction: column; }
+            .actions a, .actions button { width: 100%; text-align: center; justify-content: center; }
+            .footer-info p { font-size: 0.65rem; gap: 8px; }
+        }
+        @media (max-width: 480px) {
+            .top-bar h1 { font-size: 1.2rem; }
+            .hero { padding: 20px; }
+            .hero h2 { font-size: 1.1rem; }
+            .hero p { font-size: 0.85rem; }
+            .section-box { padding: 15px; }
+            .perfil-header { padding: 20px; }
+            .perfil-header .avatar-grande { width: 84px; height: 84px; border-width: 3px; }
+            .perfil-header .perfil-info h3 { font-size: 1.25rem; }
+            .form-group input, .form-group select { font-size: 16px; }
+            .footer-info p { flex-direction: column; gap: 5px; }
+            .footer-info p .separator { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <nav class="sidebar">
+
+        <!-- ⭐ BLOQUE DEL ADMIN (SIN clase active) — siempre rosa intenso -->
+        <a href="{{ url_for('web.admin_perfil') }}" class="admin-profile" title="Mi Perfil">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </a>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+
+            <!-- ⭐ Item "Mi Perfil" del menú — este SÍ se marca activo cuando estás en /admin/perfil -->
+            <a href="{{ url_for('web.admin_perfil') }}" class="active"><i class="fas fa-user-circle" style="color: #e10098;"></i> <span>Mi Perfil</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_marcas') }}"><i class="fas fa-building"></i> <span>Marcas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_combos') }}"><i class="fas fa-layer-group" style="color: #fd7e14;"></i> <span>Combos</span></a>
+            <a href="{{ url_for('web.admin_marketplace_vendedores') }}"><i class="fas fa-store" style="color: #0284c7;"></i> <span>Marketplace</span></a>
+            <a href="{{ url_for('web.admin_resenas') }}"><i class="fas fa-star" style="color: #ffc107;"></i> <span>Reseñas</span></a>
+            <a href="{{ url_for('web.admin_chat_panel') }}"><i class="fas fa-comment-dots" style="color: #00d4ff;"></i> <span>Chat en vivo</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
+            <a href="{{ url_for('web.listar_temporadas') }}"><i class="fas fa-calendar-alt" style="color: #f9a825;"></i> <span>Temporadas</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}"><i class="fas fa-gift"></i> <span>Promociones</span></a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+            <a href="{{ url_for('web.admin_lealtad_panel') }}"><i class="fas fa-crown" style="color: #e10098;"></i> <span>Cliente Consentido</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">FINANZAS</div>
+            <a href="{{ url_for('web.admin_monedero_panel') }}"><i class="fas fa-wallet" style="color: #e10098;"></i> <span>Monedero ORION</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}"><i class="fas fa-brain" style="color: #6f42c1;"></i> <span>Análisis Supervisado</span></a>
+            <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
+            <a href="{{ url_for('web.clasificacion_binaria') }}"><i class="fas fa-toggle-on" style="color: #17a2b8;"></i> <span>Clasificación Binaria</span></a>
+            <a href="{{ url_for('web.admin_dashboard_auditoria') }}"><i class="fas fa-shield-check" style="color: #0d47a1;"></i> <span>Auditoría</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
+            <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
+            <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+            <div class="divider"></div>
+
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+
+        </div>
+
+    </nav>
+
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+            <div class="top-bar-right">
+                <a href="{{ url_for('web.dashboard') }}" class="btn-perfil-top">
+                    <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                </a>
+                <div class="tag"><i class="fas fa-shield-alt"></i> Admin</div>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <!-- CABECERA DEL PERFIL (ROSA INTENSO) -->
+            <div class="perfil-header">
+                {% if usuario.foto %}
+                    <img src="{{ url_for('static', filename='uploads/' + usuario.foto) }}" class="avatar-grande" alt="Foto de perfil">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ usuario.nombre|default('Admin') }}&background=e10098&color=fff&size=110&bold=true" class="avatar-grande" alt="Avatar">
+                {% endif %}
+                <div class="perfil-info">
+                    <h3>{{ usuario.nombre|default('Administrador') }} {{ usuario.apellido_paterno|default('') }}</h3>
+                    <div class="email"><i class="fas fa-envelope"></i> {{ usuario.email|default('') }}</div>
+                    <span class="rol-badge"><i class="fas fa-shield-alt"></i> Administrador</span>
+                </div>
+            </div>
+
+            <!-- FORMULARIO -->
+            <div class="section-box">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
+
+                <form method="POST" enctype="multipart/form-data">
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Datos personales</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre">Nombre *</label>
+                                <input type="text" id="nombre" name="nombre" value="{{ usuario.nombre|default('') }}" required autocomplete="given-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="apellido_paterno">Apellido paterno</label>
+                                <input type="text" id="apellido_paterno" name="apellido_paterno" value="{{ usuario.apellido_paterno|default('') }}" autocomplete="family-name">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="apellido_materno">Apellido materno</label>
+                                <input type="text" id="apellido_materno" name="apellido_materno" value="{{ usuario.apellido_materno|default('') }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono">Teléfono</label>
+                                <input type="tel" id="telefono" name="telefono" value="{{ usuario.telefono|default('') }}" autocomplete="tel" inputmode="tel">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Correo electrónico *</label>
+                                <input type="email" id="email" name="email" value="{{ usuario.email|default('') }}" required autocomplete="email" inputmode="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha_nacimiento">Fecha de nacimiento</label>
+                                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ usuario.fecha_nacimiento|default('') }}">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="genero">Género</label>
+                                <select id="genero" name="genero">
+                                    <option value="">— Selecciona —</option>
+                                    <option value="Masculino" {% if usuario.genero == 'Masculino' %}selected{% endif %}>Masculino</option>
+                                    <option value="Femenino" {% if usuario.genero == 'Femenino' %}selected{% endif %}>Femenino</option>
+                                    <option value="Indefinido" {% if usuario.genero == 'Indefinido' %}selected{% endif %}>Prefiero no decir</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="foto">Foto de perfil</label>
+                                <input type="file" id="foto" name="foto" accept="image/png,image/jpeg,image/gif,image/webp">
+                                <div class="hint">PNG, JPG, GIF o WEBP. Máx. 5 MB.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="fas fa-save"></i> Guardar cambios
+                        </button>
+                        <a href="{{ url_for('web.dashboard') }}" class="btn-gray-custom">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="footer-info">
+                <p>
+                    <i class="fas fa-clock"></i>
+                    {{ datetime.now().strftime('%d/%m/%Y %H:%M') if datetime else 'Ahora' }}
+                    <span class="separator">|</span>
+                    <i class="fas fa-shield-alt"></i> ORION System v2.0
+                    <span class="separator">|</span>
+                    <i class="fas fa-copyright"></i> Todos los derechos reservados
+                    <span class="separator">|</span>
+                    <span class="heart"><i class="fas fa-heart"></i></span>
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            // Excluir el bloque admin-profile del auto-active
+            if (link.classList.contains('admin-profile')) return;
+            if (link.getAttribute('href') === currentPath) link.classList.add('active');
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -2,121 +2,811 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>ORION Admin - Gestión de Categorías</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION Admin · Categorías</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <style>
-        .table-container { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .badge-nivel { font-size: 0.75rem; font-weight: 600; }
-        /* Estilos para el menú desplegable dinámico */
-        .dropdown-submenu { position: relative; }
-        .dropdown-submenu .dropdown-menu { top: 0; left: 100%; margin-top: -6px; }
-        .dropdown-submenu:hover > .dropdown-menu { display: block; }
-    </style>
-</head>
-<body class="bg-light p-4">
-    <div class="container">
-        <h2 class="mb-4 text-primary fw-bold">Gestión de Categorías 3/3</h2>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
 
-        <div class="card mb-4 border-0 shadow-sm">
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <span id="form-header">Nueva Categoría</span>
-                <button type="button" id="btn-cancelar" class="btn btn-sm btn-light d-none" onclick="resetForm()">Cancelar</button>
-            </div>
-            <div class="card-body">
-                <form id="cat-form" action="{{ url_for('web.agregar_categoria') }}" method="POST" class="row g-3">
-                    <div class="col-md-3">
-                        <label class="small fw-bold">Nombre</label>
-                        <input name="nombre" id="nombre" class="form-control" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="small fw-bold">Categoría Padre</label>
-                        <select name="padre_id" id="padre_id" class="form-select">
-                            <option value="">-- Es Raíz (Nivel 1) --</option>
-                            {% for c in categorias %}
-                                {% if c.nivel < 3 %}
-                                    <option value="{{ c._id }}" class="cat-option">{{ c.nombre }} (Nv. {{c.nivel}})</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="small fw-bold">Imagen (URL)</label>
-                        <input name="imagen" id="imagen" class="form-control">
-                    </div>
-                    <div class="col-md-1">
-                        <label class="small fw-bold">Activo</label>
-                        <div class="form-check form-switch pt-1">
-                            <input class="form-check-input" type="checkbox" name="activo" id="activo" checked>
-                        </div>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100" id="btn-save">Guardar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        /* ========== SIDEBAR (igual que dashboard) ========== */
+        .sidebar {
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            padding: 0; height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .sidebar .admin-profile {
+            padding: 25px 20px 20px; text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            margin-bottom: 10px; flex-shrink: 0;
+        }
+        .sidebar .admin-profile .avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .admin-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .admin-profile .rol {
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
+        .sidebar .menu-scroll::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a:hover i, .sidebar a.active i { color: #e10098; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
 
-        <div class="table-container">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr><th>Img</th><th>Nombre</th><th>Nivel (3/3)</th><th>Estado</th><th>Acciones</th></tr>
-                </thead>
-                <tbody>
-                    {% for c in categorias %}
-                    <tr>
-                        <td><img src="{{ c.imagen or 'https://via.placeholder.com/40' }}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;"></td>
-                        <td><span class="fw-bold">{{ c.nombre }}</span></td>
-                        <td>
-                            <span class="badge {{ 'bg-dark' if c.nivel == 1 else 'bg-primary' if c.nivel == 2 else 'bg-info text-dark' }} badge-nivel">
-                                NIVEL {{ c.nivel }}
-                            </span>
-                            <small class="text-muted d-block">{{ c.padre_nombre }}</small>
-                        </td>
-                        <td>
-                            <span class="badge {{ 'bg-success' if c.activo else 'bg-secondary' }}">{{ 'Activo' if c.activo else 'Inactivo' }}</span>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-outline-warning btn-editar"
-                                    data-id="{{ c._id }}" data-nombre="{{ c.nombre }}" 
-                                    data-padre="{{ c.padre_id or '' }}" data-imagen="{{ c.imagen }}" 
-                                    data-activo="{{ c.activo }}">Editar</button>
-                            
-                            <form action="{{ url_for('web.borrar_categoria', id=c._id) }}" method="POST" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Borrar categoría?')">Borrar</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+        /* ========== MAIN ========== */
+        .main { margin-left: 280px; padding: 30px 35px 20px; width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #e8e8e8; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0; }
+        .top-bar h1 { font-size: 1.6rem; font-weight: 800; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .top-bar h1 i { color: #e10098; }
+        .top-bar .tag { background: #e10098; color: #fff; padding: 5px 18px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function resetForm() {
-            document.getElementById('cat-form').action = "{{ url_for('web.agregar_categoria') }}";
-            document.getElementById('cat-form').reset();
-            document.getElementById('form-header').innerText = 'Nueva Categoría';
-            document.getElementById('btn-save').innerText = 'Guardar';
-            document.getElementById('btn-cancelar').classList.add('d-none');
+        /* ========== HERO ========== */
+        .hero { background: linear-gradient(135deg, #fff, #faf0f5); padding: 25px 30px; border-radius: 16px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); flex-shrink: 0; }
+        .hero h2 { color: #1a1a2e; margin-bottom: 8px; font-weight: 800; font-size: 1.3rem; }
+        .hero h2 i { color: #e10098; }
+        .hero p { color: #666; margin-bottom: 15px; font-size: 0.95rem; line-height: 1.6; }
+        .hero strong { color: #e10098; }
+
+        /* ========== BOTONES ========== */
+        .btn-primary-custom { background: #e10098; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: inline-block; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-primary-custom:hover { background: #c00080; color: white; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3); }
+        .btn-secondary-custom { background: #00d4ff; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: inline-block; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-secondary-custom:hover { background: #00b8e0; color: white; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3); }
+        .btn-gray-custom { background: #6c757d; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: inline-block; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-gray-custom:hover { background: #5a6268; color: white; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(108, 117, 125, 0.3); }
+
+        /* ========== SECTION BOX ========== */
+        .section-box { background: #ffffff; border-radius: 16px; padding: 25px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0; }
+        .section-box h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .section-box h2 i { color: #e10098; }
+
+        /* ========== CATEGORÍAS LAYOUT (árbol + contenido) ========== */
+        .cats-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
         }
 
-        document.querySelectorAll('.btn-editar').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.dataset.id;
-                document.getElementById('cat-form').action = "/admin/categorias/editar/" + id;
-                document.getElementById('nombre').value = this.dataset.nombre;
-                document.getElementById('padre_id').value = this.dataset.padre;
-                document.getElementById('imagen').value = this.dataset.imagen;
-                document.getElementById('activo').checked = (this.dataset.activo === 'True');
-                document.getElementById('form-header').innerText = 'Editando: ' + this.dataset.nombre;
-                document.getElementById('btn-save').innerText = 'Actualizar';
-                document.getElementById('btn-cancelar').classList.remove('d-none');
-                window.scrollTo(0, 0);
-            });
+        /* ---------- Árbol lateral ---------- */
+        .tree-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            overflow: hidden;
+            height: fit-content;
+            max-height: calc(100vh - 120px);
+            position: sticky;
+            top: 20px;
+        }
+        .tree-card-head {
+            padding: 18px 22px;
+            background: linear-gradient(135deg, #fff, #faf0f5);
+            border-bottom: 2px solid #e8e8e8;
+        }
+        .tree-card-head h2 {
+            font-size: 0.95rem; font-weight: 800; color: #1a1a2e;
+            display: flex; align-items: center; gap: 10px; margin: 0;
+        }
+        .tree-card-head h2 i { color: #e10098; }
+        .tree-body {
+            padding: 14px 12px;
+            overflow-y: auto;
+            max-height: calc(100vh - 220px);
+        }
+        .tree-body::-webkit-scrollbar { width: 4px; }
+        .tree-body::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
+
+        .tree-n1 {
+            border: none; background: transparent; width: 100%;
+            text-align: left; padding: 10px 14px; border-radius: 10px;
+            font-family: inherit;
+            font-weight: 700; font-size: 0.88rem; color: #1a1a2e;
+            display: flex; align-items: center; gap: 8px; transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .tree-n1:hover { background: #f8f0f5; color: #e10098; }
+        .tree-n1 .chev { margin-left: auto; transition: transform 0.25s; font-size: 0.75rem; color: #aaa; }
+        .tree-n1.open .chev { transform: rotate(90deg); color: #e10098; }
+        .tree-n1 .badge-nivel {
+            font-size: 0.62rem; padding: 2px 9px; border-radius: 20px;
+            background: rgba(225, 0, 152, 0.1); color: #e10098;
+            font-weight: 700; margin-left: 4px;
+        }
+        .tree-children { margin-left: 14px; border-left: 2px solid #f0f0f0; padding-left: 8px; }
+        .tree-n2 {
+            border: none; background: transparent; width: 100%;
+            text-align: left; padding: 8px 10px; border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.82rem; color: #555; font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .tree-n2:hover { background: #f8f0f5; color: #e10098; }
+        .tree-n3 {
+            border: none; background: transparent; width: 100%;
+            text-align: left; padding: 6px 10px; border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.78rem; color: #777; display: block;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .tree-n3:hover { background: #f8f0f5; color: #e10098; }
+
+        /* ---------- Formulario ---------- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        .form-label-custom {
+            font-size: 0.7rem; font-weight: 700; color: #888;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 6px; display: block;
+        }
+        .form-control, .form-select {
+            border: 2px solid #e8e8e8; border-radius: 12px;
+            padding: 10px 14px; font-size: 0.88rem;
+            font-family: inherit; color: #1a1a2e;
+            width: 100%; transition: all 0.3s ease;
+            background: #fff;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #e10098; box-shadow: 0 0 0 4px rgba(225, 0, 152, 0.1);
+            outline: none;
+        }
+        .form-switch-wrap {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 0;
+        }
+        .form-check-input {
+            width: 42px; height: 22px;
+            cursor: pointer;
+            accent-color: #e10098;
+        }
+
+        /* ---------- Tabla ---------- */
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            position: relative;
+            min-width: 260px;
+            flex: 1;
+            max-width: 340px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px 10px 42px;
+            border: 2px solid #e8e8e8;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            background: #fff;
+            transition: all 0.3s ease;
+        }
+        .search-box input:focus {
+            border-color: #e10098;
+            box-shadow: 0 0 0 4px rgba(225, 0, 152, 0.1);
+            outline: none;
+        }
+        .search-box i {
+            position: absolute; left: 16px; top: 50%;
+            transform: translateY(-50%); color: #aaa;
+        }
+
+        .nivel-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+        .nivel-tab {
+            padding: 8px 16px; border-radius: 50px; font-size: 0.75rem;
+            font-weight: 700; border: 2px solid #e8e8e8; background: #fff;
+            color: #666; cursor: pointer; transition: all 0.25s ease;
+            font-family: inherit;
+        }
+        .nivel-tab:hover { border-color: #e10098; color: #e10098; }
+        .nivel-tab.active { background: #e10098; color: #fff; border-color: #e10098; box-shadow: 0 4px 14px rgba(225, 0, 152, 0.25); }
+
+        table.cats-table {
+            width: 100%;
+            font-size: 0.88rem;
+            border-collapse: collapse;
+        }
+        table.cats-table thead th {
+            font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.8px;
+            color: #888; font-weight: 700;
+            padding: 12px 14px;
+            border-bottom: 2px solid #f0f0f0;
+            text-align: left;
+            background: #fafbfc;
+        }
+        table.cats-table thead th:first-child { border-top-left-radius: 10px; }
+        table.cats-table thead th:last-child { border-top-right-radius: 10px; }
+        table.cats-table tbody tr {
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        table.cats-table tbody tr:hover { background: #fdf6fa; }
+        table.cats-table tbody td { padding: 12px 14px; vertical-align: middle; }
+
+        .cat-thumb {
+            width: 44px; height: 44px; border-radius: 10px;
+            object-fit: cover; border: 2px solid #f0f0f0;
+            background: #f5f6f8;
+        }
+        .cat-name { font-weight: 700; color: #1a1a2e; font-size: 0.88rem; }
+        .cat-parent {
+            font-size: 0.72rem; color: #888; margin-top: 3px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .cat-parent i { color: #e10098; font-size: 0.65rem; }
+
+        .badge-nivel-tabla {
+            font-size: 0.65rem; padding: 5px 12px; border-radius: 20px;
+            font-weight: 700; letter-spacing: 0.3px;
+            display: inline-block;
+        }
+        .badge-n1 { background: #1a1a2e; color: #fff; }
+        .badge-n2 { background: #6c5ce7; color: #fff; }
+        .badge-n3 { background: #e10098; color: #fff; }
+
+        .badge-estado {
+            font-size: 0.68rem; padding: 5px 12px; border-radius: 20px;
+            font-weight: 700; letter-spacing: 0.3px;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .badge-estado.activo { background: #d1fae5; color: #065f46; }
+        .badge-estado.inactivo { background: #f3f4f6; color: #6b7280; }
+
+        .btn-icon-action {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: 10px;
+            border: 2px solid transparent;
+            background: #f5f6f8;
+            cursor: pointer; transition: all 0.25s ease;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .btn-icon-action.edit { color: #f59e0b; }
+        .btn-icon-action.edit:hover { background: #fef3c7; border-color: #fcd34d; }
+        .btn-icon-action.delete { color: #dc2626; }
+        .btn-icon-action.delete:hover { background: #fee2e2; border-color: #fca5a5; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+        .empty-state i { font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 15px; }
+        .empty-state p { margin: 5px 0; }
+        .empty-state .small { font-size: 0.82rem; color: #bbb; }
+
+        /* ---------- Footer ---------- */
+        .footer-info { background: #ffffff; padding: 15px 25px; border-radius: 16px; border: 1px solid #e8e8e8; text-align: center; margin-top: auto; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+        .footer-info p { color: #888; font-size: 0.75rem; margin: 0; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .footer-info p .separator { color: #ddd; }
+        .footer-info i { color: #e10098; }
+        .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1100px) {
+            .cats-layout { grid-template-columns: 1fr; }
+            .tree-card { max-height: none; position: static; }
+            .tree-body { max-height: 320px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .admin-profile .name, .sidebar .admin-profile .email,
+            .sidebar .admin-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .admin-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .admin-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .sidebar .logout-btn i { font-size: 1.3rem; margin: 0; }
+            .main { margin-left: 70px; padding: 15px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .table-toolbar { flex-direction: column; align-items: stretch; }
+            .search-box { max-width: none; }
+            .top-bar h1 { font-size: 1.2rem; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .hero { padding: 20px; }
+            .hero h2 { font-size: 1.1rem; }
+            .hero p { font-size: 0.85rem; }
+            .section-box { padding: 18px; }
+            .footer-info p { font-size: 0.65rem; gap: 8px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- ========== SIDEBAR (igual que dashboard) ========== -->
+    <nav class="sidebar">
+
+        <div class="admin-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Admin">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ session.get('nombre', 'Admin') }}&background=e10098&color=fff&size=80&bold=true" class="avatar" alt="Admin">
+            {% endif %}
+            <div class="name">{{ session.get('nombre', 'Administrador') }}</div>
+            <div class="email">{{ session.get('email', 'admin@orion.com') }}</div>
+            <div class="rol"><i class="fas fa-shield-alt"></i> Administrador</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+
+            <div class="panel-title">MENÚ PRINCIPAL</div>
+
+            <a href="{{ url_for('web.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.lista_usuarios') }}"><i class="fas fa-users"></i> <span>Usuarios</span></a>
+            <a href="{{ url_for('web.lista_categorias') }}" class="active"><i class="fas fa-tags"></i> <span>Categorías</span></a>
+            <a href="{{ url_for('web.lista_marcas') }}"><i class="fas fa-building"></i> <span>Marcas</span></a>
+            <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
+            <a href="{{ url_for('web.admin_combos') }}"><i class="fas fa-layer-group" style="color: #fd7e14;"></i> <span>Combos</span></a>
+            <a href="{{ url_for('web.admin_marketplace_vendedores') }}"><i class="fas fa-store" style="color: #0284c7;"></i> <span>Marketplace</span></a>
+            <a href="{{ url_for('web.admin_resenas') }}"><i class="fas fa-star" style="color: #ffc107;"></i> <span>Reseñas</span></a>
+            <a href="{{ url_for('web.admin_chat_panel') }}"><i class="fas fa-comment-dots" style="color: #00d4ff;"></i> <span>Chat en vivo</span></a>
+            <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
+            <a href="{{ url_for('web.listar_temporadas') }}"><i class="fas fa-calendar-alt" style="color: #f9a825;"></i> <span>Temporadas</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">REPORTES</div>
+            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">PROMOCIONES</div>
+            <a href="{{ url_for('web.admin_listar_promociones') }}"><i class="fas fa-gift"></i> <span>Promociones</span></a>
+            <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+            <a href="{{ url_for('web.admin_lealtad_panel') }}"><i class="fas fa-crown" style="color: #e10098;"></i> <span>Cliente Consentido</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">FINANZAS</div>
+            <a href="{{ url_for('web.admin_monedero_panel') }}"><i class="fas fa-wallet" style="color: #e10098;"></i> <span>Monedero ORION</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
+            <a href="{{ url_for('web.admin_analisis_supervisado') }}"><i class="fas fa-brain" style="color: #6f42c1;"></i> <span>Análisis Supervisado</span></a>
+            <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
+            <a href="{{ url_for('web.clasificacion_binaria') }}"><i class="fas fa-toggle-on" style="color: #17a2b8;"></i> <span>Clasificación Binaria</span></a>
+            <a href="{{ url_for('web.admin_dashboard_auditoria') }}"><i class="fas fa-shield-check" style="color: #0d47a1;"></i> <span>Auditoría</span></a>
+
+            <div class="divider"></div>
+
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
+            <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
+            <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
+            <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+            <div class="divider"></div>
+
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+
+        </div>
+
+    </nav>
+
+    <!-- ========== MAIN ========== -->
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-tags"></i> Gestión de Categorías</h1>
+            <div class="tag"><i class="fas fa-shield-alt"></i> Admin</div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <!-- HERO -->
+            <section class="hero">
+                <h2><i class="fas fa-sitemap"></i> Organiza tu catálogo por categorías</h2>
+                <p>
+                    Crea y administra una estructura de <strong>hasta 3 niveles</strong> para organizar
+                    todos tus productos. Puedes crear categorías raíz (Mujer, Hombre, Niños…), subcategorías
+                    (Ropa, Calzado, Accesorios…) y sub-subcategorías (Blusas, Tenis, Bolsos…).
+                </p>
+                <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="#form-categoria" class="btn-primary-custom">
+                        <i class="fas fa-plus-circle"></i> Nueva Categoría
+                    </a>
+                    <a href="#tabla-categorias" class="btn-secondary-custom">
+                        <i class="fas fa-list"></i> Ver Todas
+                    </a>
+                </div>
+            </section>
+
+            <!-- LAYOUT: ÁRBOL + CONTENIDO -->
+            <div class="cats-layout">
+
+                <!-- ÁRBOL LATERAL -->
+                <aside class="tree-card">
+                    <div class="tree-card-head">
+                        <h2><i class="fas fa-sitemap"></i> Árbol de Categorías</h2>
+                    </div>
+                    <div class="tree-body">
+
+                        {% set n1_list = [] %}
+                        {% set n2_by_padre = {} %}
+                        {% set n3_by_padre = {} %}
+
+                        {% for c in categorias %}
+                            {% if c.nivel == 1 %}
+                                {% set _ = n1_list.append(c) %}
+                            {% elif c.nivel == 2 %}
+                                {% set _ = n2_by_padre.setdefault(c.padre_id|string, []).append(c) %}
+                            {% elif c.nivel == 3 %}
+                                {% set _ = n3_by_padre.setdefault(c.padre_id|string, []).append(c) %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if n1_list %}
+                            {% for n1 in n1_list %}
+                            <div>
+                                <button type="button" class="tree-n1" onclick="toggleTree('n1-{{ n1._id }}', this)">
+                                    <i class="fas fa-folder" style="color:{{ n1.color or '#e10098' }};"></i>
+                                    <span>{{ n1.nombre }}</span>
+                                    <span class="badge-nivel">{{ (n2_by_padre.get(n1._id|string, []) | length) }}</span>
+                                    <i class="fas fa-chevron-right chev"></i>
+                                </button>
+                                <div class="tree-children" id="n1-{{ n1._id }}" style="display:none;">
+                                    {% for n2 in n2_by_padre.get(n1._id|string, []) %}
+                                    <button type="button" class="tree-n2" onclick="toggleTree('n2-{{ n2._id }}', this)">
+                                        <i class="fas fa-folder-open" style="color:#888;"></i>
+                                        <span>{{ n2.nombre }}</span>
+                                        <span class="ms-auto badge-nivel" style="margin-left:auto;">
+                                            {{ (n3_by_padre.get(n2._id|string, []) | length) }}
+                                        </span>
+                                    </button>
+                                    <div id="n2-{{ n2._id }}" style="display:none; margin-left: 12px;">
+                                        {% for n3 in n3_by_padre.get(n2._id|string, []) %}
+                                        <button type="button" class="tree-n3">
+                                            <i class="fas fa-tag" style="font-size:0.65rem; opacity:0.6;"></i>
+                                            {{ n3.nombre }}
+                                        </button>
+                                        {% endfor %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state" style="padding: 30px 15px;">
+                                <i class="fas fa-folder-open" style="font-size:2rem;"></i>
+                                <p class="small">Aún no hay categorías.<br>Crea la primera con el formulario.</p>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </aside>
+
+                <!-- CONTENIDO PRINCIPAL -->
+                <div>
+
+                    <!-- FORMULARIO -->
+                    <div class="section-box" id="form-categoria">
+                        <h2 id="form-header">
+                            <i class="fas fa-plus-circle"></i>
+                            Nueva Categoría
+                        </h2>
+
+                        <form id="cat-form" action="{{ url_for('web.agregar_categoria') }}" method="POST">
+                            <div class="form-grid">
+
+                                <div>
+                                    <label class="form-label-custom">Nombre *</label>
+                                    <input name="nombre" id="nombre" class="form-control"
+                                           placeholder="Ej: Blusas" required>
+                                </div>
+
+                                <div>
+                                    <label class="form-label-custom">Categoría Padre</label>
+                                    <select name="padre_id" id="padre_id" class="form-select">
+                                        <option value="">— Es Raíz (Nivel 1) —</option>
+                                        {% for c in categorias %}
+                                            {% if c.nivel < 3 %}
+                                            <option value="{{ c._id }}">
+                                                {% if c.nivel == 2 %}└─ {% endif %}{{ c.nombre }} (Nv. {{ c.nivel }})
+                                            </option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="form-label-custom">Imagen (URL)</label>
+                                    <input name="imagen" id="imagen" class="form-control"
+                                           placeholder="https://...">
+                                </div>
+
+                                <div>
+                                    <label class="form-label-custom">Estado</label>
+                                    <div class="form-switch-wrap">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="activo" id="activo" checked>
+                                        <span style="font-size:0.85rem; font-weight:600; color:#555;">
+                                            Activa
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div style="display:flex; gap:8px;">
+                                    <button type="submit" class="btn-primary-custom" id="btn-save" style="flex:1;">
+                                        <i class="fas fa-save"></i> Guardar
+                                    </button>
+                                    <button type="button" id="btn-cancelar"
+                                            class="btn-gray-custom" style="display:none;"
+                                            onclick="resetForm()">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </button>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- TABLA -->
+                    <div class="section-box" id="tabla-categorias">
+                        <h2>
+                            <i class="fas fa-list-ul"></i>
+                            Lista de Categorías
+                        </h2>
+
+                        <div class="table-toolbar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchCats"
+                                       placeholder="Buscar categoría…"
+                                       oninput="aplicarFiltros()">
+                            </div>
+                            <div class="nivel-tabs">
+                                <button class="nivel-tab active" data-nivel="todos"
+                                        onclick="filtrarNivel(this, 'todos')">Todos</button>
+                                <button class="nivel-tab" data-nivel="1"
+                                        onclick="filtrarNivel(this, '1')">Nivel 1</button>
+                                <button class="nivel-tab" data-nivel="2"
+                                        onclick="filtrarNivel(this, '2')">Nivel 2</button>
+                                <button class="nivel-tab" data-nivel="3"
+                                        onclick="filtrarNivel(this, '3')">Nivel 3</button>
+                            </div>
+                        </div>
+
+                        <div style="overflow-x:auto;">
+                            <table class="cats-table" id="tablaCats">
+                                <thead>
+                                    <tr>
+                                        <th style="width:60px;">Img</th>
+                                        <th>Nombre</th>
+                                        <th style="width:150px;">Nivel</th>
+                                        <th style="width:130px;">Estado</th>
+                                        <th style="width:140px; text-align:right;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in categorias %}
+                                    <tr class="cat-row" data-nivel="{{ c.nivel }}"
+                                        data-search="{{ (c.nombre or '')|lower }} {{ (c.padre_nombre or '')|lower }}">
+                                        <td>
+                                            <img src="{{ c.imagen or 'https://via.placeholder.com/44/e10098/ffffff?text=' + (c.nombre[:1]|upper) }}"
+                                                 class="cat-thumb"
+                                                 onerror="this.src='https://via.placeholder.com/44/e10098/ffffff?text=?'">
+                                        </td>
+                                        <td>
+                                            <div class="cat-name">{{ c.nombre }}</div>
+                                            {% if c.padre_nombre %}
+                                            <div class="cat-parent">
+                                                <i class="fas fa-level-up-alt"></i>
+                                                {{ c.padre_nombre }}
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge-nivel-tabla badge-n{{ c.nivel }}">
+                                                NIVEL {{ c.nivel }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if c.activo %}
+                                            <span class="badge-estado activo">
+                                                <i class="fas fa-check-circle"></i> Activa
+                                            </span>
+                                            {% else %}
+                                            <span class="badge-estado inactivo">
+                                                <i class="fas fa-minus-circle"></i> Inactiva
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <div style="display:inline-flex; gap:6px;">
+                                                <button type="button"
+                                                        class="btn-icon-action edit btn-editar"
+                                                        title="Editar"
+                                                        data-id="{{ c._id }}"
+                                                        data-nombre="{{ c.nombre }}"
+                                                        data-padre="{{ c.padre_id or '' }}"
+                                                        data-imagen="{{ c.imagen or '' }}"
+                                                        data-activo="{{ c.activo }}">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </button>
+                                                <form action="{{ url_for('web.borrar_categoria', id=c._id) }}"
+                                                      method="POST" style="display:inline; margin:0;"
+                                                      onsubmit="return confirm('¿Borrar «{{ c.nombre }}»?')">
+                                                    <button type="submit"
+                                                            class="btn-icon-action delete"
+                                                            title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-state">
+                                                <i class="fas fa-inbox"></i>
+                                                <p>Aún no tienes categorías</p>
+                                                <p class="small">Crea la primera con el formulario de arriba</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer-info">
+                <p>
+                    <i class="fas fa-clock"></i>
+                    {{ datetime.now().strftime('%d/%m/%Y %H:%M') if datetime else 'Ahora' }}
+                    <span class="separator">|</span>
+                    <i class="fas fa-shield-alt"></i> ORION System v2.0
+                    <span class="separator">|</span>
+                    <i class="fas fa-copyright"></i> Todos los derechos reservados
+                    <span class="separator">|</span>
+                    <span class="heart"><i class="fas fa-heart"></i></span>
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    // ---------- Árbol colapsable ----------
+    function toggleTree(id, btn) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const abierto = el.style.display !== "none";
+        el.style.display = abierto ? "none" : "block";
+        btn.classList.toggle("open", !abierto);
+    }
+
+    // ---------- Reset del formulario ----------
+    function resetForm() {
+        document.getElementById('cat-form').action = "{{ url_for('web.agregar_categoria') }}";
+        document.getElementById('cat-form').reset();
+        document.getElementById('form-header').innerHTML =
+            '<i class="fas fa-plus-circle"></i> Nueva Categoría';
+        document.getElementById('btn-save').innerHTML =
+            '<i class="fas fa-save"></i> Guardar';
+        document.getElementById('btn-cancelar').style.display = 'none';
+    }
+
+    // ---------- Editar ----------
+    document.querySelectorAll('.btn-editar').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = this.dataset.id;
+            document.getElementById('cat-form').action = "/admin/categorias/editar/" + id;
+            document.getElementById('nombre').value = this.dataset.nombre;
+            document.getElementById('padre_id').value = this.dataset.padre;
+            document.getElementById('imagen').value = this.dataset.imagen;
+            document.getElementById('activo').checked =
+                (this.dataset.activo === 'True' || this.dataset.activo === 'true');
+            document.getElementById('form-header').innerHTML =
+                '<i class="fas fa-pencil-alt"></i> Editando: ' + this.dataset.nombre;
+            document.getElementById('btn-save').innerHTML =
+                '<i class="fas fa-check"></i> Actualizar';
+            document.getElementById('btn-cancelar').style.display = 'inline-block';
+            document.getElementById('form-categoria').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
-    </script>
+    });
+
+    // ---------- Filtros ----------
+    let nivelActual = "todos";
+
+    function filtrarNivel(btn, nivel) {
+        document.querySelectorAll('.nivel-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        nivelActual = nivel;
+        aplicarFiltros();
+    }
+
+    function aplicarFiltros() {
+        const q = (document.getElementById('searchCats').value || '').toLowerCase().trim();
+        document.querySelectorAll('#tablaCats .cat-row').forEach(row => {
+            const okNivel = (nivelActual === 'todos') || row.dataset.nivel === nivelActual;
+            const okQ = !q || (row.dataset.search || '').includes(q);
+            row.style.display = (okNivel && okQ) ? '' : 'none';
+        });
+    }
+
+    // ---------- Marcar activo en sidebar ----------
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            const href = link.getAttribute('href') || '';
+            // Solo marcar "Categorías" como activo si estamos en esa ruta
+            if (href.includes('categorias')) link.classList.add('active');
+        });
+    });
+</script>
+
 </body>
 </html>

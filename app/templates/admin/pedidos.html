@@ -376,6 +376,16 @@
             text-transform: uppercase; letter-spacing: 0.3px;
         }
 
+        /* ⭐ NUEVO: badge "Sandbox" para el bloque de pago */
+        .badge-sandbox {
+            background: #ede9fe; color: #5b21b6;
+            padding: 2px 10px; border-radius: 50px;
+            font-size: 0.58rem; font-weight: 800;
+            display: inline-flex; align-items: center; gap: 4px;
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-left: 6px;
+        }
+
         /* ⭐ NUEVO: badge "Estimado" para fecha de entrega */
         .badge-estimado {
             background: #fff0f8; color: #e10098;
@@ -1038,18 +1048,23 @@
                                     </div>
                                 </div>
 
-                                <!-- Pago / Conekta -->
+                                <!-- ⭐ Pago (SANDBOX, sin Conekta) -->
                                 <div class="extra-block">
-                                    <div class="extra-title"><i class="fas fa-receipt"></i> Pago</div>
+                                    <div class="extra-title">
+                                        <i class="fas fa-receipt"></i> Pago
+                                        <span class="badge-sandbox">
+                                            <i class="fas fa-flask"></i> Sandbox
+                                        </span>
+                                    </div>
                                     <div class="extra-content">
                                         <div>Método: <strong>{{ pedido.metodo_pago|title if pedido.metodo_pago else 'No especificado' }}</strong></div>
                                         {% if pedido.msi_meses and pedido.msi_meses > 0 %}
                                         <div>MSI: <strong>{{ pedido.msi_meses }} meses</strong></div>
                                         {% endif %}
                                         <div>Estado pago: <strong>{{ pedido.pago_estado|title if pedido.pago_estado else 'pendiente' }}</strong></div>
-                                        {% if pedido.conekta_order_id %}
+                                        {% if pedido.sandbox_order_id %}
                                         <div style="font-size:0.7rem; color:#94a3b8; margin-top:4px;">
-                                            Conekta: <code>{{ pedido.conekta_order_id }}</code>
+                                            Sandbox order: <code>{{ pedido.sandbox_order_id }}</code>
                                         </div>
                                         {% endif %}
                                     </div>

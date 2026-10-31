@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if promocion %}Editar{% else %}Crear{% endif %} Promoción | ORION Admin</title>
+    <title>Crear Promoción | ORION Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ===== ESTILOS BASE ===== */
+        /* ===== BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: #f5f6f8;
+            color: #1a1a2e;
+        }
         .layout { display: flex; min-height: 100vh; }
 
-        /* ===== SIDEBAR (igual que en promociones.html) ===== */
+        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px;
             background: #ffffff;
@@ -31,7 +35,6 @@
             text-align: center;
             border-bottom: 1px solid #e8e8e8;
             background: linear-gradient(135deg, #e10098, #c00080);
-            flex-shrink: 0;
         }
         .sidebar .admin-profile .avatar {
             width: 80px;
@@ -63,19 +66,16 @@
             margin-top: 5px;
         }
         .sidebar .logo {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 1.8rem;
             font-weight: 900;
             color: #e10098;
             text-align: center;
             padding: 15px 0 5px;
             letter-spacing: -1px;
-            flex-shrink: 0;
         }
         .sidebar .logo span { color: #1a1a2e; }
         .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
-        .sidebar .menu-scroll::-webkit-scrollbar { width: 3px; }
-        .sidebar .menu-scroll::-webkit-scrollbar-track { background: #f5f6f8; }
-        .sidebar .menu-scroll::-webkit-scrollbar-thumb { background: #e10098; border-radius: 4px; }
         .sidebar .panel-title {
             font-size: 0.65rem;
             text-transform: uppercase;
@@ -98,6 +98,7 @@
         }
         .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
         .sidebar a:hover { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
+        .sidebar a:hover i { color: #e10098; }
         .sidebar a.active { background: #f8f0f5; color: #e10098; border-left-color: #e10098; }
         .sidebar a.active i { color: #e10098; }
         .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
@@ -107,18 +108,19 @@
             gap: 12px;
             padding: 11px 25px;
             color: #dc3545;
-            border: none;
-            background: transparent;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
+            text-decoration: none;
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
             font-size: 0.85rem;
             font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
         }
-        .sidebar .logout-btn i { color: #dc3545; }
-        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; color: #dc3545; }
 
         /* ===== MAIN ===== */
         .main {
@@ -140,6 +142,7 @@
         .top-bar h1 {
             font-size: 1.6rem;
             font-weight: 800;
+            color: #1a1a2e;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -153,38 +156,185 @@
             font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        /* ===== FORMULARIO ===== */
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin: 0 0 20px 0;
+            font-size: 0.85rem;
+        }
+        .breadcrumb .breadcrumb-item a { color: #e10098; text-decoration: none; }
+        .breadcrumb .breadcrumb-item a:hover { text-decoration: underline; }
+        .breadcrumb .breadcrumb-item.active { color: #888; }
+
+        /* ===== FORM ===== */
         .form-container {
             background: #ffffff;
             border-radius: 16px;
-            padding: 30px;
             border: 1px solid #e8e8e8;
+            padding: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .form-container label { font-weight: 600; font-size: 0.85rem; margin-bottom: 5px; display: block; }
-        .form-container .form-control {
+        .form-container .form-group { margin-bottom: 20px; }
+        .form-container .form-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #555;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .form-container .form-group label .required { color: #dc3545; }
+        .form-container .form-group input,
+        .form-container .form-group select,
+        .form-container .form-group textarea {
             width: 100%;
             padding: 10px 14px;
-            border: 2px solid #e8e8e8;
-            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 0.9rem;
             transition: all 0.3s ease;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #fff;
         }
-        .form-container .form-control:focus { border-color: #e10098; outline: none; box-shadow: 0 0 0 3px rgba(225,0,152,0.1); }
-        .form-container .form-group { margin-bottom: 20px; }
-        .form-container .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { .form-container .form-row { grid-template-columns: 1fr; } }
-        .form-container .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
-        .form-container .checkbox-group label { font-weight: 400; display: flex; align-items: center; gap: 5px; }
-        .form-container .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: #e10098; }
-        .btn-primary-custom { background: #e10098; color: white; padding: 10px 25px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
-        .btn-primary-custom:hover { background: #c00080; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(225,0,152,0.3); }
-        .btn-secondary-custom { background: #6c757d; color: white; padding: 10px 25px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
-        .btn-secondary-custom:hover { background: #5a6268; transform: translateY(-2px); }
-        .help-text { font-size: 0.75rem; color: #888; margin-top: 5px; }
+        .form-container .form-group input:focus,
+        .form-container .form-group select:focus,
+        .form-container .form-group textarea:focus {
+            border-color: #e10098;
+            box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.1);
+            outline: none;
+        }
+        .form-container .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-container .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-container .form-check-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .form-container .form-check-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #555;
+            cursor: pointer;
+        }
+        .form-container .form-check-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #e10098;
+        }
+        .form-container .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            padding-top: 20px;
+            border-top: 1px solid #e8e8e8;
+        }
+        .form-container .form-actions .btn-cancel {
+            background: #e9ecef;
+            color: #495057;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .form-container .form-actions .btn-cancel:hover { background: #dee2e6; }
+        .form-container .form-actions .btn-save {
+            background: #e10098;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .form-container .form-actions .btn-save:hover {
+            background: #c00080;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
+        }
+        .form-container .help-text {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 4px;
+        }
 
+        /* ===== SEGMENTO AUTO (IA) ===== */
+        .form-container .segmento-auto {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #7C3AED;
+            margin-bottom: 20px;
+        }
+        .form-container .segmento-auto label {
+            font-weight: 700;
+            color: #7C3AED;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-container .segmento-auto p {
+            font-size: 0.85rem;
+            color: #555;
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+        .form-container .segmento-auto .badge-ia {
+            background: linear-gradient(135deg, #a855f7, #7C3AED);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .toast-message {
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+        }
+        .toast-message.success { background: #28a745; }
+        .toast-message.error { background: #dc3545; }
+        .toast-message.warning { background: #ffc107; color: #1a1a2e; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .sidebar { width: 70px; }
             .sidebar .logo, .sidebar .panel-title, .sidebar a span,
@@ -201,10 +351,15 @@
             .top-bar h1 { font-size: 1.2rem; }
             .top-bar { flex-direction: column; align-items: flex-start; }
             .form-container .form-row { grid-template-columns: 1fr; }
+            .form-container { padding: 20px; }
+            .form-container .form-actions { flex-direction: column; }
+            .form-container .form-actions .btn-cancel,
+            .form-container .form-actions .btn-save { width: 100%; text-align: center; }
         }
     </style>
 </head>
 <body>
+
 <div class="layout">
 
     <!-- ===== SIDEBAR ===== -->
@@ -228,20 +383,16 @@
             <a href="{{ url_for('web.lista_marcas') }}"><i class="fas fa-building"></i> <span>Marcas</span></a>
             <a href="{{ url_for('web.lista_productos') }}"><i class="fas fa-box"></i> <span>Productos</span></a>
             <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
+            <a href="{{ url_for('web.reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
             <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
 
             <div class="divider"></div>
-            <div class="panel-title">REPORTES</div>
-            <a href="{{ url_for('web.admin_reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
-
-            <div class="divider"></div>
             <div class="panel-title">PROMOCIONES</div>
-            <a href="{{ url_for('web.admin_listar_promociones') }}" class="active"><i class="fas fa-gift"></i> <span>Promociones</span></a>
             <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
+            <a href="{{ url_for('web.admin_listar_promociones') }}" class="active"><i class="fas fa-bolt"></i> <span>Promociones</span></a>
 
             <div class="divider"></div>
             <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
-            <a href="{{ url_for('web.admin_analisis_supervisado') }}"><i class="fas fa-brain" style="color:#6f42c1;"></i> <span>Análisis Supervisado</span></a>
             <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
             <a href="{{ url_for('web.prediccion_ventas') }}"><i class="fas fa-chart-bar"></i> <span>Predicción Ventas</span></a>
             <a href="{{ url_for('web.prediccion_abandono') }}"><i class="fas fa-exclamation-triangle"></i> <span>Predicción Abandono</span></a>
@@ -255,7 +406,7 @@
             <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
 
             <div class="divider"></div>
-            <form action="{{ url_for('web.logout') }}" method="GET" style="margin:0;">
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
                 <button type="submit" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
                 </button>
@@ -263,239 +414,168 @@
         </div>
     </nav>
 
-    <!-- ===== MAIN CONTENT ===== -->
+    <!-- ===== MAIN ===== -->
     <main class="main">
 
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb" style="background:transparent; padding:0; margin:0 0 20px 0;">
-                <li class="breadcrumb-item"><a href="{{ url_for('web.dashboard') }}" style="color:#e10098; text-decoration:none;">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{{ url_for('web.admin_listar_promociones') }}" style="color:#e10098; text-decoration:none;">Promociones</a></li>
-                <li class="breadcrumb-item active" style="color:#888;" aria-current="page">{% if promocion %}Editar{% else %}Crear{% endif %} Promoción</li>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('web.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('web.admin_listar_promociones') }}">Promociones</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Crear Promoción</li>
             </ol>
         </nav>
 
         <header class="top-bar">
-            <h1><i class="fas fa-gift"></i> {% if promocion %}Editar{% else %}Crear{% endif %} Promoción</h1>
-            <div class="tag"><i class="fas fa-percent"></i> Liverpool Style</div>
+            <h1><i class="fas fa-plus-circle"></i> Nueva Promoción</h1>
+            <div class="tag"><i class="fas fa-bolt"></i> Promociones</div>
         </header>
 
-        <!-- Toast Container para mensajes flash -->
         <div class="toast-container" id="toastContainer"></div>
 
         <div class="form-container">
-            <form method="POST" action="{% if promocion %}{{ url_for('web.admin_editar_promocion', promocion_id=promocion._id) }}{% else %}{{ url_for('web.admin_crear_promocion') }}{% endif %}">
-                <!-- ===== DATOS BÁSICOS ===== -->
+            <form id="formCrearPromocion" action="{{ url_for('web.admin_crear_promocion') }}" method="POST">
+
+                <!-- Código y Nombre -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="nombre">Nombre de la promoción *</label>
-                        <input type="text" id="nombre" name="nombre" class="form-control" required
-                               value="{{ promocion.nombre if promocion else '' }}">
+                        <label>Código</label>
+                        <input type="text" name="codigo" id="codigo" placeholder="Dejar en blanco para generar automático" style="text-transform:uppercase;">
+                        <div class="help-text">Opcional. Deja en blanco para generar automáticamente</div>
                     </div>
                     <div class="form-group">
-                        <label for="codigo">Código promocional (opcional)</label>
-                        <input type="text" id="codigo" name="codigo" class="form-control" placeholder="Ej: DESCUENTO10"
-                               value="{{ promocion.codigo if promocion else '' }}">
-                        <div class="help-text">El cliente puede ingresar este código manualmente.</div>
+                        <label>Nombre <span class="required">*</span></label>
+                        <input type="text" name="nombre" required placeholder="Ej: Promo Verano 2024">
                     </div>
                 </div>
 
+                <!-- Descripción -->
                 <div class="form-group">
-                    <label for="descripcion">Descripción</label>
-                    <textarea id="descripcion" name="descripcion" class="form-control" rows="3">{{ promocion.descripcion if promocion else '' }}</textarea>
+                    <label>Descripción</label>
+                    <textarea name="descripcion" placeholder="Descripción de la promoción..."></textarea>
                 </div>
 
-                <!-- ===== TIPO Y PRIORIDAD ===== -->
+                <!-- Tipo y Valor -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="tipo">Tipo de promoción *</label>
-                        <select id="tipo" name="tipo" class="form-control" required onchange="mostrarCamposSegunTipo()">
-                            <option value="">Seleccionar...</option>
-                            <option value="descuento_directo" {% if promocion and promocion.tipo == 'descuento_directo' %}selected{% endif %}>Descuento Directo</option>
-                            <option value="cantidad" {% if promocion and promocion.tipo == 'cantidad' %}selected{% endif %}>Lleva X, Paga Y (2x1, 3x2)</option>
-                            <option value="combo" {% if promocion and promocion.tipo == 'combo' %}selected{% endif %}>Combo (descuento al comprar varios)</option>
-                            <option value="envio_gratis" {% if promocion and promocion.tipo == 'envio_gratis' %}selected{% endif %}>Envío Gratis</option>
-                            <option value="pago" {% if promocion and promocion.tipo == 'pago' %}selected{% endif %}>Descuento por Método de Pago</option>
-                            <option value="cumpleanos" {% if promocion and promocion.tipo == 'cumpleanos' %}selected{% endif %}>Cumpleaños</option>
-                            <option value="abandono_carrito" {% if promocion and promocion.tipo == 'abandono_carrito' %}selected{% endif %}>Abandono de Carrito</option>
+                        <label>Tipo <span class="required">*</span></label>
+                        <select name="tipo" id="tipo" required onchange="cambiarTipo()">
+                            <option value="porcentaje">% Descuento</option>
+                            <option value="monto_fijo">Monto Fijo</option>
+                            <option value="envio_gratis">Envío Gratis</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="prioridad">Prioridad</label>
-                        <select id="prioridad" name="prioridad" class="form-control">
-                            <option value="0" {% if promocion and promocion.prioridad == 0 %}selected{% endif %}>Normal</option>
-                            <option value="1" {% if promocion and promocion.prioridad == 1 %}selected{% endif %}>Alta</option>
-                            <option value="2" {% if promocion and promocion.prioridad == 2 %}selected{% endif %}>Exclusiva (VIP)</option>
-                        </select>
+                        <label>Valor <span class="required">*</span></label>
+                        <input type="number" name="valor" id="valor" step="0.01" required placeholder="0.00">
+                        <div class="help-text" id="valor_help">Ej: 10 = 10% de descuento</div>
                     </div>
                 </div>
 
-                <!-- ===== FECHAS ===== -->
+                <!-- Descuento máximo (opcional, solo tiene sentido en %) -->
+                <div class="form-group" id="grupo_descuento_maximo" style="display:none;">
+                    <label>Descuento máximo ($, opcional)</label>
+                    <input type="number" name="descuento_maximo" step="0.01" placeholder="0.00">
+                    <div class="help-text">Tope en pesos que puede alcanzar el descuento porcentual. 0 = sin tope</div>
+                </div>
+
+                <!-- Fechas -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="fecha_inicio">Fecha de inicio</label>
-                        <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control"
-                               value="{{ promocion.fecha_inicio.strftime('%Y-%m-%d') if promocion and promocion.fecha_inicio else '' }}">
+                        <label>Fecha Inicio</label>
+                        <input type="date" name="fecha_inicio">
                     </div>
                     <div class="form-group">
-                        <label for="fecha_fin">Fecha de fin</label>
-                        <input type="date" id="fecha_fin" name="fecha_fin" class="form-control"
-                               value="{{ promocion.fecha_fin.strftime('%Y-%m-%d') if promocion and promocion.fecha_fin else '' }}">
+                        <label>Fecha Fin</label>
+                        <input type="date" name="fecha_fin">
                     </div>
                 </div>
 
-                <!-- ===== DESCUENTO (para descuento_directo y pago) ===== -->
-                <div id="camposDescuento" style="display:{% if promocion and promocion.tipo in ['descuento_directo','pago'] %}block{% else %}none{% endif %};">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="descuento_tipo">Tipo de descuento</label>
-                            <select id="descuento_tipo" name="descuento_tipo" class="form-control">
-                                <option value="porcentaje" {% if promocion and promocion.descuento_tipo == 'porcentaje' %}selected{% endif %}>Porcentaje (%)</option>
-                                <option value="monto_fijo" {% if promocion and promocion.descuento_tipo == 'monto_fijo' %}selected{% endif %}>Monto fijo ($)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="descuento_valor">Valor del descuento</label>
-                            <input type="number" step="0.01" id="descuento_valor" name="descuento_valor" class="form-control"
-                                   value="{{ promocion.descuento_valor if promocion else '' }}" placeholder="Ej: 10 para 10% o $100">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===== CANTIDAD (para tipo cantidad) ===== -->
-                <div id="camposCantidad" style="display:{% if promocion and promocion.tipo == 'cantidad' %}block{% else %}none{% endif %};">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="cantidad_requerida">Cantidad requerida (ej: 2 para 2x1)</label>
-                            <input type="number" id="cantidad_requerida" name="cantidad_requerida" class="form-control"
-                                   value="{{ promocion.cantidad_requerida if promocion else '' }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="cantidad_gratis">Cantidad gratis (ej: 1 para 2x1)</label>
-                            <input type="number" id="cantidad_gratis" name="cantidad_gratis" class="form-control"
-                                   value="{{ promocion.cantidad_gratis if promocion else '' }}">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===== COMBO (para tipo combo) ===== -->
-                <div id="camposCombo" style="display:{% if promocion and promocion.tipo == 'combo' %}block{% else %}none{% endif %};">
-                    <div class="form-group">
-                        <label>Productos del combo (selecciona al menos 2)</label>
-                        <select name="combo_productos" multiple class="form-control" style="height:120px;">
-                            {% for producto in productos %}
-                                <option value="{{ producto._id }}" 
-                                    {% if promocion and producto._id in promocion.combo_productos %}selected{% endif %}>
-                                    {{ producto.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <div class="help-text">Mantén presionado Ctrl/Cmd para seleccionar varios.</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="combo_descuento">Descuento adicional por combo (%)</label>
-                        <input type="number" step="0.01" id="combo_descuento" name="combo_descuento" class="form-control"
-                               value="{{ promocion.combo_descuento if promocion else '' }}" placeholder="Ej: 10 para 10% de descuento extra">
-                    </div>
-                </div>
-
-                <!-- ===== RESTRICCIONES ===== -->
-                <hr>
-                <h4 style="margin: 20px 0 15px;">Restricciones y condiciones</h4>
+                <!-- Uso máximo y mínimo de compra -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="monto_minimo">Monto mínimo de compra</label>
-                        <input type="number" step="0.01" id="monto_minimo" name="monto_minimo" class="form-control"
-                               value="{{ promocion.monto_minimo if promocion else '' }}" placeholder="0 = sin mínimo">
+                        <label>Uso Máximo</label>
+                        <input type="number" name="uso_maximo" placeholder="0 = ilimitado">
+                        <div class="help-text">0 significa ilimitado</div>
                     </div>
                     <div class="form-group">
-                        <label for="uso_maximo">Usos totales máximos</label>
-                        <input type="number" id="uso_maximo" name="uso_maximo" class="form-control"
-                               value="{{ promocion.uso_maximo if promocion else '' }}" placeholder="0 = ilimitado">
-                    </div>
-                    <div class="form-group">
-                        <label for="usos_por_usuario">Usos por usuario</label>
-                        <input type="number" id="usos_por_usuario" name="usos_por_usuario" class="form-control"
-                               value="{{ promocion.usos_por_usuario if promocion else '' }}" placeholder="0 = ilimitado">
+                        <label>Mínimo de Compra</label>
+                        <input type="number" name="minimo_compra" step="0.01" placeholder="0.00">
+                        <div class="help-text">Compra mínima para aplicar el descuento</div>
                     </div>
                 </div>
 
-                <!-- ===== SEGMENTO ASIGNADO AUTOMÁTICAMENTE (NUEVO) ===== -->
-                <div class="form-group" style="background: #f0f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #e10098;">
-                    <label style="font-weight: 700; color: #e10098;">
-                        <i class="fas fa-magic"></i> Segmento asignado automáticamente
-                    </label>
-                    <p style="font-size: 0.85rem; color: #555; margin-top: 5px;">
-                        El sistema analizará el descuento, monto mínimo y tipo de promoción para asignarla 
-                        <strong>automáticamente</strong> a los clientes que correspondan (VIP, Nuevos, Frecuentes o Inactivos). 
-                        Tú solo preocúpate de crear la oferta.
+                <!-- ===== PANEL IA: SEGMENTO AUTOMÁTICO ===== -->
+                <div class="form-group segmento-auto">
+                    <label><i class="fas fa-magic"></i> Segmento asignado automáticamente</label>
+                    <p>
+                        El sistema analizará el tipo, valor y mínimo de compra para asignar
+                        <strong>automáticamente</strong> el segmento de clientes (VIP, Frecuentes, Inactivos, etc.).
+                        Tú solo preocúpate de crear la oferta — la IA decide a quién mostrarla.
                     </p>
-                    <!-- Campo oculto para enviar vacío (el backend lo calculará) -->
-                    <input type="hidden" name="segmentos" value="">
-                    <div style="margin-top: 8px;">
-                        <span class="badge" style="background: #e10098; color: white; padding: 4px 12px; border-radius: 20px;">
-                            <i class="fas fa-robot"></i> IA asignará el segmento
-                        </span>
-                    </div>
+                    <div class="badge-ia"><i class="fas fa-robot"></i> IA asignará el segmento</div>
                 </div>
 
-                <!-- ===== APLICABLES ===== -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Categorías aplicables</label>
-                        <select name="categorias_aplicables" multiple class="form-control" style="height:100px;">
+                <!-- Categorías -->
+                <div class="form-group">
+                    <label>Categorías (Ctrl+clic para múltiple)</label>
+                    <select name="categorias" multiple style="height:120px;">
+                        {% if categorias %}
                             {% for categoria in categorias %}
-                                <option value="{{ categoria._id }}" 
-                                    {% if promocion and categoria._id in promocion.categorias_aplicables %}selected{% endif %}>
+                                <option value="{{ categoria._id }}">
+                                    {% if categoria.padre_id %}└─ {% endif %}
                                     {{ categoria.nombre }}
                                 </option>
                             {% endfor %}
-                        </select>
-                        <div class="help-text">Dejar vacío = aplica a todas las categorías.</div>
+                        {% else %}
+                            <option value="" disabled>No hay categorías disponibles</option>
+                        {% endif %}
+                    </select>
+                    <div class="help-text">Selecciona las categorías donde aplica la promoción</div>
+                </div>
+
+                <!-- Productos -->
+                <div class="form-group">
+                    <label>Productos (Ctrl+clic para múltiple)</label>
+                    <select name="productos" multiple style="height:120px;">
+                        {% if productos %}
+                            {% for producto in productos %}
+                                <option value="{{ producto._id }}">{{ producto.nombre }} ({{ producto.sku if producto.sku else 'Sin SKU' }})</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled>No hay productos disponibles</option>
+                        {% endif %}
+                    </select>
+                    <div class="help-text">Selecciona los productos específicos donde aplica la promoción</div>
+                </div>
+
+                <!-- Activo / Mostrar en tienda -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="form-check-group">
+                            <label>
+                                <input type="checkbox" name="activo" value="1" checked>
+                                Activo
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Productos aplicables</label>
-                        <select name="productos_aplicables" multiple class="form-control" style="height:100px;">
-                            {% for producto in productos %}
-                                <option value="{{ producto._id }}" 
-                                    {% if promocion and producto._id in promocion.productos_aplicables %}selected{% endif %}>
-                                    {{ producto.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <div class="help-text">Dejar vacío = aplica a todos los productos.</div>
+                        <div class="form-check-group">
+                            <label>
+                                <input type="checkbox" name="mostrar_en_tienda" value="1" checked>
+                                Mostrar en tienda
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ===== MÉTODOS DE PAGO ===== -->
-                <div class="form-group">
-                    <label>Métodos de pago aplicables</label>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" name="metodos_pago" value="tarjeta" {% if promocion and 'tarjeta' in promocion.metodos_pago %}checked{% endif %}> Tarjeta</label>
-                        <label><input type="checkbox" name="metodos_pago" value="paypal" {% if promocion and 'paypal' in promocion.metodos_pago %}checked{% endif %}> PayPal</label>
-                        <label><input type="checkbox" name="metodos_pago" value="oxxo" {% if promocion and 'oxxo' in promocion.metodos_pago %}checked{% endif %}> OXXO</label>
-                        <label><input type="checkbox" name="metodos_pago" value="transferencia" {% if promocion and 'transferencia' in promocion.metodos_pago %}checked{% endif %}> Transferencia</label>
-                    </div>
-                    <div class="help-text">Dejar vacío = aplica a todos los métodos.</div>
-                </div>
-
-                <!-- ===== VISIBILIDAD ===== -->
-                <div class="form-group">
-                    <label>Visibilidad</label>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" name="mostrar_en_home" value="1" {% if promocion and promocion.mostrar_en_home %}checked{% endif %}> Mostrar en página de inicio</label>
-                        <label><input type="checkbox" name="mostrar_en_producto" value="1" {% if promocion and promocion.mostrar_en_producto %}checked{% endif %}> Mostrar en páginas de producto</label>
-                    </div>
-                </div>
-
-                <!-- ===== ACTIVO ===== -->
-                <div class="form-group">
-                    <label><input type="checkbox" name="activo" value="1" {% if promocion and promocion.activo %}checked{% elif not promocion %}checked{% endif %}> Activo</label>
-                </div>
-
-                <!-- ===== BOTONES ===== -->
-                <div style="display:flex; gap:15px; margin-top:30px;">
-                    <button type="submit" class="btn-primary-custom"><i class="fas fa-save"></i> {% if promocion %}Actualizar{% else %}Crear{% endif %} Promoción</button>
-                    <a href="{{ url_for('web.admin_listar_promociones') }}" class="btn-secondary-custom"><i class="fas fa-arrow-left"></i> Cancelar</a>
+                <!-- Acciones -->
+                <div class="form-actions">
+                    <a href="{{ url_for('web.admin_listar_promociones') }}" class="btn-cancel">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Crear Promoción
+                    </button>
                 </div>
             </form>
         </div>
@@ -503,26 +583,25 @@
     </main>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
 <script>
-    function mostrarCamposSegunTipo() {
-        const tipo = document.getElementById('tipo').value;
-        document.getElementById('camposDescuento').style.display = (tipo === 'descuento_directo' || tipo === 'pago') ? 'block' : 'none';
-        document.getElementById('camposCantidad').style.display = (tipo === 'cantidad') ? 'block' : 'none';
-        document.getElementById('camposCombo').style.display = (tipo === 'combo') ? 'block' : 'none';
-    }
-
     document.addEventListener('DOMContentLoaded', function() {
-        mostrarCamposSegunTipo();
-
-        // Mostrar toasts (mensajes flash)
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    mostrarToast('{{ message }}', '{{ category }}');
+                    mostrarToast({{ message|tojson }}, {{ category|tojson }});
                 {% endfor %}
             {% endif %}
         {% endwith %}
+
+        const codigoInput = document.getElementById('codigo');
+        if (codigoInput) {
+            codigoInput.addEventListener('focus', function() {
+                if (!this.value) this.value = generarCodigo();
+            });
+        }
+
+        // Mostrar/ocultar el "descuento máximo" según el tipo
+        cambiarTipo();
     });
 
     function mostrarToast(mensaje, tipo = 'success') {
@@ -537,9 +616,50 @@
         container.appendChild(toast);
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.5s ease forwards';
-            setTimeout(() => { toast.remove(); }, 500);
+            setTimeout(() => toast.remove(), 500);
         }, 3000);
     }
+
+    function generarCodigo() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let codigo = 'PROMO-';
+        for (let i = 0; i < 8; i++) {
+            codigo += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return codigo;
+    }
+
+    function cambiarTipo() {
+        const tipo = document.getElementById('tipo').value;
+        const valorHelp = document.getElementById('valor_help');
+        const valorInput = document.getElementById('valor');
+        const grupoDtoMax = document.getElementById('grupo_descuento_maximo');
+        if (!valorInput || !valorHelp) return;
+
+        if (tipo === 'porcentaje') {
+            valorHelp.textContent = 'Ej: 10 = 10% de descuento (máximo 100%)';
+            valorInput.max = 100;
+            valorInput.disabled = false;
+            if (grupoDtoMax) grupoDtoMax.style.display = 'block';
+        } else if (tipo === 'monto_fijo') {
+            valorHelp.textContent = 'Ej: 50 = $50 de descuento';
+            valorInput.removeAttribute('max');
+            valorInput.disabled = false;
+            if (grupoDtoMax) grupoDtoMax.style.display = 'none';
+        } else {
+            valorHelp.textContent = 'El valor se ignora para envío gratis';
+            valorInput.value = 0;
+            valorInput.disabled = true;
+            if (grupoDtoMax) grupoDtoMax.style.display = 'none';
+        }
+    }
+
+    document.querySelectorAll('.sidebar a').forEach(link => {
+        if (link.href === window.location.href) {
+            link.classList.add('active');
+        }
+    });
 </script>
+
 </body>
 </html>

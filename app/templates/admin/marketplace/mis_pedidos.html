@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos | ORION</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .sidebar .vendedor-profile {
+            padding: 25px 20px 20px; text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            margin-bottom: 10px; flex-shrink: 0;
+        }
+        .sidebar .vendedor-profile .avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .vendedor-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .vendedor-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .vendedor-profile .rol {
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f0f9ff; color: #0284c7; border-left-color: #0284c7; }
+        .sidebar a:hover i, .sidebar a.active i { color: #0284c7; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px; padding: 30px 35px 20px;
+            width: 100%; min-height: 100vh; display: flex; flex-direction: column;
+        }
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 20px; border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem; font-weight: 800; color: #1a1a2e;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .top-bar h1 i { color: #0284c7; }
+        .top-bar .tag {
+            background: #0284c7; color: #fff; padding: 5px 18px;
+            border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; display: flex; align-items: center; gap: 6px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, #fff, #f0f9ff);
+            padding: 25px 30px; border-radius: 16px; border: 1px solid #e8e8e8;
+            margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .hero h2 { color: #1a1a2e; margin-bottom: 8px; font-weight: 800; font-size: 1.3rem; }
+        .hero h2 i { color: #0284c7; }
+        .hero p { color: #666; margin-bottom: 0; font-size: 0.95rem; line-height: 1.6; }
+        .hero strong { color: #0284c7; }
+
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px; margin-bottom: 25px;
+        }
+        .stat-card {
+            background: #fff; padding: 18px 22px; border-radius: 16px;
+            border: 1px solid #e8e8e8; transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #0284c7, #00d4ff);
+        }
+        .stat-card:hover { border-color: #0284c7; transform: translateY(-4px); box-shadow: 0 8px 30px rgba(2,132,199,.1); }
+        .stat-card .icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-bottom: 10px;
+        }
+        .stat-card .icon.blue   { background: #e0f2fe; color: #0284c7; }
+        .stat-card .icon.yellow { background: #fef3c7; color: #d97706; }
+        .stat-card .icon.cyan   { background: #cffafe; color: #0891b2; }
+        .stat-card .icon.green  { background: #d1fae5; color: #059669; }
+        .stat-card .number { font-size: 1.9rem; font-weight: 900; color: #1a1a2e; line-height: 1; }
+        .stat-card .label {
+            color: #888; font-size: 0.75rem; text-transform: uppercase;
+            font-weight: 700; letter-spacing: 0.5px; margin-top: 4px;
+        }
+
+        /* ===== FILTROS ===== */
+        .filters-bar {
+            display: flex; gap: 12px; align-items: end;
+            flex-wrap: wrap; margin-bottom: 20px; padding: 16px 20px;
+            background: #fff; border-radius: 12px; border: 1px solid #e8e8e8;
+        }
+        .filter-group { flex: 1; min-width: 160px; }
+        .filter-group label {
+            font-size: 0.7rem; font-weight: 700; color: #64748b;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 5px; display: block;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%; border: 2px solid #e2e8f0; border-radius: 8px;
+            padding: 8px 12px; font-size: 0.85rem; background: #f8fafc;
+            font-family: inherit; transition: all .2s;
+        }
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none; border-color: #0284c7; background: #fff;
+            box-shadow: 0 0 0 3px rgba(2,132,199,.1);
+        }
+        .filter-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        /* ===== LISTA PEDIDOS ===== */
+        .pedido-card {
+            background: #fff; border-radius: 16px; border: 1px solid #e8e8e8;
+            margin-bottom: 14px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,.03);
+            transition: all .2s;
+        }
+        .pedido-card:hover { border-color: #0284c7; box-shadow: 0 8px 24px rgba(2,132,199,.1); }
+
+        .pedido-card-head {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+            flex-wrap: wrap; background: #fafbfc;
+        }
+        .pedido-num {
+            font-weight: 800; color: #1a1a2e; font-size: 1rem;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .pedido-num i { color: #0284c7; }
+        .pedido-fecha { color: #94a3b8; font-size: .78rem; font-weight: 600; }
+
+        .estado-pill {
+            border-radius: 50px; padding: 5px 14px;
+            font-weight: 700; font-size: 0.7rem;
+            text-transform: uppercase; display: inline-flex;
+            align-items: center; gap: 5px; letter-spacing: .3px;
+        }
+        .estado-pendiente  { background: #fef3c7; color: #92400e; }
+        .estado-confirmado { background: #dbeafe; color: #1d4ed8; }
+        .estado-preparando { background: #ede9fe; color: #6d28d9; }
+        .estado-enviado    { background: #cffafe; color: #0e7490; }
+        .estado-entregado  { background: #d1fae5; color: #065f46; }
+        .estado-cancelado  { background: #fee2e2; color: #991b1b; }
+
+        .pedido-card-body {
+            padding: 16px 20px; display: grid;
+            grid-template-columns: 1fr auto; gap: 20px; align-items: center;
+        }
+        @media (max-width: 768px) { .pedido-card-body { grid-template-columns: 1fr; } }
+
+        .cliente-info { display: flex; align-items: center; gap: 12px; }
+        .cliente-info .cli-avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff; font-weight: 800; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .cliente-info .cli-nombre { font-weight: 700; color: #1a1a2e; font-size: .9rem; }
+        .cliente-info .cli-meta { color: #94a3b8; font-size: .78rem; margin-top: 2px; }
+
+        .pedido-items-resumen {
+            display: flex; align-items: center; gap: 8px;
+            color: #64748b; font-size: .82rem; font-weight: 600;
+        }
+        .pedido-items-resumen .chip {
+            background: #f1f5f9; padding: 3px 10px; border-radius: 20px;
+            color: #334155; font-size: .72rem; font-weight: 700;
+        }
+
+        .pedido-total {
+            text-align: right; flex-shrink: 0;
+        }
+        .pedido-total .monto { font-weight: 900; color: #0284c7; font-size: 1.15rem; }
+        .pedido-total .lbl { color: #94a3b8; font-size: .72rem; text-transform: uppercase; font-weight: 700; }
+
+        .pedido-card-foot {
+            padding: 12px 20px; background: #fafbfc;
+            border-top: 1px solid #f0f0f0;
+            display: flex; gap: 8px; flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        /* ===== BOTONES ===== */
+        .btn-mini {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; border-radius: 50px; font-size: .78rem;
+            font-weight: 700; border: none; cursor: pointer;
+            transition: all .2s; text-decoration: none;
+        }
+        .btn-mini.primary   { background: #0284c7; color: #fff; }
+        .btn-mini.primary:hover { background: #0369a1; color: #fff; transform: translateY(-1px); }
+        .btn-mini.warning   { background: #f9a825; color: #1a1a2e; }
+        .btn-mini.warning:hover { background: #f59f00; }
+        .btn-mini.info      { background: #e0f2fe; color: #0284c7; }
+        .btn-mini.info:hover { background: #bae6fd; }
+        .btn-mini.success   { background: #d1fae5; color: #065f46; }
+        .btn-mini.success:hover { background: #a7f3d0; }
+        .btn-mini.danger    { background: #fee2e2; color: #991b1b; }
+        .btn-mini.danger:hover { background: #fecaca; }
+        .btn-mini.ghost     { background: #fff; color: #64748b; border: 2px solid #e2e8f0; }
+        .btn-mini.ghost:hover { background: #f1f5f9; }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center; padding: 70px 20px;
+            background: #fff; border-radius: 20px;
+            border: 1px dashed #cbd5e1;
+        }
+        .empty-state i { font-size: 3.4rem; color: #cbd5e1; display: block; margin-bottom: 14px; }
+        .empty-state h4 { font-weight: 800; color: #475569; margin-bottom: 6px; }
+        .empty-state p { color: #94a3b8; font-size: .88rem; }
+
+        /* ===== MODAL DETALLE ===== */
+        .modal-header-orion {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff; padding: 22px 26px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-header-orion h4 { font-weight: 900; margin: 0; display: flex; align-items: center; gap: 10px; }
+        .modal-header-orion .close-x {
+            background: rgba(255,255,255,.2); border: none; color: #fff;
+            width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+            font-size: 1rem; transition: all .2s;
+        }
+        .modal-header-orion .close-x:hover { background: rgba(255,255,255,.35); }
+
+        .modal-section {
+            padding: 20px 26px; border-bottom: 1px solid #f0f0f0;
+        }
+        .modal-section:last-child { border-bottom: none; }
+        .modal-section-title {
+            font-size: .72rem; text-transform: uppercase; font-weight: 800;
+            color: #94a3b8; letter-spacing: 1px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .item-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 0; border-bottom: 1px solid #f8fafc;
+        }
+        .item-row:last-child { border-bottom: none; }
+        .item-img {
+            width: 56px; height: 56px; border-radius: 10px; object-fit: cover;
+            border: 2px solid #e2e8f0; flex-shrink: 0;
+        }
+        .item-img-ph {
+            width: 56px; height: 56px; border-radius: 10px;
+            background: #f1f5f9; display: flex; align-items: center; justify-content: center;
+            color: #cbd5e1; font-size: 1.3rem; border: 2px solid #e2e8f0; flex-shrink: 0;
+        }
+        .item-nombre { font-weight: 700; color: #1e293b; font-size: .9rem; }
+        .item-meta { color: #94a3b8; font-size: .78rem; margin-top: 2px; }
+        .item-subtotal { font-weight: 900; color: #0284c7; font-size: .95rem; }
+
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+        .info-cell {
+            background: #f8fafc; padding: 12px 16px;
+            border-radius: 10px; border: 1px solid #e2e8f0;
+        }
+        .info-cell .lbl {
+            font-size: .68rem; text-transform: uppercase; color: #94a3b8;
+            font-weight: 800; letter-spacing: .5px; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .info-cell .val { font-weight: 700; color: #1e293b; font-size: .88rem; word-break: break-word; }
+
+        .total-box {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            padding: 18px 22px; border-radius: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 2px solid #bae6fd;
+        }
+        .total-box .total-lbl { font-weight: 800; color: #0369a1; font-size: .85rem; text-transform: uppercase; letter-spacing: .5px; }
+        .total-box .total-val { font-weight: 900; color: #0284c7; font-size: 1.6rem; }
+
+        .footer-info {
+            background: #fff; padding: 15px 25px; border-radius: 16px;
+            border: 1px solid #e8e8e8; text-align: center;
+            margin-top: auto; box-shadow: 0 -2px 10px rgba(0,0,0,.03);
+        }
+        .footer-info p {
+            color: #888; font-size: .75rem; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; flex-wrap: wrap;
+        }
+        .footer-info i { color: #0284c7; }
+        .footer-info .heart { color: #e10098; }
+
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .vendedor-profile .name, .sidebar .vendedor-profile .email,
+            .sidebar .vendedor-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .vendedor-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .vendedor-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="vendedor-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Vendedor">
+            {% elif vendedor.logo %}
+                <img src="{{ url_for('static', filename='uploads/vendedores/' + vendedor.logo) }}" class="avatar" alt="Vendedor">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ (vendedor.nombre_tienda or 'ORION')|urlencode }}&background=0284c7&color=fff&size=80&bold=true" class="avatar" alt="Vendedor">
+            {% endif %}
+            <div class="name">{{ vendedor.nombre_tienda|default('Mi Tienda') }}</div>
+            <div class="email">{{ session.get('email', '') }}</div>
+            <div class="rol"><i class="fas fa-shop"></i> Vendedor</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+            <div class="panel-title">MI TIENDA</div>
+            <a href="{{ url_for('web.marketplace_dashboard') }}" class="{% if request.endpoint == 'web.marketplace_dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_productos') }}" class="{% if request.endpoint == 'web.marketplace_mis_productos' %}active{% endif %}">
+                <i class="fas fa-box"></i> <span>Mis productos</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_pedidos') }}" class="{% if request.endpoint == 'web.marketplace_mis_pedidos' %}active{% endif %}">
+                <i class="fas fa-shopping-cart"></i> <span>Mis pedidos</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_ventas') }}" class="{% if request.endpoint == 'web.marketplace_mis_ventas' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> <span>Mis ventas</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_clientes') }}" class="{% if request.endpoint == 'web.marketplace_mis_clientes' %}active{% endif %}">
+                <i class="fas fa-users"></i> <span>Mis clientes</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_resenas') }}" class="{% if request.endpoint == 'web.marketplace_resenas' %}active{% endif %}">
+                <i class="fas fa-star"></i> <span>Reseñas</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">LOGÍSTICA</div>
+            <a href="{{ url_for('web.marketplace_envios') }}" class="{% if request.endpoint == 'web.marketplace_envios' %}active{% endif %}">
+                <i class="fas fa-truck"></i> <span>Envíos</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.marketplace_mi_tienda') }}" class="{% if request.endpoint == 'web.marketplace_mi_tienda' %}active{% endif %}">
+                <i class="fas fa-cog"></i> <span>Mi tienda</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">TIENDA PÚBLICA</div>
+            {% if vendedor.slug %}
+            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank">
+                <i class="fas fa-eye"></i> <span>Ver mi tienda pública</span>
+            </a>
+            {% endif %}
+
+            <div class="divider"></div>
+            <div class="panel-title">CUENTA</div>
+            <a href="{{ url_for('web.raiz_tienda') }}"><i class="fas fa-home"></i> <span>Ir a tienda ORION</span></a>
+            <a href="{{ url_for('web.marketplace_perfil') }}" class="{% if request.endpoint == 'web.marketplace_perfil' %}active{% endif %}">
+                <i class="fas fa-user"></i> <span>Mi perfil</span>
+            </a>
+
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-shopping-cart"></i> Mis Pedidos</h1>
+            <div class="tag"><i class="fas fa-shop"></i> {{ vendedor.nombre_tienda|default('Mi Tienda') }}</div>
+        </header>
+
+        <section class="hero">
+            <h2><i class="fas fa-box-open"></i> Gestión de Pedidos</h2>
+            <p>
+                Revisa los pedidos que incluyen tus productos, cambia el estado
+                y prepara los envíos a tus clientes.
+            </p>
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for cat, msg in messages %}
+                    <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert" style="border-radius:12px;">
+                        {{ msg }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {# ⭐ Pre-procesamos los pedidos para que el template tenga data limpia #}
+        {% set ns = namespace(
+            total=0, pendientes=0, enviados=0, entregados=0, cancelados=0
+        ) %}
+        {% set pedidos_procesados = [] %}
+
+        {% for pedido in pedidos %}
+            {# Filtrar solo los items del vendedor actual #}
+            {% set items_v = [] %}
+            {% set subtotal_v = namespace(v=0.0) %}
+            {% for item in (pedido.items or []) %}
+                {% if item.vendedor_id|string == vendedor._id|string %}
+                    {% set precio = item.precio|default(0)|float %}
+                    {% set cantidad = item.cantidad|default(1)|int %}
+                    {% set sub = precio * cantidad %}
+                    {% set _ = items_v.append({
+                        'nombre': item.nombre|default('Producto'),
+                        'cantidad': cantidad,
+                        'precio': precio,
+                        'subtotal': sub,
+                        'imagen': item.imagen|default(item.foto)|default(''),
+                    }) %}
+                    {% set subtotal_v.v = subtotal_v.v + sub %}
+                {% endif %}
+            {% endfor %}
+
+            {% if items_v %}
+                {% set estado = pedido.estado|default('pendiente') %}
+                {% set _ = pedidos_procesados.append({
+                    '_id': pedido._id|string,
+                    'numero_pedido': pedido.numero_pedido|default(''),
+                    'estado': estado,
+                    'created_at': pedido.created_at,
+                    'usuario_nombre': pedido.usuario_nombre|default('Cliente'),
+                    'usuario_email': pedido.usuario_email|default(''),
+                    'usuario_telefono': pedido.usuario_telefono|default(''),
+                    'direccion': pedido.direccion|default({}),
+                    'items': items_v,
+                    'subtotal': subtotal_v.v,
+                    'numero_seguimiento': pedido.numero_seguimiento|default(''),
+                    'paqueteria': pedido.paqueteria|default(''),
+                }) %}
+
+                {% set ns.total = ns.total + 1 %}
+                {% if estado in ('pendiente', 'confirmado', 'preparando') %}
+                    {% set ns.pendientes = ns.pendientes + 1 %}
+                {% elif estado == 'enviado' %}
+                    {% set ns.enviados = ns.enviados + 1 %}
+                {% elif estado == 'entregado' %}
+                    {% set ns.entregados = ns.entregados + 1 %}
+                {% elif estado == 'cancelado' %}
+                    {% set ns.cancelados = ns.cancelados + 1 %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+
+        <!-- ===== STATS ===== -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon blue"><i class="fas fa-receipt"></i></div>
+                <div class="number">{{ ns.total }}</div>
+                <div class="label">Total pedidos</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon yellow"><i class="fas fa-clock"></i></div>
+                <div class="number">{{ ns.pendientes }}</div>
+                <div class="label">Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon cyan"><i class="fas fa-truck"></i></div>
+                <div class="number">{{ ns.enviados }}</div>
+                <div class="label">Enviados</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon green"><i class="fas fa-check-double"></i></div>
+                <div class="number">{{ ns.entregados }}</div>
+                <div class="label">Entregados</div>
+            </div>
+        </div>
+
+        <!-- ===== FILTROS ===== -->
+        {% if pedidos_procesados %}
+        <div class="filters-bar">
+            <div class="filter-group" style="flex: 2;">
+                <label><i class="fas fa-search"></i> Buscar</label>
+                <input type="text" id="filtroBusqueda" placeholder="Número de pedido o cliente..." oninput="aplicarFiltros()">
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-filter"></i> Estado</label>
+                <select id="filtroEstado" onchange="aplicarFiltros()">
+                    <option value="">Todos</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="preparando">Preparando</option>
+                    <option value="enviado">Enviado</option>
+                    <option value="entregado">Entregado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="button" class="btn-mini ghost" onclick="limpiarFiltros()">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ===== LISTA DE PEDIDOS ===== -->
+        {% if pedidos_procesados %}
+            <div id="listaPedidos">
+                {% for p in pedidos_procesados %}
+                <div class="pedido-card pedido-fila"
+                     data-id="{{ p._id }}"
+                     data-numero="{{ p.numero_pedido|lower }}"
+                     data-cliente="{{ p.usuario_nombre|lower }}"
+                     data-estado="{{ p.estado }}">
+
+                    <div class="pedido-card-head">
+                        <div class="pedido-num">
+                            <i class="fas fa-hashtag"></i>
+                            {{ p.numero_pedido or p._id[:8]|upper }}
+                        </div>
+                        <div class="pedido-fecha">
+                            <i class="far fa-calendar"></i>
+                            {{ p.created_at.strftime('%d/%m/%Y · %H:%M') if p.created_at else '—' }}
+                        </div>
+                        <div style="margin-left:auto;">
+                            <span class="estado-pill estado-{{ p.estado }}">
+                                {% if p.estado == 'pendiente' %}<i class="fas fa-hourglass-half"></i>
+                                {% elif p.estado == 'confirmado' %}<i class="fas fa-check"></i>
+                                {% elif p.estado == 'preparando' %}<i class="fas fa-box"></i>
+                                {% elif p.estado == 'enviado' %}<i class="fas fa-truck"></i>
+                                {% elif p.estado == 'entregado' %}<i class="fas fa-check-double"></i>
+                                {% elif p.estado == 'cancelado' %}<i class="fas fa-times"></i>
+                                {% endif %}
+                                {{ p.estado|capitalize }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pedido-card-body">
+                        <div class="cliente-info">
+                            <div class="cli-avatar">{{ (p.usuario_nombre or 'C')[0]|upper }}</div>
+                            <div>
+                                <div class="cli-nombre">{{ p.usuario_nombre }}</div>
+                                <div class="cli-meta">
+                                    {{ p.usuario_email }}
+                                    {% if p.usuario_telefono %} · {{ p.usuario_telefono }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pedido-items-resumen">
+                            <span class="chip"><i class="fas fa-box"></i> {{ p.items|length }} item{% if p.items|length != 1 %}s{% endif %}</span>
+                            <span class="chip">
+                                <i class="fas fa-cubes"></i>
+                                {{ p.items|sum(attribute='cantidad') }} uds
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pedido-card-foot">
+                        <div class="pedido-total" style="margin-right:auto; text-align:left;">
+                            <div class="lbl">Total de tus productos</div>
+                            <div class="monto">${{ "%.2f"|format(p.subtotal) }}</div>
+                        </div>
+
+                        <button type="button" class="btn-mini info btn-ver-pedido" data-id="{{ p._id }}">
+                            <i class="fas fa-eye"></i> Ver detalle
+                        </button>
+
+                        {% if p.estado in ('pendiente', 'confirmado', 'preparando') %}
+                            <button type="button" class="btn-mini warning btn-marcar-enviado"
+                                    data-id="{{ p._id }}"
+                                    data-numero="{{ p.numero_pedido or p._id[:8]|upper }}">
+                                <i class="fas fa-truck"></i> Marcar enviado
+                            </button>
+                        {% elif p.estado == 'enviado' %}
+                            <span class="btn-mini success" style="pointer-events:none;">
+                                <i class="fas fa-check"></i> Enviado
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div id="sin-resultados" style="display:none;" class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h4>Sin resultados</h4>
+                    <p>No hay pedidos con esos filtros.</p>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h4>Aún no tienes pedidos</h4>
+                <p>Cuando un cliente compre tus productos, verás los pedidos aquí.</p>
+            </div>
+        {% endif %}
+
+        <div class="footer-info" style="margin-top: 30px;">
+            <p>
+                <i class="fas fa-shield-alt"></i> ORION
+                <span>|</span>
+                <i class="fas fa-store"></i> {{ vendedor.nombre_tienda|default('Mi Tienda') }}
+                <span>|</span>
+                <span class="heart"><i class="fas fa-heart"></i></span>
+            </p>
+        </div>
+
+    </main>
+</div>
+
+<!-- ===== MODAL DETALLE DEL PEDIDO ===== -->
+<div class="modal fade" id="modalPedido" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;">
+            <div class="modal-header-orion">
+                <h4><i class="fas fa-receipt"></i> Pedido <span id="mNumero" style="margin-left:6px;">#</span></h4>
+                <button type="button" class="close-x" data-bs-dismiss="modal"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="modal-body" style="padding:0;">
+
+                <!-- ESTADO + FECHA -->
+                <div class="modal-section">
+                    <div class="info-grid">
+                        <div class="info-cell">
+                            <div class="lbl"><i class="fas fa-info-circle"></i> Estado</div>
+                            <div class="val" id="mEstado">—</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="lbl"><i class="far fa-calendar"></i> Fecha</div>
+                            <div class="val" id="mFecha">—</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="lbl"><i class="fas fa-truck"></i> Paquetería</div>
+                            <div class="val" id="mPaqueteria">—</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="lbl"><i class="fas fa-barcode"></i> Seguimiento</div>
+                            <div class="val" id="mSeguimiento">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLIENTE -->
+                <div class="modal-section">
+                    <div class="modal-section-title"><i class="fas fa-user"></i> Cliente</div>
+                    <div class="info-grid">
+                        <div class="info-cell">
+                            <div class="lbl"><i class="fas fa-user"></i> Nombre</div>
+                            <div class="val" id="mCliente">—</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="lbl"><i class="fas fa-envelope"></i> Email</div>
+                            <div class="val" id="mEmail">—</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="lbl"><i class="fas fa-phone"></i> Teléfono</div>
+                            <div class="val" id="mTelefono">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DIRECCION -->
+                <div class="modal-section">
+                    <div class="modal-section-title"><i class="fas fa-map-marker-alt"></i> Dirección de envío</div>
+                    <div class="info-cell" style="background: #f0f9ff; border-color: #bae6fd;">
+                        <div class="val" id="mDireccion" style="line-height: 1.6;">—</div>
+                    </div>
+                </div>
+
+                <!-- ITEMS -->
+                <div class="modal-section">
+                    <div class="modal-section-title"><i class="fas fa-box"></i> Tus productos en este pedido</div>
+                    <div id="mItems"></div>
+                </div>
+
+                <!-- TOTAL -->
+                <div class="modal-section">
+                    <div class="total-box">
+                        <span class="total-lbl"><i class="fas fa-dollar-sign"></i> Total de tus productos</span>
+                        <span class="total-val" id="mTotal">$0.00</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer" style="padding:14px 26px; border-top:1px solid #f0f0f0;">
+                <button type="button" class="btn-mini ghost" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+                <button type="button" class="btn-mini warning" id="mBtnMarcarEnviado" style="display:none;">
+                    <i class="fas fa-truck"></i> Marcar como enviado
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ===== DATOS DE PEDIDOS PARA EL MODAL =====
+const PEDIDOS_DATA = {
+    {% for p in pedidos_procesados %}
+    "{{ p._id }}": {
+        _id: "{{ p._id }}",
+        numero: "{{ p.numero_pedido or p._id[:8]|upper }}",
+        estado: "{{ p.estado }}",
+        fecha: "{{ p.created_at.strftime('%d/%m/%Y · %H:%M') if p.created_at else '' }}",
+        cliente: {{ p.usuario_nombre | tojson }},
+        email: {{ p.usuario_email | tojson }},
+        telefono: {{ p.usuario_telefono | tojson }},
+        direccion: {{ p.direccion | tojson }},
+        paqueteria: {{ p.paqueteria | tojson }},
+        seguimiento: {{ p.numero_seguimiento | tojson }},
+        subtotal: {{ p.subtotal }},
+        items: {{ p.items | tojson }},
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+};
+
+// ===== FILTROS =====
+function aplicarFiltros() {
+    const q = document.getElementById('filtroBusqueda').value.toLowerCase().trim();
+    const estado = document.getElementById('filtroEstado').value;
+
+    let visibles = 0;
+    document.querySelectorAll('.pedido-fila').forEach(function(fila) {
+        const num = fila.dataset.numero || '';
+        const cli = fila.dataset.cliente || '';
+        const est = fila.dataset.estado || '';
+
+        const matchQ = !q || num.includes(q) || cli.includes(q);
+        const matchE = !estado || est === estado;
+
+        if (matchQ && matchE) {
+            fila.style.display = '';
+            visibles++;
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+
+    const vacio = document.getElementById('sin-resultados');
+    if (vacio) vacio.style.display = visibles === 0 ? '' : 'none';
+}
+
+function limpiarFiltros() {
+    document.getElementById('filtroBusqueda').value = '';
+    document.getElementById('filtroEstado').value = '';
+    aplicarFiltros();
+}
+
+// ===== MODAL =====
+function abrirModalPedido(pedidoId) {
+    const p = PEDIDOS_DATA[pedidoId];
+    if (!p) return;
+
+    document.getElementById('mNumero').textContent = '#' + p.numero;
+    document.getElementById('mFecha').textContent = p.fecha || '—';
+    document.getElementById('mCliente').textContent = p.cliente || '—';
+    document.getElementById('mEmail').textContent = p.email || '—';
+    document.getElementById('mTelefono').textContent = p.telefono || '—';
+
+    // Estado con estilo
+    const estadoEl = document.getElementById('mEstado');
+    estadoEl.innerHTML = '<span class="estado-pill estado-' + p.estado + '">' + p.estado.charAt(0).toUpperCase() + p.estado.slice(1) + '</span>';
+
+    // Paquetería y seguimiento
+    document.getElementById('mPaqueteria').textContent = p.paqueteria || 'Sin asignar';
+    document.getElementById('mSeguimiento').textContent = p.seguimiento || 'Sin asignar';
+
+    // Dirección
+    const d = p.direccion || {};
+    const partes = [];
+    if (d.calle) partes.push(d.calle + (d.numero ? ' #' + d.numero : ''));
+    if (d.colonia) partes.push('Col. ' + d.colonia);
+    if (d.ciudad) partes.push(d.ciudad);
+    if (d.estado) partes.push(d.estado);
+    if (d.cp) partes.push('CP ' + d.cp);
+    document.getElementById('mDireccion').textContent = partes.length ? partes.join(', ') : 'Sin dirección registrada';
+
+    // Items
+    const itemsEl = document.getElementById('mItems');
+    if (p.items && p.items.length > 0) {
+        itemsEl.innerHTML = p.items.map(function(it) {
+            const imgHtml = it.imagen
+                ? '<img src="/static/uploads/productos/' + it.imagen + '" class="item-img" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
+                : '';
+            const phHtml = '<div class="item-img-ph"' + (it.imagen ? ' style="display:none;"' : '') + '><i class="fas fa-image"></i></div>';
+            return '<div class="item-row">' +
+                imgHtml + phHtml +
+                '<div style="flex:1;">' +
+                    '<div class="item-nombre">' + (it.nombre || 'Producto') + '</div>' +
+                    '<div class="item-meta">' + it.cantidad + ' × $' + Number(it.precio).toFixed(2) + '</div>' +
+                '</div>' +
+                '<div class="item-subtotal">$' + Number(it.subtotal).toFixed(2) + '</div>' +
+            '</div>';
+        }).join('');
+    } else {
+        itemsEl.innerHTML = '<p class="text-muted">Sin items.</p>';
+    }
+
+    // Total
+    document.getElementById('mTotal').textContent = '$' + Number(p.subtotal).toFixed(2);
+
+    // Botón marcar enviado
+    const btnEnv = document.getElementById('mBtnMarcarEnviado');
+    if (['pendiente', 'confirmado', 'preparando'].includes(p.estado)) {
+        btnEnv.style.display = '';
+        btnEnv.dataset.id = p._id;
+        btnEnv.dataset.numero = p.numero;
+    } else {
+        btnEnv.style.display = 'none';
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('modalPedido'));
+    modal.show();
+}
+
+// ===== MARCAR ENVIADO =====
+function marcarEnviado(pedidoId, numero) {
+    const paqueteria = prompt('Paquetería (opcional):\nEj: DHL, Estafeta, FedEx', '') || '';
+    const seguimiento = prompt('Número de seguimiento (opcional):', '') || '';
+
+    fetch('{{ url_for("web.marketplace_marcar_enviado", pedido_id="PLACEHOLDER") }}'.replace('PLACEHOLDER', pedidoId), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paqueteria: paqueteria, numero_seguimiento: seguimiento })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + (data.message || 'No se pudo actualizar'));
+        }
+    })
+    .catch(function(err) {
+        alert('Error de red: ' + err.message);
+    });
+}
+
+// ===== EVENT LISTENERS =====
+document.querySelectorAll('.btn-ver-pedido').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        abrirModalPedido(this.dataset.id);
+    });
+});
+
+document.querySelectorAll('.btn-marcar-enviado').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        if (confirm('¿Marcar el pedido #' + this.dataset.numero + ' como enviado?')) {
+            marcarEnviado(this.dataset.id, this.dataset.numero);
+        }
+    });
+});
+
+const btnModalEnviar = document.getElementById('mBtnMarcarEnviado');
+if (btnModalEnviar) {
+    btnModalEnviar.addEventListener('click', function() {
+        if (confirm('¿Marcar el pedido #' + this.dataset.numero + ' como enviado?')) {
+            marcarEnviado(this.dataset.id, this.dataset.numero);
+        }
+    });
+}
+</script>
+</body>
+</html>

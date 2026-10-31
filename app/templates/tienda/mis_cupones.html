@@ -11,9 +11,13 @@
         :root {
             --orion-primary: #e10098;
             --orion-primary-dark: #c00080;
-            --orion-secondary: #00d4ff;
+            --orion-secondary: #ff5eb4;
             --orion-dark: #1a1a2e;
             --orion-gray: #f5f6f8;
+            --orion-success: #10b981;
+            --orion-warning: #f59e0b;
+            --orion-danger: #ef4444;
+            --orion-border: #ececf1;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -30,11 +34,7 @@
             border-bottom: 1px solid #eee;
             padding: 6px 0;
         }
-        .top-nav a {
-            color: #666;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+        .top-nav a { color: #666; text-decoration: none; transition: color 0.3s ease; }
         .top-nav a:hover { color: var(--orion-primary); }
 
         .main-navbar {
@@ -44,205 +44,128 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
         .brand-logo {
-            font-weight: 900;
-            font-size: 2.3rem;
+            font-weight: 900; font-size: 2.3rem;
             color: var(--orion-primary) !important;
-            letter-spacing: -1.5px;
-            text-decoration: none;
+            letter-spacing: -1.5px; text-decoration: none;
         }
         .brand-logo:hover { color: var(--orion-primary-dark) !important; }
-
         .navbar .dropdown-toggle {
-            font-weight: 700;
-            color: #1a1a2e;
-            background: transparent;
-            border: none;
-            padding: 8px 12px;
+            font-weight: 700; color: #1a1a2e;
+            background: transparent; border: none; padding: 8px 12px;
         }
         .navbar .dropdown-toggle:hover { color: var(--orion-primary); }
-
         .search-container {
             border: 2px solid #eee !important;
-            border-radius: 50px;
-            overflow: hidden;
-            width: 100%;
+            border-radius: 50px; overflow: hidden; width: 100%;
         }
         .search-container input {
-            border: none;
-            padding: 8px 20px;
-            font-size: 0.9rem;
-            background: #f8f9fa;
+            border: none; padding: 8px 20px;
+            font-size: 0.9rem; background: #f8f9fa;
         }
         .search-container input:focus { box-shadow: none; background: #fff; }
         .search-container .btn-search {
-            background: #f8f9fa;
-            border: none;
-            padding: 8px 15px;
+            background: #f8f9fa; border: none; padding: 8px 15px;
         }
         .search-container .btn-search:hover { background: #eee; }
-
         .user-avatar {
-            width: 38px;
-            height: 38px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid var(--orion-primary);
+            width: 38px; height: 38px; object-fit: cover;
+            border-radius: 50%; border: 2px solid var(--orion-primary);
         }
         .brand-border {
             height: 4px;
             background: linear-gradient(90deg, var(--orion-primary), #1a1a2e);
             width: 100%;
         }
-
-        .dropdown-submenu {
-            position: relative;
-        }
+        .dropdown-submenu { position: relative; }
         .dropdown-submenu>.dropdown-menu {
-            top: 0;
-            left: 100%;
-            margin-top: -6px;
-            display: none;
+            top: 0; left: 100%; margin-top: -6px; display: none;
         }
-        .dropdown-submenu:hover>.dropdown-menu {
-            display: block;
-        }
+        .dropdown-submenu:hover>.dropdown-menu { display: block; }
         .dropdown-submenu>a::after {
-            content: " ▶";
-            font-size: 0.6rem;
-            float: right;
-            margin-top: 5px;
+            content: " ▶"; font-size: 0.6rem; float: right; margin-top: 5px;
         }
         .dropdown-menu {
-            border-radius: 12px;
-            border: none;
+            border-radius: 12px; border: none;
             box-shadow: 0 10px 40px rgba(0,0,0,0.12);
         }
-        .dropdown-item {
-            padding: 8px 20px;
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-        .dropdown-item:hover {
-            background: rgba(225, 0, 152, 0.05);
-            color: var(--orion-primary);
-        }
-
-        .btn-cart {
-            position: relative;
-            color: #1a1a2e;
-            font-size: 1.4rem;
-            text-decoration: none;
-        }
+        .dropdown-item { padding: 8px 20px; font-weight: 500; font-size: 0.85rem; }
+        .dropdown-item:hover { background: rgba(225, 0, 152, 0.05); color: var(--orion-primary); }
+        .btn-cart { position: relative; color: #1a1a2e; font-size: 1.4rem; text-decoration: none; }
         .btn-cart:hover { color: var(--orion-primary); }
         .btn-cart .badge-cart {
-            position: absolute;
-            top: -8px;
-            right: -10px;
-            background: var(--orion-primary);
-            color: #fff;
-            font-size: 0.55rem;
-            padding: 2px 6px;
-            border-radius: 50%;
-            font-weight: 700;
+            position: absolute; top: -8px; right: -10px;
+            background: var(--orion-primary); color: #fff;
+            font-size: 0.55rem; padding: 2px 6px;
+            border-radius: 50%; font-weight: 700;
         }
-
         .user-link {
-            color: #1a1a2e;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
+            color: #1a1a2e; font-weight: 700; text-decoration: none;
+            display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
         }
         .user-link:hover { color: var(--orion-primary); }
 
         .hero-pedidos {
-            background: linear-gradient(135deg, #0033A0 0%, #002277 100%);
-            padding: 30px 0;
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, #e10098 0%, #b8006c 100%);
+            padding: 26px 0;
+            margin-bottom: 22px;
+            position: relative; overflow: hidden;
         }
         .hero-pedidos::before {
-            content: '';
-            position: absolute;
-            top: -60%;
-            right: -5%;
-            width: 250px;
-            height: 250px;
-            background: rgba(227, 24, 55, 0.06);
+            content: ''; position: absolute;
+            top: -60%; right: -5%;
+            width: 250px; height: 250px;
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 50%;
         }
         .hero-pedidos::after {
-            content: '';
-            position: absolute;
-            bottom: -50%;
-            left: -3%;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 215, 0, 0.04);
+            content: ''; position: absolute;
+            bottom: -50%; left: -3%;
+            width: 200px; height: 200px;
+            background: rgba(255, 215, 0, 0.10);
             border-radius: 50%;
         }
         .hero-pedidos .container { position: relative; z-index: 1; }
         .hero-pedidos .hero-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 15px;
+            display: flex; align-items: center;
+            justify-content: space-between; flex-wrap: wrap; gap: 15px;
         }
         .hero-pedidos .hero-text { flex: 1; }
         .hero-pedidos .hero-title {
-            font-weight: 800;
-            font-size: 1.8rem;
-            color: #FFFFFF;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-weight: 800; font-size: 1.8rem;
+            color: #FFFFFF; letter-spacing: -0.5px;
+            margin-bottom: 4px; display: flex; align-items: center; gap: 10px;
         }
         .hero-pedidos .hero-title .bi { color: #FFD700; font-size: 1.6rem; }
-        .hero-pedidos .hero-subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-            font-weight: 400;
-        }
+        .hero-pedidos .hero-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; font-weight: 400; }
         .hero-pedidos .hero-stats {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: rgba(255, 255, 255, 0.10);
+            display: flex; align-items: center; gap: 16px;
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(8px);
-            padding: 8px 22px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 8px 22px; border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.20);
         }
         .hero-pedidos .hero-stats .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #FFFFFF;
-            font-weight: 600;
-            font-size: 0.85rem;
+            display: flex; align-items: center; gap: 6px;
+            color: #FFFFFF; font-weight: 600; font-size: 0.85rem;
         }
         .hero-pedidos .hero-stats .stat-item .bi { color: #FFD700; font-size: 1rem; }
         .hero-pedidos .hero-stats .stat-divider {
-            width: 1px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.15);
+            width: 1px; height: 24px;
+            background: rgba(255, 255, 255, 0.20);
         }
 
-        .container-main { max-width: 1200px; margin: auto; padding: 0 5% 40px; }
+        /* ⭐ CONTENEDOR ANCHO: ocupa todo el viewport, margen mínimo */
+        .container-main {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0 20px 40px;
+        }
 
         .user-segment-badge {
-            display: inline-block;
-            padding: 6px 18px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            text-transform: uppercase;
+            display: inline-block; padding: 6px 18px;
+            border-radius: 50px; font-weight: 700;
+            font-size: 0.75rem; text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .user-segment-badge.vip { background: #fff8e1; color: #f9a825; border: 1px solid #f9a825; }
@@ -250,153 +173,289 @@
         .user-segment-badge.ocasional { background: #e8f5e9; color: #2e7d32; border: 1px solid #2e7d32; }
         .user-segment-badge.inactivo { background: #ffebee; color: #c62828; border: 1px solid #c62828; }
 
+        .cupon-activo-banner {
+            background: linear-gradient(135deg, #e5f7ed, #d1f2e0);
+            border: 1.5px solid #198754;
+            border-radius: 14px;
+            padding: 12px 18px;
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 12px;
+            margin-bottom: 16px; flex-wrap: wrap;
+            box-shadow: 0 2px 12px rgba(25, 135, 84, 0.10);
+        }
+        .cupon-activo-banner .ca-info {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.88rem; color: #198754; font-weight: 700;
+        }
+        .cupon-activo-banner .ca-info i { font-size: 1.4rem; }
+        .cupon-activo-banner .ca-code {
+            font-family: monospace; background: #fff;
+            padding: 2px 10px; border-radius: 6px;
+            font-size: 0.82rem; border: 1px solid #198754; color: #198754;
+        }
+        .cupon-activo-banner .ca-btn-quitar {
+            background: #fff; color: #dc3545;
+            border: 1.5px solid #dc3545;
+            padding: 5px 14px; border-radius: 50px;
+            font-weight: 700; font-size: 0.75rem;
+            cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .cupon-activo-banner .ca-btn-quitar:hover { background: #dc3545; color: #fff; }
+
+        /* ⭐ Aviso cuando hay cupón activo (política Liverpool) */
+        .cupon-politica-aviso {
+            background: #fff7ed;
+            border: 1.5px solid #f59e0b;
+            border-radius: 12px;
+            padding: 10px 16px;
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.82rem; color: #92400e; font-weight: 600;
+        }
+        .cupon-politica-aviso i { font-size: 1.2rem; color: #f59e0b; flex-shrink: 0; }
+
+        .filtros-cupones {
+            display: flex; gap: 10px; flex-wrap: wrap;
+            align-items: center; margin-bottom: 16px;
+            background: #fff; padding: 10px 14px;
+            border-radius: 12px; border: 1px solid var(--orion-border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .filtros-cupones input {
+            flex: 1; min-width: 220px;
+            padding: 8px 16px; border: 1.5px solid var(--orion-border);
+            border-radius: 50px; font-size: 0.85rem;
+            background: #f8f9fa; transition: all 0.2s;
+        }
+        .filtros-cupones input:focus {
+            outline: none; border-color: var(--orion-primary);
+            background: #fff; box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.08);
+        }
+        .filtros-cupones select {
+            padding: 8px 16px; border: 1.5px solid var(--orion-border);
+            border-radius: 50px; font-size: 0.85rem;
+            background: #f8f9fa; cursor: pointer;
+        }
+        .filtros-cupones select:focus {
+            outline: none; border-color: var(--orion-primary);
+            background: #fff;
+        }
+
+        /* ============================================================
+           ⭐ GRID ALINEADO A LA IZQUIERDA: ocupa todo el ancho
+        ============================================================ */
         .coupon-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 26px;
+            align-items: start;
+            justify-content: start;
+            width: 100%;
         }
+
         .coupon-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border: 1px solid #f0f0f0;
-            transition: all 0.3s ease;
+            transition: all 0.22s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
         }
         .coupon-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.09);
         }
         .coupon-card::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
             background: linear-gradient(90deg, var(--orion-primary), var(--orion-secondary));
         }
-        .coupon-card .coupon-code {
-            font-family: monospace;
-            font-size: 1.2rem;
-            font-weight: 700;
+        .coupon-card .coupon-body {
+            padding: 12px 14px 0 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .coupon-card .coupon-footer {
+            padding: 8px 14px 14px 14px;
+        }
+
+        /* ACTIVA */
+        .coupon-card.activa {
+            border: 2px solid #198754;
+            box-shadow: 0 6px 22px rgba(25, 135, 84, 0.16);
+        }
+        .coupon-card.activa::before {
+            background: linear-gradient(90deg, #198754, #10b981);
+        }
+        .coupon-card.activa .coupon-stamp-activa {
+            position: absolute;
+            top: 8px; right: 8px;
+            background: #198754; color: #fff;
+            font-size: 0.56rem; font-weight: 800;
+            letter-spacing: 0.6px; padding: 3px 8px;
+            border-radius: 50px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            z-index: 2;
+            display: inline-flex; align-items: center; gap: 3px;
+        }
+
+        /* BLOQUEADA (hay cupón activo pero este no es) */
+        .coupon-card.bloqueada {
+            opacity: 0.72;
+            filter: grayscale(0.15);
+        }
+        .coupon-card.bloqueada:hover { transform: none; }
+        .coupon-card.bloqueada::before { background: #d1d5db; }
+
+        /* USADA */
+        .coupon-card.usado {
+            opacity: 0.7;
+            filter: grayscale(0.35);
+        }
+        .coupon-card.usado:hover {
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .coupon-card.usado::before { background: #d1d5db; }
+        .coupon-card.usado .coupon-stamp {
+            position: absolute;
+            top: 38px; right: -28px;
+            background: #dc3545; color: #fff;
+            font-size: 0.55rem; font-weight: 900;
+            letter-spacing: 1.2px; padding: 4px 38px;
+            transform: rotate(35deg);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            z-index: 2;
+        }
+
+        .coupon-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem; font-weight: 700;
             color: var(--orion-primary);
             background: #f8f0f5;
-            padding: 4px 12px;
-            border-radius: 8px;
-            letter-spacing: 2px;
-            display: inline-block;
+            padding: 3px 9px; border-radius: 6px;
+            letter-spacing: 1.2px; display: inline-block;
         }
-        .coupon-card .coupon-value {
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--orion-primary);
+        .coupon-value {
+            font-size: 1.35rem; font-weight: 900;
+            color: var(--orion-primary); margin-top: 5px;
+            line-height: 1.1;
         }
-        .coupon-card .coupon-value small {
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: #888;
+        .coupon-value small {
+            font-size: 0.68rem; font-weight: 400; color: #888;
         }
-        .coupon-card .coupon-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #1a1a2e;
+        .coupon-name {
+            font-weight: 700; font-size: 0.82rem;
+            color: #1a1a2e; margin-top: 3px; line-height: 1.22;
         }
-        .coupon-card .coupon-desc {
-            color: #666;
-            font-size: 0.85rem;
+        .coupon-desc {
+            color: #666; font-size: 0.72rem;
+            margin-top: 3px; line-height: 1.3;
+            min-height: 1.9em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
-        .coupon-card .coupon-valid {
-            font-size: 0.75rem;
-            color: #888;
-        }
-
-        .coupon-card .badge-categoria {
-            font-size: 0.55rem;
-            padding: 2px 10px;
-            border-radius: 50px;
-            font-weight: 600;
-            background: #e8f5e9;
-            color: #2e7d32;
-            margin: 2px;
-            display: inline-block;
-        }
-        .coupon-card .badge-producto {
-            font-size: 0.55rem;
-            padding: 2px 10px;
-            border-radius: 50px;
-            font-weight: 600;
-            background: #e3f2fd;
-            color: #1565c0;
-            margin: 2px;
-            display: inline-block;
+        .coupon-valid {
+            font-size: 0.64rem; color: #888;
+            margin-top: 7px;
+            display: flex; align-items: center; gap: 3px;
         }
 
-        .coupon-card .btn-use {
-            background: var(--orion-primary);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            width: 100%;
+        .segment-badge {
+            font-size: 0.48rem; padding: 2px 7px;
+            border-radius: 50px; font-weight: 600;
+            background: #f0f0f0; color: #888;
+            margin: 1px; display: inline-block;
         }
-        .coupon-card .btn-use:hover {
+        .segment-badge.vip { background: #fff8e1; color: #f9a825; }
+        .segment-badge.frecuente { background: #e3f2fd; color: #1565c0; }
+        .segment-badge.ocasional { background: #e8f5e9; color: #2e7d32; }
+        .segment-badge.inactivo { background: #ffebee; color: #c62828; }
+
+        .uso-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 2px 7px; border-radius: 50px;
+            font-size: 0.58rem; font-weight: 700;
+        }
+        .uso-badge.disponible { background: #d1fae5; color: #065f46; }
+        .uso-badge.parcial    { background: #fef3c7; color: #92400e; }
+        .uso-badge.agotado    { background: #fee2e2; color: #991b1b; }
+        .uso-badge.activo     { background: #198754; color: #fff; }
+
+        .progress-uso {
+            height: 3px; background: #f0f0f0;
+            border-radius: 4px; overflow: hidden; margin-top: 4px;
+        }
+        .progress-uso > div {
+            height: 100%; transition: width 0.3s ease;
+        }
+
+        .btn-use {
+            background: var(--orion-primary); color: #fff;
+            border: none; padding: 7px 12px;
+            border-radius: 50px; font-weight: 700;
+            font-size: 0.7rem; transition: all 0.2s ease;
+            cursor: pointer; width: 100%;
+            display: flex; align-items: center;
+            justify-content: center; gap: 4px;
+            white-space: nowrap;
+        }
+        .btn-use:hover {
             background: var(--orion-primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(225, 0, 152, 0.28);
         }
-        .coupon-card .btn-use:disabled {
-            background: #ccc;
+        .btn-use:disabled,
+        .btn-use.disabled-cupon {
+            background: #e9ecef; color: #6b7280;
+            cursor: not-allowed; transform: none; box-shadow: none;
+        }
+        .btn-use.disabled-cupon:hover {
+            background: #e9ecef; transform: none; box-shadow: none;
+        }
+        .btn-use.usado-btn {
+            background: #f3f4f6; color: #9ca3af;
+        }
+        /* ⭐ BOTÓN BLOQUEADO: hay otro cupón activo */
+        .btn-use.bloqueado-btn {
+            background: #f9fafb;
+            color: #9ca3af;
+            border: 1.5px dashed #d1d5db;
             cursor: not-allowed;
+        }
+        .btn-use.bloqueado-btn:hover {
+            background: #f9fafb;
             transform: none;
             box-shadow: none;
         }
-
-        .coupon-card .btn-use.disabled-cupon {
-            background: #e9ecef;
-            color: #888;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        .coupon-card .btn-use.disabled-cupon:hover {
-            background: #e9ecef;
-            transform: none;
-            box-shadow: none;
-        }
-        .coupon-card .minimo-alerta {
-            font-size: 0.7rem;
+        .btn-use.quitar-btn {
+            background: #fff;
             color: #dc3545;
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            border: 1.5px solid #dc3545;
         }
-        .coupon-card .minimo-alerta i {
-            font-size: 0.8rem;
+        .btn-use.quitar-btn:hover {
+            background: #dc3545;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(220, 53, 69, 0.22);
         }
 
-        .coupon-card .segment-badge {
-            font-size: 0.55rem;
-            padding: 2px 10px;
-            border-radius: 50px;
-            font-weight: 600;
-            background: #f0f0f0;
-            color: #888;
-            margin: 2px;
-            display: inline-block;
+        .minimo-alerta {
+            font-size: 0.6rem; color: #dc3545;
+            margin-top: 4px; display: flex;
+            align-items: center; gap: 3px;
+            justify-content: center;
         }
-        .coupon-card .segment-badge.vip { background: #fff8e1; color: #f9a825; }
-        .coupon-card .segment-badge.frecuente { background: #e3f2fd; color: #1565c0; }
-        .coupon-card .segment-badge.ocasional { background: #e8f5e9; color: #2e7d32; }
-        .coupon-card .segment-badge.inactivo { background: #ffebee; color: #c62828; }
-        .coupon-card .segment-badge.todos { background: #f0f0f0; color: #888; }
+        .minimo-alerta i { font-size: 0.65rem; }
 
         .empty-state {
             text-align: center;
@@ -405,46 +464,85 @@
             border-radius: 16px;
             border: 1px solid #f0f0f0;
         }
-        .empty-state .icon { font-size: 4rem; color: #ddd; margin-bottom: 15px; }
+        .empty-state .icon {
+            font-size: 4rem; color: #ddd; margin-bottom: 15px;
+        }
         .empty-state h4 { font-weight: 700; color: #1a1a2e; }
         .empty-state p { color: #888; }
 
+        .historial-box {
+            margin-top: 26px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid #f0f0f0;
+        }
+        .historial-box h5 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--orion-primary);
+            padding-bottom: 10px;
+        }
+        .historial-item {
+            background: #f8f9fa;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            border: 1px solid #eee;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         footer {
-            background: #1a1a2e;
-            color: #fff;
-            padding: 30px 0;
-            text-align: center;
-            margin-top: 40px;
+            background: #1a1a2e; color: #fff;
+            padding: 30px 0; text-align: center; margin-top: 40px;
         }
         footer p { margin: 0; font-size: 0.85rem; opacity: 0.6; }
 
+        /* ============================================================
+           ⭐ RESPONSIVE EN CASCADA
+        ============================================================ */
+        @media (max-width: 1400px) {
+            .coupon-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+        }
+        @media (max-width: 1200px) {
+            .coupon-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        @media (max-width: 992px) {
+            .coupon-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
         @media (max-width: 768px) {
+            .coupon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .hero-pedidos .hero-content { flex-direction: column; align-items: flex-start; }
             .hero-pedidos .hero-stats { width: 100%; justify-content: center; flex-wrap: wrap; }
             .hero-pedidos .hero-title { font-size: 1.4rem; }
-            .coupon-grid { grid-template-columns: 1fr; }
             .search-container { width: 100% !important; }
             .brand-logo { font-size: 1.8rem; }
+            .container-main { padding: 0 12px 30px; }
         }
         @media (max-width: 576px) {
+            .coupon-grid { grid-template-columns: 1fr; }
             .user-link span { display: none; }
             .hero-pedidos .hero-stats .stat-item { font-size: 0.75rem; }
+            .filtros-cupones { flex-direction: column; align-items: stretch; }
+            .filtros-cupones input { min-width: 100%; }
         }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
-    <!-- ===== TOP NAV ===== -->
     <div class="top-nav" style="font-size:0.75rem; background:#f8f9fa; border-bottom:1px solid #eee; padding:6px 0;">
         <div class="container d-flex justify-content-end gap-4">
             <a href="#" style="color:#666; text-decoration:none;"><i class="bi bi-geo-alt"></i> Encuentra tu tienda</a>
             <a href="/servicios" style="color:#666; text-decoration:none;"><i class="bi bi-truck"></i> Servicios</a>
-            <a href="#" style="color:#666; text-decoration:none;"><i class="bi bi-question-circle"></i> Ayuda</a>
+            <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none">Ayuda</a>
         </div>
     </div>
 
-    <!-- ===== NAVBAR ===== -->
     <nav class="navbar navbar-expand-lg navbar-light main-navbar">
         <div class="container">
             <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
@@ -453,9 +551,7 @@
             </button>
             <div class="collapse navbar-collapse" id="orionNavbar">
                 <div class="dropdown mx-lg-3">
-                    <button class="dropdown-toggle" data-bs-toggle="dropdown">
-                        Categorías
-                    </button>
+                    <button class="dropdown-toggle" data-bs-toggle="dropdown">Categorías</button>
                     <ul class="dropdown-menu shadow border-0 py-2">
                         {% if categorias %}
                             {% for padre in categorias if not padre.padre_id %}
@@ -484,15 +580,15 @@
                     </div>
                 </form>
 
-                <div class="d-flex align-items-center gap-3">
+                                <div class="d-flex align-items-center gap-3">
                     {% if session.get('nombre') %}
-                        <a href="{{ url_for('web.perfil') }}" class="user-link">
-                            {% if session.get('foto') %}
-                                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="user-avatar" alt="Perfil">
+                        <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                            {% if current_user_foto %}
+                                <img src="{{ foto_src(current_user_foto) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;">
                             {% else %}
-                                <i class="bi bi-person-circle fs-3"></i>
+                                <i class="bi bi-person fs-5 me-1"></i>
                             {% endif %}
-                            <span>HOLA, {{ session['nombre'] }}</span>
+                            Hola, {{ session['nombre'] }}
                         </a>
                         <a href="{{ url_for('web.logout') }}" class="btn btn-outline-danger btn-sm"><i class="bi bi-box-arrow-right"></i> Salir</a>
                     {% else %}
@@ -511,7 +607,6 @@
     </nav>
     <div class="brand-border"></div>
 
-    <!-- ===== HERO ===== -->
     <section class="hero-pedidos">
         <div class="container">
             <div class="hero-content">
@@ -521,18 +616,18 @@
                 </div>
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <i class="bi bi-ticket"></i> 
-                        <span>{{ cupones|length if cupones else 0 }} cupones disponibles</span>
+                        <i class="bi bi-ticket"></i>
+                        <span>{{ cupones|length if cupones else 0 }} disponibles</span>
                     </div>
                     <div class="stat-divider"></div>
                     <div class="stat-item">
-                        <i class="bi bi-clock-history"></i> 
+                        <i class="bi bi-clock-history"></i>
                         <span>{{ historial|length if historial else 0 }} usados</span>
                     </div>
                     <div class="stat-divider"></div>
                     <div class="stat-item">
                         <i class="bi bi-tag"></i>
-                        <span>Tu segmento: 
+                        <span>Segmento:
                             <span class="user-segment-badge {{ segmento|lower }}">
                                 {% if segmento == 'VIP' %}👑{% endif %}
                                 {% if segmento == 'Frecuente' %}🔄{% endif %}
@@ -542,115 +637,188 @@
                             </span>
                         </span>
                     </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <i class="bi bi-cart"></i>
-                        <span>Total carrito: ${{ "%.2f"|format(total_carrito|default(0)) }}</span>
-                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== CONTENIDO ===== -->
     <main class="container-main">
 
+        <!-- ⭐ Banner del cupón activo (renderizado directo por el backend) -->
+        {% if hay_cupon_activo %}
+        <div class="cupon-activo-banner">
+            <div class="ca-info">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Ya tienes un cupón aplicado en tu carrito:</span>
+                <span class="ca-code">{{ codigo_cupon_activo }}</span>
+            </div>
+            <button type="button" class="ca-btn-quitar" onclick="quitarCuponActivo('{{ codigo_cupon_activo }}')">
+                <i class="bi bi-x-circle"></i> Quitar cupón
+            </button>
+        </div>
+
+        <!-- ⭐ Aviso de política Liverpool -->
+        <div class="cupon-politica-aviso">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>
+                Solo puedes tener <strong>un cupón activo a la vez</strong>.
+                Para usar otro, primero quita el cupón actual con el botón de arriba.
+            </span>
+        </div>
+        {% endif %}
+
+        {% if cupones and cupones|length > 1 %}
+        <div class="filtros-cupones">
+            <input type="text" id="buscarCupon" placeholder="🔍 Buscar por código o nombre...">
+            <select id="filtroEstado">
+                <option value="">Todos</option>
+                <option value="disponibles">Solo disponibles</option>
+                <option value="usados">Solo usados</option>
+            </select>
+        </div>
+        {% endif %}
+
         {% if cupones and cupones|length > 0 %}
-        <div class="coupon-grid">
+        <div class="coupon-grid" id="couponGrid">
             {% for cupon in cupones %}
-            <div class="coupon-card">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-                    <span class="coupon-code">{{ cupon.codigo }}</span>
-                    <span style="font-size:0.7rem; color:#888;">
-                        {% if cupon.tipo == 'porcentaje' %}
-                            <span class="badge bg-info text-white">% Descuento</span>
-                        {% elif cupon.tipo == 'monto_fijo' %}
-                            <span class="badge bg-success text-white">Monto Fijo</span>
-                        {% else %}
-                            <span class="badge bg-primary text-white">Envío Gratis</span>
-                        {% endif %}
-                    </span>
-                </div>
+            {% set usado = cupon.ya_usado_por_mi %}
+            {% set activo = cupon.es_cupon_activo %}
+            {% set bloqueada = hay_cupon_activo and not activo and not usado %}
 
-                <div class="coupon-value">
-                    {% if cupon.tipo == 'porcentaje' %}
-                        {{ cupon.valor }}% <small>de descuento</small>
-                    {% elif cupon.tipo == 'monto_fijo' %}
-                        ${{ "%.2f"|format(cupon.valor) }} <small>de descuento</small>
-                    {% else %}
-                        <i class="bi bi-truck"></i> <small>Envío gratis</small>
-                    {% endif %}
-                </div>
+            <div class="coupon-card {% if usado %}usado{% endif %} {% if activo %}activa{% endif %} {% if bloqueada %}bloqueada{% endif %}"
+                 data-codigo="{{ cupon.codigo }}"
+                 data-nombre="{{ cupon.nombre|lower }}"
+                 data-usado="{{ 'usado' if usado else 'disponible' }}">
 
-                <div class="coupon-name">{{ cupon.nombre }}</div>
-                <div class="coupon-desc">{{ cupon.descripcion }}</div>
+                {% if usado %}
+                    <div class="coupon-stamp">USADO</div>
+                {% endif %}
 
-                <div style="margin-top:6px;">
-                    {% if cupon.segmentos and cupon.segmentos|length > 0 %}
-                        <span style="font-size:0.65rem; color:#888;">Disponible para:</span>
-                        {% for seg in cupon.segmentos %}
-                            <span class="segment-badge {{ seg|lower }}">{{ seg }}</span>
-                        {% endfor %}
-                    {% else %}
-                        <span class="segment-badge todos">Todos los clientes</span>
-                    {% endif %}
-                    {% if cupon.minimo_compra > 0 %}
-                        <span style="font-size:0.65rem; color:#888; margin-left:6px;">
-                            <i class="bi bi-cart"></i> Mín. ${{ "%.2f"|format(cupon.minimo_compra) }}
+                {% if activo %}
+                    <div class="coupon-stamp-activa">
+                        <i class="bi bi-check-circle-fill"></i> EN USO
+                    </div>
+                {% endif %}
+
+                <div class="coupon-body">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
+                        <span class="coupon-code">{{ cupon.codigo }}</span>
+                        <span style="font-size:0.6rem;">
+                            {% if cupon.tipo == 'porcentaje' %}
+                                <span class="badge bg-info text-white">%</span>
+                            {% elif cupon.tipo == 'monto_fijo' %}
+                                <span class="badge bg-success text-white">$</span>
+                            {% else %}
+                                <span class="badge bg-primary text-white"><i class="bi bi-truck"></i></span>
+                            {% endif %}
                         </span>
-                    {% endif %}
-                </div>
+                    </div>
 
-                {% if cupon.categorias and cupon.categorias|length > 0 %}
-                <div style="margin-top:4px;">
-                    <span style="font-size:0.65rem; color:#888;">Categorías:</span>
-                    {% for cat_id in cupon.categorias %}
-                        {% for categoria in categorias %}
-                            {% if categoria._id|string == cat_id|string %}
-                                <span class="badge-categoria">{{ categoria.nombre }}</span>
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-                </div>
-                {% endif %}
+                    <div class="coupon-value">
+                        {% if cupon.tipo == 'porcentaje' %}
+                            {{ cupon.valor }}% <small>de descuento</small>
+                        {% elif cupon.tipo == 'monto_fijo' %}
+                            ${{ "%.2f"|format(cupon.valor) }} <small>de descuento</small>
+                        {% else %}
+                            <i class="bi bi-truck"></i> <small>Envío gratis</small>
+                        {% endif %}
+                    </div>
 
-                {% if cupon.productos and cupon.productos|length > 0 %}
-                <div style="margin-top:4px;">
-                    <span style="font-size:0.65rem; color:#888;">Productos:</span>
-                    {% for prod_id in cupon.productos %}
-                        {% for producto in productos %}
-                            {% if producto._id|string == prod_id|string %}
-                                <span class="badge-producto">{{ producto.nombre }}</span>
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-                </div>
-                {% endif %}
+                    <div class="coupon-name">{{ cupon.nombre }}</div>
+                    <div class="coupon-desc">{{ cupon.descripcion }}</div>
 
-                <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:3px; align-items:center;">
+                        {% if cupon.segmentos and cupon.segmentos|length > 0 %}
+                            {% for seg in cupon.segmentos %}
+                                <span class="segment-badge {{ seg|lower }}">{{ seg }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="segment-badge">Todos</span>
+                        {% endif %}
+                        {% if cupon.minimo_compra > 0 %}
+                            <span class="segment-badge" style="background:#fff0f8; color:#e10098;">
+                                <i class="bi bi-cart"></i> Mín. ${{ "%.2f"|format(cupon.minimo_compra) }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div style="margin-top:8px;">
+                        {% if usado %}
+                            <span class="uso-badge agotado">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Ya usado ({{ cupon.usos_usuario }}/{{ cupon.usos_permitidos }})
+                            </span>
+                        {% elif activo %}
+                            <span class="uso-badge activo">
+                                <i class="bi bi-lightning-charge-fill"></i>
+                                Aplicado al carrito
+                            </span>
+                        {% elif cupon.usos_usuario > 0 %}
+                            <span class="uso-badge parcial">
+                                <i class="bi bi-clock-history"></i>
+                                Usos: {{ cupon.usos_usuario }}/{{ cupon.usos_permitidos }}
+                                · te quedan {{ cupon.usos_restantes }}
+                            </span>
+                        {% else %}
+                            <span class="uso-badge disponible">
+                                <i class="bi bi-check-circle"></i>
+                                Disponible ({{ cupon.usos_permitidos }} uso{{ 's' if cupon.usos_permitidos != 1 else '' }})
+                            </span>
+                        {% endif %}
+
+                        {% if cupon.uso_maximo_global and cupon.uso_maximo_global > 0 %}
+                            <div class="progress-uso">
+                                {% set pct = ((cupon.usos_globales or 0) / cupon.uso_maximo_global * 100) | round(0, 'floor') %}
+                                <div style="width: {{ pct }}%; background:
+                                    {% if pct >= 100 %}#dc3545
+                                    {% elif pct >= 80 %}#f59e0b
+                                    {% else %}#10b981{% endif %};"></div>
+                            </div>
+                            <div style="font-size:0.6rem; color:#888; margin-top:2px;">
+                                Global: {{ cupon.usos_globales }}/{{ cupon.uso_maximo_global }} usos
+                            </div>
+                        {% endif %}
+                    </div>
+
                     <div class="coupon-valid">
                         <i class="bi bi-calendar3"></i>
                         {% if cupon.fecha_fin %}
-                            Válido hasta: {{ cupon.fecha_fin.strftime('%d/%m/%Y') if cupon.fecha_fin else 'N/A' }}
+                            Válido hasta: {{ cupon.fecha_fin.strftime('%d/%m/%Y') if cupon.fecha_fin and cupon.fecha_fin.strftime else (cupon.fecha_fin[:10] if cupon.fecha_fin else 'N/A') }}
                         {% else %}
                             Sin fecha de expiración
                         {% endif %}
                     </div>
                 </div>
 
-                <div style="margin-top:12px;">
-                    {% if cupon.cumple_minimo %}
-                        <button class="btn-use" onclick="usarCupon('{{ cupon.codigo }}')">
-                            <i class="bi bi-check-circle"></i> Usar cupón
+                <div class="coupon-footer">
+                    {% if usado %}
+                        <button class="btn-use usado-btn" disabled>
+                            <i class="bi bi-lock"></i> Ya lo usaste
                         </button>
-                    {% else %}
+                    {% elif activo %}
+                        <button class="btn-use quitar-btn" onclick="quitarCuponActivo('{{ cupon.codigo }}')">
+                            <i class="bi bi-x-circle"></i> Quitar del carrito
+                        </button>
+                    {% elif not cupon.cumple_minimo %}
                         <button class="btn-use disabled-cupon" disabled>
                             <i class="bi bi-lock"></i> Agrega más al carrito
                         </button>
                         <div class="minimo-alerta">
                             <i class="bi bi-exclamation-circle"></i>
-                            Faltan ${{ "%.2f"|format(cupon.minimo_compra - total_carrito) }} para usar este cupón
+                            Faltan ${{ "%.2f"|format(cupon.minimo_compra - total_carrito) }}
                         </div>
+                    {% elif hay_cupon_activo %}
+                        <!-- ⭐ BLOQUEADO: hay otro cupón activo (política Liverpool) -->
+                        <button class="btn-use bloqueado-btn" disabled
+                                title="Quita el cupón actual para poder usar este">
+                            <i class="bi bi-lock-fill"></i> Quita el cupón actual primero
+                        </button>
+                    {% else %}
+                        <button class="btn-use"
+                                data-codigo="{{ cupon.codigo }}"
+                                onclick="usarCupon('{{ cupon.codigo }}', this)">
+                            <i class="bi bi-check-circle"></i> Usar cupón
+                        </button>
                     {% endif %}
                 </div>
             </div>
@@ -673,15 +841,15 @@
         {% endif %}
 
         {% if historial and historial|length > 0 %}
-        <div style="margin-top:30px; background:white; border-radius:16px; padding:20px; border:1px solid #f0f0f0;">
-            <h5 style="font-weight:700; display:flex; align-items:center; gap:8px; border-bottom:2px solid #e10098; padding-bottom:10px;">
-                <i class="bi bi-clock-history" style="color:#e10098;"></i> Historial de cupones usados
-            </h5>
-            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;">
+        <div class="historial-box">
+            <h5><i class="bi bi-clock-history" style="color:#e10098;"></i> Historial de cupones usados</h5>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:14px;">
                 {% for uso in historial %}
-                <span style="background:#f8f9fa; padding:4px 14px; border-radius:50px; font-size:0.8rem; border:1px solid #eee;">
+                <span class="historial-item">
                     <i class="bi bi-ticket" style="color:#e10098;"></i> {{ uso.cupon_codigo }}
-                    <span style="color:#888; font-size:0.7rem;">{{ uso.fecha_uso.strftime('%d/%m/%Y') if uso.fecha_uso else '' }}</span>
+                    <span style="color:#888; font-size:0.7rem;">
+                        {{ uso.fecha_uso.strftime('%d/%m/%Y') if uso.fecha_uso and uso.fecha_uso.strftime else (uso.fecha_uso[:10] if uso.fecha_uso else '') }}
+                    </span>
                 </span>
                 {% endfor %}
             </div>
@@ -690,7 +858,6 @@
 
     </main>
 
-    <!-- ===== FOOTER ===== -->
     <footer>
         <div class="container">
             <p>© 2026 ORION SYSTEM. Todos los derechos reservados.</p>
@@ -700,47 +867,121 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function usarCupon(codigo) {
+    // ============================================================
+    // FILTRO LOCAL
+    // ============================================================
+    const _buscar = document.getElementById('buscarCupon');
+    const _filtro = document.getElementById('filtroEstado');
+
+    function filtrarCupones() {
+        const q = (_buscar?.value || '').toLowerCase().trim();
+        const f = _filtro?.value || '';
+        document.querySelectorAll('.coupon-card').forEach(card => {
+            const codigo = (card.dataset.codigo || '').toLowerCase();
+            const nombre = (card.dataset.nombre || '');
+            const usado  = card.dataset.usado || '';
+            let visible = true;
+            if (q && !codigo.includes(q) && !nombre.includes(q)) visible = false;
+            if (f === 'disponibles' && usado !== 'disponible') visible = false;
+            if (f === 'usados' && usado !== 'usado') visible = false;
+            card.style.display = visible ? '' : 'none';
+        });
+    }
+    if (_buscar) _buscar.addEventListener('input', filtrarCupones);
+    if (_filtro) _filtro.addEventListener('change', filtrarCupones);
+
+    // ============================================================
+    // Actualizar badge del carrito
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/api/v1/carrito', { credentials: 'same-origin' })
+            .then(r => r.json())
+            .then(carrito => {
+                if (carrito && carrito.items) {
+                    const total = carrito.items.reduce((sum, item) => sum + (item.cantidad || 0), 0);
+                    const badge = document.querySelector('.badge-cart');
+                    if (badge) badge.textContent = total;
+                }
+            })
+            .catch(() => {});
+    });
+
+    // ============================================================
+    // APLICAR CUPÓN (modelo Liverpool: solo si no hay otro activo)
+    // ============================================================
+    function usarCupon(codigo, btnEl) {
         if (!confirm('¿Aplicar el cupón ' + codigo + ' a tu carrito?')) return;
 
-        const btn = event.target;
+        const btn = btnEl || event.target;
+        const htmlOriginal = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Aplicando...';
 
         fetch('/api/cupon/aplicar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
             body: JSON.stringify({ codigo: codigo })
         })
-        .then(response => response.json())
+        .then(r => r.json())
         .then(data => {
             if (data.success) {
-                alert('✅ ' + data.message);
-                // Redirigir al carrito
+                alert('✅ ' + (data.message || 'Cupón aplicado'));
                 window.location.href = data.redirect || "{{ url_for('web.ver_carrito') }}";
             } else {
-                alert('❌ ' + data.message);
+                let detalle = data.message || 'Cupón no válido';
+
+                // ⭐ Casos específicos del modelo Liverpool estricto
+                if (data.debug === 'cupon_ya_aplicado') {
+                    detalle = 'Ya tienes el cupón ' + (data.cupon_actual || '') +
+                              ' aplicado. Quítalo primero para usar otro.';
+                } else if (data.debug === 'cupon_mismo_ya_aplicado') {
+                    detalle = 'Este cupón ya está aplicado a tu carrito.';
+                } else if (data.debug === 'registro_lealtad_no_encontrado') {
+                    detalle = 'No encontramos tu registro de lealtad. Visita /mi-lealtad primero.';
+                } else if (data.debug === 'no_encontrado') {
+                    const disp = (data.cupones_disponibles || []).map(c => c.id).filter(Boolean);
+                    detalle = disp.length
+                        ? 'Cupón "' + (data.codigo_buscado || codigo) + '" no existe. Tus cupones: ' + disp.join(', ')
+                        : 'No tienes cupones disponibles.';
+                } else if (data.debug === 'cupon_usado') {
+                    detalle = 'Este cupón ya fue utilizado.';
+                } else if (data.debug === 'cupon_vencido' || data.debug === 'cupon_general_vencido') {
+                    detalle = 'Este cupón ya expiró.';
+                } else if (data.debug === 'min_compra_no_alcanzado') {
+                    detalle = 'Compra mínima: $' + (data.min_compra || 0).toFixed(2) +
+                              '. Tu subtotal: $' + (data.subtotal || 0).toFixed(2);
+                }
+
+                alert('❌ ' + detalle);
+                console.warn('[Cupón] Debug:', data);
                 btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-check-circle"></i> Usar cupón';
+                btn.innerHTML = htmlOriginal;
             }
         })
-        .catch(error => {
+        .catch(err => {
+            console.error(err);
             alert('❌ Error al aplicar el cupón');
             btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-check-circle"></i> Usar cupón';
+            btn.innerHTML = htmlOriginal;
         });
     }
 
-    // Actualizar contador del carrito
-    fetch('/api/v1/carrito')
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.items) {
-                const total = data.items.reduce((sum, item) => sum + item.cantidad, 0);
-                const badge = document.querySelector('.badge-cart');
-                if (badge) badge.textContent = total;
-            }
-        });
+    // ============================================================
+    // QUITAR CUPÓN
+    // ============================================================
+    function quitarCuponActivo(codigo) {
+        if (!confirm('¿Quitar el cupón "' + (codigo || '') + '" de tu carrito?')) return;
+
+        fetch('/api/cupon/quitar', {
+            method: 'POST',
+            credentials: 'same-origin'
+        })
+        .then(() => {
+            location.reload();
+        })
+        .catch(() => alert('Error al quitar el cupón'));
+    }
 </script>
 </body>
 </html>

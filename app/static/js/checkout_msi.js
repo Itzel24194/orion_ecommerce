@@ -1,50 +1,41 @@
 // ================================================================
 // app/static/js/checkout_msi.js
-// Manejo del modal MSI con re-tokenización de tarjetas guardadas
+// Manejo del modal MSI — MODO SANDBOX 
 // ================================================================
 
 /**
- * Re-tokeniza una tarjeta guardada con su CVC.
- * Genera un token de un solo uso para el backend.
+ * Genera un token de SANDBOX localmente (sin llamar a ninguna API).
+ * En producción esto lo haría  / Stripe.js / MercadoPago.js.
  *
- * @param {string} paymentSourceId  El src_... de la tarjeta guardada
+ * @param {string} paymentSourceId  ID interno de la tarjeta guardada
  * @param {string} cvc              CVC de 3-4 dígitos
- * @returns {Promise<string>}       Token ID (tok_...)
+ * @returns {Promise<string>}       Token ID (tok_sandbox_...)
  */
 function tokenizarTarjetaGuardada(paymentSourceId, cvc) {
     return new Promise((resolve, reject) => {
-        if (typeof Conekta === 'undefined') {
-            return reject(new Error(
-                'Conekta.js no está cargado. Recarga la página.'
-            ));
-        }
         if (!paymentSourceId || !cvc) {
             return reject(new Error(
                 'Faltan el payment_source_id o el CVC.'
             ));
         }
 
-        console.log('[MSI] Re-tokenizando tarjeta guardada...');
-        console.log('[MSI] payment_source_id:', paymentSourceId);
+        // Validación mínima del CVC (3 o 4 dígitos)
+        if (!/^\d{3,4}$/.test(cvc)) {
+            return reject(new Error(
+                'El CVC debe tener 3 o 4 dígitos.'
+            ));
+        }
 
-        Conekta.Token.create(
-            {
-                card: {
-                    payment_source_id: paymentSourceId,
-                    cvc: cvc
-                }
-            },
-            function success(token) {
-                console.log('[MSI] Token generado:', token.id);
-                resolve(token.id);
-            },
-            function error(err) {
-                console.error('[MSI] Error tokenizando:', err);
-                const msg = (err && (err.message_to_purchaser || err.message))
-                            || 'Error al validar la tarjeta.';
-                reject(new Error(msg));
-            }
-        );
+        console.log('[MSI-SANDBOX] Generando token local (sin API)...');
+        console.log('[MSI-SANDBOX] payment_source_id:', paymentSourceId);
+
+        // ⭐ Simulación local: token de un solo uso, sin red
+        const tokenId = 'tok_sandbox_' +
+            Date.now().toString(36) + '_' +
+            Math.random().toString(36).slice(2, 10);
+
+        console.log('[MSI-SANDBOX] Token generado:', tokenId);
+        resolve(tokenId);
     });
 }
 
@@ -79,7 +70,7 @@ function inicializarSelectorTarjetas() {
 }
 
 /**
- * Submit del formulario MSI.
+ * Submit del formulario MSI (SANDBOX).
  */
 async function procesarPagoMSI(event) {
     event.preventDefault();
@@ -113,17 +104,17 @@ async function procesarPagoMSI(event) {
     }
 
     try {
-        // -------- 1) Re-tokenizar en el navegador --------
+        // -------- 1) Token local (sandbox, sin API) --------
         const tokenId = await tokenizarTarjetaGuardada(paymentSourceId, cvc);
 
-        // -------- 2) Enviar al backend --------
+        // -------- 2) Enviar al backend (modo sandbox) --------
         const resp = await fetch('/api/checkout/msi', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
             body: JSON.stringify({
-                token_id:            tokenId,          // ⭐ token re-tokenizado
-                tarjeta_guardada_id: select.value,     // para resolver customer_id
+                token_id:            tokenId,          // ⭐ token de sandbox local
+                tarjeta_guardada_id: select.value,     // para resolver la tarjeta en metodos_pago
                 meses_msi:           mesesMSI,
                 tipo_envio:          document.getElementById('tipo_envio')?.value || 'domicilio',
                 nombre:              document.getElementById('nombre')?.value   || '',
@@ -141,7 +132,7 @@ async function procesarPagoMSI(event) {
             alert(data.error || 'Error al procesar el pago.');
         }
     } catch (err) {
-        console.error('[MSI] Error:', err);
+        console.error('[MSI-SANDBOX] Error:', err);
         alert(err.message || 'No se pudo procesar el pago.');
     } finally {
         if (btn) {

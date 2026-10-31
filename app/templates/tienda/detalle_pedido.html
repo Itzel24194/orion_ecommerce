@@ -31,7 +31,6 @@
 
         * { font-family: 'Inter', sans-serif; }
 
-        /* ⭐ TODO BLANCO PURO */
         html, body {
             background: #ffffff !important;
             color: var(--orion-dark);
@@ -39,7 +38,6 @@
             padding-bottom: 60px;
         }
 
-        /* ============ TOP NAV (BLANCO) ============ */
         .top-nav {
             background: #ffffff !important;
             color: #666;
@@ -70,7 +68,6 @@
         }
         .brand-logo:hover { color: var(--orion-primary-dark) !important; }
 
-        /* Línea rosa */
         .brand-border {
             height: 4px;
             background: linear-gradient(90deg, var(--orion-primary), var(--orion-primary-dark));
@@ -212,10 +209,8 @@
         .hero-stats .stat-item i { color: #FFD700; font-size: 1.1rem; }
         .stat-divider { width: 1px; height: 24px; background: rgba(255,255,255,.35); }
 
-        /* ============ CONTENT ============ */
         .content { margin-top: -32px; position: relative; z-index: 2; }
 
-        /* ============ BOTONES ============ */
         .btn-orion {
             background: var(--orion-primary);
             color: #fff;
@@ -275,7 +270,62 @@
             border-color: var(--orion-danger);
         }
 
-        /* ============ TARJETAS (BLANCO PURO) ============ */
+        /* ⭐ Botón Confirmar Pago (verde Liverpool) */
+        .btn-confirmar-pago {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: .9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .2s;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, .35);
+            cursor: pointer;
+        }
+        .btn-confirmar-pago:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(16, 185, 129, .45);
+            color: #fff;
+        }
+        .btn-confirmar-pago:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .badge-pagado {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: .72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .badge-pendiente-pago {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: .72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #f59e0b;
+        }
+
         .detail-card {
             background: #ffffff !important;
             border-radius: var(--radius);
@@ -300,7 +350,6 @@
             font-size: 1.15rem;
         }
 
-        /* ============ STATUS BADGES ============ */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -350,7 +399,6 @@
             gap: 5px;
         }
 
-        /* ============ INFO ROWS ============ */
         .info-row {
             display: flex;
             justify-content: space-between;
@@ -372,7 +420,6 @@
             text-align: right;
         }
 
-        /* ============ FECHA ESTIMADA ============ */
         .fecha-estimada-wrap {
             display: inline-flex;
             flex-direction: column;
@@ -393,7 +440,6 @@
             color: var(--orion-success);
         }
 
-        /* ============ PRODUCTOS (BLANCO) ============ */
         .producto-item-detail {
             display: flex;
             align-items: center;
@@ -466,7 +512,6 @@
             text-align: right;
         }
 
-        /* ============ STATUS ALERT ============ */
         .status-alert {
             display: flex;
             align-items: center;
@@ -503,7 +548,6 @@
             color: var(--orion-gray);
         }
 
-        /* ============ TIMELINE ============ */
         .timeline {
             display: flex;
             justify-content: space-between;
@@ -568,7 +612,6 @@
         .timeline-step.done span,
         .timeline-step.active span { color: var(--orion-dark); }
 
-        /* ============ MODAL ============ */
         .modal-confirmacion {
             position: fixed;
             inset: 0;
@@ -665,7 +708,6 @@
             transform: none;
         }
 
-        /* ============ TOAST ============ */
         .toast-container-custom {
             position: fixed;
             bottom: 24px;
@@ -702,7 +744,6 @@
             to { transform: translateX(120%); opacity: 0; }
         }
 
-        /* ============ FOOTER ROSA ORION (FORZADO) ============ */
         footer,
         footer.footer,
         .footer {
@@ -752,7 +793,6 @@
             color: #FFD700 !important;
         }
 
-        /* ============ RESPONSIVE ============ */
         @media (max-width: 768px) {
             .hero-title { font-size: 1.5rem; }
             .hero-stats { padding: 10px 16px; gap: 12px; width: 100%; justify-content: center; }
@@ -769,16 +809,14 @@
 <body>
 
     <div class="wrapper">
-        <!-- ===== TOP NAV ===== -->
         <div class="top-nav">
             <div class="container d-flex justify-content-end gap-4">
                 <a href="#"><i class="bi bi-geo-alt"></i> Encuentra tu tienda</a>
                 <a href="/servicios"><i class="bi bi-truck"></i> Servicios</a>
-                <a href="#"><i class="bi bi-question-circle"></i> Ayuda</a>
+                <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none">Ayuda</a>
             </div>
         </div>
 
-        <!-- ===== NAVBAR ===== -->
         <nav class="navbar navbar-expand-lg navbar-light main-navbar">
             <div class="container">
                 <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
@@ -822,16 +860,15 @@
                         </div>
                     </form>
 
-                    <div class="ms-3 d-flex align-items-center gap-3">
+                                    <div class="ms-3 d-flex align-items-center gap-3">
                         {% if session.get('nombre') %}
-                            <a href="{{ url_for('web.perfil') }}" class="user-link">
-                                {% if session.get('foto') %}
-                                    <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}"
-                                         class="user-avatar" alt="Perfil">
+                            <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                                {% if current_user_foto %}
+                                    <img src="{{ foto_src(current_user_foto) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;">
                                 {% else %}
-                                    <i class="bi bi-person-circle fs-3"></i>
+                                    <i class="bi bi-person fs-5 me-1"></i>
                                 {% endif %}
-                                <span>HOLA, {{ session['nombre'] }}</span>
+                                Hola, {{ session['nombre'] }}
                             </a>
                         {% else %}
                             <a href="/login" class="user-link">
@@ -852,7 +889,6 @@
 
         <div class="brand-border"></div>
 
-        <!-- ===== HERO ===== -->
         <section class="hero-pedidos">
             <div class="container">
                 <div class="hero-content">
@@ -861,7 +897,7 @@
                             <i class="bi bi-receipt"></i> Detalle del Pedido
                         </h1>
                         <p class="hero-subtitle">
-                            <i class="bi bi-box-seam me-1"></i> 
+                            <i class="bi bi-box-seam me-1"></i>
                             Pedido #{{ pedido.numero_pedido if pedido.numero_pedido else pedido._id|string|truncate(8, True, '') }}
                         </p>
                     </div>
@@ -880,7 +916,6 @@
             </div>
         </section>
 
-        <!-- ===== CONTENIDO ===== -->
         <div class="container content">
             <div class="row">
                 <div class="col-12">
@@ -904,28 +939,36 @@
                         {% set es_estimada = True %}
                     {% endif %}
 
-                    <!-- Alerta de estado -->
+                    {# ⭐ Estado efectivo para el timeline: si está pagado, cuenta como confirmado #}
+                    {% set pago_ok = pedido.pago_confirmado or pedido.pago_estado == 'pagado' %}
                     {% set estado_actual = pedido.estado if pedido.estado else 'pendiente' %}
-                    <div class="status-alert {{ estado_actual }}">
-                        {% if estado_actual == 'pendiente' %}
+                    {% if estado_actual == 'pendiente' and pago_ok %}
+                        {% set estado_visual = 'confirmado' %}
+                    {% else %}
+                        {% set estado_visual = estado_actual %}
+                    {% endif %}
+
+                    <!-- Alerta de estado -->
+                    <div class="status-alert {{ estado_visual }}">
+                        {% if estado_visual == 'pendiente' %}
                             <i class="bi bi-clock-history"></i>
                             <div class="status-alert-text">
-                                <div class="status-alert-title">Pedido pendiente de confirmación</div>
-                                <div class="status-alert-sub">Estamos procesando tu pedido. Te notificaremos pronto.</div>
+                                <div class="status-alert-title">Pedido pendiente de pago</div>
+                                <div class="status-alert-sub">Confirma tu pago para que podamos preparar tu pedido.</div>
                             </div>
-                        {% elif estado_actual == 'confirmado' %}
+                        {% elif estado_visual == 'confirmado' %}
                             <i class="bi bi-check2-circle"></i>
                             <div class="status-alert-text">
-                                <div class="status-alert-title">¡Tu pedido fue confirmado!</div>
+                                <div class="status-alert-title">¡Tu pago fue confirmado!</div>
                                 <div class="status-alert-sub">Estamos preparando todo para el envío.</div>
                             </div>
-                        {% elif estado_actual == 'preparando' %}
+                        {% elif estado_visual == 'preparando' %}
                             <i class="bi bi-box-seam"></i>
                             <div class="status-alert-text">
                                 <div class="status-alert-title">Preparando tu pedido</div>
                                 <div class="status-alert-sub">Estamos empacando tus productos.</div>
                             </div>
-                        {% elif estado_actual == 'enviado' %}
+                        {% elif estado_visual == 'enviado' %}
                             <i class="bi bi-truck"></i>
                             <div class="status-alert-text">
                                 <div class="status-alert-title">Tu pedido está en camino</div>
@@ -937,13 +980,13 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        {% elif estado_actual == 'entregado' %}
+                        {% elif estado_visual == 'entregado' %}
                             <i class="bi bi-check-circle-fill"></i>
                             <div class="status-alert-text">
                                 <div class="status-alert-title">Pedido entregado</div>
                                 <div class="status-alert-sub">¡Gracias por tu compra!</div>
                             </div>
-                        {% elif estado_actual == 'cancelado' %}
+                        {% elif estado_visual == 'cancelado' %}
                             <i class="bi bi-x-octagon"></i>
                             <div class="status-alert-text">
                                 <div class="status-alert-title">Pedido cancelado</div>
@@ -953,7 +996,7 @@
                     </div>
 
                     <!-- Timeline -->
-                    {% if estado_actual not in ['cancelado'] %}
+                    {% if estado_visual not in ['cancelado'] %}
                     <div class="detail-card">
                         <div class="timeline">
                             {% set pasos = [
@@ -963,7 +1006,7 @@
                                 ('entregado', 'Entregado', 'bi-check-circle')
                             ] %}
                             {% set orden_estados = ['pendiente', 'confirmado', 'enviado', 'entregado'] %}
-                            {% set idx_actual = orden_estados.index(estado_actual) if estado_actual in orden_estados else 0 %}
+                            {% set idx_actual = orden_estados.index(estado_visual) if estado_visual in orden_estados else 0 %}
                             {% for clave, etiqueta, icono in pasos %}
                                 {% set idx_paso = loop.index0 %}
                                 {% set clase = 'done' if idx_paso < idx_actual else ('active' if idx_paso == idx_actual else '') %}
@@ -988,6 +1031,14 @@
                                 <span class="status-badge status-{{ pedido.estado if pedido.estado else 'pendiente' }}">
                                     {{ pedido.estado|title if pedido.estado else 'Pendiente' }}
                                 </span>
+
+                                {# ⭐ Badge de pago #}
+                                {% if pago_ok %}
+                                    <span class="badge-pagado ms-1"><i class="bi bi-check-circle-fill"></i> Pagado</span>
+                                {% else %}
+                                    <span class="badge-pendiente-pago ms-1"><i class="bi bi-exclamation-circle-fill"></i> Pago pendiente</span>
+                                {% endif %}
+
                                 {% if pedido.tipo_envio == 'click_collect' %}
                                     <span class="badge-click-collect"><i class="bi bi-shop"></i> Click & Collect</span>
                                 {% endif %}
@@ -1061,14 +1112,14 @@
                     <!-- PRODUCTOS -->
                     <div class="detail-card">
                         <h4><i class="bi bi-box"></i> Productos</h4>
-                        
+
                         {% set items = pedido.items_list if pedido.items_list is defined else [] %}
-                        
+
                         {% if items and items|length > 0 %}
                             {% for item in items %}
                                 <div class="producto-item-detail">
                                     {% set imagen = item.imagen or item.foto or 'default.jpg' %}
-                                    <img src="{{ url_for('static', filename='uploads/productos/' + imagen) }}" 
+                                    <img src="{{ url_for('static', filename='uploads/productos/' + imagen) }}"
                                          class="producto-img-detail" alt="{{ item.nombre }}" loading="lazy"
                                          onerror="this.src='https://via.placeholder.com/72/1a1a2e/666?text=Producto'">
                                     <div class="producto-info-detail">
@@ -1185,15 +1236,40 @@
                     </div>
                     {% endif %}
 
-                    <!-- Acciones -->
-                    <div class="d-flex gap-3 flex-wrap mb-4">
-                        <a href="{{ url_for('web.catalogo') }}" class="btn-orion">
+                    <!-- ⭐ ACCIONES -->
+                    <div class="d-flex gap-3 flex-wrap mb-4 align-items-center">
+
+                        {# ⭐ Botón Confirmar pago (solo si está pendiente de pago) #}
+                        {% if not pago_ok and estado_actual != 'cancelado' %}
+                            <form method="POST"
+                                  action="{{ url_for('web.confirmar_pago', id=pedido._id) }}"
+                                  onsubmit="return confirm('¿Confirmar pago de ${{ '%.2f'|format(pedido.total|default(0)) }}?\n\nSe procesará el pago y tu cupón se marcará como usado.');"
+                                  style="display:inline;">
+                                <button type="submit" class="btn-confirmar-pago">
+                                    <i class="bi bi-credit-card-fill"></i>
+                                    Confirmar pago ${{ "%.2f"|format(pedido.total|default(0)) }}
+                                </button>
+                            </form>
+                        {% elif pago_ok and estado_actual != 'cancelado' %}
+                            <a href="{{ url_for('web.mi_factura_pdf', id=pedido._id) }}"
+                               class="btn-orion"
+                               target="_blank">
+                                <i class="bi bi-file-earmark-pdf"></i> Descargar factura
+                            </a>
+                        {% endif %}
+
+                        <a href="{{ url_for('web.catalogo') }}" class="btn-orion-outline">
                             <i class="bi bi-shop"></i> Seguir comprando
                         </a>
                         <a href="{{ url_for('web.mis_pedidos_clientes') }}" class="btn-orion-outline">
                             <i class="bi bi-box-seam"></i> Ver todos mis pedidos
                         </a>
-                        {% if pedido.estado in ['pendiente', 'confirmado'] %}
+
+                        {% if pedido.estado in ['pendiente', 'confirmado'] and not pago_ok %}
+                            <button class="btn-cancelar" onclick="abrirModalCancelar('{{ pedido._id }}')">
+                                <i class="bi bi-x-circle"></i> Cancelar pedido
+                            </button>
+                        {% elif pedido.estado in ['pendiente', 'confirmado'] and pago_ok %}
                             <button class="btn-cancelar" onclick="abrirModalCancelar('{{ pedido._id }}')">
                                 <i class="bi bi-x-circle"></i> Cancelar pedido
                             </button>
@@ -1204,7 +1280,6 @@
             </div>
         </div>
 
-        <!-- ===== MODAL DE CONFIRMACIÓN ===== -->
         <div class="modal-confirmacion" id="modalCancelar">
             <div class="modal-content-custom">
                 <div class="modal-icon">
@@ -1225,7 +1300,6 @@
 
         <div class="toast-container-custom" id="toastContainer"></div>
 
-        <!-- ⭐ FOOTER ROSA ORION (FORZADO) -->
         <footer>
             <div class="container">
                 <p>
@@ -1319,7 +1393,7 @@
                 <span>${mensaje}</span>
             `;
             container.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.style.animation = 'slideOut 0.5s ease forwards';
                 setTimeout(() => {

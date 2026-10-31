@@ -231,7 +231,7 @@
         <div class="container d-flex justify-content-end gap-4">
             <a href="#" class="text-secondary text-decoration-none">Encuentra tu tienda</a>
             <a href="/servicios" class="text-secondary text-decoration-none">Servicios</a>
-            <a href="#" class="text-secondary text-decoration-none">Ayuda</a>
+            <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none">Ayuda</a>
         </div>
     </div>
 
@@ -262,16 +262,12 @@
                 <form class="d-flex flex-grow-1" action="{{ url_for('web.catalogo') }}" method="GET">
                     <input class="form-control rounded-pill bg-light" type="search" name="q" placeholder="Buscar productos...">
                 </form>
-                <div class="ms-3 d-flex align-items-center gap-3">
-                    {% if session.get('nombre') %}
-                        <a href="/perfil" class="text-dark fw-bold text-decoration-none d-flex align-items-center gap-2">
-                            {% if session.get('foto') %}
-                                <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}?t={{ range(1, 10000) | random }}" class="user-avatar" alt="Perfil">
-                            {% else %}
-                                <i class="bi bi-person-circle fs-3"></i>
-                            {% endif %}
-                            HOLAAA, {{ session['nombre'] }}
-                        </a>
+                                <div class="ms-3 d-flex align-items-center gap-3">
+                     {% if session.get('nombre') %}
+                <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                    {% if session.get('foto') %}<img src="{{ url_for('static', filename='uploads/' + session['foto']) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;">{% endif %}
+                    Hola, {{ session['nombre'] }}
+                </a>
                     {% else %}
                         <a href="/login" class="text-dark fw-bold">INICIAR SESIÓN</a>
                     {% endif %}

@@ -8,23 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/perfil.css') }}">
-
-    <!-- ===== CONEKTA.JS ===== -->
-    <script src="https://cdn.conekta.io/js/latest/conekta.js"></script>
-    <script>
-    (function () {
-        var CONEKTA_KEY = "{{ config.CONEKTA_PUBLIC_KEY if config and config.CONEKTA_PUBLIC_KEY else '' }}";
-        if (typeof Conekta !== 'undefined' && CONEKTA_KEY && CONEKTA_KEY.length >= 20) {
-            Conekta.setPublicKey(CONEKTA_KEY);
-            Conekta.setLanguage("es");
-            console.log('[Conekta] Public key configurada:', CONEKTA_KEY.substring(0, 12) + '...');
-        } else {
-            console.warn('[Conekta] No se pudo configurar la public key. CONEKTA_KEY =', CONEKTA_KEY);
-        }
-    })();
-    </script>
-    <style>
-    </style>
 </head>
 <body>
 
@@ -34,7 +17,7 @@
             <div class="container d-flex justify-content-end gap-4">
                 <a href="#"><i class="bi bi-geo-alt"></i> {{ _('Encuentra tu tienda') }}</a>
                 <a href="/servicios"><i class="bi bi-truck"></i> {{ _('Servicios') }}</a>
-                <a href="#"><i class="bi bi-question-circle"></i> {{ _('Ayuda') }}</a>
+                <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none">Ayuda</a>
             </div>
         </div>
 
@@ -77,8 +60,8 @@
                     <div class="ms-3 d-flex align-items-center gap-3">
                         {% if session.get('nombre') %}
                             <a href="{{ url_for('web.perfil') }}" class="user-link">
-                                {% if session.get('foto') %}
-                                    <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}?t={{ range(1, 10000) | random }}" class="user-avatar" alt="{{ _('Perfil') }}">
+                                {% if current_user_foto %}
+                                    <img src="{{ foto_src(current_user_foto) }}" class="user-avatar" alt="{{ _('Perfil') }}">
                                 {% else %}
                                     <i class="bi bi-person-circle fs-3"></i>
                                 {% endif %}
@@ -105,7 +88,7 @@
                     <div class="panel-card text-center">
 
                         {% if usuario.foto %}
-                            <img src="{{ url_for('static', filename='uploads/' + usuario.foto) }}" class="avatar" alt="{{ _('Perfil') }}">
+                            <img src="{{ foto_src(usuario.foto) }}" class="avatar" alt="{{ _('Perfil') }}">
                         {% else %}
                             <img src="https://ui-avatars.com/api/?name={{ usuario.nombre }}&size=100&background=e10098&color=fff" class="avatar" alt="{{ _('Perfil') }}">
                         {% endif %}
@@ -137,8 +120,17 @@
                             <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-pedidos"><i class="bi bi-box-seam"></i> {{ _('Mis Pedidos') }}</button>
                             <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-direcciones"><i class="bi bi-geo-alt"></i> {{ _('Direcciones') }}</button>
                             <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-favoritos"><i class="bi bi-heart"></i> {{ _('Favoritos') }}</button>
-                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-consentido"><i class="bi bi-stars"></i> {{ _('Cliente Consentido') }}</button>
-                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-cartera"><i class="bi bi-wallet2"></i> {{ _('Mi cartera') }}</button>
+
+                            {# ⭐ "Cliente Consentido" ahora es un enlace directo a la vista dedicada #}
+                            <a href="{{ url_for('web.mi_lealtad') }}" class="nav-link">
+                                <i class="bi bi-stars"></i> {{ _('Cliente Consentido') }}
+                            </a>
+
+                            {# ⭐ "Mi cartera" ahora es un enlace directo a la vista dedicada #}
+                            <a href="{{ url_for('web.mi_monedero') }}" class="nav-link">
+                                <i class="bi bi-wallet2"></i> {{ _('Mi cartera') }}
+                            </a>
+
                             <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-complexion"><i class="bi bi-rulers"></i> {{ _('Mi Complexión') }}</button>
                             <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-intereses"><i class="bi bi-heart-pulse"></i> {{ _('Intereses') }}</button>
                             <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-comunicaciones"><i class="bi bi-bell"></i> {{ _('Comunicaciones') }}</button>
@@ -724,195 +716,29 @@
                         </div>
 
                         <!-- ============================================================
-                             ⭐ TAB CLIENTE CONSENTIDO ⭐
+                             ⭐ TAB CLIENTE CONSENTIDO — REDIRIGE A VISTA DEDICADA
                              ============================================================ -->
                         <div class="tab-pane fade" id="tab-consentido">
-
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h4 class="mb-0"><i class="bi bi-stars"></i> {{ _('Cliente Consentido') }}</h4>
-                                <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" onclick="lcCargarDatos(true)">
-                                    <i class="bi bi-arrow-clockwise"></i> {{ _('Recargar') }}
-                                </button>
-                            </div>
-
-                            <div id="lcErrorBox" class="alert alert-warning small" style="display:none;">
-                                <i class="bi bi-exclamation-triangle"></i>
-                                <strong>{{ _('No se pudo cargar la información:') }}</strong>
-                                <div id="lcErrorMsg" style="margin-top:6px; font-family: monospace; font-size: 0.75rem;"></div>
-                                <div style="margin-top:8px;">
-                                    <button type="button" class="btn btn-outline-warning btn-sm rounded-pill" onclick="lcCargarDatos(true)">
-                                        <i class="bi bi-arrow-clockwise"></i> {{ _('Reintentar') }}
-                                    </button>
-                                    <small class="text-muted ms-2">{{ _('Revisa la consola del navegador (F12) para más detalles.') }}</small>
-                                </div>
-                            </div>
-
-                            <div class="lc-membresia" id="lcMembresia">
-                                <div class="lc-top">
-                                    <div>
-                                        <div class="lc-badge">
-                                            <span id="lcEmoji">🥉</span>
-                                            <span id="lcNivelNombre">—</span>
-                                        </div>
-                                        <h2>{{ usuario.nombre }} {{ usuario.apellido_paterno or '' }}</h2>
-                                        <div class="lc-puntos-txt">
-                                            {{ _('Puntos disponibles') }}
-                                            <strong id="lcPuntos">—</strong>
-                                            <small id="lcValor">$0.00 MXN</small>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <div class="lc-mini-label">{{ _('Gasto total') }}</div>
-                                        <div class="lc-gasto" id="lcGasto">$0</div>
-                                        <div class="lc-mini-label" style="margin-top:8px;">{{ _('Compras') }}</div>
-                                        <div class="lc-compras" id="lcCompras">0</div>
-                                    </div>
-                                </div>
-
-                                <div class="lc-progreso" id="lcProgresoWrapper">
-                                    <div class="lc-prog-top">
-                                        <span id="lcProgIzq">—</span>
-                                        <span id="lcProgDer">—</span>
-                                    </div>
-                                    <div class="progress">
-                                        <div id="lcProgBarra" class="progress-bar" role="progressbar" style="width:0%;"></div>
-                                    </div>
-                                    <div class="lc-prog-info" id="lcProgInfo">—</div>
-                                </div>
-                            </div>
-
-                            <div class="lc-section-title">
-                                <i class="bi bi-ticket-perforated-fill"></i>
-                                {{ _('Mis cupones') }}
-                                <small id="lcCuponesCount">—</small>
-                            </div>
-
-                            <div class="row g-3" id="lcCuponesGrid">
-                                <div class="col-12 text-center text-muted small py-4">
-                                    <i class="bi bi-hourglass-split"></i> {{ _('Cargando cupones...') }}
-                                </div>
-                            </div>
-
-                            <div class="lc-section-title">
-                                <i class="bi bi-gift-fill"></i>
-                                {{ _('Beneficios de tu nivel') }}
-                                <small id="lcBeneficiosCount">—</small>
-                            </div>
-
-                            <div id="lcBeneficiosLista">
-                                <div class="text-center text-muted small py-4">
-                                    <i class="bi bi-hourglass-split"></i> {{ _('Cargando beneficios...') }}
-                                </div>
-                            </div>
-
-                            <div class="lc-section-title">
-                                <i class="bi bi-bar-chart-steps"></i>
-                                {{ _('Programa de niveles') }}
-                                <small>{{ _('Acumula compras y sube de nivel') }}</small>
-                            </div>
-
-                            <table class="lc-tabla-niveles" id="lcTablaNiveles">
-                                <thead>
-                                    <tr>
-                                        <th>{{ _('Nivel') }}</th>
-                                        <th>{{ _('Gasto requerido') }}</th>
-                                        <th>{{ _('Multiplicador') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr data-nivel="Bronce">
-                                        <td><span class="lc-punto-nivel" style="background:#CD7F32;"></span>🥉 {{ _('Bronce') }}</td>
-                                        <td>$0 – $5,000</td>
-                                        <td>1x</td>
-                                    </tr>
-                                    <tr data-nivel="Plata">
-                                        <td><span class="lc-punto-nivel" style="background:#A9AFBC;"></span>🥈 {{ _('Plata') }}</td>
-                                        <td>$5,000 – $20,000</td>
-                                        <td>1.5x</td>
-                                    </tr>
-                                    <tr data-nivel="Oro">
-                                        <td><span class="lc-punto-nivel" style="background:#C99B2E;"></span>🥇 {{ _('Oro') }}</td>
-                                        <td>$20,000 – $50,000</td>
-                                        <td>2x</td>
-                                    </tr>
-                                    <tr data-nivel="Diamante">
-                                        <td><span class="lc-punto-nivel" style="background:#7A5FE0;"></span>💎 {{ _('Diamante') }}</td>
-                                        <td>$50,000+</td>
-                                        <td>3x</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <div class="lc-section-title">
-                                <i class="bi bi-clock-history"></i>
-                                {{ _('Historial de puntos') }}
-                                <small>{{ _('Últimos movimientos') }}</small>
-                            </div>
-
-                            <div id="lcHistorial">
-                                <div class="text-center text-muted small py-4">
-                                    <i class="bi bi-hourglass-split"></i> {{ _('Cargando historial...') }}
-                                </div>
-                            </div>
-
+                            <h4><i class="bi bi-stars"></i> {{ _('Cliente Consentido') }}</h4>
+                            <p class="text-muted small">
+                                {{ _('El programa de lealtad se abrió en una vista dedicada para que puedas ver tu nivel, puntos, cupones y beneficios sin recargar el perfil.') }}
+                            </p>
+                            <a href="{{ url_for('web.mi_lealtad') }}" class="btn-orion btn-orion-sm">
+                                <i class="bi bi-box-arrow-up-right"></i> {{ _('Abrir Cliente Consentido') }}
+                            </a>
                         </div>
 
                         <!-- ============================================================
-                             ⭐ TAB MI CARTERA (MONEDERO DIGITAL) ⭐
+                             ⭐ TAB MI CARTERA — RE-RENDERIZA LA VISTA DEDICADA
                              ============================================================ -->
                         <div class="tab-pane fade" id="tab-cartera">
-
                             <h4><i class="bi bi-wallet2"></i> {{ _('Mi cartera') }}</h4>
-
-                            <div id="lvCarteraLoader" class="text-center text-muted small py-4">
-                                <i class="bi bi-hourglass-split"></i> {{ _('Cargando monedero...') }}
-                            </div>
-
-                            <div id="lvCarteraContenido" style="display:none;">
-
-                                <div class="lv-cartera-grid">
-
-                                    <div>
-                                        <div class="lv-card">
-                                            <div class="lv-card-top">
-                                                <div class="lv-card-label">
-                                                    MONEDERO
-                                                    <small>DIGITAL</small>
-                                                </div>
-                                                <div class="lv-card-number" id="lvNumeroTarjeta">
-                                                    •••• •••• •••• ••••
-                                                </div>
-                                            </div>
-                                            <div class="lv-card-bottom">
-                                                <div class="lv-card-brand">
-                                                    ORION
-                                                    <small>XXXX XXXX XXXX</small>
-                                                </div>
-                                                <div class="lv-card-cvv">CVV •••</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="lv-info-panel">
-
-                                        <div class="lv-info-card">
-                                            <div class="lv-info-label">{{ _('Saldo monedero digital') }}</div>
-                                            <div class="lv-info-value">$<span id="lvSaldo">0.00</span></div>
-                                        </div>
-
-                                        <div class="lv-transfer-card" onclick="lvAbrirDrawer()">
-                                            <div>
-                                                <div class="lv-transfer-title">{{ _('Transferir saldo a mi monedero digital') }}</div>
-                                                <div class="lv-transfer-desc">
-                                                    {{ _('Úsalo para realizar compras por internet y pagos con Monedero Pocket en tienda') }}
-                                                </div>
-                                            </div>
-                                            <i class="bi bi-chevron-right lv-transfer-arrow"></i>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
+                            <p class="text-muted small">
+                                {{ _('El monedero digital se abrió en una vista dedicada para que puedas ver el saldo, la tarjeta y transferir sin recargar el perfil.') }}
+                            </p>
+                            <a href="{{ url_for('web.mi_monedero') }}" class="btn-orion btn-orion-sm">
+                                <i class="bi bi-box-arrow-up-right"></i> {{ _('Abrir mi cartera') }}
+                            </a>
                         </div>
 
                         <!-- ============================================================
@@ -1639,7 +1465,6 @@
                         <option value="oxxo">🏪 {{ _('Pago en tienda (OXXO)') }}</option>
                     </select>
 
-                    <!-- ===== CAMPOS TARJETA (Conekta) ===== -->
                     <div id="pmCamposTarjeta">
                         <div class="row g-2">
                             <div class="col-12">
@@ -1675,7 +1500,7 @@
                         </div>
                         <p class="small text-muted mt-2 mb-0">
                             <i class="bi bi-shield-lock"></i>
-                            {{ _('Tus datos se envían directamente a Conekta. No los almacenamos en el servidor.') }}
+                            {{ _('Modo sandbox: la tarjeta se tokeniza localmente sin enviar datos a ninguna pasarela externa.') }}
                         </p>
                     </div>
 
@@ -1776,82 +1601,6 @@
             </div>
         </div>
     </div>
-
-    <!-- ============================================================
-         DRAWER: TRANSFERIR SALDO AL MONEDERO
-         ============================================================ -->
-    <div class="lv-drawer-backdrop" id="lvBackdrop" onclick="lvCerrarDrawer()"></div>
-
-    <aside class="lv-drawer" id="lvDrawer" aria-hidden="true">
-        <header class="lv-drawer-header">
-            <h5 class="lv-drawer-title">{{ _('Transferir saldo a mi monedero') }}</h5>
-            <button class="lv-drawer-close" onclick="lvCerrarDrawer()" aria-label="{{ _('Cerrar') }}">&times;</button>
-        </header>
-
-        <div class="lv-drawer-body">
-
-            <div class="lv-drawer-subtitle">{{ _('Transfiere el saldo de un monedero electrónico') }}</div>
-
-            <div class="lv-mini-card">
-                <div class="lv-card-top">
-                    <div class="lv-card-label">
-                        MONEDERO
-                        <small>DIGITAL</small>
-                    </div>
-                    <div class="lv-card-number" id="lvNumeroTarjetaMini">
-                        •••• •••• •••• ••••
-                    </div>
-                </div>
-                <div class="lv-card-bottom">
-                    <div class="lv-card-brand">
-                        ORION
-                        <small>XXXX XXXX XXXX</small>
-                    </div>
-                    <div class="lv-card-cvv">CVV •••</div>
-                </div>
-            </div>
-
-            <form id="lvTransferForm" onsubmit="lvEnviarTransferencia(event)">
-
-                <div class="lv-field">
-                    <label for="lvMonto">{{ _('Monto a transferir') }} <span class="req">*</span></label>
-                    <input type="number" id="lvMonto" min="1" step="0.01" placeholder="$0.00" required>
-                </div>
-
-                <div class="lv-field">
-                    <label for="lvMonedero">{{ _('Monedero') }} <span class="req">*</span></label>
-                    <input type="text" id="lvMonedero" placeholder="{{ _('Nombre del monedero') }}" required>
-                </div>
-
-                <div class="lv-row">
-                    <div class="lv-field">
-                        <label for="lvSerie">{{ _('Número de serie') }} <span class="req">*</span></label>
-                        <input type="text" id="lvSerie" maxlength="4" inputmode="numeric" placeholder="XXXX" required>
-                        <div class="lv-field-hint">
-                            {{ _('Primeros 4 dígitos del número inferior en tu tarjeta') }}
-                            <a href="#" class="lv-help" onclick="alert('{{ _('Son los últimos 4 dígitos impresos al reverso de tu tarjeta.') }}'); return false;">
-                                <i>?</i> {{ _('Qué es esto') }}
-                            </a>
-                        </div>
-                    </div>
-                    <div class="lv-field">
-                        <label for="lvCvv">CVV <span class="req">*</span></label>
-                        <input type="text" id="lvCvv" maxlength="3" inputmode="numeric" placeholder="•••" required>
-                        <div class="lv-field-hint">{{ _('Código de seguridad') }}</div>
-                    </div>
-                </div>
-
-                <div class="lv-error" id="lvError"></div>
-            </form>
-
-        </div>
-
-        <footer class="lv-drawer-footer">
-            <button type="button" class="lv-btn-continue" id="lvBtnContinuar" disabled onclick="lvEnviarTransferencia(event)">
-                {{ _('Continuar') }}
-            </button>
-        </footer>
-    </aside>
 
     <!-- ===== SCRIPTS ===== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -2601,456 +2350,6 @@
             const tabIdioma = document.querySelector('[data-bs-target="#tab-idioma"]');
             if (tabIdioma) tabIdioma.addEventListener('shown.bs.tab', cargarPreferenciasIdioma);
             if (window.location.hash === '#tab-idioma') cargarPreferenciasIdioma();
-        });
-
-        // ============================================================
-        // ⭐ CLIENTE CONSENTIDO — AUTO-CARGA + DIAGNÓSTICO
-        // ============================================================
-
-        const LC_NIVEL_ORDEN = ['Bronce', 'Plata', 'Oro', 'Diamante'];
-        let lcCargando = false;
-
-        async function lcCargarDatos(forzar = false) {
-            if (lcCargando) return;
-            lcCargando = true;
-
-            const errorBox = document.getElementById('lcErrorBox');
-            const errorMsg = document.getElementById('lcErrorMsg');
-
-            if (errorBox) errorBox.style.display = 'none';
-            if (errorMsg) errorMsg.textContent = '';
-
-            const setCargando = (id, msg) => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = `<div class="text-center text-muted small py-4">
-                    <i class="bi bi-hourglass-split"></i> ${msg}</div>`;
-            };
-            setCargando('lcCuponesGrid', '{{ _("Cargando cupones...") }}');
-            setCargando('lcBeneficiosLista', '{{ _("Cargando beneficios...") }}');
-            setCargando('lcHistorial', '{{ _("Cargando historial...") }}');
-
-            const endpoints = [
-                '/api/lealtad/mi-info',
-                '/mi-cuenta/lealtad/mi-info',
-                '/api/lealtad/info'
-            ];
-
-            let lastError = null;
-            let data = null;
-            let endpointOk = null;
-
-            for (const base of endpoints) {
-                const url = forzar ? base + '?_=' + Date.now() : base;
-                try {
-                    console.log(`[Lealtad] Probando ${url}...`);
-                    const r = await fetch(url, {
-                        cache: 'no-store',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Cache-Control': 'no-cache'
-                        },
-                        credentials: 'same-origin'
-                    });
-
-                    console.log(`[Lealtad] ${url} → HTTP ${r.status}`);
-
-                    if (!r.ok) {
-                        lastError = `HTTP ${r.status} en ${base}`;
-                        continue;
-                    }
-
-                    const contentType = r.headers.get('Content-Type') || '';
-                    if (!contentType.includes('application/json')) {
-                        lastError = `${base} devolvió ${contentType} en vez de JSON`;
-                        continue;
-                    }
-
-                    const json = await r.json();
-                    console.log(`[Lealtad] ${base} respuesta:`, json);
-
-                    if (!json.success) {
-                        lastError = `${base} respondió success:false → ${json.error || json.message || 'sin mensaje'}`;
-                        continue;
-                    }
-
-                    data = json;
-                    endpointOk = base;
-                    break;
-
-                } catch (e) {
-                    console.warn(`[Lealtad] Error en ${base}:`, e);
-                    lastError = `${base}: ${e.message}`;
-                }
-            }
-
-            if (!data) {
-                console.error('[Lealtad] No se pudo cargar desde ningún endpoint. Último error:', lastError);
-
-                if (errorMsg) {
-                    errorMsg.innerHTML = `
-                        <div><strong>Último error:</strong> ${lastError || 'Error desconocido'}</div>
-                        <div style="margin-top:6px; color:#92400e;">
-                            <strong>Revisa:</strong>
-                            <ul style="margin:4px 0 0 18px; padding:0;">
-                                <li>Que el endpoint <code>/api/lealtad/mi-info</code> exista en <code>web.py</code></li>
-                                <li>Que la sesión esté iniciada (no expirada)</li>
-                                <li>Terminal de Flask: busca errores 404 / 500</li>
-                            </ul>
-                        </div>`;
-                }
-                if (errorBox) errorBox.style.display = 'block';
-
-                setCargando('lcCuponesGrid', '{{ _("Sin información disponible.") }}');
-                setCargando('lcBeneficiosLista', '{{ _("Sin información disponible.") }}');
-                setCargando('lcHistorial', '{{ _("Sin información disponible.") }}');
-
-                lcCargando = false;
-                return;
-            }
-
-            console.log(`[Lealtad] Datos cargados desde ${endpointOk}`);
-
-            try {
-                lcRenderMembresia(data);
-                lcRenderCupones(data.cupones || []);
-                lcRenderBeneficios(data.beneficios_actuales || data.beneficios || []);
-                lcRenderTablaNiveles(data.nivel || 'Bronce');
-                lcRenderHistorial(data.historial_puntos || data.historial || []);
-            } catch (renderErr) {
-                console.error('[Lealtad] Error renderizando datos:', renderErr);
-                if (errorMsg) {
-                    errorMsg.textContent = 'Error al renderizar: ' + renderErr.message;
-                }
-                if (errorBox) errorBox.style.display = 'block';
-            }
-
-            lcCargando = false;
-        }
-
-        function lcRenderMembresia(d) {
-            const emoji   = document.getElementById('lcEmoji');
-            const nombre  = document.getElementById('lcNivelNombre');
-            const puntos  = document.getElementById('lcPuntos');
-            const valor   = document.getElementById('lcValor');
-            const gasto   = document.getElementById('lcGasto');
-            const compras = document.getElementById('lcCompras');
-            const izq     = document.getElementById('lcProgIzq');
-            const der     = document.getElementById('lcProgDer');
-            const barra   = document.getElementById('lcProgBarra');
-            const info    = document.getElementById('lcProgInfo');
-            const wrap    = document.getElementById('lcProgresoWrapper');
-
-            if (emoji)   emoji.textContent   = d.emoji_nivel || '🥉';
-            if (nombre)  nombre.textContent  = d.nivel || 'Bronce';
-            if (puntos)  puntos.textContent  = Number(d.puntos_disponibles || 0).toLocaleString('es-MX');
-            if (valor)   valor.textContent   = '$' + Number(d.valor_puntos || 0).toFixed(2) + ' MXN';
-            if (gasto)   gasto.textContent   = '$' + Number(d.gasto_total || 0).toLocaleString('es-MX', {maximumFractionDigits:0});
-            if (compras) compras.textContent = d.compras_realizadas || 0;
-
-            const p = d.progreso || {};
-            if (p.siguiente_nivel) {
-                if (wrap) wrap.style.display = 'block';
-                if (izq) izq.textContent = `{{ _('Progreso a') }} ${p.siguiente_nivel}`;
-                if (der) der.textContent = (p.progreso_pct || 0) + '%';
-                if (barra) {
-                    barra.style.width = '0%';
-                    setTimeout(() => { barra.style.width = (p.progreso_pct || 0) + '%'; }, 150);
-                }
-                if (info) info.textContent = `{{ _('Te faltan') }} $${Number(p.gasto_restante || 0).toLocaleString('es-MX', {maximumFractionDigits:0})} {{ _('para subir a') }} ${p.siguiente_nivel}`;
-            } else {
-                if (wrap) wrap.style.display = 'none';
-            }
-        }
-
-        function lcRenderCupones(cupones) {
-            const grid = document.getElementById('lcCuponesGrid');
-            const count = document.getElementById('lcCuponesCount');
-            if (!grid) return;
-
-            if (count) count.textContent = `${cupones.length} {{ _('activos') }}`;
-
-            if (!cupones.length) {
-                grid.innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <i class="bi bi-ticket-perforated fs-1 text-muted"></i>
-                        <p class="text-muted mt-2">{{ _('No tienes cupones activos') }}</p>
-                    </div>`;
-                return;
-            }
-
-            grid.innerHTML = cupones.map(c => {
-                const desc = c.descuento || c.descripcion || c.titulo || 'Cupón';
-                const titulo = c.titulo || c.descripcion || 'Cupón ORION';
-                const codigo = c.codigo || '';
-                const vigencia = c.fecha_expiracion || c.vigencia || '';
-                const info = c.info || '';
-
-                return `
-                    <div class="col-md-6 col-lg-4">
-                        <div class="lc-cupon">
-                            <div>
-                                <div class="lc-desc">${desc}</div>
-                                <div class="lc-titulo">${titulo}</div>
-                                ${info ? `<div class="lc-info"><i class="bi bi-info-circle"></i> ${info}</div>` : ''}
-                            </div>
-                            <div>
-                                ${codigo ? `
-                                    <div class="lc-codigo">
-                                        <code>${codigo}</code>
-                                        <button type="button" title="{{ _('Copiar código') }}" onclick="lcCopiarCodigo('${codigo}')">
-                                            <i class="bi bi-clipboard"></i>
-                                        </button>
-                                    </div>` : ''}
-                                ${vigencia ? `<div class="lc-vigencia"><i class="bi bi-clock-history"></i> ${vigencia}</div>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function lcCopiarCodigo(codigo) {
-            if (!codigo) return;
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(codigo).then(() => {
-                    mostrarToast(`{{ _('Cupón copiado:') }} ${codigo}`);
-                });
-            } else {
-                mostrarToast(`{{ _('Código:') }} ${codigo}`);
-            }
-        }
-
-        function lcRenderBeneficios(beneficios) {
-            const cont = document.getElementById('lcBeneficiosLista');
-            const count = document.getElementById('lcBeneficiosCount');
-            if (!cont) return;
-
-            if (count) count.textContent = `${beneficios.length}`;
-
-            if (!beneficios.length) {
-                cont.innerHTML = `<div class="text-center text-muted py-4">{{ _('Sin beneficios disponibles') }}</div>`;
-                return;
-            }
-
-            const iconos = ['truck', 'arrow-repeat', 'percent', 'headset', 'gift', 'lightning', 'gem', 'airplane'];
-
-            cont.innerHTML = beneficios.map((b, i) => {
-                const texto = typeof b === 'string' ? b : (b.texto || b.t || '');
-                const icono = iconos[i % iconos.length];
-                return `
-                    <div class="lc-beneficio">
-                        <div class="lc-ico"><i class="bi bi-${icono}"></i></div>
-                        <div style="flex:1;">
-                            <div class="lc-t">${texto}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function lcRenderTablaNiveles(nivelActual) {
-            const tabla = document.getElementById('lcTablaNiveles');
-            if (!tabla) return;
-            tabla.querySelectorAll('tbody tr').forEach(fila => {
-                fila.classList.toggle('actual', fila.getAttribute('data-nivel') === nivelActual);
-            });
-        }
-
-        function lcRenderHistorial(historial) {
-            const cont = document.getElementById('lcHistorial');
-            if (!cont) return;
-
-            if (!historial.length) {
-                cont.innerHTML = `<div class="text-center text-muted py-4">{{ _('Sin movimientos recientes') }}</div>`;
-                return;
-            }
-
-            cont.innerHTML = historial.slice(0, 20).map(h => {
-                const pts = Number(h.puntos || 0);
-                const signo = pts >= 0 ? 'lc-h-mas' : 'lc-h-menos';
-                const valor = (pts >= 0 ? '+' : '') + pts.toLocaleString('es-MX');
-                let fecha = h.fecha || '';
-                if (h.fecha && typeof h.fecha === 'object' && h.fecha.$date) {
-                    fecha = new Date(h.fecha.$date).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
-                }
-                return `
-                    <div class="lc-historial-item">
-                        <div>
-                            <div style="font-weight:600;">${h.descripcion || h.concepto || 'Movimiento'}</div>
-                            <div class="lc-h-fecha"><i class="bi bi-calendar3"></i> ${fecha}</div>
-                        </div>
-                        <div class="${signo}">${valor} {{ _('pts') }}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function lcAutoCargarSiCorresponde() {
-            const hash = window.location.hash || '';
-            const pane = document.getElementById('tab-consentido');
-            const isVisible = pane && pane.classList.contains('show');
-
-            if (hash === '#tab-consentido' || isVisible) {
-                console.log('[Lealtad] Auto-cargando por hash/tab visible');
-                lcCargarDatos();
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const tabCC = document.querySelector('[data-bs-target="#tab-consentido"]');
-            if (tabCC) tabCC.addEventListener('shown.bs.tab', () => lcCargarDatos());
-            lcAutoCargarSiCorresponde();
-        });
-
-        window.addEventListener('hashchange', () => {
-            if (window.location.hash === '#tab-consentido') lcCargarDatos();
-        });
-
-        // ============================================================
-        // ⭐ MI CARTERA (MONEDERO DIGITAL)
-        // ============================================================
-
-        let lvNumeroTarjetaGlobal = '';
-
-        async function lvCargarDatos() {
-            const loader = document.getElementById('lvCarteraLoader');
-            const cont = document.getElementById('lvCarteraContenido');
-
-            try {
-                const r = await fetch("{{ url_for('web.api_monedero_resumen') }}", {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                    credentials: 'same-origin'
-                });
-                if (!r.ok) throw new Error('HTTP ' + r.status);
-
-                const data = await r.json();
-                if (!data.success) throw new Error(data.error || 'Error API');
-
-                lvNumeroTarjetaGlobal = data.numero_tarjeta || '';
-
-                document.getElementById('lvSaldo').textContent = Number(data.saldo || 0).toFixed(2);
-                document.getElementById('lvNumeroTarjeta').textContent = data.numero_tarjeta || '•••• •••• •••• ••••';
-                document.getElementById('lvNumeroTarjetaMini').textContent = data.numero_tarjeta || '•••• •••• •••• ••••';
-
-                if (loader) loader.style.display = 'none';
-                if (cont) cont.style.display = 'block';
-
-            } catch (e) {
-                console.warn('Error cargando Monedero:', e);
-                if (loader) {
-                    loader.innerHTML = `
-                        <div class="text-center text-danger small py-4">
-                            <i class="bi bi-exclamation-circle"></i>
-                            {{ _('No se pudo cargar el monedero. Intenta de nuevo más tarde.') }}
-                        </div>`;
-                }
-            }
-        }
-
-        function lvAbrirDrawer() {
-            document.getElementById('lvDrawer').classList.add('open');
-            document.getElementById('lvBackdrop').classList.add('open');
-            document.getElementById('lvDrawer').setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function lvCerrarDrawer() {
-            document.getElementById('lvDrawer').classList.remove('open');
-            document.getElementById('lvBackdrop').classList.remove('open');
-            document.getElementById('lvDrawer').setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-        }
-
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') lvCerrarDrawer();
-        });
-
-        const lvInputs = ['lvMonto', 'lvMonedero', 'lvSerie', 'lvCvv'];
-        const lvBtnContinuar = document.getElementById('lvBtnContinuar');
-
-        function lvValidarFormulario() {
-            const monto    = parseFloat(document.getElementById('lvMonto').value) > 0;
-            const monedero = document.getElementById('lvMonedero').value.trim().length > 0;
-            const serie    = document.getElementById('lvSerie').value.trim().length === 4;
-            const cvv      = document.getElementById('lvCvv').value.trim().length === 3;
-
-            const ok = monto && monedero && serie && cvv;
-            lvBtnContinuar.classList.toggle('enabled', ok);
-            lvBtnContinuar.disabled = !ok;
-        }
-
-        lvInputs.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener('input', lvValidarFormulario);
-        });
-
-        async function lvEnviarTransferencia(ev) {
-            ev.preventDefault();
-
-            const monto    = parseFloat(document.getElementById('lvMonto').value);
-            const serie    = document.getElementById('lvSerie').value.trim();
-            const cvv      = document.getElementById('lvCvv').value.trim();
-            const errorBox = document.getElementById('lvError');
-
-            errorBox.style.display = 'none';
-
-            if (!monto || monto <= 0) {
-                errorBox.textContent = '{{ _('Ingresa un monto válido') }}';
-                errorBox.style.display = 'block';
-                return;
-            }
-            if (serie.length !== 4) {
-                errorBox.textContent = '{{ _('El número de serie debe tener 4 dígitos') }}';
-                errorBox.style.display = 'block';
-                return;
-            }
-            if (cvv.length !== 3) {
-                errorBox.textContent = '{{ _('El CVV debe tener 3 dígitos') }}';
-                errorBox.style.display = 'block';
-                return;
-            }
-
-            lvBtnContinuar.disabled = true;
-            lvBtnContinuar.textContent = '{{ _('Procesando...') }}';
-
-            try {
-                const r = await fetch("{{ url_for('web.api_monedero_transferir') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        monto: monto,
-                        numero_serie: serie,
-                        cvv: cvv
-                    })
-                });
-
-                const data = await r.json();
-
-                if (data.success) {
-                    mostrarToast(data.message || '{{ _('Transferencia exitosa') }}', 'success');
-                    lvCerrarDrawer();
-                    setTimeout(() => location.reload(), 1200);
-                } else {
-                    errorBox.textContent = data.error || data.message || '{{ _('Error en la transferencia') }}';
-                    errorBox.style.display = 'block';
-                }
-            } catch (e) {
-                errorBox.textContent = '{{ _('Error de conexión') }}';
-                errorBox.style.display = 'block';
-            } finally {
-                lvBtnContinuar.textContent = '{{ _('Continuar') }}';
-                lvValidarFormulario();
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const tabCart = document.querySelector('[data-bs-target="#tab-cartera"]');
-            if (tabCart) tabCart.addEventListener('shown.bs.tab', lvCargarDatos);
-            if (window.location.hash === '#tab-cartera') lvCargarDatos();
         });
 
         // ============================================================
@@ -4057,7 +3356,7 @@
         });
 
         // ============================================================
-        // ⭐ MÉTODOS DE PAGO — CON CONEKTA.JS
+        // ⭐ MÉTODOS DE PAGO — SANDBOX (sin Conekta.js)
         // ============================================================
         let pmMetodosActuales = [];
 
@@ -4071,7 +3370,6 @@
             if (o) o.style.display = (tipo === 'oxxo')    ? 'block' : 'none';
         }
 
-        // Detecta marca a partir del BIN
         function _detectarMarca(numero) {
             if (/^4/.test(numero)) return 'Visa';
             if (/^5[1-5]/.test(numero)) return 'Mastercard';
@@ -4088,7 +3386,6 @@
                 return;
             }
 
-            // Reset completo
             document.getElementById('pmTipo').value = 'tarjeta';
             document.getElementById('pmNumero').value = '';
             document.getElementById('pmTitular').value = '';
@@ -4121,9 +3418,6 @@
                 errorBox.style.display = 'block';
             };
 
-            // ============================================================
-            // TARJETA — Tokenizar con Conekta.js
-            // ============================================================
             if (tipo === 'tarjeta') {
                 const numeroRaw = (document.getElementById('pmNumero').value || '').replace(/\s/g, '');
                 const titular   = (document.getElementById('pmTitular').value || '').trim();
@@ -4146,9 +3440,6 @@
                 if (!/^\d{3,4}$/.test(cvc)) {
                     return mostrarError('CVC inválido (3 o 4 dígitos).');
                 }
-                if (typeof Conekta === 'undefined') {
-                    return mostrarError('El SDK de pagos no se cargó. Recarga la página.');
-                }
 
                 if (btn) {
                     btn.disabled = true;
@@ -4156,25 +3447,15 @@
                 }
 
                 try {
-                    // 1) Tokenizar con Conekta.js
-                    const token = await new Promise((resolve, reject) => {
-                        Conekta.Token.create({
-                            card: {
-                                number:    numeroRaw,
-                                name:      titular,
-                                exp_year:  expYear.length === 2 ? ('20' + expYear) : expYear,
-                                exp_month: expMonth,
-                                cvc:       cvc
-                            }
-                        }, resolve, reject);
-                    });
+                    const tokenId = 'tok_sandbox_' +
+                        Date.now().toString(36) + '_' +
+                        Math.random().toString(36).slice(2, 10);
 
-                    console.log('[Conekta] Token generado:', token.id);
+                    console.log('[SANDBOX] Token local generado:', tokenId);
 
-                    // 2) Enviar el token al backend
                     const payload = {
                         tipo:           'tarjeta',
-                        token_id:       token.id,
+                        token_id:       tokenId,
                         marca:          _detectarMarca(numeroRaw),
                         ultimos4:       numeroRaw.slice(-4),
                         titular:        titular,
@@ -4197,15 +3478,14 @@
                         bootstrap.Modal.getInstance(
                             document.getElementById('modalNuevoMetodoPago')
                         ).hide();
-                        mostrarToast('Tarjeta agregada correctamente', 'success');
+                        mostrarToast('Tarjeta agregada correctamente (sandbox)', 'success');
                         cargarMetodosPago();
                     } else {
                         mostrarError(data.message || data.error || 'Error al guardar la tarjeta');
                     }
                 } catch (err) {
-                    console.error('[Conekta] Error tokenizando:', err);
-                    const msg = err && (err.message_to_purchaser || err.message) || 'Error al validar la tarjeta';
-                    mostrarError(msg);
+                    console.error('[SANDBOX] Error guardando tarjeta:', err);
+                    mostrarError(err && err.message || 'Error al guardar la tarjeta');
                 } finally {
                     if (btn) {
                         btn.disabled = false;
@@ -4215,9 +3495,6 @@
                 return;
             }
 
-            // ============================================================
-            // PAYPAL
-            // ============================================================
             if (tipo === 'paypal') {
                 const email = (document.getElementById('pmEmailPaypal').value || '').trim();
                 if (!email || email.indexOf('@') === -1) {
@@ -4252,9 +3529,6 @@
                 return;
             }
 
-            // ============================================================
-            // OXXO
-            // ============================================================
             if (tipo === 'oxxo') {
                 if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...'; }
                 try {
@@ -4428,7 +3702,6 @@
                 cargarMetodosPago();
             }
 
-            // Formateo automático del número de tarjeta (espacios cada 4 dígitos)
             const pmNumero = document.getElementById('pmNumero');
             if (pmNumero) {
                 pmNumero.addEventListener('input', function () {
@@ -4436,7 +3709,6 @@
                 });
             }
 
-            // Solo dígitos en mes/año/cvc
             ['pmExpMonth', 'pmExpYear', 'pmCvc'].forEach(function (id) {
                 const el = document.getElementById(id);
                 if (el) {

@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Centro de ayuda de ORION: envíos, devoluciones, pagos, cuenta, mesa de regalos y marketplace.">
+    <meta name="theme-color" content="#e10098">
+    <title>Ayuda | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root { --orion-primary: #e10098; --orion-market: #0284c7; }
+
+        html { scroll-behavior: smooth; }
+        body { background: #f8f9fa; font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; }
+
+        .skip-link {
+            position: absolute; left: -9999px; top: 0;
+            background: var(--orion-primary); color: #fff;
+            padding: 10px 16px; border-radius: 0 0 8px 0; z-index: 9999;
+        }
+        .skip-link:focus { left: 0; }
+
+        .brand-logo {
+            font-weight: 900; font-size: 2.3rem;
+            color: var(--orion-primary) !important;
+            letter-spacing: -1.5px; text-decoration: none;
+        }
+        .top-nav { font-size: 0.85rem; background: #f8f9fa; border-bottom: 1px solid #eee; }
+
+        .orion-breadcrumb { background: transparent; padding: 12px 0 0; font-size: .82rem; }
+        .orion-breadcrumb a { color: #666; text-decoration: none; }
+        .orion-breadcrumb a:hover { color: var(--orion-primary); }
+        .orion-breadcrumb .active { color: var(--orion-primary); font-weight: 700; }
+
+        .ayuda-hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 50%, #e10098 130%);
+            border-radius: 24px;
+            padding: 60px 40px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0 40px;
+        }
+        .ayuda-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -10%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(225,0,152,.35), transparent 70%);
+            pointer-events: none;
+        }
+        .ayuda-hero h1 { font-weight: 900; font-size: 2.6rem; margin-bottom: 12px; position: relative; z-index: 1; }
+        .ayuda-hero p { font-size: 1.05rem; color: rgba(255,255,255,.85); max-width: 620px; position: relative; z-index: 1; }
+
+        .ayuda-buscador { max-width: 620px; margin: 24px auto 0; position: relative; z-index: 1; }
+        .ayuda-buscador form { display: flex; gap: 10px; }
+        .ayuda-buscador input {
+            flex: 1;
+            padding: 16px 22px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        }
+        .ayuda-buscador input:focus { outline: 3px solid rgba(251,191,36,.5); }
+        .ayuda-buscador button {
+            background: #fbbf24;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 50px;
+            padding: 0 26px;
+            font-weight: 800;
+            font-size: .95rem;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+            transition: all .2s;
+        }
+        .ayuda-buscador button:hover { background: #fff; }
+
+        .ayuda-mensaje {
+            margin-top: 14px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: .9rem;
+            font-weight: 600;
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+        .ayuda-mensaje.info { background: rgba(255,255,255,.15); color: #fff; display: block; }
+        .ayuda-mensaje.ok { background: #10b981; color: #fff; display: block; }
+        .ayuda-mensaje.error { background: #ef4444; color: #fff; display: block; }
+
+        .ayuda-categorias {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 18px; margin-bottom: 50px;
+        }
+        .ayuda-card {
+            background: #fff; border-radius: 18px; padding: 24px;
+            box-shadow: 0 6px 24px rgba(0,0,0,.06);
+            transition: all .3s ease;
+            text-decoration: none; color: inherit;
+            border: 1px solid #f0f0f0; display: block;
+        }
+        .ayuda-card:hover, .ayuda-card:focus-visible {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(225,0,152,.15);
+            border-color: rgba(225,0,152,.2);
+            color: inherit; outline: none;
+        }
+        .ayuda-card:focus-visible { outline: 3px solid rgba(225,0,152,.4); outline-offset: 2px; }
+        .ayuda-card .icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; margin-bottom: 14px;
+        }
+        .ayuda-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; }
+        .ayuda-card p { font-size: .85rem; color: #666; margin: 0; }
+
+        .faq-section {
+            background: #fff; border-radius: 20px; padding: 32px;
+            box-shadow: 0 6px 24px rgba(0,0,0,.06); margin-bottom: 40px;
+            scroll-margin-top: 80px;
+            transition: box-shadow .3s;
+        }
+        .faq-section.destacada {
+            box-shadow: 0 0 0 4px rgba(225,0,152,.25), 0 6px 24px rgba(0,0,0,.06);
+        }
+        .faq-section h2 {
+            font-weight: 900; font-size: 1.5rem; margin-bottom: 22px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .faq-section h2 i { color: #e10098; }
+
+        .accordion-item {
+            border: 1px solid #eee; border-radius: 12px !important;
+            margin-bottom: 10px; overflow: hidden;
+        }
+        .accordion-button { font-weight: 700; color: #1a1a2e; background: #fafafa; }
+        .accordion-button:not(.collapsed) {
+            background: rgba(225,0,152,.06); color: #e10098; box-shadow: none;
+        }
+        .accordion-button:focus { box-shadow: none; border-color: rgba(225,0,152,.2); }
+        .accordion-body { font-size: .92rem; color: #444; line-height: 1.65; }
+
+        .contacto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px; margin-bottom: 40px;
+        }
+        .contacto-card {
+            background: #fff; border-radius: 18px; padding: 26px; text-align: center;
+            box-shadow: 0 6px 24px rgba(0,0,0,.06); border: 1px solid #f0f0f0;
+        }
+        .contacto-card .icon {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; margin: 0 auto 14px;
+        }
+        .contacto-card h4 { font-weight: 800; font-size: 1rem; margin-bottom: 6px; }
+        .contacto-card p { font-size: .85rem; color: #666; margin-bottom: 12px; }
+        .contacto-card a, .contacto-card button {
+            color: #e10098; font-weight: 700; text-decoration: none;
+            font-size: .88rem; background: none; border: none; padding: 0; cursor: pointer;
+            font-family: inherit;
+        }
+        .contacto-card a:hover, .contacto-card button:hover { text-decoration: underline; }
+
+        .ayuda-cta {
+            background: linear-gradient(135deg, #e10098, #c00080);
+            border-radius: 22px; padding: 40px; color: #fff;
+            text-align: center; margin-bottom: 40px;
+        }
+        .ayuda-cta h2 { font-weight: 900; font-size: 1.6rem; margin-bottom: 10px; }
+        .ayuda-cta p { color: rgba(255,255,255,.9); margin-bottom: 22px; }
+        .ayuda-cta .btn {
+            background: #fff; color: #e10098; font-weight: 800;
+            padding: 12px 30px; border-radius: 50px; border: none;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .ayuda-cta .btn:hover { background: #fbbf24; color: #1a1a2e; }
+
+        footer {
+            background: #1a1a2e; color: #fff;
+            padding: 40px 0 20px; margin-top: 60px;
+        }
+        footer .brand-logo { color: #fff !important; }
+        footer a { color: rgba(255,255,255,.75); text-decoration: none; }
+        footer a:hover { color: #fff; text-decoration: underline; }
+        footer .footer-links {
+            display: flex; flex-wrap: wrap; gap: 18px;
+            justify-content: center; margin-bottom: 20px; font-size: .85rem;
+        }
+
+        .back-to-top {
+            position: fixed; bottom: 20px; right: 20px;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--orion-primary); color: #fff; border: none;
+            display: none; align-items: center; justify-content: center;
+            font-size: 1.2rem; cursor: pointer; z-index: 900;
+            box-shadow: 0 8px 24px rgba(225,0,152,.4);
+        }
+        .back-to-top.show { display: flex; }
+        .back-to-top:hover { background: #c00080; }
+
+        @media (max-width: 768px) {
+            .ayuda-hero { padding: 40px 24px; }
+            .ayuda-hero h1 { font-size: 1.9rem; }
+            .ayuda-buscador form { flex-direction: column; }
+            .ayuda-buscador button { padding: 14px 22px; justify-content: center; }
+            .faq-section { padding: 24px; }
+            .contacto-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .contacto-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#contenidoAyuda" class="skip-link">Saltar al contenido</a>
+
+    <!-- TOP NAV -->
+    <div class="top-nav py-2 text-secondary d-none d-lg-block">
+        <div class="container d-flex justify-content-end gap-4">
+            <a href="/catalogo" class="text-secondary text-decoration-none">Encuentra tu tienda</a>
+            <a href="/ayuda#contacto" class="text-secondary text-decoration-none">Servicios</a>
+            <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none fw-semibold" style="color:var(--orion-primary) !important;" aria-current="page">Ayuda</a>
+            <a href="{{ url_for('web.mis_cupones') }}" class="text-secondary text-decoration-none"><i class="bi bi-ticket-perforated me-1" aria-hidden="true"></i>Mis cupones</a>
+            <a href="{{ url_for('web.mis_mesas_regalos') }}" class="text-secondary text-decoration-none fw-semibold" style="color:var(--orion-primary) !important;"><i class="bi bi-gift-fill me-1" aria-hidden="true"></i>Mesa de Regalos</a>
+            <a href="{{ url_for('web.marketplace') }}" class="text-decoration-none" style="color:#0284c7; font-weight:700;"><i class="bi bi-shop me-1" aria-hidden="true"></i>Marketplace</a>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="/">ORION</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#orionNavbar" aria-controls="orionNavbar" aria-expanded="false" aria-label="Abrir menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="orionNavbar">
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
+                    <li class="nav-item"><a class="nav-link" href="/catalogo">Catálogo</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('web.ayuda') }}" style="color:var(--orion-primary); font-weight:700;" aria-current="page">Ayuda</a></li>
+                    <li class="nav-item">
+                        {% if session.get('nombre') %}
+                            <a href="/perfil" class="text-dark fw-bold text-decoration-none">HOLA, {{ session['nombre'] }}</a>
+                        {% else %}
+                            <a href="/login" class="text-dark fw-bold text-decoration-none">INICIAR SESIÓN</a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('web.ver_carrito') }}" class="text-dark text-decoration-none" style="font-size:1.3rem;" aria-label="Carrito">
+                            <i class="bi bi-bag" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- BREADCRUMB -->
+    <div class="container">
+        <nav class="orion-breadcrumb" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Ayuda</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- CONTENIDO -->
+    <main id="contenidoAyuda" class="container py-4">
+
+        <!-- HERO + BUSCADOR FUNCIONAL -->
+        <div class="ayuda-hero">
+            <h1><i class="bi bi-life-preserver me-2" aria-hidden="true"></i> Centro de Ayuda</h1>
+            <p>Encuentra respuestas rápidas a tus dudas. Escribe una palabra (ej. envío, devolución, pago) y te llevamos a la respuesta.</p>
+
+            <div class="ayuda-buscador">
+                <form id="ayudaForm" role="search" novalidate>
+                    <label for="ayudaBuscador" class="visually-hidden">Buscar en el centro de ayuda</label>
+                    <input
+                        type="search"
+                        id="ayudaBuscador"
+                        placeholder="Ej. envío, devolución, OXXO, contraseña…"
+                        autocomplete="off"
+                    >
+                    <button type="submit">
+                        <i class="bi bi-search" aria-hidden="true"></i> Buscar
+                    </button>
+                </form>
+                <div id="ayudaMensaje" class="ayuda-mensaje" role="status" aria-live="polite"></div>
+            </div>
+        </div>
+
+        <!-- CATEGORÍAS -->
+        <div class="ayuda-categorias">
+            <a href="#faq-envios" class="ayuda-card">
+                <div class="icon"><i class="bi bi-truck" aria-hidden="true"></i></div>
+                <h3>Envíos y entregas</h3>
+                <p>Tiempos, costos y seguimiento de tu pedido.</p>
+            </a>
+            <a href="#faq-devoluciones" class="ayuda-card">
+                <div class="icon" style="background: linear-gradient(135deg, #0284c7, #0369a1);"><i class="bi bi-arrow-repeat" aria-hidden="true"></i></div>
+                <h3>Devoluciones</h3>
+                <p>Cómo devolver un producto y plazos.</p>
+            </a>
+            <a href="#faq-pagos" class="ayuda-card">
+                <div class="icon" style="background: linear-gradient(135deg, #10b981, #047857);"><i class="bi bi-credit-card" aria-hidden="true"></i></div>
+                <h3>Pagos</h3>
+                <p>Métodos aceptados, facturación y seguridad.</p>
+            </a>
+            <a href="#faq-cuenta" class="ayuda-card">
+                <div class="icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);"><i class="bi bi-person-circle" aria-hidden="true"></i></div>
+                <h3>Mi cuenta</h3>
+                <p>Registro, contraseña y perfil.</p>
+            </a>
+            <a href="#faq-mesas" class="ayuda-card">
+                <div class="icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><i class="bi bi-gift-fill" aria-hidden="true"></i></div>
+                <h3>Mesa de Regalos</h3>
+                <p>Crea tu mesa, comparte y recibe bonificación.</p>
+            </a>
+            <a href="#faq-marketplace" class="ayuda-card">
+                <div class="icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);"><i class="bi bi-shop" aria-hidden="true"></i></div>
+                <h3>Marketplace</h3>
+                <p>Compra en tiendas de emprendedores y vende en ORION.</p>
+            </a>
+        </div>
+
+        <!-- FAQ ENVÍOS -->
+        <section class="faq-section" id="faq-envios" aria-labelledby="tituloEnvios" data-seccion="envios">
+            <h2 id="tituloEnvios"><i class="bi bi-truck" aria-hidden="true"></i> Envíos y entregas</h2>
+            <div class="accordion" id="accEnvios">
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#e1" aria-expanded="false" aria-controls="e1">
+                            ¿Cuánto tarda mi pedido en llegar?
+                        </button>
+                    </h3>
+                    <div id="e1" class="accordion-collapse collapse" data-bs-parent="#accEnvios">
+                        <div class="accordion-body">
+                            Los pedidos se procesan en 1–2 días hábiles. El envío estándar tarda 3–5 días hábiles. Si tu pedido supera los 50 artículos, se considera envío prioritario con entrega en 1 día hábil.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#e2" aria-expanded="false" aria-controls="e2">
+                            ¿Hacen envíos a todo México?
+                        </button>
+                    </h3>
+                    <div id="e2" class="accordion-collapse collapse" data-bs-parent="#accEnvios">
+                        <div class="accordion-body">
+                            Sí, enviamos a todo el territorio nacional. El costo de envío se calcula al finalizar la compra según tu dirección.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#e3" aria-expanded="false" aria-controls="e3">
+                            ¿Cómo rastreo mi pedido?
+                        </button>
+                    </h3>
+                    <div id="e3" class="accordion-collapse collapse" data-bs-parent="#accEnvios">
+                        <div class="accordion-body">
+                            Ve a <strong>Mi cuenta → Mis pedidos</strong>. Ahí verás el estado de cada pedido y la guía de rastreo cuando esté disponible.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ DEVOLUCIONES -->
+        <section class="faq-section" id="faq-devoluciones" aria-labelledby="tituloDev" data-seccion="devoluciones">
+            <h2 id="tituloDev"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> Devoluciones</h2>
+            <div class="accordion" id="accDev">
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#d1" aria-expanded="false" aria-controls="d1">
+                            ¿Cuánto tiempo tengo para devolver un producto?
+                        </button>
+                    </h3>
+                    <div id="d1" class="accordion-collapse collapse" data-bs-parent="#accDev">
+                        <div class="accordion-body">
+                            Tienes 30 días naturales desde la entrega para solicitar una devolución, siempre que el producto esté en su empaque original y sin uso.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#d2" aria-expanded="false" aria-controls="d2">
+                            ¿Cómo solicito una devolución?
+                        </button>
+                    </h3>
+                    <div id="d2" class="accordion-collapse collapse" data-bs-parent="#accDev">
+                        <div class="accordion-body">
+                            Escríbenos a <strong>devoluciones@orion.com</strong> con tu número de pedido y el motivo. Te enviaremos una guía de devolución sin costo.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#d3" aria-expanded="false" aria-controls="d3">
+                            ¿Cuándo recibo mi reembolso?
+                        </button>
+                    </h3>
+                    <div id="d3" class="accordion-collapse collapse" data-bs-parent="#accDev">
+                        <div class="accordion-body">
+                            Una vez que recibimos y verificamos el producto, el reembolso se procesa en 5–7 días hábiles al mismo método de pago.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ PAGOS -->
+        <section class="faq-section" id="faq-pagos" aria-labelledby="tituloPagos" data-seccion="pagos">
+            <h2 id="tituloPagos"><i class="bi bi-credit-card" aria-hidden="true"></i> Pagos</h2>
+            <div class="accordion" id="accPagos">
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#p1" aria-expanded="false" aria-controls="p1">
+                            ¿Qué métodos de pago aceptan?
+                        </button>
+                    </h3>
+                    <div id="p1" class="accordion-collapse collapse" data-bs-parent="#accPagos">
+                        <div class="accordion-body">
+                            Aceptamos tarjeta de crédito/débito, PayPal, OXXO y transferencia bancaria. El método se elige al finalizar la compra.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#p2" aria-expanded="false" aria-controls="p2">
+                            ¿Puedo pagar en OXXO?
+                        </button>
+                    </h3>
+                    <div id="p2" class="accordion-collapse collapse" data-bs-parent="#accPagos">
+                        <div class="accordion-body">
+                            Sí. Al elegir OXXO, recibirás una referencia de pago y un voucher descargable. Tienes 3 días para pagar en tienda.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#p3" aria-expanded="false" aria-controls="p3">
+                            ¿Es seguro comprar en ORION?
+                        </button>
+                    </h3>
+                    <div id="p3" class="accordion-collapse collapse" data-bs-parent="#accPagos">
+                        <div class="accordion-body">
+                            Sí. Usamos conexión cifrada (SSL) y no almacenamos datos de tarjeta en nuestros servidores. Todos los pagos se procesan con pasarelas certificadas.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ CUENTA -->
+        <section class="faq-section" id="faq-cuenta" aria-labelledby="tituloCuenta" data-seccion="cuenta">
+            <h2 id="tituloCuenta"><i class="bi bi-person-circle" aria-hidden="true"></i> Mi cuenta</h2>
+            <div class="accordion" id="accCuenta">
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1" aria-expanded="false" aria-controls="c1">
+                            ¿Cómo creo una cuenta?
+                        </button>
+                    </h3>
+                    <div id="c1" class="accordion-collapse collapse" data-bs-parent="#accCuenta">
+                        <div class="accordion-body">
+                            Haz clic en <strong>Iniciar sesión → Crear cuenta</strong>, llena el formulario con tu correo y contraseña, y confirma tu correo.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2" aria-expanded="false" aria-controls="c2">
+                            ¿Olvidé mi contraseña, qué hago?
+                        </button>
+                    </h3>
+                    <div id="c2" class="accordion-collapse collapse" data-bs-parent="#accCuenta">
+                        <div class="accordion-body">
+                            En la pantalla de login, haz clic en <strong>¿Olvidaste tu contraseña?</strong> y te enviaremos un enlace para restablecerla.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3" aria-expanded="false" aria-controls="c3">
+                            ¿Cómo actualizo mis datos personales?
+                        </button>
+                    </h3>
+                    <div id="c3" class="accordion-collapse collapse" data-bs-parent="#accCuenta">
+                        <div class="accordion-body">
+                            Ve a <strong>Mi cuenta → Perfil</strong>. Ahí puedes actualizar tu nombre, teléfono, dirección y foto de perfil.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ MESAS -->
+        <section class="faq-section" id="faq-mesas" aria-labelledby="tituloMesas" data-seccion="mesas">
+            <h2 id="tituloMesas"><i class="bi bi-gift-fill" aria-hidden="true"></i> Mesa de Regalos</h2>
+            <div class="accordion" id="accMesas">
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#m1" aria-expanded="false" aria-controls="m1">
+                            ¿Qué es la Mesa de Regalos?
+                        </button>
+                    </h3>
+                    <div id="m1" class="accordion-collapse collapse" data-bs-parent="#accMesas">
+                        <div class="accordion-body">
+                            Es una lista de regalos para bodas, baby showers, XV años y más. Tus invitados compran de tu lista y tú recibes una <strong>bonificación del 10%</strong> en tu monedero.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#m2" aria-expanded="false" aria-controls="m2">
+                            ¿Cómo creo mi mesa?
+                        </button>
+                    </h3>
+                    <div id="m2" class="accordion-collapse collapse" data-bs-parent="#accMesas">
+                        <div class="accordion-body">
+                            Ve a <strong>Mesa de Regalos → Crear mi mesa</strong>, elige la ocasión, agrega productos y comparte el enlace con tus invitados.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ MARKETPLACE -->
+        <section class="faq-section" id="faq-marketplace" aria-labelledby="tituloMkt" data-seccion="marketplace">
+            <h2 id="tituloMkt"><i class="bi bi-shop" aria-hidden="true"></i> Marketplace</h2>
+            <div class="accordion" id="accMkt">
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#k1" aria-expanded="false" aria-controls="k1">
+                            ¿Qué es el Marketplace de ORION?
+                        </button>
+                    </h3>
+                    <div id="k1" class="accordion-collapse collapse" data-bs-parent="#accMkt">
+                        <div class="accordion-body">
+                            Es un espacio donde emprendedores y pequeñas marcas venden sus productos dentro de ORION. Todos los vendedores pasan por un proceso de verificación.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#k2" aria-expanded="false" aria-controls="k2">
+                            ¿Cómo vendo en ORION?
+                        </button>
+                    </h3>
+                    <div id="k2" class="accordion-collapse collapse" data-bs-parent="#accMkt">
+                        <div class="accordion-body">
+                            Regístrate en <strong>Marketplace → Vender en ORION</strong>, sube tu documentación y una vez aprobado podrás publicar tus productos.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACTO -->
+        <div class="contacto-grid" id="contacto">
+            <div class="contacto-card">
+                <div class="icon"><i class="bi bi-envelope-fill" aria-hidden="true"></i></div>
+                <h4>Correo</h4>
+                <p>Respondemos en menos de 24 h.</p>
+                <a href="mailto:soporte@orion.com?subject=Ayuda%20ORION">soporte@orion.com</a>
+            </div>
+            <div class="contacto-card">
+                <div class="icon" style="background: linear-gradient(135deg, #10b981, #047857);"><i class="bi bi-whatsapp" aria-hidden="true"></i></div>
+                <h4>WhatsApp</h4>
+                <p>Lun a Vie · 9:00 – 18:00</p>
+                <a href="https://wa.me/525512345678?text=Hola%2C%20necesito%20ayuda%20con%20ORION" target="_blank" rel="noopener">+52 55 1234 5678</a>
+            </div>
+            <div class="contacto-card">
+                <div class="icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);"><i class="bi bi-telephone-fill" aria-hidden="true"></i></div>
+                <h4>Teléfono</h4>
+                <p>Lun a Vie · 9:00 – 18:00</p>
+                <a href="tel:+525512345678">+52 55 1234 5678</a>
+            </div>
+            <div class="contacto-card">
+                <div class="icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><i class="bi bi-chat-dots-fill" aria-hidden="true"></i></div>
+                <h4>Chat en vivo</h4>
+                <p>Disponible en la página principal.</p>
+                <a href="/">Ir al chat</a>
+            </div>
+        </div>
+
+        <!-- CTA CONTACTO REAL -->
+        <div class="ayuda-cta" id="contactarSoporte">
+            <h2>¿No encontraste lo que buscabas?</h2>
+            <p>Escríbenos y te ayudamos personalmente. Elige el canal que prefieras.</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="mailto:soporte@orion.com?subject=Ayuda%20ORION&body=Hola%2C%20necesito%20ayuda%20con%3A%20"
+                   class="btn">
+                    <i class="bi bi-envelope me-1" aria-hidden="true"></i> Enviar correo
+                </a>
+                <a href="https://wa.me/525512345678?text=Hola%2C%20necesito%20ayuda%20con%20ORION"
+                   target="_blank" rel="noopener"
+                   class="btn" style="background:#25D366; color:#fff;">
+                    <i class="bi bi-whatsapp me-1" aria-hidden="true"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="text-center mb-3">
+                <a href="/" class="brand-logo">ORION</a>
+            </div>
+            <div class="footer-links">
+                <a href="/catalogo">Catálogo</a>
+                <a href="{{ url_for('web.ayuda') }}">Ayuda</a>
+                <a href="{{ url_for('web.mis_cupones') }}">Mis cupones</a>
+                <a href="{{ url_for('web.marketplace') }}">Marketplace</a>
+                <a href="mailto:soporte@orion.com">Contacto</a>
+            </div>
+            <p class="text-center text-secondary mb-0">© 2026 ORION System - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <button id="backToTop" class="back-to-top" aria-label="Volver arriba">
+        <i class="bi bi-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            const form = document.getElementById('ayudaForm');
+            const input = document.getElementById('ayudaBuscador');
+            const mensaje = document.getElementById('ayudaMensaje');
+            const btnTop = document.getElementById('backToTop');
+
+            // Lista de todas las FAQ con su texto buscable
+            const faqs = Array.from(document.querySelectorAll('.accordion-item')).map(function (item) {
+                const btn = item.querySelector('.accordion-button');
+                const body = item.querySelector('.accordion-body');
+                const seccion = item.closest('.faq-section');
+                return {
+                    item: item,
+                    btn: btn,
+                    body: body,
+                    seccion: seccion,
+                    texto: ((btn ? btn.textContent : '') + ' ' + (body ? body.textContent : '')).toLowerCase()
+                };
+            });
+
+            function mostrarMensaje(texto, tipo) {
+                mensaje.className = 'ayuda-mensaje ' + tipo;
+                mensaje.textContent = texto;
+            }
+
+            function limpiarMensaje() {
+                mensaje.className = 'ayuda-mensaje';
+                mensaje.textContent = '';
+            }
+
+            function quitarDestacados() {
+                document.querySelectorAll('.faq-section.destacada').forEach(function (s) {
+                    s.classList.remove('destacada');
+                });
+            }
+
+            function buscar(e) {
+                if (e) e.preventDefault();
+                const q = (input.value || '').trim().toLowerCase();
+
+                if (!q) {
+                    mostrarMensaje('Escribe al menos una palabra (ej. "envío", "devolución", "OXXO").', 'info');
+                    return;
+                }
+
+                quitarDestacados();
+
+                // Buscar la primera FAQ que contenga la palabra
+                const match = faqs.find(function (f) { return f.texto.indexOf(q) !== -1; });
+
+                if (!match) {
+                    mostrarMensaje('No encontramos resultados para "' + input.value.trim() + '". Prueba con otra palabra o usa los botones de abajo para contactarnos.', 'error');
+                    return;
+                }
+
+                mostrarMensaje('Encontramos una respuesta. Te llevamos a ella…', 'ok');
+
+                // Destacar la sección
+                if (match.seccion) match.seccion.classList.add('destacada');
+
+                // Hacer scroll a la sección
+                if (match.seccion) {
+                    match.seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+
+                // Abrir el acordeón si está cerrado
+                if (match.btn && match.btn.classList.contains('collapsed')) {
+                    try {
+                        const collapse = bootstrap.Collapse.getOrCreateInstance(
+                            document.querySelector(match.btn.getAttribute('data-bs-target'))
+                        );
+                        collapse.show();
+                    } catch (err) {
+                        // Fallback: click directo
+                        match.btn.click();
+                    }
+                }
+
+                // Quitar el destacado después de 3 segundos
+                setTimeout(quitarDestacados, 3000);
+            }
+
+            if (form) form.addEventListener('submit', buscar);
+
+            // Botón "volver arriba"
+            if (btnTop) {
+                window.addEventListener('scroll', function () {
+                    btnTop.classList.toggle('show', window.scrollY > 400);
+                });
+                btnTop.addEventListener('click', function () {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+
+            // Si llega con ?q=..., prellenar y buscar
+            const params = new URLSearchParams(window.location.search);
+            const qInicial = params.get('q');
+            if (qInicial && input) {
+                input.value = qInicial;
+                buscar();
+            }
+        })();
+    </script>
+
+</body>
+</html>

@@ -755,7 +755,7 @@
                                 {% for temp in temporadas %}
                                     <option value="{{ temp._id }}"
                                             {{ 'selected' if producto_seleccionado and producto_seleccionado.temporada_id|string == temp._id|string }}>
-                                        {{ temp.nombre }} ({{ temp.fecha_inicio.strftime('%d/%m') }} - {{ temp.fecha_fin.strftime('%d/%m') }})
+                                        {{ temp.nombre }} ({{ temp.fecha_inicio|fmt_fecha('%d/%m') }} - {{ temp.fecha_fin|fmt_fecha('%d/%m') }})
                                         {% if temp.activa %} ✅ {% else %} ⛔ {% endif %}
                                     </option>
                                 {% endfor %}
@@ -793,7 +793,7 @@
                             {% for foto in producto_seleccionado.fotos %}
                             <div class="position-relative d-inline-block item-foto">
                                 <input type="hidden" name="fotos_existentes[]" value="{{ foto }}">
-                                <img src="{{ url_for('static', filename='uploads/productos/' + foto) }}" class="preview-img">
+                                <img src="{{ foto | foto_src }}" class="preview-img">
                                 <button type="button" class="btn btn-danger btn-sm position-absolute"
                                         style="top:-8px; right:-8px; border-radius: 50%; width:24px;height:24px;padding:0;line-height:1;"
                                         onclick="this.parentElement.remove();actualizarContadorFotos();">×</button>
@@ -822,7 +822,7 @@
                             {% for video in producto_seleccionado.videos %}
                             <div class="position-relative d-inline-block item-video">
                                 <input type="hidden" name="videos_existentes[]" value="{{ video }}">
-                                <video src="{{ url_for('static', filename='uploads/productos/' + video) }}"
+                                <video src="{{ video | video_src }}"
                                        class="preview-video" controls muted preload="metadata"></video>
                                 <button type="button" class="btn btn-danger btn-sm position-absolute"
                                         style="top:-8px; right:-8px; border-radius: 50%; width:24px;height:24px;padding:0;line-height:1;"
@@ -990,7 +990,7 @@
                                 data-search="{{ p.nombre }} {{ p.descripcion or '' }} {% for emp in marcas %}{% if emp._id|string == p.marca_id|string %}{{ emp.nombre_comercial }}{% endif %}{% endfor %}">
                                 <td>
                                     {% if p.fotos %}
-                                        <img src="{{ url_for('static', filename='uploads/productos/' + p.fotos[0]) }}" class="preview-img">
+                                        <img src="{{ p.fotos[0] | foto_src }}" class="preview-img" alt="{{ p.nombre }}">
                                     {% else %}
                                         <div class="img-placeholder"><i class="fas fa-image"></i></div>
                                     {% endif %}
@@ -1310,8 +1310,8 @@ productosData['{{ p._id }}'] = {
     marca_id: '{{ p.marca_id or "" }}',
     estado: '{{ p.estado }}',
     activo: {{ p.activo|default(True)|tojson }},
-    fotos: [{% if p.fotos %}{% for foto in p.fotos %}{{ url_for("static", filename="uploads/productos/" + foto) | tojson }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}],
-    videos: [{% if p.videos %}{% for video in p.videos %}{{ url_for("static", filename="uploads/productos/" + video) | tojson }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}],
+    fotos: [{% if p.fotos %}{% for foto in p.fotos %}{{ (foto | foto_src) | tojson }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}],
+    videos: [{% if p.videos %}{% for video in p.videos %}{{ (video | video_src) | tojson }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}],
     variables: {{ p.variables | tojson if p.variables else [] }}
 };
 {% endfor %}
@@ -1400,7 +1400,6 @@ document.getElementById('input-fotos').addEventListener('change', function(e) {
         reader.readAsDataURL(file);
         agregadas++;
     });
-    // ⚠️ NO se limpia this.value aquí para no perder los archivos
 });
 
 /* ========== VIDEOS ========== */
@@ -1438,7 +1437,6 @@ document.getElementById('input-videos').addEventListener('change', function(e) {
         actualizarContadorVideos();
         agregadas++;
     });
-    // ⚠️ NO se limpia this.value aquí para no perder los archivos
 });
 
 /* ========== CATEGORÍA PREVIEW ========== */
@@ -1712,7 +1710,15 @@ function confirmarEliminar(id, nombre) {
     }
 }
 
-/* ========== FILTROS ========== */
+/* ========== FILTROS Y PAGINACIÓN ========== */
+let paginaActual = 1;
+let tamanoPagina = 25;
+let filasVisibles = [];
+
+function getAllFilas() {
+    return Array.from(document.querySelectorAll('#tbody-productos .fila-producto'));
+}
+
 function aplicarFiltros() {
     paginaActual = 1;
     filtrarFilas();
@@ -1736,232 +1742,136 @@ function filtrarFilas() {
     filasVisibles = getAllFilas().filter(f => {
         const nombre = (f.dataset.nombre || '').toLowerCase();
         const search = (f.dataset.search || '').toLowerCase();
-        const categoria = f.dataset.categoria || '';
-        const marcaFila = f.dataset.marca || '';
-        const estadoFila = f.dataset.estado || '';
-        const stock = parseInt(f.dataset.stock) || 0;
-
-        if (q && !nombre.includes(q) && !search.includes(q)) return false;
-        if (cat && categoria !== cat) return false;
-        if (marca && marcaFila !== marca) return false;
-        if (estado === 'activo' && estadoFila !== 'activo') return false;
-        if (estado === 'inactivo' && estadoFila !== 'inactivo') return false;
-        if (estado === 'sin-stock' && stock > 0) return false;
-        if (estado === 'stock-bajo' && (stock === 0 || stock >= 10)) return false;
-        return true;
+        const stock = parseInt(f.dataset.stock || '0');
+        const okTexto = !q || nombre.includes(q) || search.includes(q);
+        const okCat = !cat || f.dataset.categoria === cat;
+        const okMarca = !marca || f.dataset.marca === marca;
+        let okEstado = true;
+        if (estado === 'activo') okEstado = f.dataset.estado === 'activo';
+        else if (estado === 'inactivo') okEstado = f.dataset.estado !== 'activo';
+        else if (estado === 'sin-stock') okEstado = stock === 0;
+        else if (estado === 'stock-bajo') okEstado = stock > 0 && stock < 10;
+        return okTexto && okCat && okMarca && okEstado;
     });
-}
-
-/* ========== PAGINACIÓN ========== */
-let paginaActual = 1;
-let filasVisibles = [];
-let tamPagina = 25;
-
-function getAllFilas() {
-    return Array.from(document.querySelectorAll('#tbody-productos .fila-producto'));
-}
-
-function renderPagina() {
-    const todas = getAllFilas();
-    todas.forEach(f => { f.style.display = 'none'; });
-
-    const totalFiltradas = filasVisibles.length;
-    const tp = tamPagina === 0 ? totalFiltradas : tamPagina;
-    const totalPags = tp > 0 ? Math.ceil(totalFiltradas / tp) : 1;
-    if (paginaActual > totalPags) paginaActual = Math.max(1, totalPags);
-
-    const inicio = tp > 0 ? (paginaActual - 1) * tp : 0;
-    const fin = tp > 0 ? Math.min(inicio + tp, totalFiltradas) : totalFiltradas;
-
-    filasVisibles.slice(inicio, fin).forEach(f => { f.style.display = ''; });
-
-    const infoEl = document.getElementById('paginationInfo');
-    if (totalFiltradas === 0) {
-        infoEl.textContent = 'No se encontraron productos';
-    } else if (tamPagina === 0) {
-        infoEl.textContent = 'Mostrando todos los ' + totalFiltradas + ' productos';
-    } else {
-        infoEl.textContent = 'Mostrando ' + (inicio + 1) + '–' + fin + ' de ' + totalFiltradas + ' producto' + (totalFiltradas !== 1 ? 's' : '');
-    }
-
-    const ctrl = document.getElementById('paginationControls');
-    if (tamPagina === 0 || totalPags <= 1) { ctrl.innerHTML = ''; return; }
-
-    let btns = '';
-    btns += '<button class="btn-page" onclick="irPagina(' + (paginaActual-1) + ')" ' + (paginaActual === 1 ? 'disabled' : '') + '>‹</button>';
-
-    const rango = new Set();
-    rango.add(1); rango.add(totalPags);
-    for (let i = Math.max(1, paginaActual - 2); i <= Math.min(totalPags, paginaActual + 2); i++) rango.add(i);
-    const paginas = Array.from(rango).sort((a, b) => a - b);
-
-    let prev = 0;
-    paginas.forEach(p => {
-        if (p - prev > 1) btns += '<span style="padding:5px 4px;color:#94a3b8;">…</span>';
-        btns += '<button class="btn-page' + (p === paginaActual ? ' active' : '') + '" onclick="irPagina(' + p + ')">' + p + '</button>';
-        prev = p;
-    });
-
-    btns += '<button class="btn-page" onclick="irPagina(' + (paginaActual+1) + ')" ' + (paginaActual === totalPags ? 'disabled' : '') + '>›</button>';
-    ctrl.innerHTML = btns;
-}
-
-function irPagina(p) {
-    const tp = tamPagina === 0 ? filasVisibles.length : tamPagina;
-    const totalPags = tp > 0 ? Math.ceil(filasVisibles.length / tp) : 1;
-    paginaActual = Math.max(1, Math.min(p, totalPags));
-    renderPagina();
-    document.getElementById('tbody-productos').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function cambiarTamanoPagina() {
-    tamPagina = parseInt(document.getElementById('pageSizeSelect').value);
+    tamanoPagina = parseInt(document.getElementById('pageSizeSelect').value) || 25;
     paginaActual = 1;
     renderPagina();
 }
 
-/* ========== EXPORTAR EXCEL ========== */
-function exportarExcel() {
-    const filas = filasVisibles.length > 0 ? filasVisibles : getAllFilas();
+function renderPagina() {
+    const total = filasVisibles.length;
+    let inicio, fin;
+    if (tamanoPagina === 0) {
+        inicio = 0; fin = total; paginaActual = 1;
+    } else {
+        const totalPaginas = Math.max(1, Math.ceil(total / tamanoPagina));
+        if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+        inicio = (paginaActual - 1) * tamanoPagina;
+        fin = Math.min(inicio + tamanoPagina, total);
+    }
 
-    const datos = [];
-    datos.push(['nombre', 'descripcion', 'categoria_id', 'marca_id', 'estado',
-                'sku', 'color', 'talla', 'precio', 'stock',
-                'fotos', 'fotos_urls', 'videos', 'videos_urls']);
-
-    filas.forEach(fila => {
-        const id = fila.dataset.id;
-        const data = productosData[id];
-        if (!data) return;
-
-        const nombre = data.nombre || '';
-        const descripcion = data.descripcion || '';
-        const categoria = data.categoria_id || '';
-        const marca = data.marca_id || '';
-        const estado = data.estado || '';
-        const variables = data.variables || [];
-
-        const fotos = data.fotos || [];
-        const fotosNombres = fotos.map(f => f.split('/').pop()).join(' | ');
-        const fotosUrls = fotos.join(' | ');
-
-        const videos = data.videos || [];
-        const videosNombres = videos.map(v => v.split('/').pop()).join(' | ');
-        const videosUrls = videos.join(' | ');
-
-        if (variables.length === 0) {
-            datos.push([nombre, descripcion, categoria, marca, estado,
-                        '', '', '', 0, 0,
-                        fotosNombres, fotosUrls, videosNombres, videosUrls]);
-        } else {
-            variables.forEach(v => {
-                datos.push([
-                    nombre, descripcion, categoria, marca, estado,
-                    v.sku || '', v.color || '', v.tamano || '',
-                    v.precio || 0, v.stock || 0,
-                    fotosNombres, fotosUrls, videosNombres, videosUrls
-                ]);
-            });
-        }
+    // Ocultar todas y mostrar solo las visibles
+    getAllFilas().forEach(f => f.style.display = 'none');
+    filasVisibles.forEach((f, i) => {
+        if (i >= inicio && i < fin) f.style.display = '';
     });
 
-    const ws = XLSX.utils.aoa_to_sheet(datos);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+    // Info
+    const info = document.getElementById('paginationInfo');
+    if (total === 0) {
+        info.textContent = 'Mostrando 0 de 0 productos';
+    } else {
+        info.textContent = 'Mostrando ' + (inicio + 1) + '–' + fin + ' de ' + total + ' productos';
+    }
 
-    const fecha = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `orion-inventario-${fecha}.xlsx`);
+    // Controles
+    const controls = document.getElementById('paginationControls');
+    controls.innerHTML = '';
+    if (tamanoPagina === 0 || total === 0) return;
+
+    const totalPaginas = Math.ceil(total / tamanoPagina);
+    const btnPrev = document.createElement('button');
+    btnPrev.className = 'btn-page';
+    btnPrev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    btnPrev.disabled = paginaActual === 1;
+    btnPrev.onclick = () => { if (paginaActual > 1) { paginaActual--; renderPagina(); } };
+    controls.appendChild(btnPrev);
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        if (totalPaginas > 7 && i > 2 && i < totalPaginas - 1 && Math.abs(i - paginaActual) > 1) {
+            if (i === 3 || i === totalPaginas - 2) {
+                const dots = document.createElement('span');
+                dots.textContent = '…';
+                dots.style.padding = '0 4px';
+                dots.style.color = '#94a3b8';
+                controls.appendChild(dots);
+            }
+            continue;
+        }
+        const b = document.createElement('button');
+        b.className = 'btn-page' + (i === paginaActual ? ' active' : '');
+        b.textContent = i;
+        b.onclick = () => { paginaActual = i; renderPagina(); };
+        controls.appendChild(b);
+    }
+
+    const btnNext = document.createElement('button');
+    btnNext.className = 'btn-page';
+    btnNext.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    btnNext.disabled = paginaActual === totalPaginas;
+    btnNext.onclick = () => { if (paginaActual < totalPaginas) { paginaActual++; renderPagina(); } };
+    controls.appendChild(btnNext);
 }
 
-/* ========== IMPORTAR EXCEL ========== */
+/* ========== IMPORTAR / EXPORTAR EXCEL ========== */
+let modalImportar;
 function abrirModalImportar() {
-    new bootstrap.Modal(document.getElementById('modalImportar')).show();
+    if (!modalImportar) modalImportar = new bootstrap.Modal(document.getElementById('modalImportar'));
+    document.getElementById('importResultado').style.display = 'none';
+    modalImportar.show();
 }
 
-function descargarPlantillaExcel() {
-    const datos = [
-        ['nombre', 'descripcion', 'categoria_id', 'marca_id', 'estado',
-         'sku', 'color', 'talla', 'precio', 'stock',
-         'fotos', 'fotos_urls', 'videos', 'videos_urls'],
-        ['Camiseta Ejemplo', 'Camiseta de algodón', 'ID_CATEGORIA', 'ID_MARCA', 'activo',
-         'CAM-ROJO-M', 'Rojo', 'M', 299.00, 50,
-         '', '', '', ''],
-        ['Camiseta Ejemplo', '', '', '', '',
-         'CAM-ROJO-L', 'Rojo', 'L', 299.00, 30,
-         '', '', '', ''],
-        ['Camiseta Ejemplo', '', '', '', '',
-         'CAM-AZUL-M', 'Azul', 'M', 309.00, 40,
-         '', '', '', ''],
-        ['Producto con media', 'Con imagen y video remotos', 'ID_CATEGORIA', 'ID_MARCA', 'activo',
-         'PROD-MEDIA-1', 'Único', 'M', 199.00, 10,
-         '', 'https://ejemplo.com/imagen1.jpg | https://ejemplo.com/imagen2.jpg',
-         '', 'https://ejemplo.com/video1.mp4'],
-    ];
-    const ws = XLSX.utils.aoa_to_sheet(datos);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Plantilla');
-    XLSX.writeFile(wb, 'orion-plantilla-productos.xlsx');
-}
-
-document.getElementById('formImportarExcel').addEventListener('submit', async function(e) {
+document.getElementById('formImportarExcel').addEventListener('submit', function(e) {
     e.preventDefault();
-    const fileInput = document.getElementById('inputExcel');
-    if (!fileInput.files.length) { alert('Selecciona un archivo'); return; }
-
+    const formData = new FormData(this);
     const resultado = document.getElementById('importResultado');
     resultado.style.display = 'block';
-    resultado.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Procesando archivo...</div>';
-
-    try {
-        const formDataFinal = new FormData();
-        formDataFinal.append('archivo_excel', fileInput.files[0]);
-        formDataFinal.append('actualizar_existentes', document.getElementById('chkActualizar').checked ? '1' : '0');
-
-        const resp = await fetch('/admin/productos/importar-excel', {
-            method: 'POST',
-            body: formDataFinal
-        });
-        const json = await resp.json();
-
-        if (json.success) {
-            let html = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> ' + (json.message || 'Productos importados correctamente') + '</div>';
-            if (json.detalle) {
-                html += '<div style="font-size:0.8rem;color:#475569;">';
-                html += '📦 Filas procesadas: ' + (json.detalle.total_filas || 0) + '<br>';
-                html += '✅ Creados: ' + (json.detalle.creados || 0) + '<br>';
-                html += '🔄 Actualizados: ' + (json.detalle.actualizados || 0) + '<br>';
-                html += '⏭️ Omitidos: ' + (json.detalle.omitidos || 0) + '<br>';
-                if (json.detalle.imagenes_descargadas) {
-                    html += '🖼️ Imágenes descargadas: ' + json.detalle.imagenes_descargadas + '<br>';
-                }
-                if (json.detalle.videos_descargados) {
-                    html += '🎬 Videos descargados: ' + json.detalle.videos_descargados;
-                }
-                html += '</div>';
+    resultado.innerHTML = '<div class="alert alert-info">Importando... <i class="fas fa-spinner fa-spin"></i></div>';
+    fetch('/admin/productos/importar_excel', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                resultado.innerHTML = '<div class="alert alert-success">✅ ' + (data.mensaje || 'Importación completada') + '</div>';
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                resultado.innerHTML = '<div class="alert alert-danger">❌ ' + (data.error || 'Error al importar') + '</div>';
             }
-            resultado.innerHTML = html;
-            setTimeout(() => location.reload(), 2500);
-        } else {
-            resultado.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ' + (json.message || 'Error al importar') + '</div>';
-        }
-    } catch (err) {
-        resultado.innerHTML = '<div class="alert alert-danger">Error: ' + err.message + '</div>';
-    }
+        })
+        .catch(err => {
+            resultado.innerHTML = '<div class="alert alert-danger">❌ Error de red: ' + err.message + '</div>';
+        });
 });
+
+function descargarPlantillaExcel() {
+    window.location.href = '/admin/productos/plantilla_excel';
+}
+
+function exportarExcel() {
+    window.location.href = '/admin/productos/exportar_excel';
+}
 
 /* ========== INICIALIZACIÓN ========== */
 document.addEventListener('DOMContentLoaded', function() {
     actualizarContadorFotos();
     actualizarContadorVideos();
-    actualizarContadorTallas();
-
+    actualizarVistaPreviaCategoria();
     document.getElementById('btnAgregarColor').addEventListener('click', agregarColor);
     document.getElementById('inputNuevoColor').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') { e.preventDefault(); agregarColor(); }
     });
-
-    if (document.getElementById('categoriaSelect').value) actualizarVistaPreviaCategoria();
-
     filtrarFilas();
     renderPagina();
 });

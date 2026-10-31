@@ -15,7 +15,7 @@
             color: #1a1a2e;
         }
         .layout { display: flex; min-height: 100vh; }
-        
+
         .sidebar {
             width: 280px;
             background: #ffffff;
@@ -169,51 +169,8 @@
             color: #e10098;
             text-decoration: none;
         }
-        .breadcrumb .breadcrumb-item a:hover {
-            text-decoration: underline;
-        }
-        .breadcrumb .breadcrumb-item.active {
-            color: #888;
-        }
-
-        .btn-primary-custom {
-            background: #e10098;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-primary-custom:hover {
-            background: #c00080;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
-        }
-        .btn-secondary-custom {
-            background: #6c757d;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-secondary-custom:hover {
-            background: #5a6268;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(108, 117, 125, 0.3);
-        }
+        .breadcrumb .breadcrumb-item a:hover { text-decoration: underline; }
+        .breadcrumb .breadcrumb-item.active { color: #888; }
 
         .form-container {
             background: #ffffff;
@@ -222,9 +179,7 @@
             padding: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .form-container .form-group {
-            margin-bottom: 20px;
-        }
+        .form-container .form-group { margin-bottom: 20px; }
         .form-container .form-group label {
             font-weight: 600;
             font-size: 0.85rem;
@@ -232,9 +187,7 @@
             display: block;
             margin-bottom: 6px;
         }
-        .form-container .form-group label .required {
-            color: #dc3545;
-        }
+        .form-container .form-group label .required { color: #dc3545; }
         .form-container .form-group input,
         .form-container .form-group select,
         .form-container .form-group textarea {
@@ -254,10 +207,7 @@
             box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.1);
             outline: none;
         }
-        .form-container .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+        .form-container .form-group textarea { resize: vertical; min-height: 80px; }
         .form-container .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -301,9 +251,7 @@
             transition: all 0.3s ease;
             text-decoration: none;
         }
-        .form-container .form-actions .btn-cancel:hover {
-            background: #dee2e6;
-        }
+        .form-container .form-actions .btn-cancel:hover { background: #dee2e6; }
         .form-container .form-actions .btn-save {
             background: #e10098;
             color: white;
@@ -380,7 +328,6 @@
 
 <div class="layout">
 
-    <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar">
         <div class="admin-profile">
             {% if session.get('foto') %}
@@ -403,25 +350,25 @@
             <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
             <a href="{{ url_for('web.reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
             <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
-            
+
             <div class="divider"></div>
             <div class="panel-title">PROMOCIONES</div>
             <a href="{{ url_for('web.admin_listar_cupones') }}"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
-            
+
             <div class="divider"></div>
             <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
             <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
             <a href="{{ url_for('web.prediccion_ventas') }}"><i class="fas fa-chart-bar"></i> <span>Predicción Ventas</span></a>
             <a href="{{ url_for('web.prediccion_abandono') }}"><i class="fas fa-exclamation-triangle"></i> <span>Predicción Abandono</span></a>
             <a href="{{ url_for('web.deteccion_fraude') }}"><i class="fas fa-shield-alt"></i> <span>Detección Fraude</span></a>
-            
+
             <div class="divider"></div>
             <div class="panel-title">CONFIGURACIÓN</div>
             <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
             <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
             <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
             <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
-            
+
             <div class="divider"></div>
             <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
                 <button type="submit" class="logout-btn">
@@ -431,10 +378,8 @@
         </div>
     </nav>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <main class="main">
 
-        <!-- ===== BREADCRUMB ===== -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('web.dashboard') }}">Dashboard</a></li>
@@ -448,98 +393,121 @@
             <div class="tag"><i class="fas fa-percent"></i> Promociones</div>
         </header>
 
-        <!-- Toast Container -->
         <div class="toast-container" id="toastContainer"></div>
 
+        {# ============================================================
+           ⭐ Normalización de variables para que el template no explote
+           cuando vienen strings / None / false.
+           ============================================================ #}
+        {% set _id_str = cupon._id|string if cupon._id else '' %}
+        {% set _tipo = cupon.tipo if cupon.tipo else 'porcentaje' %}
+        {% set _valor = cupon.valor if cupon.valor is not none else 0 %}
+        {% set _uso_maximo = cupon.uso_maximo if cupon.uso_maximo is not none else 0 %}
+        {% set _minimo = cupon.minimo_compra if cupon.minimo_compra is not none else 0 %}
+        {% set _activo = cupon.activo if cupon.activo is not none else true %}
+        {% set _segmentos = cupon.segmentos if cupon.segmentos else [] %}
+        {% set _categorias = cupon.categorias if cupon.categorias else [] %}
+        {% set _productos = cupon.productos if cupon.productos else [] %}
+
+        {# Fechas: soporta datetime, date, string 'YYYY-MM-DD' y None #}
+        {% if cupon.fecha_inicio is string %}
+            {% set _fecha_inicio = cupon.fecha_inicio[:10] %}
+        {% elif cupon.fecha_inicio %}
+            {% set _fecha_inicio = cupon.fecha_inicio.strftime('%Y-%m-%d') %}
+        {% else %}
+            {% set _fecha_inicio = '' %}
+        {% endif %}
+
+        {% if cupon.fecha_fin is string %}
+            {% set _fecha_fin = cupon.fecha_fin[:10] %}
+        {% elif cupon.fecha_fin %}
+            {% set _fecha_fin = cupon.fecha_fin.strftime('%Y-%m-%d') %}
+        {% else %}
+            {% set _fecha_fin = '' %}
+        {% endif %}
+
         <div class="form-container">
-            <form action="{{ url_for('web.admin_editar_cupon', id=cupon._id) }}" method="POST">
-                <!-- Código y Nombre -->
+            <form action="{{ url_for('web.admin_editar_cupon', id=_id_str) }}" method="POST">
                 <div class="form-row">
                     <div class="form-group">
                         <label>Código</label>
-                        <input type="text" value="{{ cupon.codigo }}" disabled style="background:#f0f0f0; color:#888;">
+                        <input type="text" value="{{ cupon.codigo or '' }}" disabled style="background:#f0f0f0; color:#888;">
                         <div class="help-text">El código no se puede modificar</div>
                     </div>
                     <div class="form-group">
                         <label>Nombre <span class="required">*</span></label>
-                        <input type="text" name="nombre" value="{{ cupon.nombre }}" required placeholder="Ej: Descuento Verano 2024">
+                        <input type="text" name="nombre" value="{{ cupon.nombre or '' }}" required placeholder="Ej: Descuento Verano 2024">
                     </div>
                 </div>
 
-                <!-- Descripción -->
                 <div class="form-group">
                     <label>Descripción</label>
-                    <textarea name="descripcion" placeholder="Descripción del cupón...">{{ cupon.descripcion }}</textarea>
+                    <textarea name="descripcion" placeholder="Descripción del cupón...">{{ cupon.descripcion or '' }}</textarea>
                 </div>
 
-                <!-- Tipo y Valor -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tipo <span class="required">*</span></label>
                         <select name="tipo" id="tipo" required onchange="cambiarTipo()">
-                            <option value="porcentaje" {% if cupon.tipo == 'porcentaje' %}selected{% endif %}>% Descuento</option>
-                            <option value="monto_fijo" {% if cupon.tipo == 'monto_fijo' %}selected{% endif %}>Monto Fijo</option>
-                            <option value="envio_gratis" {% if cupon.tipo == 'envio_gratis' %}selected{% endif %}>Envío Gratis</option>
+                            <option value="porcentaje" {% if _tipo == 'porcentaje' %}selected{% endif %}>% Descuento</option>
+                            <option value="monto_fijo" {% if _tipo == 'monto_fijo' %}selected{% endif %}>Monto Fijo</option>
+                            <option value="envio_gratis" {% if _tipo == 'envio_gratis' %}selected{% endif %}>Envío Gratis</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Valor <span class="required">*</span></label>
-                        <input type="number" name="valor" id="valor" step="0.01" required value="{{ cupon.valor }}" placeholder="0.00">
+                        <input type="number" name="valor" id="valor" step="0.01" required value="{{ _valor }}" placeholder="0.00">
                         <div class="help-text" id="valor_help">
-                            {% if cupon.tipo == 'porcentaje' %}Ej: 10 = 10% de descuento{% elif cupon.tipo == 'monto_fijo' %}Ej: 50 = $50 de descuento{% else %}El valor se ignora para envío gratis{% endif %}
+                            {% if _tipo == 'porcentaje' %}Ej: 10 = 10% de descuento
+                            {% elif _tipo == 'monto_fijo' %}Ej: 50 = $50 de descuento
+                            {% else %}El valor se ignora para envío gratis{% endif %}
                         </div>
                     </div>
                 </div>
 
-                <!-- Fechas -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Fecha Inicio</label>
-                        <input type="date" name="fecha_inicio" value="{{ cupon.fecha_inicio.strftime('%Y-%m-%d') if cupon.fecha_inicio else '' }}">
+                        <input type="date" name="fecha_inicio" value="{{ _fecha_inicio }}">
                     </div>
                     <div class="form-group">
                         <label>Fecha Fin</label>
-                        <input type="date" name="fecha_fin" value="{{ cupon.fecha_fin.strftime('%Y-%m-%d') if cupon.fecha_fin else '' }}">
+                        <input type="date" name="fecha_fin" value="{{ _fecha_fin }}">
                     </div>
                 </div>
 
-                <!-- Uso Máximo y Mínimo Compra -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Uso Máximo</label>
-                        <input type="number" name="uso_maximo" value="{{ cupon.uso_maximo }}" placeholder="0 = ilimitado">
+                        <input type="number" name="uso_maximo" value="{{ _uso_maximo }}" placeholder="0 = ilimitado">
                         <div class="help-text">0 significa ilimitado</div>
                     </div>
                     <div class="form-group">
                         <label>Mínimo de Compra</label>
-                        <input type="number" name="minimo_compra" step="0.01" value="{{ cupon.minimo_compra }}" placeholder="0.00">
+                        <input type="number" name="minimo_compra" step="0.01" value="{{ _minimo }}" placeholder="0.00">
                     </div>
                 </div>
 
-                <!-- Segmentos -->
                 <div class="form-group">
                     <label>Segmentos (Ctrl+clic para múltiple)</label>
                     <select name="segmentos" multiple style="height:120px;">
-                        <option value="todos" {% if 'todos' in cupon.segmentos %}selected{% endif %}>Todos los clientes</option>
-                        <option value="vip" {% if 'vip' in cupon.segmentos %}selected{% endif %}>Clientes VIP</option>
-                        <option value="frecuente" {% if 'frecuente' in cupon.segmentos %}selected{% endif %}>Clientes Frecuentes</option>
-                        <option value="ocasional" {% if 'ocasional' in cupon.segmentos %}selected{% endif %}>Compradores Ocasionales</option>
-                        <option value="inactivo" {% if 'inactivo' in cupon.segmentos %}selected{% endif %}>Clientes Inactivos</option>
+                        <option value="todos" {% if 'todos' in _segmentos %}selected{% endif %}>Todos los clientes</option>
+                        <option value="vip" {% if 'vip' in _segmentos %}selected{% endif %}>Clientes VIP</option>
+                        <option value="frecuente" {% if 'frecuente' in _segmentos %}selected{% endif %}>Clientes Frecuentes</option>
+                        <option value="ocasional" {% if 'ocasional' in _segmentos %}selected{% endif %}>Compradores Ocasionales</option>
+                        <option value="inactivo" {% if 'inactivo' in _segmentos %}selected{% endif %}>Clientes Inactivos</option>
                     </select>
                     <div class="help-text">Mantén presionado Ctrl para seleccionar múltiples</div>
                 </div>
 
-                <!-- 🔥 CATEGORÍAS (NUEVO) -->
                 <div class="form-group">
                     <label>Categorías (Ctrl+clic para múltiple)</label>
                     <select name="categorias" multiple style="height:120px;">
-                        <option value="">-- Seleccionar categorías --</option>
                         {% if categorias %}
                             {% for categoria in categorias %}
-                                <option value="{{ categoria._id }}" {% if categoria._id|string in cupon.categorias %}selected{% endif %}>
-                                    {% if categoria.padre_id %}
-                                        └─ 
-                                    {% endif %}
+                                <option value="{{ categoria._id }}"
+                                    {% if categoria._id|string in _categorias|map('string')|list %}selected{% endif %}>
+                                    {% if categoria.padre_id %}└─ {% endif %}
                                     {{ categoria.nombre }}
                                 </option>
                             {% endfor %}
@@ -550,14 +518,13 @@
                     <div class="help-text">Selecciona las categorías donde aplica el descuento</div>
                 </div>
 
-                <!-- 🔥 PRODUCTOS (NUEVO) -->
                 <div class="form-group">
                     <label>Productos (Ctrl+clic para múltiple)</label>
                     <select name="productos" multiple style="height:120px;">
-                        <option value="">-- Seleccionar productos --</option>
                         {% if productos %}
                             {% for producto in productos %}
-                                <option value="{{ producto._id }}" {% if producto._id|string in cupon.productos %}selected{% endif %}>
+                                <option value="{{ producto._id }}"
+                                    {% if producto._id|string in _productos|map('string')|list %}selected{% endif %}>
                                     {{ producto.nombre }} ({{ producto.sku if producto.sku else 'Sin SKU' }})
                                 </option>
                             {% endfor %}
@@ -568,17 +535,15 @@
                     <div class="help-text">Selecciona los productos específicos donde aplica el descuento</div>
                 </div>
 
-                <!-- Activo -->
                 <div class="form-group">
                     <div class="form-check-group">
                         <label>
-                            <input type="checkbox" name="activo" value="1" {% if cupon.activo %}checked{% endif %}>
+                            <input type="checkbox" name="activo" value="1" {% if _activo %}checked{% endif %}>
                             Activo
                         </label>
                     </div>
                 </div>
 
-                <!-- Acciones -->
                 <div class="form-actions">
                     <a href="{{ url_for('web.admin_listar_cupones') }}" class="btn-cancel">
                         <i class="fas fa-times"></i> Cancelar
@@ -598,7 +563,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    mostrarToast('{{ message }}', '{{ category }}');
+                    mostrarToast({{ message|tojson }}, {{ category|tojson }});
                 {% endfor %}
             {% endif %}
         {% endwith %}
@@ -606,6 +571,7 @@
 
     function mostrarToast(mensaje, tipo = 'success') {
         const container = document.getElementById('toastContainer');
+        if (!container) return;
         const toast = document.createElement('div');
         toast.className = `toast-message ${tipo}`;
         let icon = 'check-circle';
@@ -615,9 +581,7 @@
         container.appendChild(toast);
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.5s ease forwards';
-            setTimeout(() => {
-                toast.remove();
-            }, 500);
+            setTimeout(() => toast.remove(), 500);
         }, 3000);
     }
 
@@ -625,14 +589,15 @@
         const tipo = document.getElementById('tipo').value;
         const valorHelp = document.getElementById('valor_help');
         const valorInput = document.getElementById('valor');
-        
+        if (!valorInput || !valorHelp) return;
+
         if (tipo === 'porcentaje') {
             valorHelp.textContent = 'Ej: 10 = 10% de descuento (máximo 100%)';
             valorInput.max = 100;
             valorInput.disabled = false;
         } else if (tipo === 'monto_fijo') {
             valorHelp.textContent = 'Ej: 50 = $50 de descuento';
-            valorInput.max = null;
+            valorInput.removeAttribute('max');
             valorInput.disabled = false;
         } else {
             valorHelp.textContent = 'El valor se ignora para envío gratis';

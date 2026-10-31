@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ===== ESTILOS BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
@@ -15,8 +14,7 @@
             color: #1a1a2e;
         }
         .layout { display: flex; min-height: 100vh; }
-        
-        /* ===== SIDEBAR ===== */
+
         .sidebar {
             width: 280px;
             background: #ffffff;
@@ -122,7 +120,6 @@
         .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
         .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; color: #dc3545; }
 
-        /* ===== MAIN ===== */
         .main {
             margin-left: 280px;
             padding: 30px 35px 20px;
@@ -171,51 +168,8 @@
             color: #e10098;
             text-decoration: none;
         }
-        .breadcrumb .breadcrumb-item a:hover {
-            text-decoration: underline;
-        }
-        .breadcrumb .breadcrumb-item.active {
-            color: #888;
-        }
-
-        .btn-primary-custom {
-            background: #e10098;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-primary-custom:hover {
-            background: #c00080;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3);
-        }
-        .btn-secondary-custom {
-            background: #6c757d;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-secondary-custom:hover {
-            background: #5a6268;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(108, 117, 125, 0.3);
-        }
+        .breadcrumb .breadcrumb-item a:hover { text-decoration: underline; }
+        .breadcrumb .breadcrumb-item.active { color: #888; }
 
         .form-container {
             background: #ffffff;
@@ -224,9 +178,7 @@
             padding: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .form-container .form-group {
-            margin-bottom: 20px;
-        }
+        .form-container .form-group { margin-bottom: 20px; }
         .form-container .form-group label {
             font-weight: 600;
             font-size: 0.85rem;
@@ -234,9 +186,7 @@
             display: block;
             margin-bottom: 6px;
         }
-        .form-container .form-group label .required {
-            color: #dc3545;
-        }
+        .form-container .form-group label .required { color: #dc3545; }
         .form-container .form-group input,
         .form-container .form-group select,
         .form-container .form-group textarea {
@@ -256,10 +206,7 @@
             box-shadow: 0 0 0 3px rgba(225, 0, 152, 0.1);
             outline: none;
         }
-        .form-container .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+        .form-container .form-group textarea { resize: vertical; min-height: 80px; }
         .form-container .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -303,9 +250,7 @@
             transition: all 0.3s ease;
             text-decoration: none;
         }
-        .form-container .form-actions .btn-cancel:hover {
-            background: #dee2e6;
-        }
+        .form-container .form-actions .btn-cancel:hover { background: #dee2e6; }
         .form-container .form-actions .btn-save {
             background: #e10098;
             color: white;
@@ -429,25 +374,25 @@
             <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
             <a href="{{ url_for('web.reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
             <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
-            
+
             <div class="divider"></div>
             <div class="panel-title">PROMOCIONES</div>
             <a href="{{ url_for('web.admin_listar_cupones') }}" class="active"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
-            
+
             <div class="divider"></div>
             <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
             <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
             <a href="{{ url_for('web.prediccion_ventas') }}"><i class="fas fa-chart-bar"></i> <span>Predicción Ventas</span></a>
             <a href="{{ url_for('web.prediccion_abandono') }}"><i class="fas fa-exclamation-triangle"></i> <span>Predicción Abandono</span></a>
             <a href="{{ url_for('web.deteccion_fraude') }}"><i class="fas fa-shield-alt"></i> <span>Detección Fraude</span></a>
-            
+
             <div class="divider"></div>
             <div class="panel-title">CONFIGURACIÓN</div>
             <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
             <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
             <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
             <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
-            
+
             <div class="divider"></div>
             <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
                 <button type="submit" class="logout-btn">
@@ -457,7 +402,7 @@
         </div>
     </nav>
 
-    <!-- ===== MAIN CONTENT ===== -->
+    <!-- ===== MAIN ===== -->
     <main class="main">
 
         <nav aria-label="breadcrumb">
@@ -473,12 +418,10 @@
             <div class="tag"><i class="fas fa-percent"></i> Promociones</div>
         </header>
 
-        <!-- Toast Container -->
         <div class="toast-container" id="toastContainer"></div>
 
         <div class="form-container">
             <form id="formCrearCupon" action="{{ url_for('web.admin_crear_cupon') }}" method="POST">
-                <!-- Código y Nombre -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Código</label>
@@ -491,13 +434,11 @@
                     </div>
                 </div>
 
-                <!-- Descripción -->
                 <div class="form-group">
                     <label>Descripción</label>
                     <textarea name="descripcion" placeholder="Descripción del cupón..."></textarea>
                 </div>
 
-                <!-- Tipo y Valor -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tipo <span class="required">*</span></label>
@@ -514,7 +455,6 @@
                     </div>
                 </div>
 
-                <!-- Fechas -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Fecha Inicio</label>
@@ -526,7 +466,6 @@
                     </div>
                 </div>
 
-                <!-- Uso Máximo y Mínimo Compra -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Uso Máximo</label>
@@ -539,28 +478,23 @@
                     </div>
                 </div>
 
-                <!-- ===== SEGMENTO ASIGNADO AUTOMÁTICAMENTE ===== -->
                 <div class="form-group segmento-auto">
                     <label><i class="fas fa-magic"></i> Segmento asignado automáticamente</label>
                     <p>
-                        El sistema analizará el tipo, valor y mínimo de compra para asignar 
+                        El sistema analizará el tipo, valor y mínimo de compra para asignar
                         <strong>automáticamente</strong> el segmento de clientes (VIP, Frecuentes, Inactivos, etc.).
                         Tú solo preocúpate de crear la oferta.
                     </p>
                     <div class="badge-ia"><i class="fas fa-robot"></i> IA asignará el segmento</div>
                 </div>
 
-                <!-- 🔥 CATEGORÍAS -->
                 <div class="form-group">
                     <label>Categorías (Ctrl+clic para múltiple)</label>
                     <select name="categorias" multiple style="height:120px;">
-                        <option value="">-- Seleccionar categorías --</option>
                         {% if categorias %}
                             {% for categoria in categorias %}
                                 <option value="{{ categoria._id }}">
-                                    {% if categoria.padre_id %}
-                                        └─ 
-                                    {% endif %}
+                                    {% if categoria.padre_id %}└─ {% endif %}
                                     {{ categoria.nombre }}
                                 </option>
                             {% endfor %}
@@ -571,11 +505,9 @@
                     <div class="help-text">Selecciona las categorías donde aplica el descuento</div>
                 </div>
 
-                <!-- 🔥 PRODUCTOS -->
                 <div class="form-group">
                     <label>Productos (Ctrl+clic para múltiple)</label>
                     <select name="productos" multiple style="height:120px;">
-                        <option value="">-- Seleccionar productos --</option>
                         {% if productos %}
                             {% for producto in productos %}
                                 <option value="{{ producto._id }}">{{ producto.nombre }} ({{ producto.sku if producto.sku else 'Sin SKU' }})</option>
@@ -587,7 +519,6 @@
                     <div class="help-text">Selecciona los productos específicos donde aplica el descuento</div>
                 </div>
 
-                <!-- Activo y Mostrar en tienda -->
                 <div class="form-row">
                     <div class="form-group">
                         <div class="form-check-group">
@@ -607,7 +538,6 @@
                     </div>
                 </div>
 
-                <!-- Acciones -->
                 <div class="form-actions">
                     <a href="{{ url_for('web.admin_listar_cupones') }}" class="btn-cancel">
                         <i class="fas fa-times"></i> Cancelar
@@ -627,20 +557,22 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    mostrarToast('{{ message }}', '{{ category }}');
+                    mostrarToast({{ message|tojson }}, {{ category|tojson }});
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        document.getElementById('codigo').addEventListener('focus', function() {
-            if (!this.value) {
-                this.value = generarCodigo();
-            }
-        });
+        const codigoInput = document.getElementById('codigo');
+        if (codigoInput) {
+            codigoInput.addEventListener('focus', function() {
+                if (!this.value) this.value = generarCodigo();
+            });
+        }
     });
 
     function mostrarToast(mensaje, tipo = 'success') {
         const container = document.getElementById('toastContainer');
+        if (!container) return;
         const toast = document.createElement('div');
         toast.className = `toast-message ${tipo}`;
         let icon = 'check-circle';
@@ -650,9 +582,7 @@
         container.appendChild(toast);
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.5s ease forwards';
-            setTimeout(() => {
-                toast.remove();
-            }, 500);
+            setTimeout(() => toast.remove(), 500);
         }, 3000);
     }
 
@@ -669,14 +599,15 @@
         const tipo = document.getElementById('tipo').value;
         const valorHelp = document.getElementById('valor_help');
         const valorInput = document.getElementById('valor');
-        
+        if (!valorInput || !valorHelp) return;
+
         if (tipo === 'porcentaje') {
             valorHelp.textContent = 'Ej: 10 = 10% de descuento (máximo 100%)';
             valorInput.max = 100;
             valorInput.disabled = false;
         } else if (tipo === 'monto_fijo') {
             valorHelp.textContent = 'Ej: 50 = $50 de descuento';
-            valorInput.max = null;
+            valorInput.removeAttribute('max');
             valorInput.disabled = false;
         } else {
             valorHelp.textContent = 'El valor se ignora para envío gratis';

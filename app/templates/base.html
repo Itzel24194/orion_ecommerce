@@ -328,8 +328,8 @@
                         <!-- ===== USUARIO AUTENTICADO ===== -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                {% if session.get('foto') %}
-                                    <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" 
+                                {% if current_user_foto %}
+                                    <img src="{{ foto_src(current_user_foto) }}" 
                                          class="avatar-nav" alt="Avatar">
                                 {% else %}
                                     <img src="{{ url_for('static', filename='img/default-avatar.png') }}" 
@@ -337,6 +337,9 @@
                                 {% endif %}
                                 <span>{{ session.get('nombre', 'Usuario') }}</span>
                                 
+                                {% if session.get('rol') == 'admin' %}
+                                    <span class="badge-rol badge-admin ms-2">Admin</span>
+                                {% else %}
                                     <span class="badge-rol badge-cliente ms-2">Cliente</span>
                                 {% endif %}
                             </a>

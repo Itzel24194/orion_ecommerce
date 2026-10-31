@@ -7,26 +7,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        :root { --orion-primary: #e10098; --orion-discount: #d92121; }
+        :root { --orion-primary: #e10098; --orion-discount: #d92121; --orion-market: #0284c7; }
 
-        /* ===== MENÚ CATEGORÍAS ===== */
+        /* ===== DROPDOWN CATEGORÍAS ===== */
         .dropdown-submenu { position: relative; }
-        .dropdown-submenu > .dropdown-menu { 
-            top: 0; 
-            left: 100%; 
-            margin-top: -6px; 
-            display: none; 
-            border-radius: 12px; 
-            padding: 8px; 
-            min-width: 200px; 
+        .dropdown-submenu > .dropdown-menu {
+            top: 0; left: 100%; margin-top: -6px;
+            display: none; border-radius: 12px; padding: 8px; min-width: 220px;
         }
         .dropdown-submenu:hover > .dropdown-menu { display: block; }
-        .dropdown-submenu > a::after { 
-            content: " ▶"; 
-            font-size: 0.6rem; 
-            float: right; 
-            margin-top: 5px; 
-        }
+        .dropdown-submenu > a::after { content: " ▶"; font-size: 0.6rem; float: right; margin-top: 5px; color: #aaa; }
 
         /* ===== HERO ===== */
         .hero-slide { height: 500px; background-size: cover; background-position: center; display: flex; align-items: center; }
@@ -34,65 +24,617 @@
         .slide-2 { background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=1920'); }
 
         /* ===== BANNERS ===== */
-        .banner-full { 
-            height: 350px; 
-            background-size: cover; 
-            background-position: center; 
-            display: flex; 
-            align-items: center; 
-            border-radius: 20px; 
-            margin: 40px -50px; 
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1920'); 
+        .banner-full {
+            height: 350px; background-size: cover; background-position: center;
+            display: flex; align-items: center; border-radius: 20px;
+            margin: 40px -50px;
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1920');
         }
 
-        /* ===== TENDENCIAS ===== */
-        .trend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; height: 500px; }
-        .trend-item { position: relative; overflow: hidden; border-radius: 15px; cursor: pointer; }
-        .trend-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .trend-item:hover img { transform: scale(1.1); }
-        .trend-item:first-child { grid-row: span 2; }
-        .trend-item:last-child { grid-column: span 2; }
-        .trend-overlay { position: absolute; bottom: 20px; left: 20px; color: white; font-weight: bold; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+        /* ===== TENDENCIAS / MARCAS ===== */
+        .trend-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 180px; gap: 16px; }
+        .trend-item {
+            position: relative; overflow: hidden;
+            border-radius: 18px; cursor: pointer;
+            background-size: cover; background-position: center;
+            transition: all .4s ease;
+            text-decoration: none; color: #fff;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 22px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+        }
+        .trend-item::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,.65));
+            transition: all .4s ease; z-index: 1;
+        }
+        .trend-item:hover { transform: translateY(-6px); box-shadow: 0 14px 40px rgba(225,0,152,.2); }
+        .trend-item:hover::before { background: linear-gradient(180deg, transparent 20%, rgba(0,0,0,.8)); }
+        .trend-item .t-icon {
+            position: absolute; top: 20px; right: 20px; z-index: 2;
+            width: 42px; height: 42px; border-radius: 50%;
+            background: rgba(255,255,255,.2); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.2rem;
+            border: 1px solid rgba(255,255,255,.3);
+        }
+        .trend-item .t-initial {
+            position: absolute; top: 22px; left: 22px; z-index: 2;
+            width: 54px; height: 54px; border-radius: 14px;
+            background: rgba(255,255,255,.95); color: #1a1a2e;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,.2);
+            transition: transform .3s ease;
+        }
+        .trend-item:hover .t-initial { transform: scale(1.08) rotate(-4deg); }
+        .trend-item .t-name {
+            position: relative; z-index: 2;
+            font-weight: 800; font-size: 1.15rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,.4);
+            text-transform: uppercase; letter-spacing: .5px;
+        }
+        .trend-item .t-parent {
+            position: relative; z-index: 2;
+            font-size: .7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: #FFD700; margin-bottom: 4px;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .trend-item .t-count {
+            position: relative; z-index: 2;
+            font-size: .75rem; opacity: .9;
+            margin-top: 4px; display: flex; align-items: center; gap: 6px;
+        }
+        .trend-item .t-count i { font-size: .8rem; color: #FFD700; }
+        .trend-item .t-arrow {
+            position: relative; z-index: 2;
+            margin-top: 10px;
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: .72rem; font-weight: 700; color: #FFD700;
+            opacity: 0; transform: translateY(6px);
+            transition: all .3s ease;
+        }
+        .trend-item:hover .t-arrow { opacity: 1; transform: translateY(0); }
+        .trend-item.trend-large { grid-column: span 2; grid-row: span 2; }
+        .trend-item.trend-wide  { grid-column: span 2; }
+        .trend-bg-1 { background: linear-gradient(135deg, #e10098, #c00080); }
+        .trend-bg-2 { background: linear-gradient(135deg, #0284c7, #0369a1); }
+        .trend-bg-3 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .trend-bg-4 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .trend-bg-5 { background: linear-gradient(135deg, #10b981, #047857); }
+        .trend-bg-6 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+        /* ============================================================
+           ⭐ GRID 2 COLUMNAS: MESA REGALOS + MARKETPLACE
+           ============================================================ */
+        .duo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 40px 0;
+        }
+        .duo-card {
+            border-radius: 24px; padding: 40px 34px;
+            position: relative; overflow: hidden; color: #fff;
+            min-height: 340px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .duo-card::before {
+            content: ''; position: absolute; top: -60%; right: -20%;
+            width: 380px; height: 380px;
+            background: radial-gradient(circle, rgba(255,255,255,.18), transparent 70%);
+            pointer-events: none;
+        }
+        .duo-card::after {
+            content: ''; position: absolute; bottom: -70%; left: -10%;
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(255,255,255,.1), transparent 70%);
+            pointer-events: none;
+        }
+        .duo-card.registry { background: linear-gradient(135deg, #e10098 0%, #c00080 100%); }
+        .duo-card.market   { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); }
+        .duo-card .duo-icon {
+            width: 60px; height: 60px; border-radius: 18px;
+            background: rgba(255,255,255,.2); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.7rem; color: #FFD700;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255,255,255,.25);
+        }
+        .duo-card.market .duo-icon { color: #fbbf24; }
+        .duo-card h3 {
+            font-weight: 900; font-size: 1.6rem;
+            margin-bottom: 10px; color: #fff; line-height: 1.15;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .duo-card p {
+            font-size: .92rem; opacity: .95;
+            line-height: 1.6; margin-bottom: 20px;
+            color: rgba(255,255,255,.95);
+            position: relative; z-index: 1;
+        }
+        .duo-card p strong { color: #FFD700; }
+        .duo-card.market p strong { color: #fbbf24; }
+        .duo-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 22px; position: relative; z-index: 1; }
+        .duo-chip {
+            background: rgba(255,255,255,.2);
+            border: 1px solid rgba(255,255,255,.3);
+            color: #fff; padding: 5px 12px; border-radius: 50px;
+            font-size: .7rem; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .duo-cta {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 26px; border-radius: 50px;
+            font-weight: 800; font-size: .85rem;
+            text-decoration: none; border: none; cursor: pointer;
+            transition: all .25s ease;
+            position: relative; z-index: 1; width: fit-content;
+        }
+        .duo-card.registry .duo-cta { background: #FFD700; color: #1a1a2e; box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+        .duo-card.registry .duo-cta:hover { background: #ffed4e; color: #1a1a2e; transform: translateY(-3px); }
+        .duo-card.market .duo-cta { background: #fbbf24; color: #1a1a2e; box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+        .duo-card.market .duo-cta:hover { background: #fcd34d; color: #1a1a2e; transform: translateY(-3px); }
+        .duo-secondary {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 12px 22px; border-radius: 50px;
+            font-weight: 700; font-size: .82rem;
+            text-decoration: none; border: 2px solid rgba(255,255,255,.3);
+            color: #fff; background: transparent;
+            transition: all .2s ease;
+            position: relative; z-index: 1; margin-left: 8px;
+        }
+        .duo-secondary:hover { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.5); }
+
+        /* ============================================================
+           ⭐ VIDEO HERO
+           ============================================================ */
+        .video-hero {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            min-height: 520px;
+            display: flex; align-items: center;
+            margin: 60px 0 30px;
+            box-shadow: 0 24px 60px rgba(0,0,0,.25);
+            isolation: isolate;
+        }
+        .video-hero video {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+        .video-hero::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                linear-gradient(90deg, rgba(15,15,30,.88) 0%, rgba(15,15,30,.55) 50%, rgba(15,15,30,.25) 100%),
+                radial-gradient(circle at 80% 30%, rgba(225,0,152,.35), transparent 55%);
+            z-index: 1;
+        }
+        .video-hero-inner {
+            position: relative; z-index: 2;
+            padding: 60px 55px;
+            max-width: 640px;
+            color: #fff;
+        }
+        .video-hero-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(225,0,152,.9);
+            color: #fff; padding: 7px 18px; border-radius: 50px;
+            font-size: .72rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 24px rgba(225,0,152,.5);
+        }
+        .video-hero h2 {
+            font-weight: 900; font-size: 3rem;
+            line-height: 1.05; margin-bottom: 16px;
+            color: #fff; letter-spacing: -.5px;
+        }
+        .video-hero h2 span {
+            background: linear-gradient(135deg, #fbbf24, #e10098);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .video-hero p {
+            font-size: 1.05rem; line-height: 1.65;
+            color: rgba(255,255,255,.85);
+            margin-bottom: 28px; max-width: 520px;
+        }
+        .video-hero p strong { color: #fbbf24; }
+        .video-hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+        .video-hero-cta-primary {
+            background: linear-gradient(135deg, #e10098, #c00080);
+            color: #fff; padding: 15px 34px; border-radius: 50px;
+            font-weight: 800; font-size: .92rem;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+            box-shadow: 0 12px 36px rgba(225,0,152,.5);
+            transition: all .25s ease; border: none; cursor: pointer;
+        }
+        .video-hero-cta-primary:hover { transform: translateY(-3px); color: #fff; box-shadow: 0 16px 46px rgba(225,0,152,.7); }
+        .video-hero-cta-secondary {
+            background: rgba(255,255,255,.12);
+            border: 2px solid rgba(255,255,255,.3);
+            backdrop-filter: blur(10px);
+            color: #fff; padding: 15px 32px; border-radius: 50px;
+            font-weight: 800; font-size: .92rem;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+            transition: all .25s ease;
+        }
+        .video-hero-cta-secondary:hover { background: rgba(255,255,255,.22); color: #fff; border-color: rgba(255,255,255,.5); }
+        .video-hero-stats {
+            position: absolute; bottom: 30px; right: 40px; z-index: 2;
+            display: flex; gap: 12px;
+        }
+        .video-hero-stat {
+            background: rgba(255,255,255,.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 16px; padding: 12px 20px;
+            color: #fff; text-align: center;
+        }
+        .video-hero-stat .val { font-weight: 900; font-size: 1.3rem; color: #fbbf24; line-height: 1; }
+        .video-hero-stat .lbl { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: .85; margin-top: 4px; }
+
+        /* ============================================================
+           ⭐ MOSAICO DE IMÁGENES
+           ============================================================ */
+        .mosaic-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 280px;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .mosaic-item {
+            position: relative; overflow: hidden;
+            border-radius: 20px;
+            background-size: cover; background-position: center;
+            box-shadow: 0 6px 24px rgba(0,0,0,.08);
+            transition: all .5s ease;
+            cursor: pointer;
+        }
+        .mosaic-item::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.6));
+            transition: all .5s ease;
+        }
+        .mosaic-item:hover { transform: scale(1.03); box-shadow: 0 16px 40px rgba(225,0,152,.25); }
+        .mosaic-item:hover::before { background: linear-gradient(180deg, transparent 25%, rgba(0,0,0,.8)); }
+        .mosaic-item .mosaic-caption {
+            position: absolute; bottom: 20px; left: 20px; right: 20px;
+            color: #fff; z-index: 1;
+        }
+        .mosaic-item .mosaic-caption .mini {
+            font-size: .68rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: #fbbf24; margin-bottom: 4px;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .mosaic-item .mosaic-caption .big {
+            font-weight: 900; font-size: 1.25rem;
+            line-height: 1.15; text-shadow: 0 2px 10px rgba(0,0,0,.5);
+        }
+        .mosaic-item.m1 { background-image: url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=900'); }
+        .mosaic-item.m2 { background-image: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=900'); }
+        .mosaic-item.m3 { background-image: url('https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=900'); }
+        .mosaic-item.m4 { background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=900'); }
 
         /* ===== MARQUEE ===== */
         .marquee-banner { background: var(--orion-primary); color: white; padding: 10px 0; overflow: hidden; white-space: nowrap; font-weight: bold; font-size: 0.9rem; }
         .marquee-text { display: inline-block; animation: marquee 20s linear infinite; }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* ===== TARJETAS DESTACADAS ===== */
         .featured-card { border-radius: 20px; overflow: hidden; transition: 0.4s; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .featured-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(225, 0, 152, 0.2); }
-
         .brand-logo { font-weight: 900; font-size: 2.3rem; color: var(--orion-primary) !important; letter-spacing: -1.5px; }
         .top-nav { font-size: 0.85rem; background: #f8f9fa; border-bottom: 1px solid #eee; }
         .user-avatar { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 2px solid var(--orion-primary); }
 
-        /* ===== PROMOCIONES ===== */
+        /* VIP */
+        .vip-welcome {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 50%, #0f3460 100%);
+            border-radius: 24px; padding: 0; position: relative; overflow: hidden;
+            margin: 40px 0; box-shadow: 0 20px 60px rgba(0,0,0,.15);
+        }
+        .vip-welcome::before {
+            content: ''; position: absolute; top: -50%; right: -10%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(225,0,152,.25), transparent 70%);
+            pointer-events: none;
+        }
+        .vip-welcome::after {
+            content: ''; position: absolute; bottom: -50%; left: -5%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(251,191,36,.15), transparent 70%);
+            pointer-events: none;
+        }
+        .vip-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 380px 1fr; gap: 0; }
+        .vip-side { padding: 40px 35px; border-right: 1px solid rgba(255,255,255,.08); display: flex; flex-direction: column; justify-content: center; }
+        .vip-side .vip-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a1a2e; padding: 6px 16px; border-radius: 50px;
+            font-size: .72rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px;
+            width: fit-content; margin-bottom: 18px;
+        }
+        .vip-side h2 { font-weight: 900; font-size: 2rem; color: #fff; margin-bottom: 6px; line-height: 1.1; }
+        .vip-side h2 span {
+            background: linear-gradient(135deg, #e10098, #fbbf24);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .vip-side p { color: rgba(255,255,255,.7); font-size: .88rem; margin-bottom: 24px; }
+        .vip-code-box {
+            background: rgba(255,255,255,.05);
+            border: 2px dashed rgba(251,191,36,.5);
+            border-radius: 16px; padding: 16px 20px;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+        .vip-code-box .code-label {
+            font-size: .65rem; color: rgba(255,255,255,.5);
+            text-transform: uppercase; letter-spacing: 1px;
+            font-weight: 700; margin-bottom: 2px;
+        }
+        .vip-code-box .code-value {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem; font-weight: 800;
+            color: #fbbf24; letter-spacing: 1px;
+        }
+        .vip-copy-btn {
+            background: rgba(251,191,36,.15);
+            border: 1px solid rgba(251,191,36,.3);
+            color: #fbbf24;
+            width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all .2s;
+        }
+        .vip-copy-btn:hover { background: #fbbf24; color: #1a1a2e; }
+        .vip-main { padding: 40px 35px; }
+        .vip-main-title { display: flex; align-items: center; gap: 10px; color: #fff; font-size: 1.05rem; font-weight: 800; margin-bottom: 20px; }
+        .vip-main-title i { color: #fbbf24; }
+        .vip-main-title .ver-todas { margin-left: auto; color: #fbbf24; font-size: .78rem; font-weight: 700; text-decoration: none; }
+        .vip-main-title .ver-todas:hover { text-decoration: underline; }
+        .vip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+        .vip-prod {
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 14px; overflow: hidden;
+            text-decoration: none; color: #fff;
+            transition: all .3s ease;
+            display: flex; flex-direction: column;
+        }
+        .vip-prod:hover {
+            transform: translateY(-4px);
+            border-color: rgba(251,191,36,.4);
+            box-shadow: 0 12px 30px rgba(225,0,152,.2);
+            color: #fff;
+        }
+        .vip-prod-img { width: 100%; height: 130px; object-fit: cover; background: rgba(255,255,255,.03); display: block; }
+        .vip-prod-img-placeholder {
+            width: 100%; height: 130px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, rgba(225,0,152,.15), rgba(251,191,36,.1));
+            color: rgba(255,255,255,.4); font-size: 2.2rem;
+        }
+        .vip-prod-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+        .vip-prod-name {
+            font-size: .82rem; font-weight: 700; color: #fff; margin: 0;
+            overflow: hidden; text-overflow: ellipsis;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.3; min-height: 2.1em;
+        }
+        .vip-prod-price { color: #fbbf24; font-weight: 800; font-size: .95rem; }
+        .vip-prod-price small { color: rgba(255,255,255,.5); font-weight: 500; font-size: .7rem; }
+
+        /* TOP SELLERS */
+        .top-sellers-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 20px; }
+        .top-seller {
+            position: relative; border-radius: 22px; overflow: hidden;
+            min-height: 340px;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            text-decoration: none; color: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,.1);
+            transition: all .4s ease; padding: 28px;
+            isolation: isolate;
+        }
+        .top-seller::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,.75));
+            z-index: 1;
+        }
+        .top-seller:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(225,0,152,.25); }
+        .top-seller:hover .ts-img { transform: scale(1.08); }
+        .ts-img { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s ease; z-index: 0; }
+        .ts-bg-1 { background-image: linear-gradient(135deg, #e10098, #c00080); }
+        .ts-bg-2 { background-image: linear-gradient(135deg, #0284c7, #0369a1); }
+        .ts-bg-3 { background-image: linear-gradient(135deg, #f59e0b, #d97706); }
+        .ts-bg-4 { background-image: linear-gradient(135deg, #10b981, #047857); }
+        .ts-bg-5 { background-image: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .ts-bg-6 { background-image: linear-gradient(135deg, #ef4444, #dc2626); }
+        .ts-badge {
+            position: absolute; top: 20px; left: 20px; z-index: 2;
+            background: #fbbf24; color: #1a1a2e;
+            padding: 6px 14px; border-radius: 50px;
+            font-size: .7rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: .5px;
+            display: inline-flex; align-items: center; gap: 6px;
+            box-shadow: 0 4px 14px rgba(0,0,0,.2);
+        }
+        .ts-rank {
+            position: absolute; top: 20px; right: 20px; z-index: 2;
+            width: 46px; height: 46px; border-radius: 50%;
+            background: rgba(255,255,255,.15); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,.25);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1.2rem; color: #fff;
+        }
+        .ts-content { position: relative; z-index: 2; }
+        .ts-cat {
+            font-size: .7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: #fbbf24; margin-bottom: 6px;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .ts-name { font-weight: 900; font-size: 1.3rem; line-height: 1.15; margin-bottom: 8px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.4); }
+        .ts-price { font-weight: 900; font-size: 1.3rem; color: #fbbf24; margin-bottom: 12px; }
+        .ts-price small { color: rgba(255,255,255,.6); font-size: .75rem; font-weight: 500; }
+        .ts-cta {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,.95); color: #1a1a2e;
+            padding: 8px 18px; border-radius: 50px;
+            font-size: .78rem; font-weight: 800;
+            transition: all .25s;
+        }
+        .top-seller:hover .ts-cta { background: #fbbf24; transform: translateX(4px); }
+
+        /* EXPERIENCE */
+        .experience-banner {
+            position: relative; overflow: hidden;
+            border-radius: 24px; min-height: 420px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #e10098 130%);
+            display: flex; align-items: center; padding: 0;
+            box-shadow: 0 20px 60px rgba(0,0,0,.2);
+        }
+        .experience-banner::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(225,0,152,.35), transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(251,191,36,.25), transparent 45%);
+            pointer-events: none;
+        }
+        .experience-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0; width: 100%; }
+        .experience-text { padding: 55px 50px; display: flex; flex-direction: column; justify-content: center; }
+        .experience-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, #e10098, #fbbf24);
+            color: #fff; padding: 7px 18px; border-radius: 50px;
+            font-size: .72rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            width: fit-content; margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(225,0,152,.35);
+        }
+        .experience-text h2 { font-weight: 900; font-size: 2.4rem; color: #fff; line-height: 1.1; margin-bottom: 14px; }
+        .experience-text h2 span {
+            background: linear-gradient(135deg, #fbbf24, #e10098);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .experience-text p { color: rgba(255,255,255,.75); font-size: 1rem; line-height: 1.65; max-width: 480px; margin-bottom: 26px; }
+        .experience-text p strong { color: #fbbf24; }
+        .experience-features { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
+        .experience-feature {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.12);
+            padding: 8px 16px; border-radius: 50px;
+            font-size: .78rem; font-weight: 700; color: #fff;
+        }
+        .experience-feature i { color: #fbbf24; font-size: .95rem; }
+        .experience-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-experience-primary {
+            background: linear-gradient(135deg, #e10098, #c00080);
+            color: #fff; padding: 14px 30px; border-radius: 50px;
+            font-weight: 800; font-size: .9rem;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+            border: none; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(225,0,152,.4);
+            transition: all .25s ease;
+        }
+        .btn-experience-primary:hover { transform: translateY(-3px); color: #fff; box-shadow: 0 14px 40px rgba(225,0,152,.55); }
+        .btn-experience-secondary {
+            background: rgba(255,255,255,.1);
+            border: 2px solid rgba(255,255,255,.25);
+            color: #fff; padding: 14px 30px; border-radius: 50px;
+            font-weight: 800; font-size: .9rem;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+            transition: all .25s ease;
+        }
+        .btn-experience-secondary:hover { background: rgba(255,255,255,.2); color: #fff; border-color: rgba(255,255,255,.5); }
+        .experience-visual { position: relative; display: flex; align-items: center; justify-content: center; padding: 40px; }
+        .experience-thumb {
+            position: relative; width: 100%; max-width: 420px;
+            aspect-ratio: 4 / 5; border-radius: 24px;
+            background: linear-gradient(135deg, #e10098, #fbbf24);
+            background-size: cover; background-position: center;
+            background-image:
+                linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.55)),
+                url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=900');
+            box-shadow: 0 30px 60px rgba(0,0,0,.4);
+            overflow: hidden; cursor: pointer; transition: transform .35s ease;
+        }
+        .experience-thumb:hover { transform: scale(1.03) rotate(-1deg); }
+        .experience-thumb::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,.4));
+            pointer-events: none;
+        }
+        .play-btn {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px; height: 90px; border-radius: 50%;
+            background: rgba(255,255,255,.95); color: #e10098;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; box-shadow: 0 15px 40px rgba(0,0,0,.3);
+            z-index: 2; transition: all .3s ease; border: none; cursor: pointer;
+        }
+        .play-btn::before {
+            content: ''; position: absolute; inset: -12px;
+            border-radius: 50%; border: 3px solid rgba(255,255,255,.5);
+            animation: playPulse 2s ease-out infinite;
+        }
+        @keyframes playPulse {
+            0%   { transform: scale(1);   opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        .experience-thumb:hover .play-btn { background: #fbbf24; color: #1a1a2e; transform: translate(-50%, -50%) scale(1.08); }
+        .experience-thumb-label { position: absolute; bottom: 24px; left: 24px; right: 24px; z-index: 2; color: #fff; }
+        .experience-thumb-label .mini-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(251,191,36,.95); color: #1a1a2e;
+            padding: 5px 12px; border-radius: 50px;
+            font-size: .68rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .experience-thumb-label .title { font-weight: 900; font-size: 1.15rem; text-shadow: 0 2px 10px rgba(0,0,0,.5); line-height: 1.2; }
+        .experience-thumb-label .sub { font-size: .78rem; opacity: .9; margin-top: 4px; }
+        .floating-stat {
+            position: absolute; background: #fff; border-radius: 16px;
+            padding: 12px 18px; box-shadow: 0 12px 30px rgba(0,0,0,.15);
+            display: flex; align-items: center; gap: 12px; z-index: 3;
+        }
+        .floating-stat .fs-icon {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: linear-gradient(135deg, #e10098, #c00080);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+        }
+        .floating-stat.gold .fs-icon { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+        .floating-stat .fs-value { font-weight: 900; color: #1a1a2e; font-size: 1rem; line-height: 1; }
+        .floating-stat .fs-label { font-size: .68rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+        .floating-stat.fs-top { top: 40px; left: -10px; animation: floatUpDown 3s ease-in-out infinite; }
+        .floating-stat.fs-bottom { bottom: 60px; right: -10px; animation: floatUpDown 3.5s ease-in-out infinite reverse; }
+        @keyframes floatUpDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* PROMOS */
         .promo-card {
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            border: none;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            position: relative;
-            background: white;
-            height: 100%;
+            border-radius: 16px; overflow: hidden; transition: all 0.4s ease;
+            border: none; box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            position: relative; background: white; height: 100%;
         }
         .promo-card:hover { transform: translateY(-8px); box-shadow: 0 15px 40px rgba(225,0,152,0.15); }
         .promo-card .promo-img { height: 200px; object-fit: cover; width: 100%; }
         .promo-card .promo-badge {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: var(--orion-discount);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            z-index: 2;
+            position: absolute; top: 15px; left: 15px;
+            background: var(--orion-discount); color: white;
+            padding: 6px 14px; border-radius: 50px;
+            font-weight: 700; font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 0.5px; z-index: 2;
         }
         .promo-card .promo-badge.vip { background: #f9a825; color: #1a1a2e; }
         .promo-card .promo-badge.envio { background: #2e7d32; }
@@ -100,637 +642,207 @@
         .promo-card .promo-body h5 { font-weight: 800; font-size: 1.1rem; }
         .promo-card .promo-body .promo-desc { color: #666; font-size: 0.85rem; }
         .promo-card .promo-body .promo-code {
-            background: #f5f5f5;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: var(--orion-primary);
-            display: inline-block;
-            letter-spacing: 1px;
+            background: #f5f5f5; padding: 8px 16px; border-radius: 8px;
+            font-weight: 700; font-size: 0.85rem; color: var(--orion-primary);
+            display: inline-block; letter-spacing: 1px;
         }
         .promo-card .promo-body .btn-aplicar {
-            background: var(--orion-primary);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 50px;
-            border: none;
-            font-weight: 700;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            background: var(--orion-primary); color: white;
+            padding: 8px 20px; border-radius: 50px; border: none;
+            font-weight: 700; font-size: 0.8rem;
+            transition: all 0.3s ease; cursor: pointer;
         }
         .promo-card .promo-body .btn-aplicar:hover {
-            background: #c00080;
-            transform: scale(1.05);
+            background: #c00080; transform: scale(1.05);
             box-shadow: 0 4px 15px rgba(225,0,152,0.3);
         }
-        .promo-card .promo-body .btn-aplicar:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
 
-        /* ===== TOAST ===== */
+        /* TOAST */
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .toast-message {
-            padding: 15px 25px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            margin-bottom: 10px;
+            padding: 15px 25px; border-radius: 12px; color: white;
+            font-weight: 600; margin-bottom: 10px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.15);
             animation: slideIn 0.4s ease;
         }
         .toast-message.success { background: #2e7d32; }
         .toast-message.error { background: #c62828; }
         .toast-message.warning { background: #f9a825; color: #1a1a2e; }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-
-        /* ===== VIDEO ===== */
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-        }
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 
         .banner-promo {
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            background-size: cover;
-            background-position: center;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            padding: 40px;
+            border-radius: 20px; overflow: hidden; transition: all 0.4s ease;
+            background-size: cover; background-position: center;
+            min-height: 200px; display: flex; align-items: center; padding: 40px;
         }
         .banner-promo:hover { transform: scale(1.02); }
 
-        /* ============================================================
-           ⭐ MESA DE REGALOS — HOME
-           ============================================================ */
-        .registry-section {
-            background: linear-gradient(135deg, #e10098 0%, #c00080 100%);
-            border-radius: 24px;
-            padding: 48px 40px;
-            position: relative;
-            overflow: hidden;
-            color: #fff;
-            margin: 40px 0;
-        }
-        .registry-section::before {
-            content: '';
-            position: absolute;
-            top: -60%; right: -10%;
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%);
-            pointer-events: none;
-        }
-        .registry-section::after {
-            content: '';
-            position: absolute;
-            bottom: -80%; left: -5%;
-            width: 350px; height: 350px;
-            background: radial-gradient(circle, rgba(255,255,255,.1), transparent 70%);
-            pointer-events: none;
-        }
-        .registry-inner {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-        .registry-text { flex: 1; min-width: 280px; }
-        .registry-text h2 {
-            font-weight: 900;
-            font-size: 2.2rem;
-            margin-bottom: 12px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .registry-text h2 i { color: #FFD700; }
-        .registry-text p {
-            font-size: 1rem;
-            opacity: .95;
-            line-height: 1.6;
-            max-width: 620px;
-            color: #fff;
-            margin-bottom: 24px;
-        }
-        .registry-text p strong { color: #FFD700; }
-        .registry-cta {
-            background: #FFD700;
-            color: #1a1a2e;
-            border: none;
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: .95rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all .25s ease;
-            box-shadow: 0 8px 24px rgba(0,0,0,.15);
-        }
-        .registry-cta:hover {
-            background: #ffed4e;
-            color: #1a1a2e;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0,0,0,.25);
-        }
-        .registry-benefits {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: rgba(255,255,255,.12);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,.22);
-            border-radius: 20px;
-            padding: 24px 28px;
-            min-width: 260px;
-        }
-        .registry-benefit {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: .88rem;
-            font-weight: 600;
-            color: #fff;
-        }
-        .registry-benefit i {
-            width: 36px; height: 36px;
-            background: rgba(255,255,255,.2);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
-            color: #FFD700;
-            flex-shrink: 0;
-        }
+        .top-nav .mkt-link { color: #0284c7 !important; font-weight: 700; }
+        .top-nav .mkt-link:hover { color: #0369a1 !important; }
 
-        /* Event type chips (mini) */
-        .event-chips {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 16px;
-        }
-        .event-chip {
-            background: rgba(255,255,255,.2);
-            border: 1px solid rgba(255,255,255,.3);
-            color: #fff;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: .75rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all .2s;
-        }
-        .event-chip:hover {
-            background: rgba(255,255,255,.35);
-            color: #fff;
-            transform: translateY(-2px);
-        }
-
-        /* ============================================================
-           ⭐ MARKETPLACE — HOME (NUEVO)
-           ============================================================ */
-        .marketplace-section {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            border-radius: 24px;
-            padding: 48px 40px;
-            position: relative;
-            overflow: hidden;
-            color: #fff;
-            margin: 40px 0;
-        }
-        .marketplace-section::before {
-            content: '';
-            position: absolute;
-            top: -60%; right: -10%;
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(255,255,255,.15), transparent 70%);
-            pointer-events: none;
-        }
-        .marketplace-section::after {
-            content: '';
-            position: absolute;
-            bottom: -80%; left: -5%;
-            width: 350px; height: 350px;
-            background: radial-gradient(circle, rgba(255,255,255,.1), transparent 70%);
-            pointer-events: none;
-        }
-        .marketplace-inner {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-        .marketplace-text { flex: 1; min-width: 280px; }
-        .marketplace-text h2 {
-            font-weight: 900;
-            font-size: 2.2rem;
-            margin-bottom: 12px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .marketplace-text h2 i { color: #fbbf24; }
-        .marketplace-text p {
-            font-size: 1rem;
-            opacity: .95;
-            line-height: 1.6;
-            max-width: 620px;
-            color: #fff;
-            margin-bottom: 24px;
-        }
-        .marketplace-text p strong { color: #fbbf24; }
-        .marketplace-cta {
-            background: #fbbf24;
-            color: #1a1a2e;
-            border: none;
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: .95rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all .25s ease;
-            box-shadow: 0 8px 24px rgba(0,0,0,.15);
-        }
-        .marketplace-cta:hover {
-            background: #fcd34d;
-            color: #1a1a2e;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0,0,0,.25);
-        }
-        .marketplace-cta.secondary {
-            background: rgba(255,255,255,.2);
-            color: #fff;
-            box-shadow: none;
-        }
-        .marketplace-cta.secondary:hover {
-            background: rgba(255,255,255,.35);
-            color: #fff;
-        }
-        .marketplace-benefits {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: rgba(255,255,255,.12);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,.22);
-            border-radius: 20px;
-            padding: 24px 28px;
-            min-width: 260px;
-        }
-        .marketplace-benefit {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: .88rem;
-            font-weight: 600;
-            color: #fff;
-        }
-        .marketplace-benefit i {
-            width: 36px; height: 36px;
-            background: rgba(255,255,255,.2);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
-            color: #fbbf24;
-            flex-shrink: 0;
-        }
-        .marketplace-chips {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 16px;
-        }
-        .marketplace-chip {
-            background: rgba(255,255,255,.2);
-            border: 1px solid rgba(255,255,255,.3);
-            color: #fff;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: .75rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all .2s;
-        }
-        .marketplace-chip:hover {
-            background: rgba(255,255,255,.35);
-            color: #fff;
-            transform: translateY(-2px);
-        }
-        /* Link top-nav marketplace */
-        .top-nav .mkt-link {
-            color: #0284c7 !important;
-            font-weight: 700;
-        }
-        .top-nav .mkt-link:hover {
-            color: #0369a1 !important;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .hero-slide { height: 350px; }
-            .trend-grid { height: 350px; }
-            .banner-full { margin: 20px 0; height: 250px; }
-            .promo-card .promo-img { height: 150px; }
-            .registry-section { padding: 32px 24px; border-radius: 18px; }
-            .registry-text h2 { font-size: 1.6rem; }
-            .registry-text p { font-size: .9rem; }
-            .registry-cta { width: 100%; justify-content: center; }
-            .marketplace-section { padding: 32px 24px; border-radius: 18px; }
-            .marketplace-text h2 { font-size: 1.6rem; }
-            .marketplace-text p { font-size: .9rem; }
-            .marketplace-cta { width: 100%; justify-content: center; }
-        }
-        @media (max-width: 576px) {
-            .hero-slide { height: 250px; }
-            .trend-grid { grid-template-columns: 1fr 1fr; height: auto; }
-            .trend-item:first-child { grid-row: span 1; }
-            .trend-item:last-child { grid-column: span 2; }
-            .trend-item { height: 150px; }
-            .banner-promo { padding: 20px; min-height: 150px; }
-            .registry-section { padding: 24px 18px; }
-            .registry-text h2 { font-size: 1.3rem; }
-            .marketplace-section { padding: 24px 18px; }
-            .marketplace-text h2 { font-size: 1.3rem; }
-        }
-
-        /* ===== BADGE CARRITO ===== */
+        /* CARRITO */
         .badge-cart {
-            font-size: 0.55rem;
-            padding: 0.2rem 0.45rem;
-            background: var(--orion-primary) !important;
-            color: #fff !important;
-            border-radius: 50% !important;
-            border: 2px solid #fff;
+            font-size: 0.55rem; padding: 0.2rem 0.45rem;
+            background: var(--orion-primary) !important; color: #fff !important;
+            border-radius: 50% !important; border: 2px solid #fff;
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         .nav-icon-carrito {
-            position: relative;
-            display: inline-block;
-            color: #333;
-            text-decoration: none;
-            font-size: 1.4rem;
+            position: relative; display: inline-block;
+            color: #333; text-decoration: none; font-size: 1.4rem;
             transition: 0.2s;
         }
         .nav-icon-carrito:hover { color: var(--orion-primary); }
-        .nav-icon-carrito .badge-cart {
-            position: absolute;
-            top: -8px;
-            right: -10px;
+        .nav-icon-carrito .badge-cart { position: absolute; top: -8px; right: -10px; }
+
+        /* AUTOCOMPLETADO */
+        .search-wrapper { max-width: 680px; min-width: 260px; position: relative; }
+        .search-container {
+            border: 2px solid #eee !important; border-radius: 50px;
+            overflow: hidden; background: #f8f9fa; transition: all 0.25s ease;
         }
-        /* ============================================================
-   AUTOCOMPLETADO DE BÚSQUEDA — ORION
-   ============================================================ */
-.search-wrapper {
-    max-width: 680px;
-    min-width: 260px;
-    position: relative;
-}
+        .search-wrapper:focus-within .search-container {
+            border-color: var(--orion-primary, #e10098) !important;
+            box-shadow: 0 0 0 4px rgba(225, 0, 152, 0.08); background: #fff;
+        }
+        .autocomplete-dropdown {
+            position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid #f0f0f0; max-height: 480px;
+            overflow-y: auto; z-index: 1050;
+            animation: acFadeIn 0.18s ease;
+        }
+        @keyframes acFadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        .autocomplete-dropdown::-webkit-scrollbar { width: 6px; }
+        .autocomplete-dropdown::-webkit-scrollbar-thumb { background: #e10098; border-radius: 10px; }
+        .autocomplete-loading, .autocomplete-empty { padding: 18px 20px; font-size: 0.85rem; color: #888; text-align: center; }
+        .autocomplete-loading i, .autocomplete-empty i { color: #e10098; margin-right: 6px; }
+        .autocomplete-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 16px; text-decoration: none; color: #333;
+            transition: background 0.15s ease; cursor: pointer;
+            border: none; width: 100%; text-align: left;
+        }
+        .autocomplete-item:hover, .autocomplete-item.active { background: #fdf2f8; }
+        .autocomplete-item.active { box-shadow: inset 3px 0 0 #e10098; }
+        .autocomplete-item-img {
+            width: 48px; height: 48px; border-radius: 10px;
+            object-fit: cover; background: #f8f8f8;
+            border: 1px solid #eee; flex-shrink: 0;
+        }
+        .autocomplete-item-img.placeholder {
+            display: flex; align-items: center; justify-content: center;
+            color: #ccc; font-size: 1.2rem;
+        }
+        .autocomplete-item-info { flex: 1; min-width: 0; }
+        .autocomplete-item-name {
+            font-weight: 700; font-size: 0.88rem; color: #1a1a2e;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            margin-bottom: 2px;
+        }
+        .autocomplete-item-name mark {
+            background: rgba(225, 0, 152, 0.15); color: #e10098;
+            font-weight: 800; padding: 0 2px; border-radius: 3px;
+        }
+        .autocomplete-item-meta { display: flex; gap: 10px; font-size: 0.72rem; color: #888; flex-wrap: wrap; }
+        .autocomplete-item-meta .marca { color: #e10098; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+        .autocomplete-item-price { font-weight: 800; color: #e10098; font-size: 0.92rem; flex-shrink: 0; margin-left: auto; }
+        .autocomplete-footer {
+            padding: 10px 16px; border-top: 1px solid #f0f0f0;
+            text-align: center; background: #fafafa; border-radius: 0 0 16px 16px;
+        }
+        .autocomplete-footer a { color: #e10098 !important; font-weight: 700; font-size: 0.8rem; text-decoration: none; }
+        .autocomplete-footer a:hover { text-decoration: underline !important; }
 
-.search-container {
-    border: 2px solid #eee !important;
-    border-radius: 50px;
-    overflow: hidden;
-    background: #f8f9fa;
-    transition: all 0.25s ease;
-}
-
-.search-wrapper:focus-within .search-container {
-    border-color: var(--orion-primary, #e10098) !important;
-    box-shadow: 0 0 0 4px rgba(225, 0, 152, 0.08);
-    background: #fff;
-}
-
-.autocomplete-dropdown {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    right: 0;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    border: 1px solid #f0f0f0;
-    max-height: 480px;
-    overflow-y: auto;
-    z-index: 1050;
-    animation: acFadeIn 0.18s ease;
-}
-
-@keyframes acFadeIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-.autocomplete-dropdown::-webkit-scrollbar { width: 6px; }
-.autocomplete-dropdown::-webkit-scrollbar-thumb {
-    background: #e10098;
-    border-radius: 10px;
-}
-
-.autocomplete-loading,
-.autocomplete-empty {
-    padding: 18px 20px;
-    font-size: 0.85rem;
-    color: #888;
-    text-align: center;
-}
-.autocomplete-loading i,
-.autocomplete-empty i {
-    color: #e10098;
-    margin-right: 6px;
-}
-
-.autocomplete-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    text-decoration: none;
-    color: #333;
-    transition: background 0.15s ease;
-    cursor: pointer;
-    border: none;
-    width: 100%;
-    text-align: left;
-}
-
-.autocomplete-item:hover,
-.autocomplete-item.active {
-    background: #fdf2f8;
-}
-
-.autocomplete-item.active {
-    box-shadow: inset 3px 0 0 #e10098;
-}
-
-.autocomplete-item-img {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    object-fit: cover;
-    background: #f8f8f8;
-    border: 1px solid #eee;
-    flex-shrink: 0;
-}
-
-.autocomplete-item-img.placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ccc;
-    font-size: 1.2rem;
-}
-
-.autocomplete-item-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.autocomplete-item-name {
-    font-weight: 700;
-    font-size: 0.88rem;
-    color: #1a1a2e;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-bottom: 2px;
-}
-
-.autocomplete-item-name mark {
-    background: rgba(225, 0, 152, 0.15);
-    color: #e10098;
-    font-weight: 800;
-    padding: 0 2px;
-    border-radius: 3px;
-}
-
-.autocomplete-item-meta {
-    display: flex;
-    gap: 10px;
-    font-size: 0.72rem;
-    color: #888;
-    flex-wrap: wrap;
-}
-
-.autocomplete-item-meta .marca {
-    color: #e10098;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.autocomplete-item-price {
-    font-weight: 800;
-    color: #e10098;
-    font-size: 0.92rem;
-    flex-shrink: 0;
-    margin-left: auto;
-}
-
-.autocomplete-footer {
-    padding: 10px 16px;
-    border-top: 1px solid #f0f0f0;
-    text-align: center;
-    background: #fafafa;
-    border-radius: 0 0 16px 16px;
-}
-
-.autocomplete-footer a {
-    color: #e10098 !important;
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-decoration: none;
-}
-
-.autocomplete-footer a:hover {
-    text-decoration: underline !important;
-}
-
-@media (max-width: 767px) {
-    .search-wrapper { max-width: 100%; }
-    .autocomplete-dropdown { max-height: 60vh; }
-    .autocomplete-item-name { font-size: 0.82rem; }
-    .autocomplete-item-img { width: 40px; height: 40px; }
-}
+        /* RESPONSIVE */
+        @media (max-width: 1100px) {
+            .duo-grid { grid-template-columns: 1fr; }
+            .mosaic-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 240px; }
+            .top-sellers-grid { grid-template-columns: 1fr 1fr; }
+            .experience-inner { grid-template-columns: 1fr; }
+            .experience-visual { padding: 20px 40px 60px; }
+            .video-hero h2 { font-size: 2.4rem; }
+            .video-hero-inner { padding: 50px 40px; }
+            .video-hero-stats { bottom: 20px; right: 20px; }
+        }
+        @media (max-width: 992px) {
+            .trend-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
+            .trend-item.trend-large { grid-column: span 2; grid-row: span 1; }
+            .trend-item.trend-wide  { grid-column: span 2; }
+            .vip-inner { grid-template-columns: 1fr; }
+            .vip-side { border-right: none; border-bottom: 1px solid rgba(255,255,255,.08); }
+        }
+        @media (max-width: 768px) {
+            .hero-slide { height: 350px; }
+            .banner-full { margin: 20px 0; height: 250px; }
+            .promo-card .promo-img { height: 150px; }
+            .duo-card { padding: 32px 24px; border-radius: 18px; }
+            .duo-card h3 { font-size: 1.35rem; }
+            .duo-cta, .duo-secondary { width: 100%; justify-content: center; margin-left: 0; margin-top: 8px; }
+            .video-hero { min-height: 440px; border-radius: 18px; margin: 40px 0 20px; }
+            .video-hero h2 { font-size: 1.9rem; }
+            .video-hero-inner { padding: 40px 28px; }
+            .video-hero-stats { position: static; padding: 0 28px 30px; }
+            .mosaic-grid { grid-template-columns: 1fr; grid-auto-rows: 200px; }
+            .search-wrapper { max-width: 100%; }
+            .autocomplete-dropdown { max-height: 60vh; }
+            .autocomplete-item-name { font-size: 0.82rem; }
+            .autocomplete-item-img { width: 40px; height: 40px; }
+            .top-sellers-grid { grid-template-columns: 1fr; }
+            .top-seller { min-height: 260px; }
+            .experience-banner { min-height: auto; }
+            .experience-text { padding: 32px 24px; }
+            .experience-text h2 { font-size: 1.7rem; }
+            .experience-visual { padding: 0 24px 40px; }
+            .floating-stat.fs-top { left: 10px; top: 20px; }
+            .floating-stat.fs-bottom { right: 10px; bottom: 20px; }
+        }
+        @media (max-width: 576px) {
+            .hero-slide { height: 250px; }
+            .trend-grid { grid-template-columns: 1fr; grid-auto-rows: 150px; }
+            .trend-item.trend-large { grid-column: span 1; grid-row: span 1; }
+            .trend-item.trend-wide  { grid-column: span 1; }
+            .banner-promo { padding: 20px; min-height: 150px; }
+            .vip-side h2 { font-size: 1.5rem; }
+            .video-hero h2 { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- ===== TOAST CONTAINER ===== -->
+    <!-- TOAST -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ===== TOP NAV ===== -->
+    <!-- TOP NAV -->
     <div class="top-nav py-2 text-secondary d-none d-lg-block">
         <div class="container d-flex justify-content-end gap-4">
             <a href="#" class="text-secondary text-decoration-none">Encuentra tu tienda</a>
             <a href="/servicios" class="text-secondary text-decoration-none">Servicios</a>
-            <a href="#" class="text-secondary text-decoration-none">Ayuda</a>
+            <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none">Ayuda</a>
             <a href="{{ url_for('web.mis_cupones') }}" class="text-secondary text-decoration-none">
                 <i class="bi bi-ticket-perforated me-1"></i>Mis cupones
             </a>
-            <!-- ⭐ MESA DE REGALOS -->
             <a href="{{ url_for('web.mis_mesas_regalos') }}" class="text-secondary text-decoration-none fw-semibold" style="color:var(--orion-primary) !important;">
                 <i class="bi bi-gift-fill me-1"></i>Mesa de Regalos
             </a>
-            <!-- ⭐ NUEVO: MARKETPLACE (condicional según sesión) -->
+            <a href="{{ url_for('web.marketplace') }}" class="text-decoration-none mkt-link">
+                <i class="bi bi-shop me-1"></i>Marketplace
+            </a>
             {% if session.get('es_vendedor') %}
                 <a href="{{ url_for('web.marketplace_dashboard') }}" class="text-decoration-none mkt-link">
                     <i class="bi bi-shop-window me-1"></i>Mi tienda
                 </a>
             {% elif session.get('user_id') %}
                 <a href="{{ url_for('web.marketplace_registro') }}" class="text-decoration-none mkt-link">
-                    <i class="bi bi-shop me-1"></i>Vender en ORION
-                </a>
-            {% else %}
-                <a href="{{ url_for('web.marketplace') }}" class="text-decoration-none mkt-link">
-                    <i class="bi bi-shop me-1"></i>Marketplace
+                    <i class="bi bi-box-arrow-in-right me-1"></i>Vender en ORION
                 </a>
             {% endif %}
         </div>
     </div>
 
-    <!-- ===== NAVBAR ===== -->
+    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
         <div class="container">
             <a class="navbar-brand brand-logo" href="/">ORION</a>
@@ -739,94 +851,92 @@
             </button>
             <div class="collapse navbar-collapse" id="orionNavbar">
                 <div class="dropdown mx-lg-4">
-                    <button class="btn btn-white fw-bold text-dark dropdown-toggle border-0" data-bs-toggle="dropdown">Categorías</button>
-                    <ul class="dropdown-menu shadow border-0 py-2" style="min-width: 220px;">
+                    <button class="btn btn-white fw-bold text-dark dropdown-toggle border-0" data-bs-toggle="dropdown">
+                        Categorías
+                    </button>
+                    <ul class="dropdown-menu shadow border-0 py-2" style="min-width: 240px;">
                         {% if categorias %}
                             {% for padre in categorias if not padre.padre_id %}
                             <li class="dropdown-submenu">
-                                <a class="dropdown-item" href="/catalogo?categoria={{padre._id}}">{{ padre.nombre }}</a>
+                                <a class="dropdown-item" href="/catalogo?categoria={{ padre._id }}">{{ padre.nombre }}</a>
+                                {% set hijos = categorias | selectattr('padre_id', 'equalto', padre._id) | list %}
+                                {% if hijos %}
                                 <ul class="dropdown-menu shadow border-0" style="border-radius: 12px;">
-                                    {% for hijo in categorias if hijo.padre_id == padre._id %}
-                                    <li><a class="dropdown-item" href="/catalogo?categoria={{hijo._id}}">{{ hijo.nombre }}</a></li>
+                                    {% for hijo in hijos %}
+                                        {% set nietos = categorias | selectattr('padre_id', 'equalto', hijo._id) | list %}
+                                        {% if nietos %}
+                                        <li class="dropdown-submenu">
+                                            <a class="dropdown-item" href="/catalogo?categoria={{ hijo._id }}">{{ hijo.nombre }}</a>
+                                            <ul class="dropdown-menu shadow border-0" style="border-radius: 12px;">
+                                                {% for nieto in nietos %}
+                                                <li><a class="dropdown-item" href="/catalogo?categoria={{ nieto._id }}">{{ nieto.nombre }}</a></li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                        {% else %}
+                                        <li><a class="dropdown-item" href="/catalogo?categoria={{ hijo._id }}">{{ hijo.nombre }}</a></li>
+                                        {% endif %}
                                     {% endfor %}
                                 </ul>
+                                {% endif %}
                             </li>
                             {% endfor %}
+                        {% else %}
+                            <li class="text-center text-muted py-3 small">Sin categorías</li>
                         {% endif %}
                     </ul>
                 </div>
-                <div class="search-wrapper flex-grow-1">
-    <form action="/catalogo" method="GET" autocomplete="off" id="searchForm">
-        <div class="input-group search-container">
-            <input class="form-control border-0 bg-light ps-4"
-                   type="search" name="q" id="searchInput"
-                   placeholder="Buscar productos..." autocomplete="off">
-            <button class="btn btn-light border-0 text-muted px-3" type="submit">
-                <i class="bi bi-search"></i>
-            </button>
-        </div>
-    </form>
 
-    <div id="autocompleteResults" class="autocomplete-dropdown" style="display:none;">
-        <div id="autocompleteLoading" class="autocomplete-loading" style="display:none;">
-            <i class="bi bi-hourglass-split"></i> Buscando...
-        </div>
-        <div id="autocompleteList"></div>
-        <div id="autocompleteFooter" class="autocomplete-footer" style="display:none;">
-            <a href="#" id="autocompleteVerTodos">
-                Ver todos los resultados <i class="bi bi-arrow-right"></i>
-            </a>
-        </div>
-        <div id="autocompleteEmpty" class="autocomplete-empty" style="display:none;">
-            <i class="bi bi-search"></i> No encontramos productos
-        </div>
-    </div>
-</div>
+                <div class="search-wrapper flex-grow-1">
+                    <form action="/catalogo" method="GET" autocomplete="off" id="searchForm">
+                        <div class="input-group search-container">
+                            <input class="form-control border-0 bg-light ps-4" type="search" name="q" id="searchInput"
+                                   placeholder="Buscar productos..." autocomplete="off">
+                            <button class="btn btn-light border-0 text-muted px-3" type="submit"><i class="bi bi-search"></i></button>
+                        </div>
+                    </form>
+                    <div id="autocompleteResults" class="autocomplete-dropdown" style="display:none;">
+                        <div id="autocompleteLoading" class="autocomplete-loading" style="display:none;"><i class="bi bi-hourglass-split"></i> Buscando...</div>
+                        <div id="autocompleteList"></div>
+                        <div id="autocompleteFooter" class="autocomplete-footer" style="display:none;">
+                            <a href="#" id="autocompleteVerTodos">Ver todos los resultados <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                        <div id="autocompleteEmpty" class="autocomplete-empty" style="display:none;"><i class="bi bi-search"></i> No encontramos productos</div>
+                    </div>
+                </div>
 
                 <div class="ms-3 d-flex align-items-center gap-3">
                     {% if session.get('nombre') %}
                         <a href="/perfil" class="text-dark fw-bold text-decoration-none d-flex align-items-center gap-2">
-                            {% if session.get('foto') %}
-                                <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}?t={{ range(1, 10000) | random }}" class="user-avatar" alt="Perfil">
+                            {% if current_user_foto %}
+                                <img src="{{ foto_src(current_user_foto) }}" class="user-avatar" alt="Perfil">
                             {% else %}
                                 <i class="bi bi-person-circle fs-3"></i>
                             {% endif %}
-                            HOLAAA, {{ session['nombre'] }}
+                            HOLA, {{ session['nombre'] }}
                         </a>
                     {% else %}
                         <a href="/login" class="text-dark fw-bold">INICIAR SESIÓN</a>
                     {% endif %}
-
-                    <!-- ✅ CARRITO CON BADGE DE TOTAL DE UNIDADES -->
                     <a href="{{ url_for('web.ver_carrito') }}" class="nav-icon-carrito">
                         <i class="bi bi-bag"></i>
                         {% set total = total_unidades|default(0) %}
-                        {% if total > 0 %}
-                            <span class="badge-cart">{{ total }}</span>
-                        {% endif %}
+                        {% if total > 0 %}<span class="badge-cart">{{ total }}</span>{% endif %}
                     </a>
-
                     <a href="{{ url_for('web.listar_promociones_cliente') }}" class="btn btn-sm btn-outline-primary rounded-pill d-none d-md-inline-block" style="border-color:var(--orion-primary); color:var(--orion-primary);">
                         <i class="bi bi-gift"></i> Promos
                     </a>
-
-                    <!-- ⭐ NUEVO: Botón Marketplace (visible en navbar) -->
-                    {% if session.get('es_vendedor') %}
-                    <a href="{{ url_for('web.marketplace_dashboard') }}" class="btn btn-sm rounded-pill d-none d-md-inline-block" style="background:#0284c7; color:#fff; font-weight:700;">
-                        <i class="bi bi-shop-window"></i> Mi tienda
-                    </a>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- ===== MARQUEE ===== -->
+    <!-- MARQUEE -->
     <div class="marquee-banner">
         <div class="marquee-text">¡ENVÍOS GRATIS A TODO MÉXICO! • OFERTAS ESPECIALES POR TIEMPO LIMITADO • ¡DESCUBRE LO NUEVO DE ORION! • 🎁 CREA TU MESA DE REGALOS Y RECIBE 10% DE BONIFICACIÓN • 🏪 VENDE EN ORION Y LLEGA A MILES DE CLIENTES</div>
     </div>
 
-    <!-- ===== HERO CAROUSEL ===== -->
+    <!-- HERO CAROUSEL -->
     <div id="orionCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-inner">
             <div class="carousel-item active hero-slide slide-1">
@@ -846,116 +956,138 @@
         </div>
     </div>
 
-    <!-- ===== ⭐ MESA DE REGALOS ===== -->
+    <!-- ============================================================
+         ⭐ VIDEO HERO — Reemplaza "Compra por estilo" + "Ofertas Relámpago"
+         ============================================================ -->
     <section class="container">
-        <div class="registry-section">
-            <div class="registry-inner">
-                <div class="registry-text">
-                    <h2><i class="bi bi-gift-fill"></i> Mesa de Regalos ORION</h2>
-                    <p>
-                        Crea tu lista de regalos para bodas, baby showers, XV años y más.
-                        Compártela con tus invitados y recibe
-                        <strong>10% de bonificación</strong> en tu monedero electrónico.
-                    </p>
-                    <div class="event-chips">
-                        <span class="event-chip"><i class="bi bi-heart-fill"></i> Boda</span>
-                        <span class="event-chip"><i class="bi bi-balloon-fill"></i> Baby Shower</span>
-                        <span class="event-chip"><i class="bi bi-stars"></i> XV Años</span>
-                        <span class="event-chip"><i class="bi bi-cake2-fill"></i> Cumpleaños</span>
-                        <span class="event-chip"><i class="bi bi-droplet-fill"></i> Bautizo</span>
-                    </div>
-                    <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
-                        <a href="{{ url_for('web.crear_mesa_regalos') }}" class="registry-cta">
-                            <i class="bi bi-plus-circle-fill"></i> Crear mi Mesa de Regalos
-                        </a>
-                        <a href="{{ url_for('web.mis_mesas_regalos') }}" class="registry-cta" style="background:rgba(255,255,255,.2); color:#fff; box-shadow:none;">
-                            <i class="bi bi-list-ul"></i> Ver mis mesas
-                        </a>
-                    </div>
+        <div class="video-hero">
+            <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1600">
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" type="video/mp4">
+            </video>
+
+            <div class="video-hero-inner">
+                <span class="video-hero-tag">
+                    <i class="bi bi-play-circle-fill"></i> Vive la experiencia
+                </span>
+                <h2>
+                    Descubre <span>ORION</span>,<br>
+                    tu tienda de confianza.
+                </h2>
+                <p>
+                    Miles de productos, marcas verificadas y envíos a todo México.
+                    Compra fácil, rápido y seguro. <strong>Todo en un solo lugar.</strong>
+                </p>
+                <div class="video-hero-ctas">
+                    <a href="/catalogo" class="video-hero-cta-primary">
+                        <i class="bi bi-bag-fill"></i> Explorar productos
+                    </a>
+                    <a href="{{ url_for('web.listar_promociones_cliente') }}" class="video-hero-cta-secondary">
+                        <i class="bi bi-gift-fill"></i> Ver promociones
+                    </a>
                 </div>
-                <div class="registry-benefits">
-                    <div class="registry-benefit">
-                        <i class="bi bi-percent"></i>
-                        <span>10% de bonificación en monedero</span>
-                    </div>
-                    <div class="registry-benefit">
-                        <i class="bi bi-share-fill"></i>
-                        <span>Link personalizado para invitados</span>
-                    </div>
-                    <div class="registry-benefit">
-                        <i class="bi bi-wallet2"></i>
-                        <span>Fondo de efectivo o regalos físicos</span>
-                    </div>
-                    <div class="registry-benefit">
-                        <i class="bi bi-truck"></i>
-                        <span>Envío gratis a tu casa</span>
-                    </div>
+            </div>
+
+            <div class="video-hero-stats">
+                <div class="video-hero-stat">
+                    <div class="val">+50K</div>
+                    <div class="lbl">Clientes</div>
+                </div>
+                <div class="video-hero-stat">
+                    <div class="val">4.9★</div>
+                    <div class="lbl">Rating</div>
+                </div>
+                <div class="video-hero-stat">
+                    <div class="val">+10K</div>
+                    <div class="lbl">Productos</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mosaico de imágenes (solo visual, sin link al catálogo) -->
+        <div class="mosaic-grid">
+            <div class="mosaic-item m1">
+                <div class="mosaic-caption">
+                    <div class="mini"><i class="bi bi-fire"></i> Tendencia</div>
+                    <div class="big">Moda Urbana</div>
+                </div>
+            </div>
+            <div class="mosaic-item m2">
+                <div class="mosaic-caption">
+                    <div class="mini"><i class="bi bi-star-fill"></i> Top</div>
+                    <div class="big">Sneakers 2026</div>
+                </div>
+            </div>
+            <div class="mosaic-item m3">
+                <div class="mosaic-caption">
+                    <div class="mini"><i class="bi bi-gem"></i> Elegance</div>
+                    <div class="big">Accesorios</div>
+                </div>
+            </div>
+            <div class="mosaic-item m4">
+                <div class="mosaic-caption">
+                    <div class="mini"><i class="bi bi-house-heart-fill"></i> Estilo</div>
+                    <div class="big">Hogar & Deco</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== ⭐ NUEVO: SECCIÓN MARKETPLACE ===== -->
+    <!-- ============================================================
+         MESA DE REGALOS + MARKETPLACE — LADO A LADO
+         ============================================================ -->
     <section class="container">
-        <div class="marketplace-section">
-            <div class="marketplace-inner">
-                <div class="marketplace-text">
-                    <h2><i class="bi bi-shop-window"></i> Marketplace ORION</h2>
-                    <p>
-                        Descubre tiendas de emprendedores y marcas independientes.
-                        ¿Tienes un negocio? <strong>Vende en ORION</strong> y llega a miles de clientes
-                        con nuestro sistema de comisiones transparente.
-                    </p>
-                    <div class="marketplace-chips">
-                        <span class="marketplace-chip"><i class="bi bi-bag-heart-fill"></i> Moda</span>
-                        <span class="marketplace-chip"><i class="bi bi-phone-fill"></i> Electrónica</span>
-                        <span class="marketplace-chip"><i class="bi bi-house-heart-fill"></i> Hogar</span>
-                        <span class="marketplace-chip"><i class="bi bi-bicycle"></i> Deportes</span>
-                        <span class="marketplace-chip"><i class="bi bi-flower1"></i> Belleza</span>
-                        <span class="marketplace-chip"><i class="bi bi-controller"></i> Gaming</span>
-                    </div>
-                    <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
-                        <a href="{{ url_for('web.marketplace') }}" class="marketplace-cta">
-                            <i class="bi bi-shop"></i> Explorar Marketplace
-                        </a>
-                        {% if session.get('es_vendedor') %}
-                            <a href="{{ url_for('web.marketplace_dashboard') }}" class="marketplace-cta secondary">
-                                <i class="bi bi-speedometer2"></i> Mi panel de vendedor
-                            </a>
-                        {% elif session.get('user_id') %}
-                            <a href="{{ url_for('web.marketplace_registro') }}" class="marketplace-cta secondary">
-                                <i class="bi bi-plus-circle-fill"></i> Vender en ORION
-                            </a>
-                        {% else %}
-                            <a href="{{ url_for('web.marketplace_registro') }}" class="marketplace-cta secondary">
-                                <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión y vender
-                            </a>
-                        {% endif %}
-                    </div>
+        <div class="duo-grid">
+            {# ---- MESA DE REGALOS ---- #}
+            <div class="duo-card registry">
+                <div class="duo-icon"><i class="bi bi-gift-fill"></i></div>
+                <h3>Mesa de Regalos</h3>
+                <p>Crea tu lista para bodas, baby showers, XV años y más. Recibe <strong>10% de bonificación</strong> en tu monedero.</p>
+                <div class="duo-chips">
+                    <span class="duo-chip"><i class="bi bi-heart-fill"></i> Boda</span>
+                    <span class="duo-chip"><i class="bi bi-balloon-fill"></i> Baby Shower</span>
+                    <span class="duo-chip"><i class="bi bi-stars"></i> XV Años</span>
+                    <span class="duo-chip"><i class="bi bi-cake2-fill"></i> Cumpleaños</span>
                 </div>
-                <div class="marketplace-benefits">
-                    <div class="marketplace-benefit">
-                        <i class="bi bi-percent"></i>
-                        <span>Comisión desde 15% por venta</span>
-                    </div>
-                    <div class="marketplace-benefit">
-                        <i class="bi bi-bar-chart-fill"></i>
-                        <span>Panel con métricas en tiempo real</span>
-                    </div>
-                    <div class="marketplace-benefit">
-                        <i class="bi bi-credit-card-2-front-fill"></i>
-                        <span>Pagos seguros con Conekta</span>
-                    </div>
-                    <div class="marketplace-benefit">
-                        <i class="bi bi-truck"></i>
-                        <span>Logística y envíos ORION</span>
-                    </div>
+                <div>
+                    <a href="{{ url_for('web.crear_mesa_regalos') }}" class="duo-cta">
+                        <i class="bi bi-plus-circle-fill"></i> Crear mi mesa
+                    </a>
+                    <a href="{{ url_for('web.mis_mesas_regalos') }}" class="duo-secondary">
+                        <i class="bi bi-list-ul"></i> Mis mesas
+                    </a>
+                </div>
+            </div>
+
+            {# ---- MARKETPLACE ---- #}
+            <div class="duo-card market">
+                <div class="duo-icon"><i class="bi bi-shop-window"></i></div>
+                <h3>Marketplace ORION</h3>
+                <p>Descubre tiendas de emprendedores. ¿Tienes un negocio? <strong>Vende en ORION</strong> y llega a miles de clientes.</p>
+                <div class="duo-chips">
+                    <span class="duo-chip"><i class="bi bi-bag-heart-fill"></i> Moda</span>
+                    <span class="duo-chip"><i class="bi bi-phone-fill"></i> Electrónica</span>
+                    <span class="duo-chip"><i class="bi bi-house-heart-fill"></i> Hogar</span>
+                    <span class="duo-chip"><i class="bi bi-controller"></i> Gaming</span>
+                </div>
+                <div>
+                    <a href="{{ url_for('web.marketplace') }}" class="duo-cta">
+                        <i class="bi bi-shop"></i> Explorar
+                    </a>
+                    {% if session.get('es_vendedor') %}
+                        <a href="{{ url_for('web.marketplace_dashboard') }}" class="duo-secondary">
+                            <i class="bi bi-speedometer2"></i> Mi panel
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('web.marketplace_registro') }}" class="duo-secondary">
+                            <i class="bi bi-shop"></i> Vender
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== PROMOCIONES DESTACADAS ===== -->
+    <!-- PROMOCIONES -->
     {% if promociones_home and promociones_home|length > 0 %}
     <section class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -970,34 +1102,20 @@
                 <div class="promo-card">
                     <div class="position-relative">
                         <img src="{{ promo.imagen if promo.imagen else 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?q=80&w=800' }}" class="promo-img" alt="{{ promo.nombre }}">
-                        {% if promo.tipo == 'descuento_directo' %}
-                            <span class="promo-badge">{{ promo.descuento_valor }}% OFF</span>
-                        {% elif promo.tipo == 'envio_gratis' %}
-                            <span class="promo-badge envio">🚚 ENVÍO GRATIS</span>
-                        {% elif promo.tipo == 'cantidad' %}
-                            <span class="promo-badge">{{ promo.cantidad_requerida }}x{{ promo.cantidad_gratis }}</span>
-                        {% elif promo.tipo == 'combo' %}
-                            <span class="promo-badge">🔥 COMBO</span>
-                        {% elif promo.tipo == 'pago' %}
-                            <span class="promo-badge">💳 {{ promo.descuento_valor }}%</span>
-                        {% elif promo.tipo == 'cumpleanos' %}
-                            <span class="promo-badge vip">🎂 CUMPLEAÑOS</span>
-                        {% else %}
-                            <span class="promo-badge">🎯 OFERTA</span>
-                        {% endif %}
+                        {% if promo.tipo == 'descuento_directo' %}<span class="promo-badge">{{ promo.descuento_valor }}% OFF</span>
+                        {% elif promo.tipo == 'envio_gratis' %}<span class="promo-badge envio">🚚 ENVÍO GRATIS</span>
+                        {% elif promo.tipo == 'cantidad' %}<span class="promo-badge">{{ promo.cantidad_requerida }}x{{ promo.cantidad_gratis }}</span>
+                        {% elif promo.tipo == 'combo' %}<span class="promo-badge">🔥 COMBO</span>
+                        {% elif promo.tipo == 'pago' %}<span class="promo-badge">💳 {{ promo.descuento_valor }}%</span>
+                        {% elif promo.tipo == 'cumpleanos' %}<span class="promo-badge vip">🎂 CUMPLEAÑOS</span>
+                        {% else %}<span class="promo-badge">🎯 OFERTA</span>{% endif %}
                     </div>
                     <div class="promo-body">
                         <h5>{{ promo.nombre }}</h5>
                         <p class="promo-desc">{{ promo.descripcion }}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            {% if promo.codigo %}
-                                <span class="promo-code">{{ promo.codigo }}</span>
-                            {% else %}
-                                <span class="promo-code">APLICA</span>
-                            {% endif %}
-                            <button class="btn-aplicar" data-promo-id="{{ promo._id }}" onclick="aplicarPromocion(this)">
-                                Aplicar
-                            </button>
+                            <span class="promo-code">{{ promo.codigo or 'APLICA' }}</span>
+                            <button class="btn-aplicar" data-promo-id="{{ promo._id }}" onclick="aplicarPromocion(this)">Aplicar</button>
                         </div>
                     </div>
                 </div>
@@ -1007,29 +1125,38 @@
     </section>
     {% endif %}
 
-    <!-- ===== BANNER PUBLICITARIO ===== -->
+    <!-- MARCAS DESTACADAS -->
+    {% if marcas and marcas|length > 0 %}
     <section class="container my-5">
-        <div class="banner-promo text-white" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
-            <div>
-                <h2 class="display-5 fw-bold"><i class="bi bi-lightning-fill" style="color:#f9a825;"></i> Ofertas Relámpago</h2>
-                <p class="fs-5">Descuentos de hasta <strong>50%</strong> en productos seleccionados. ¡Corre que se acaban!</p>
-                <a href="#" class="btn btn-light rounded-pill px-4 py-2 fw-bold">Ver ofertas <i class="bi bi-arrow-right"></i></a>
-            </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0"><i class="bi bi-award-fill" style="color:var(--orion-primary);"></i> MARCAS DESTACADAS</h3>
+            <a href="/catalogo" class="text-decoration-none" style="color:var(--orion-primary); font-weight:600;">Ver todo <i class="bi bi-arrow-right"></i></a>
         </div>
-    </section>
-
-    <!-- ===== TENDENCIAS ===== -->
-    <section class="container my-5">
-        <h3 class="mb-4">TENDENCIAS DE TEMPORADA</h3>
         <div class="trend-grid">
-            <div class="trend-item"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f"><div class="trend-overlay">MODA</div></div>
-            <div class="trend-item"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff"><div class="trend-overlay">SNEAKERS</div></div>
-            <div class="trend-item"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e"><div class="trend-overlay">AUDIO</div></div>
-            <div class="trend-item"><img src="https://images.unsplash.com/photo-1583394838336-acd977736f90"><div class="trend-overlay">ACCESORIOS</div></div>
+            {% for marca in marcas[:4] %}
+                {% set nombre_marca = marca.nombre_comercial or marca.nombre or marca.marca or 'Marca' %}
+                {% set inicial = nombre_marca[0]|upper %}
+                {% set bg_class = 'trend-bg-' ~ ((loop.index0 % 6) + 1) %}
+                {% if loop.index == 1 %}
+                    <a href="/catalogo?marca={{ marca._id }}" class="trend-item trend-large {{ bg_class }}">
+                {% elif loop.index == 2 %}
+                    <a href="/catalogo?marca={{ marca._id }}" class="trend-item trend-wide {{ bg_class }}">
+                {% else %}
+                    <a href="/catalogo?marca={{ marca._id }}" class="trend-item {{ bg_class }}">
+                {% endif %}
+                        <div class="t-initial">{{ inicial }}</div>
+                        <div class="t-icon"><i class="bi bi-patch-check-fill"></i></div>
+                        <div class="t-parent"><i class="bi bi-award-fill"></i> Marca oficial</div>
+                        <div class="t-name">{{ nombre_marca }}</div>
+                        <div class="t-count"><i class="bi bi-box-seam-fill"></i> Explorar marca</div>
+                        <div class="t-arrow">Ver productos <i class="bi bi-arrow-right"></i></div>
+                    </a>
+            {% endfor %}
         </div>
     </section>
+    {% endif %}
 
-    <!-- ===== NUEVA COLECCIÓN ===== -->
+    <!-- NUEVA COLECCIÓN -->
     <section class="container my-5">
         <h3 class="mb-4">NUEVA COLECCIÓN</h3>
         <div class="banner-full p-5 text-white">
@@ -1041,40 +1168,88 @@
         </div>
     </section>
 
-    <!-- ===== VIDEO PROMOCIONAL ===== -->
+    <!-- EXPERIENCIA ORION -->
     <section class="container my-5">
-        <h3 class="mb-4"><i class="bi bi-play-circle-fill" style="color:var(--orion-primary);"></i> Descubre la Experiencia ORION</h3>
-        <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="ORION Experience" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <div class="experience-banner">
+            <div class="experience-inner">
+                <div class="experience-text">
+                    <span class="experience-tag"><i class="bi bi-stars"></i> Experiencia ORION</span>
+                    <h2>Compra <span>inteligente</span>,<br>recibe <span>más</span> de lo que esperas.</h2>
+                    <p>En ORION unimos <strong>tecnología</strong>, <strong>envíos rápidos</strong> y <strong>atención personalizada</strong> para darte la mejor experiencia de compra en línea.</p>
+                    <div class="experience-features">
+                        <span class="experience-feature"><i class="bi bi-truck"></i> Envíos gratis</span>
+                        <span class="experience-feature"><i class="bi bi-shield-check"></i> Compra segura</span>
+                        <span class="experience-feature"><i class="bi bi-arrow-repeat"></i> Devolución fácil</span>
+                        <span class="experience-feature"><i class="bi bi-headset"></i> Soporte 24/7</span>
+                    </div>
+                    <div class="experience-actions">
+                        <a href="/catalogo" class="btn-experience-primary"><i class="bi bi-bag-fill"></i> Empezar a comprar</a>
+                        <a href="{{ url_for('web.listar_promociones_cliente') }}" class="btn-experience-secondary"><i class="bi bi-gift-fill"></i> Ver promociones</a>
+                    </div>
+                </div>
+                <div class="experience-visual">
+                    <div class="experience-thumb" onclick="window.location.href='/catalogo'">
+                        <div class="play-btn"><i class="bi bi-play-fill"></i></div>
+                        <div class="experience-thumb-label">
+                            <span class="mini-tag"><i class="bi bi-lightning-charge-fill"></i> Nuevo</span>
+                            <div class="title">Colección Primavera 2026</div>
+                            <div class="sub">Descubre lo más nuevo →</div>
+                        </div>
+                    </div>
+                    <div class="floating-stat fs-top">
+                        <div class="fs-icon"><i class="bi bi-people-fill"></i></div>
+                        <div><div class="fs-value">+50K</div><div class="fs-label">Clientes felices</div></div>
+                    </div>
+                    <div class="floating-stat gold fs-bottom">
+                        <div class="fs-icon"><i class="bi bi-star-fill"></i></div>
+                        <div><div class="fs-value">4.9 / 5</div><div class="fs-label">Calificación</div></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- ===== SECCIÓN BIENVENIDA CLIENTE ===== -->
+    <!-- VIP -->
     {% if session.get('user_id') %}
-    <section class="container my-5 py-4 bg-light rounded-4 shadow-sm">
-        <div class="row align-items-center">
-            <div class="col-md-4 text-center border-end">
-                <h5 class="text-uppercase text-muted">Tu beneficio exclusivo</h5>
-                <h2 class="display-6 fw-bold text-primary">¡Hola, {{ session['nombre'] }}!</h2>
-                <div class="bg-primary text-white p-3 rounded-pill my-3 shadow">
-                    CÓDIGO: <strong class="fs-4">ORION-VIP-20</strong>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <h5 class="mb-3">Sugerencias para ti:</h5>
-                <div class="d-flex gap-3 overflow-auto">
-                    {% if sugerencias %}
-                        {% for prod in sugerencias %}
-                        <div class="card border-0 shadow-sm" style="min-width: 150px;">
-                            <img src="{{ prod.imagen }}" class="card-img-top" style="height: 120px; object-fit: cover;">
-                            <div class="card-body p-2 text-center">
-                                <p class="small fw-bold mb-0 text-truncate">{{ prod.nombre }}</p>
-                                <small class="text-primary">${{ prod.precio }}</small>
-                            </div>
+    <section class="container my-5">
+        <div class="vip-welcome">
+            <div class="vip-inner">
+                <div class="vip-side">
+                    <span class="vip-tag"><i class="bi bi-star-fill"></i> Cliente Consentido</span>
+                    <h2>¡Hola,<br><span>{{ session['nombre'] }}!</span></h2>
+                    <p>Este es tu espacio exclusivo. Disfruta de descuentos, recomendaciones personalizadas y beneficios únicos.</p>
+                    <div class="vip-code-box">
+                        <div>
+                            <div class="code-label">Tu código VIP</div>
+                            <div class="code-value">ORION-VIP-20</div>
                         </div>
-                        {% endfor %}
+                        <button type="button" class="vip-copy-btn" onclick="copiarCodigoVIP('ORION-VIP-20', this)" title="Copiar código"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                </div>
+                <div class="vip-main">
+                    <div class="vip-main-title"><i class="bi bi-stars"></i> Sugerencias para ti <a href="/catalogo" class="ver-todas">Ver todas <i class="bi bi-arrow-right"></i></a></div>
+                    {% if sugerencias and sugerencias|length > 0 %}
+                        <div class="vip-grid">
+                            {% for prod in sugerencias[:4] %}
+                            <a href="{{ prod.url if prod.url else '/catalogo' }}" class="vip-prod">
+                                {% if prod.imagen %}
+                                    <img src="{{ prod.imagen }}" class="vip-prod-img" alt="{{ prod.nombre }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="vip-prod-img-placeholder" style="display:none;"><i class="bi bi-bag-heart"></i></div>
+                                {% else %}<div class="vip-prod-img-placeholder"><i class="bi bi-bag-heart"></i></div>{% endif %}
+                                <div class="vip-prod-body">
+                                    <p class="vip-prod-name">{{ prod.nombre }}</p>
+                                    <span class="vip-prod-price">{% if prod.precio %}${{ '%.2f'|format(prod.precio) }}{% else %}<small>Ver precio</small>{% endif %}</span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
                     {% else %}
-                        <p class="text-muted">Sigue navegando para recibir recomendaciones personalizadas.</p>
+                        <div class="vip-grid">
+                            <a href="/catalogo?orden=recientes" class="vip-prod"><div class="vip-prod-img-placeholder" style="background: linear-gradient(135deg, rgba(225,0,152,.25), rgba(251,191,36,.15));"><i class="bi bi-lightning-charge-fill" style="color:#fbbf24;"></i></div><div class="vip-prod-body"><p class="vip-prod-name">Novedades</p><span class="vip-prod-price"><small>Ver productos</small></span></div></a>
+                            <a href="/catalogo?orden=precio_asc" class="vip-prod"><div class="vip-prod-img-placeholder" style="background: linear-gradient(135deg, rgba(2,132,199,.25), rgba(16,185,129,.15));"><i class="bi bi-tag-fill" style="color:#38bdf8;"></i></div><div class="vip-prod-body"><p class="vip-prod-name">Mejores precios</p><span class="vip-prod-price"><small>Ver ofertas</small></span></div></a>
+                            <a href="/catalogo?orden=recientes" class="vip-prod"><div class="vip-prod-img-placeholder" style="background: linear-gradient(135deg, rgba(139,92,246,.25), rgba(236,72,153,.15));"><i class="bi bi-fire" style="color:#a78bfa;"></i></div><div class="vip-prod-body"><p class="vip-prod-name">Tendencias</p><span class="vip-prod-price"><small>Ver ahora</small></span></div></a>
+                            <a href="{{ url_for('web.listar_promociones_cliente') }}" class="vip-prod"><div class="vip-prod-img-placeholder" style="background: linear-gradient(135deg, rgba(251,191,36,.25), rgba(225,0,152,.15));"><i class="bi bi-gift-fill" style="color:#fbbf24;"></i></div><div class="vip-prod-body"><p class="vip-prod-name">Promociones</p><span class="vip-prod-price"><small>Ver promos</small></span></div></a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -1082,17 +1257,41 @@
     </section>
     {% endif %}
 
-    <!-- ===== MÁS VENDIDOS ===== -->
+    <!-- MÁS VENDIDOS -->
     <section class="container my-5 pb-5">
-        <h3 class="mb-4">MÁS VENDIDOS</h3>
-        <div class="row g-4">
-            <div class="col-md-4"><div class="card featured-card p-4 text-center"><h4>Producto Top 1</h4></div></div>
-            <div class="col-md-4"><div class="card featured-card p-4 text-center"><h4>Producto Top 2</h4></div></div>
-            <div class="col-md-4"><div class="card featured-card p-4 text-center"><h4>Producto Top 3</h4></div></div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0"><i class="bi bi-trophy-fill" style="color:#f59e0b;"></i> MÁS VENDIDOS</h3>
+            <a href="/catalogo?orden=recientes" class="text-decoration-none" style="color:var(--orion-primary); font-weight:600;">Ver todo <i class="bi bi-arrow-right"></i></a>
         </div>
+
+        {% if mas_vendidos and mas_vendidos|length > 0 %}
+            <div class="top-sellers-grid">
+                {% for p in mas_vendidos[:3] %}
+                    {% set bg = 'ts-bg-' ~ ((loop.index0 % 6) + 1) %}
+                    <a href="{{ p.url if p.url else '/catalogo' }}" class="top-seller">
+                        {% if p.imagen %}<div class="ts-img" style="background-image: linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.7)), url('{{ p.imagen }}');"></div>
+                        {% else %}<div class="ts-img {{ bg }}"></div>{% endif %}
+                        <span class="ts-badge"><i class="bi bi-fire"></i> Top #{{ loop.index }}</span>
+                        <span class="ts-rank">{% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% else %}🥉{% endif %}</span>
+                        <div class="ts-content">
+                            <div class="ts-cat"><i class="bi bi-star-fill"></i> Más vendido</div>
+                            <div class="ts-name">{{ p.nombre or 'Producto destacado' }}</div>
+                            {% if p.precio %}<div class="ts-price">${{ '%.2f'|format(p.precio) }}</div>{% endif %}
+                            <span class="ts-cta">Ver producto <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="top-sellers-grid">
+                <a href="/catalogo?orden=recientes" class="top-seller"><div class="ts-img ts-bg-1"></div><span class="ts-badge"><i class="bi bi-fire"></i> Top #1</span><span class="ts-rank">🥇</span><div class="ts-content"><div class="ts-cat"><i class="bi bi-star-fill"></i> Los favoritos</div><div class="ts-name">Lo más vendido de la semana</div><span class="ts-cta">Descubrir <i class="bi bi-arrow-right"></i></span></div></a>
+                <a href="/catalogo?orden=precio_asc" class="top-seller"><div class="ts-img ts-bg-2"></div><span class="ts-badge"><i class="bi bi-fire"></i> Top #2</span><span class="ts-rank">🥈</span><div class="ts-content"><div class="ts-cat"><i class="bi bi-tag-fill"></i> Precios bajos</div><div class="ts-name">Ofertas irresistibles</div><span class="ts-cta">Ahorra ya <i class="bi bi-arrow-right"></i></span></div></a>
+                <a href="/catalogo?orden=recientes" class="top-seller"><div class="ts-img ts-bg-4"></div><span class="ts-badge"><i class="bi bi-fire"></i> Top #3</span><span class="ts-rank">🥉</span><div class="ts-content"><div class="ts-cat"><i class="bi bi-lightning-charge-fill"></i> Novedades</div><div class="ts-name">Recién llegados</div><span class="ts-cta">Ver nuevos <i class="bi bi-arrow-right"></i></span></div></a>
+            </div>
+        {% endif %}
     </section>
 
-    <!-- ===== BANNERS INFERIORES ===== -->
+    <!-- BANNERS INFERIORES -->
     <section class="container my-5">
         <div class="row g-4">
             <div class="col-md-6">
@@ -1122,7 +1321,7 @@
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
+    <!-- FOOTER -->
     <footer class="bg-dark text-white p-5 text-center">
         <div class="container">
             <div class="row">
@@ -1143,14 +1342,8 @@
                         <li><a href="#" class="text-secondary text-decoration-none">Nuevo</a></li>
                         <li><a href="#" class="text-secondary text-decoration-none">Más vendidos</a></li>
                         <li><a href="#" class="text-secondary text-decoration-none">Categorías</a></li>
-                        <!-- ⭐ MESA DE REGALOS -->
-                        <li><a href="{{ url_for('web.crear_mesa_regalos') }}" class="text-secondary text-decoration-none" style="color:#e10098 !important;">
-                            <i class="bi bi-gift-fill"></i> Mesa de Regalos
-                        </a></li>
-                        <!-- ⭐ NUEVO: MARKETPLACE -->
-                        <li><a href="{{ url_for('web.marketplace') }}" class="text-secondary text-decoration-none" style="color:#0284c7 !important;">
-                            <i class="bi bi-shop"></i> Marketplace
-                        </a></li>
+                        <li><a href="{{ url_for('web.crear_mesa_regalos') }}" class="text-secondary text-decoration-none" style="color:#e10098 !important;"><i class="bi bi-gift-fill"></i> Mesa de Regalos</a></li>
+                        <li><a href="{{ url_for('web.marketplace') }}" class="text-secondary text-decoration-none" style="color:#0284c7 !important;"><i class="bi bi-shop"></i> Marketplace</a></li>
                     </ul>
                 </div>
                 <div class="col-md-2 text-start">
@@ -1167,16 +1360,13 @@
                     <p class="text-secondary">Recibe ofertas exclusivas y novedades.</p>
                     <div class="input-group">
                         <input type="email" class="form-control bg-dark text-white border-secondary" placeholder="Tu email">
-                        <button class="btn btn-primary rounded-end" style="background:var(--orion-primary); border:none;">
-                            <i class="bi bi-send"></i>
-                        </button>
+                        <button class="btn btn-primary rounded-end" style="background:var(--orion-primary); border:none;"><i class="bi bi-send"></i></button>
                     </div>
                     <div class="mt-2">
                         <span class="badge bg-secondary me-1"><i class="bi bi-credit-card"></i> Tarjetas</span>
                         <span class="badge bg-secondary me-1"><i class="bi bi-paypal"></i> PayPal</span>
                         <span class="badge bg-secondary"><i class="bi bi-shield-check"></i> Seguro</span>
                     </div>
-                    <!-- ⭐ NUEVO: Link para vender -->
                     <div class="mt-3">
                         <a href="{{ url_for('web.marketplace_registro') }}" class="text-decoration-none" style="color:#fbbf24; font-weight:700;">
                             <i class="bi bi-shop-window"></i> ¿Quieres vender en ORION? Únete →
@@ -1189,85 +1379,46 @@
         </div>
     </footer>
 
-    <!-- ================================================================
-         WIDGET DE CHAT FLOTANTE - ORION
-         ================================================================ -->
+    <!-- CHAT WIDGET -->
     <div id="chatWidget" style="position:fixed; bottom:20px; right:20px; z-index:9999; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-        <!-- Botón de abrir/cerrar -->
         <button id="chatToggle" style="background:#e10098; border:none; border-radius:50%; width:60px; height:60px; box-shadow:0 4px 20px rgba(225,0,152,0.4); color:white; font-size:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.3s;">
             <i class="bi bi-chat-dots"></i>
         </button>
-        <!-- Ventana de chat -->
         <div id="chatWindow" style="display:none; position:absolute; bottom:70px; right:0; width:360px; max-width:90vw; height:500px; background:white; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.2); overflow:hidden; flex-direction:column; border:1px solid #eee;">
-            <!-- Cabecera -->
             <div style="background:linear-gradient(135deg, #e10098, #c00080); color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <strong style="font-size:1.1rem;">ORION</strong>
-                    <div style="font-size:0.7rem; opacity:0.8;">Atención al cliente</div>
-                </div>
+                <div><strong style="font-size:1.1rem;">ORION</strong><div style="font-size:0.7rem; opacity:0.8;">Atención al cliente</div></div>
                 <button id="chatClose" style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;">&times;</button>
             </div>
-            <!-- Mensajes -->
             <div id="chatMessages" style="flex:1; padding:15px; overflow-y:auto; background:#f9f9f9; display:flex; flex-direction:column; gap:8px;">
                 <div class="mensaje-sistema" style="text-align:center; color:#999; font-size:0.8rem;">Conectando...</div>
             </div>
-            <!-- Formulario de identificación (si no autenticado) -->
             <div id="chatLogin" style="padding:15px; border-top:1px solid #eee; background:white;">
                 <input type="text" id="chatNombre" placeholder="Tu nombre *" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; margin-bottom:8px; font-size:0.9rem;">
                 <input type="email" id="chatEmail" placeholder="Tu email (opcional)" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:8px; margin-bottom:8px; font-size:0.9rem;">
                 <button id="chatStartBtn" style="background:#e10098; color:white; border:none; border-radius:50px; padding:10px; width:100%; font-weight:bold; cursor:pointer;">Iniciar conversación</button>
             </div>
-            <!-- Área de mensaje (visible después de iniciar) -->
             <div id="chatInputArea" style="display:none; padding:10px 15px; border-top:1px solid #eee; background:white; gap:10px;">
                 <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:20px; font-size:0.9rem;">
-                <button id="chatSendBtn" style="background:#e10098; border:none; border-radius:50%; width:40px; height:40px; color:white; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-                    <i class="bi bi-send"></i>
-                </button>
+                <button id="chatSendBtn" style="background:#e10098; border:none; border-radius:50%; width:40px; height:40px; color:white; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="bi bi-send"></i></button>
             </div>
         </div>
     </div>
 
-    <!-- Estilos CSS inline para el widget -->
     <style>
-        #chatMessages .mensaje-cliente {
-            align-self: flex-end;
-            background: #e10098;
-            color: white;
-            padding: 8px 14px;
-            border-radius: 18px 18px 4px 18px;
-            max-width: 80%;
-            word-wrap: break-word;
-            font-size: 0.9rem;
-        }
-        #chatMessages .mensaje-admin {
-            align-self: flex-start;
-            background: #f0f0f0;
-            color: #333;
-            padding: 8px 14px;
-            border-radius: 18px 18px 18px 4px;
-            max-width: 80%;
-            word-wrap: break-word;
-            font-size: 0.9rem;
-        }
-        #chatMessages .mensaje-sistema {
-            text-align: center;
-            color: #999;
-            font-size: 0.7rem;
-            margin: 4px 0;
-        }
-        #chatMessages .mensaje-fecha {
-            font-size: 0.6rem;
-            color: #999;
-            margin-top: 2px;
-        }
+        #chatMessages .mensaje-cliente { align-self: flex-end; background: #e10098; color: white; padding: 8px 14px; border-radius: 18px 18px 4px 18px; max-width: 80%; word-wrap: break-word; font-size: 0.9rem; }
+        #chatMessages .mensaje-admin { align-self: flex-start; background: #f0f0f0; color: #333; padding: 8px 14px; border-radius: 18px 18px 18px 4px; max-width: 80%; word-wrap: break-word; font-size: 0.9rem; }
+        #chatMessages .mensaje-sistema { text-align: center; color: #999; font-size: 0.7rem; margin: 4px 0; }
+        #chatMessages .mensaje-fecha { font-size: 0.6rem; color: #999; margin-top: 2px; }
         #chatMessages .mensaje-cliente .mensaje-fecha { color: rgba(255,255,255,0.7); }
         #chatMessages .mensaje-admin .mensaje-fecha { color: #999; }
     </style>
 
-    <!-- ===== SCRIPTS ===== -->
+    <!-- ⭐ WIDGET DE LEALTAD — RESTAURADO a su posición original -->
+    {% include 'tienda/widget_lealtad.html' %}
+
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ===== TOAST =====
         function mostrarToast(mensaje, tipo = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -1277,112 +1428,93 @@
             if (tipo === 'warning') icon = 'exclamation-triangle';
             toast.innerHTML = `<i class="bi bi-${icon} me-2"></i> ${mensaje}`;
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.5s ease forwards';
-                setTimeout(() => toast.remove(), 500);
-            }, 4000);
+            setTimeout(() => { toast.style.animation = 'slideOut 0.5s ease forwards'; setTimeout(() => toast.remove(), 500); }, 4000);
         }
 
-        // ===== APLICAR PROMOCIÓN =====
-        async function aplicarPromocion(btn) {
-            const promoId = btn.dataset.promoId;
-            
-            btn.disabled = true;
-            btn.textContent = 'Aplicando...';
-
-            try {
-                let montoCarrito = 0;
-                try {
-                    const res = await fetch("{{ url_for('web.api_carrito') }}", {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    const data = await res.json();
-                    if (data.total) {
-                        montoCarrito = data.total;
-                    } else if (data.items) {
-                        montoCarrito = data.items.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-                    }
-                } catch (e) {
-                    console.warn('No se pudo obtener el carrito:', e);
-                    const totalElement = document.querySelector('.cart-total, .total-price, #cart-total, .subtotal');
-                    if (totalElement) {
-                        const raw = totalElement.innerText.replace(/[$,]/g, '').trim();
-                        montoCarrito = parseFloat(raw) || 0;
-                    }
-                }
-
-                const res = await fetch("{{ url_for('web.aplicar_promocion') }}", {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        promocion_id: promoId, 
-                        monto_carrito: montoCarrito 
-                    })
+        function copiarCodigoVIP(codigo, btn) {
+            const done = () => {
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check2"></i>';
+                btn.style.background = '#22c55e'; btn.style.color = '#fff';
+                mostrarToast('¡Código copiado! 🎁', 'success');
+                setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; btn.style.color = ''; }, 1800);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(codigo).then(done).catch(() => {
+                    const ta = document.createElement('textarea'); ta.value = codigo; document.body.appendChild(ta); ta.select();
+                    document.execCommand('copy'); document.body.removeChild(ta); done();
                 });
-                const data = await res.json();
-
-                if (data.success) {
-                    mostrarToast('✅ ' + data.message, 'success');
-                    setTimeout(() => {
-                        window.location.href = "{{ url_for('web.ver_carrito') }}";
-                    }, 1500);
-                } else {
-                    mostrarToast('❌ ' + data.message, 'error');
-                    btn.disabled = false;
-                    btn.textContent = 'Aplicar';
-                }
-            } catch (error) {
-                console.error('Error al aplicar promoción:', error);
-                mostrarToast('❌ Error al aplicar la promoción. Intenta de nuevo.', 'error');
-                btn.disabled = false;
-                btn.textContent = 'Aplicar';
+            } else {
+                const ta = document.createElement('textarea'); ta.value = codigo; document.body.appendChild(ta); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta); done();
             }
         }
 
-        // ===== ANIMACIÓN DE TARJETAS =====
+        async function aplicarPromocion(btn) {
+            const promoId = btn.dataset.promoId;
+            btn.disabled = true; btn.textContent = 'Aplicando...';
+            try {
+                let montoCarrito = 0;
+                try {
+                    const res = await fetch("{{ url_for('web.api_carrito') }}", { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+                    const data = await res.json();
+                    if (data.total) montoCarrito = data.total;
+                    else if (data.items) montoCarrito = data.items.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+                } catch (e) {
+                    const totalElement = document.querySelector('.cart-total, .total-price, #cart-total, .subtotal');
+                    if (totalElement) { const raw = totalElement.innerText.replace(/[$,]/g, '').trim(); montoCarrito = parseFloat(raw) || 0; }
+                }
+                const res = await fetch("{{ url_for('web.aplicar_promocion') }}", {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ promocion_id: promoId, monto_carrito: montoCarrito })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    mostrarToast('✅ ' + data.message, 'success');
+                    setTimeout(() => { window.location.href = "{{ url_for('web.ver_carrito') }}"; }, 1500);
+                } else {
+                    mostrarToast('❌ ' + data.message, 'error');
+                    btn.disabled = false; btn.textContent = 'Aplicar';
+                }
+            } catch (error) {
+                mostrarToast('❌ Error al aplicar la promoción. Intenta de nuevo.', 'error');
+                btn.disabled = false; btn.textContent = 'Aplicar';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            const promoCards = document.querySelectorAll('.promo-card');
-            promoCards.forEach((card, i) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.6s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, 200 + i * 150);
-            });
+            const animar = (selector, delayBase) => {
+                document.querySelectorAll(selector).forEach((el, i) => {
+                    el.style.opacity = '0'; el.style.transform = 'translateY(20px)';
+                    setTimeout(() => { el.style.transition = 'all .5s ease'; el.style.opacity = '1'; el.style.transform = 'translateY(0)'; }, delayBase + i * 100);
+                });
+            };
+            animar('.promo-card', 200);
+            animar('.trend-item', 300);
+            animar('.vip-prod', 400);
+            animar('.top-seller', 300);
+            animar('.mosaic-item', 250);
+            animar('.duo-card', 200);
         });
 
-        // ================================================================
-        //  CHAT WIDGET - ORION (con limpieza al cerrar sesión)
-        // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
-            // 🔒 VARIABLE DE AUTENTICACIÓN DESDE EL SERVIDOR
             const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
-
-            const toggleBtn = document.getElementById('chatToggle');
+            const toggleBtn  = document.getElementById('chatToggle');
             const chatWindow = document.getElementById('chatWindow');
-            const closeBtn = document.getElementById('chatClose');
+            const closeBtn   = document.getElementById('chatClose');
             const messagesDiv = document.getElementById('chatMessages');
-            const loginDiv = document.getElementById('chatLogin');
-            const inputArea = document.getElementById('chatInputArea');
-            const chatInput = document.getElementById('chatInput');
-            const sendBtn = document.getElementById('chatSendBtn');
-            const startBtn = document.getElementById('chatStartBtn');
+            const loginDiv   = document.getElementById('chatLogin');
+            const inputArea  = document.getElementById('chatInputArea');
+            const chatInput  = document.getElementById('chatInput');
+            const sendBtn    = document.getElementById('chatSendBtn');
+            const startBtn   = document.getElementById('chatStartBtn');
             const nombreInput = document.getElementById('chatNombre');
-            const emailInput = document.getElementById('chatEmail');
+            const emailInput  = document.getElementById('chatEmail');
+            let conversacionId = null, pollingInterval = null;
 
-            let conversacionId = null;
-            let pollingInterval = null;
-            let isOpen = false;
-
-            // ===== SI EL USUARIO NO ESTÁ LOGUEADO, LIMPIAR TODO =====
             if (!isLoggedIn) {
                 localStorage.removeItem('orion_chat_conversacion');
-                loginDiv.style.display = 'block';
-                inputArea.style.display = 'none';
-                conversacionId = null;
+                loginDiv.style.display = 'block'; inputArea.style.display = 'none'; conversacionId = null;
             } else {
                 const storedConv = localStorage.getItem('orion_chat_conversacion');
                 if (storedConv) {
@@ -1391,131 +1523,66 @@
                         .then(r => r.json())
                         .then(data => {
                             if (data.success && data.mensajes) {
-                                loginDiv.style.display = 'none';
-                                inputArea.style.display = 'flex';
-                                renderMessages(data.mensajes);
-                                startPolling();
-                                if (data.estado === 'cerrado') {
-                                    chatInput.disabled = true;
-                                    sendBtn.disabled = true;
-                                }
+                                loginDiv.style.display = 'none'; inputArea.style.display = 'flex';
+                                renderMessages(data.mensajes); startPolling();
+                                if (data.estado === 'cerrado') { chatInput.disabled = true; sendBtn.disabled = true; }
                             } else {
-                                localStorage.removeItem('orion_chat_conversacion');
-                                conversacionId = null;
-                                loginDiv.style.display = 'block';
-                                inputArea.style.display = 'none';
+                                localStorage.removeItem('orion_chat_conversacion'); conversacionId = null;
+                                loginDiv.style.display = 'block'; inputArea.style.display = 'none';
                             }
                         })
                         .catch(() => {
-                            localStorage.removeItem('orion_chat_conversacion');
-                            conversacionId = null;
-                            loginDiv.style.display = 'block';
-                            inputArea.style.display = 'none';
+                            localStorage.removeItem('orion_chat_conversacion'); conversacionId = null;
+                            loginDiv.style.display = 'block'; inputArea.style.display = 'none';
                         });
                 } else {
-                    loginDiv.style.display = 'block';
-                    inputArea.style.display = 'none';
+                    loginDiv.style.display = 'block'; inputArea.style.display = 'none';
                 }
             }
 
-            // Abrir/cerrar ventana
             toggleBtn.addEventListener('click', function() {
                 if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
-                    chatWindow.style.display = 'flex';
-                    if (conversacionId) {
-                        cargarMensajes();
-                    }
+                    chatWindow.style.display = 'flex'; if (conversacionId) cargarMensajes();
                 } else {
-                    chatWindow.style.display = 'none';
-                    if (pollingInterval) {
-                        clearInterval(pollingInterval);
-                        pollingInterval = null;
-                    }
+                    chatWindow.style.display = 'none'; if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
                 }
             });
+            closeBtn.addEventListener('click', function() { chatWindow.style.display = 'none'; if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; } });
 
-            closeBtn.addEventListener('click', function() {
-                chatWindow.style.display = 'none';
-                if (pollingInterval) {
-                    clearInterval(pollingInterval);
-                    pollingInterval = null;
-                }
-            });
-
-            // Iniciar conversación
             startBtn.addEventListener('click', function() {
-                const nombre = nombreInput.value.trim();
-                const email = emailInput.value.trim();
-                if (!nombre) {
-                    alert('Por favor ingresa tu nombre.');
-                    return;
-                }
-                fetch('/api/chat/iniciar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre: nombre, email: email })
-                })
-                .then(r => r.json())
-                .then(data => {
+                const nombre = nombreInput.value.trim(), email = emailInput.value.trim();
+                if (!nombre) { alert('Por favor ingresa tu nombre.'); return; }
+                fetch('/api/chat/iniciar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nombre: nombre, email: email }) })
+                .then(r => r.json()).then(data => {
                     if (data.success && data.conversacion_id) {
                         conversacionId = data.conversacion_id;
                         localStorage.setItem('orion_chat_conversacion', conversacionId);
-                        loginDiv.style.display = 'none';
-                        inputArea.style.display = 'flex';
-                        cargarMensajes();
-                        startPolling();
-                    } else {
-                        alert('Error al iniciar conversación: ' + (data.error || ''));
-                    }
-                })
-                .catch(err => alert('Error de conexión.'));
+                        loginDiv.style.display = 'none'; inputArea.style.display = 'flex';
+                        cargarMensajes(); startPolling();
+                    } else { alert('Error al iniciar conversación: ' + (data.error || '')); }
+                }).catch(() => alert('Error de conexión.'));
             });
 
-            // Enviar mensaje
             function enviarMensaje() {
                 const texto = chatInput.value.trim();
                 if (!texto || !conversacionId) return;
                 chatInput.value = '';
-                fetch('/api/chat/enviar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ conversacion_id: conversacionId, mensaje: texto })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        cargarMensajes();
-                    } else {
-                        alert('Error al enviar mensaje.');
+                fetch('/api/chat/enviar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conversacion_id: conversacionId, mensaje: texto }) })
+                .then(r => r.json()).then(data => { if (data.success) cargarMensajes(); else alert('Error al enviar mensaje.'); });
+            }
+            sendBtn.addEventListener('click', enviarMensaje);
+            chatInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') enviarMensaje(); });
+
+            function cargarMensajes() {
+                if (!conversacionId) return;
+                fetch(`/api/chat/obtener?conversacion_id=${conversacionId}`).then(r => r.json()).then(data => {
+                    if (data.success && data.mensajes) {
+                        renderMessages(data.mensajes);
+                        if (data.estado === 'cerrado') { chatInput.disabled = true; sendBtn.disabled = true; if (pollingInterval) clearInterval(pollingInterval); }
+                        else { chatInput.disabled = false; sendBtn.disabled = false; }
                     }
                 });
             }
-
-            sendBtn.addEventListener('click', enviarMensaje);
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') enviarMensaje();
-            });
-
-            // Cargar mensajes
-            function cargarMensajes() {
-                if (!conversacionId) return;
-                fetch(`/api/chat/obtener?conversacion_id=${conversacionId}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.success && data.mensajes) {
-                            renderMessages(data.mensajes);
-                            if (data.estado === 'cerrado') {
-                                chatInput.disabled = true;
-                                sendBtn.disabled = true;
-                                if (pollingInterval) clearInterval(pollingInterval);
-                            } else {
-                                chatInput.disabled = false;
-                                sendBtn.disabled = false;
-                            }
-                        }
-                    });
-            }
-
             function renderMessages(mensajes) {
                 messagesDiv.innerHTML = '';
                 mensajes.forEach(m => {
@@ -1523,213 +1590,102 @@
                     div.classList.add(m.es_admin ? 'mensaje-admin' : 'mensaje-cliente');
                     const fecha = new Date(m.fecha);
                     const timeStr = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                    div.innerHTML = `
-                        <div>${m.mensaje}</div>
-                        <div class="mensaje-fecha">${m.nombre_remitente || 'Cliente'} • ${timeStr}</div>
-                    `;
+                    div.innerHTML = `<div>${m.mensaje}</div><div class="mensaje-fecha">${m.nombre_remitente || 'Cliente'} • ${timeStr}</div>`;
                     messagesDiv.appendChild(div);
                 });
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
-
             function startPolling() {
                 if (pollingInterval) clearInterval(pollingInterval);
-                pollingInterval = setInterval(() => {
-                    if (conversacionId) cargarMensajes();
-                }, 3000);
+                pollingInterval = setInterval(() => { if (conversacionId) cargarMensajes(); }, 3000);
             }
-
-            if (conversacionId) {
-                startPolling();
-            }
+            if (conversacionId) startPolling();
         });
     </script>
-    <!-- ===== AUTOCOMPLETADO DE BÚSQUEDA — ORION ===== -->
-<script>
-(function () {
-    const input    = document.getElementById('searchInput');
-    const dropdown = document.getElementById('autocompleteResults');
-    const list     = document.getElementById('autocompleteList');
-    const loading  = document.getElementById('autocompleteLoading');
-    const empty    = document.getElementById('autocompleteEmpty');
-    const footer   = document.getElementById('autocompleteFooter');
-    const verTodos = document.getElementById('autocompleteVerTodos');
-    const form     = document.getElementById('searchForm');
 
-    if (!input || !dropdown) return;
+    <script>
+    (function () {
+        const input    = document.getElementById('searchInput');
+        const dropdown = document.getElementById('autocompleteResults');
+        const list     = document.getElementById('autocompleteList');
+        const loading  = document.getElementById('autocompleteLoading');
+        const empty    = document.getElementById('autocompleteEmpty');
+        const footer   = document.getElementById('autocompleteFooter');
+        const verTodos = document.getElementById('autocompleteVerTodos');
+        const form     = document.getElementById('searchForm');
+        if (!input || !dropdown) return;
+        let debounceTimer = null, controller = null, items = [], activeIndex = -1, currentQuery = '';
 
-    let debounceTimer = null;
-    let controller    = null;
-    let items         = [];
-    let activeIndex   = -1;
-    let currentQuery  = '';
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
+        function escapeRegex(str) { return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+        function highlight(text, query) { if (!query) return escapeHtml(text); const regex = new RegExp('(' + escapeRegex(query) + ')', 'gi'); return escapeHtml(text).replace(regex, '<mark>$1</mark>'); }
+        function fmtPrecio(n) { return '$' + Number(n || 0).toFixed(2); }
+        function showDropdown() { dropdown.style.display = 'block'; }
+        function hideDropdown() { dropdown.style.display = 'none'; activeIndex = -1; }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-    function escapeRegex(str) {
-        return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-    function highlight(text, query) {
-        if (!query) return escapeHtml(text);
-        const regex = new RegExp('(' + escapeRegex(query) + ')', 'gi');
-        return escapeHtml(text).replace(regex, '<mark>$1</mark>');
-    }
-    function fmtPrecio(n) { return '$' + Number(n || 0).toFixed(2); }
-
-    function showDropdown() { dropdown.style.display = 'block'; }
-    function hideDropdown() { dropdown.style.display = 'none'; activeIndex = -1; }
-
-    function renderResults(resultados, query) {
-        list.innerHTML = '';
-        items = [];
-        activeIndex = -1;
-
-        if (!resultados || resultados.length === 0) {
-            loading.style.display = 'none';
-            empty.style.display   = 'block';
-            footer.style.display  = 'none';
-            list.style.display    = 'none';
-            showDropdown();
-            return;
-        }
-
-        loading.style.display = 'none';
-        empty.style.display   = 'none';
-        list.style.display    = 'block';
-        footer.style.display  = 'block';
-        list.innerHTML = '';
-
-        resultados.forEach(function (p, idx) {
-            const a = document.createElement('a');
-            a.className = 'autocomplete-item';
-            a.href = p.url;
-            a.setAttribute('role', 'option');
-            a.dataset.index = idx;
-
-            const imgHtml = p.foto
-                ? '<img src="' + escapeHtml(p.foto) + '" class="autocomplete-item-img" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
-                : '<div class="autocomplete-item-img placeholder"><i class="bi bi-image"></i></div>';
-
-            const meta = [];
-            if (p.marca)     meta.push('<span class="marca">' + escapeHtml(p.marca) + '</span>');
-            if (p.categoria) meta.push('<span>' + escapeHtml(p.categoria) + '</span>');
-
-            a.innerHTML =
-                imgHtml +
-                '<div class="autocomplete-item-info">' +
-                    '<div class="autocomplete-item-name">' + highlight(p.nombre, query) + '</div>' +
-                    '<div class="autocomplete-item-meta">' + meta.join('') + '</div>' +
-                '</div>' +
-                '<div class="autocomplete-item-price">' + fmtPrecio(p.precio) + '</div>';
-
-            list.appendChild(a);
-            items.push(a);
-        });
-
-        showDropdown();
-    }
-
-    function setActive(idx) {
-        items.forEach(function (el) { el.classList.remove('active'); });
-        if (idx < 0) { activeIndex = -1; return; }
-        if (idx >= items.length) idx = 0;
-        if (idx < 0) idx = items.length - 1;
-        items[idx].classList.add('active');
-        items[idx].scrollIntoView({ block: 'nearest' });
-        activeIndex = idx;
-    }
-
-    input.addEventListener('keydown', function (e) {
-        const isOpen = dropdown.style.display === 'block';
-        if (e.key === 'ArrowDown') {
-            if (!isOpen && currentQuery.length >= 2) {
-                fetchSuggestions(currentQuery);
-                e.preventDefault();
-                return;
+        function renderResults(resultados, query) {
+            list.innerHTML = ''; items = []; activeIndex = -1;
+            if (!resultados || resultados.length === 0) {
+                loading.style.display = 'none'; empty.style.display = 'block'; footer.style.display = 'none'; list.style.display = 'none'; showDropdown(); return;
             }
-            e.preventDefault();
-            setActive(activeIndex + 1);
-        } else if (e.key === 'ArrowUp') {
-            if (isOpen) { e.preventDefault(); setActive(activeIndex - 1); }
-        } else if (e.key === 'Enter') {
-            if (isOpen && activeIndex >= 0 && items[activeIndex]) {
-                e.preventDefault();
-                window.location.href = items[activeIndex].href;
-            }
-        } else if (e.key === 'Escape') {
-            hideDropdown();
-        }
-    });
-
-    function fetchSuggestions(query) {
-        currentQuery = query;
-        if (controller) { try { controller.abort(); } catch (e) {} }
-        controller = new AbortController();
-
-        loading.style.display = 'block';
-        empty.style.display   = 'none';
-        list.style.display    = 'none';
-        footer.style.display  = 'none';
-        showDropdown();
-
-        const url = '/api/productos/autocompletar?q=' + encodeURIComponent(query);
-
-        fetch(url, { signal: controller.signal })
-            .then(function (r) { return r.json(); })
-            .then(function (data) {
-                if (!data || !data.success) throw new Error('Bad response');
-                renderResults(data.resultados || [], query);
-            })
-            .catch(function (err) {
-                if (err.name === 'AbortError') return;
-                console.warn('Autocompletar error:', err);
-                loading.style.display = 'none';
-                empty.style.display   = 'block';
+            loading.style.display = 'none'; empty.style.display = 'none'; list.style.display = 'block'; footer.style.display = 'block'; list.innerHTML = '';
+            resultados.forEach(function (p, idx) {
+                const a = document.createElement('a');
+                a.className = 'autocomplete-item'; a.href = p.url; a.setAttribute('role', 'option'); a.dataset.index = idx;
+                const imgHtml = p.foto ? '<img src="' + escapeHtml(p.foto) + '" class="autocomplete-item-img" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '<div class="autocomplete-item-img placeholder"><i class="bi bi-image"></i></div>';
+                const meta = [];
+                if (p.marca)     meta.push('<span class="marca">' + escapeHtml(p.marca) + '</span>');
+                if (p.categoria) meta.push('<span>' + escapeHtml(p.categoria) + '</span>');
+                a.innerHTML = imgHtml + '<div class="autocomplete-item-info"><div class="autocomplete-item-name">' + highlight(p.nombre, query) + '</div><div class="autocomplete-item-meta">' + meta.join('') + '</div></div><div class="autocomplete-item-price">' + fmtPrecio(p.precio) + '</div>';
+                list.appendChild(a); items.push(a);
             });
-    }
+            showDropdown();
+        }
 
-    input.addEventListener('input', function () {
-        const q = input.value.trim();
-        clearTimeout(debounceTimer);
-        if (q.length < 2) { hideDropdown(); return; }
-        if (verTodos) verTodos.href = '/catalogo?q=' + encodeURIComponent(q);
-        debounceTimer = setTimeout(function () { fetchSuggestions(q); }, 220);
-    });
+        function setActive(idx) {
+            items.forEach(function (el) { el.classList.remove('active'); });
+            if (idx < 0) { activeIndex = -1; return; }
+            if (idx >= items.length) idx = 0;
+            if (idx < 0) idx = items.length - 1;
+            items[idx].classList.add('active'); items[idx].scrollIntoView({ block: 'nearest' }); activeIndex = idx;
+        }
 
-    document.addEventListener('click', function (e) {
-        if (!dropdown.contains(e.target) && e.target !== input) hideDropdown();
-    });
-
-    input.addEventListener('blur', function () {
-        setTimeout(function () {
-            if (!dropdown.matches(':hover')) hideDropdown();
-        }, 180);
-    });
-
-    input.addEventListener('focus', function () {
-        const q = input.value.trim();
-        if (q.length >= 2 && items.length > 0) showDropdown();
-    });
-
-    if (form) {
-        form.addEventListener('submit', function (e) {
+        input.addEventListener('keydown', function (e) {
             const isOpen = dropdown.style.display === 'block';
-            if (isOpen && activeIndex >= 0 && items[activeIndex]) {
-                e.preventDefault();
-                window.location.href = items[activeIndex].href;
-            }
+            if (e.key === 'ArrowDown') {
+                if (!isOpen && currentQuery.length >= 2) { fetchSuggestions(currentQuery); e.preventDefault(); return; }
+                e.preventDefault(); setActive(activeIndex + 1);
+            } else if (e.key === 'ArrowUp') {
+                if (isOpen) { e.preventDefault(); setActive(activeIndex - 1); }
+            } else if (e.key === 'Enter') {
+                if (isOpen && activeIndex >= 0 && items[activeIndex]) { e.preventDefault(); window.location.href = items[activeIndex].href; }
+            } else if (e.key === 'Escape') { hideDropdown(); }
         });
-    }
-})();
-</script>
 
-    <!-- ===== WIDGET DE LEALTAD (Cliente Consentido) ===== -->
-    {% include 'tienda/widget_lealtad.html' %}
+        function fetchSuggestions(query) {
+            currentQuery = query;
+            if (controller) { try { controller.abort(); } catch (e) {} }
+            controller = new AbortController();
+            loading.style.display = 'block'; empty.style.display = 'none'; list.style.display = 'none'; footer.style.display = 'none'; showDropdown();
+            fetch('/api/productos/autocompletar?q=' + encodeURIComponent(query), { signal: controller.signal })
+                .then(function (r) { return r.json(); })
+                .then(function (data) { if (!data || !data.success) throw new Error('Bad response'); renderResults(data.resultados || [], query); })
+                .catch(function (err) { if (err.name === 'AbortError') return; loading.style.display = 'none'; empty.style.display = 'block'; });
+        }
+
+        input.addEventListener('input', function () {
+            const q = input.value.trim();
+            clearTimeout(debounceTimer);
+            if (q.length < 2) { hideDropdown(); return; }
+            if (verTodos) verTodos.href = '/catalogo?q=' + encodeURIComponent(q);
+            debounceTimer = setTimeout(function () { fetchSuggestions(q); }, 220);
+        });
+        document.addEventListener('click', function (e) { if (!dropdown.contains(e.target) && e.target !== input) hideDropdown(); });
+        input.addEventListener('blur', function () { setTimeout(function () { if (!dropdown.matches(':hover')) hideDropdown(); }, 180); });
+        input.addEventListener('focus', function () { const q = input.value.trim(); if (q.length >= 2 && items.length > 0) showDropdown(); });
+        if (form) { form.addEventListener('submit', function (e) { const isOpen = dropdown.style.display === 'block'; if (isOpen && activeIndex >= 0 && items[activeIndex]) { e.preventDefault(); window.location.href = items[activeIndex].href; } }); }
+    })();
+    </script>
 
 </body>
 </html>
