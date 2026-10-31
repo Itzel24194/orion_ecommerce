@@ -40,3 +40,5 @@ desktop.ini
 
 # Archivos de depuración
 app/static/debug_impi/
+.history/
+app/static/uploads/
