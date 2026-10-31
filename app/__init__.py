@@ -1,12 +1,14 @@
+# app/__init__.py
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from flask import Flask, request, session
+from flask import Flask, request, session, jsonify, send_from_directory
 from flask_mail import Mail
 from pymongo import MongoClient
 from flask_apscheduler import APScheduler
 from flask_babel import Babel, gettext
 from datetime import datetime, timedelta
+from bson import ObjectId # ⭐ Añadido para buscar por ID
 
 # ================================================================
 # CARGAR .env DESDE LA RAÍZ DEL PROYECTO
@@ -24,24 +26,11 @@ babel = Babel()
 
 
 # ================================================================
-# FUNCIÓN AUXILIAR PARA VALIDAR LLAVES DE CONEKTA
+# ⭐ CONFIG SANDBOX (sin pasarela externa)
 # ================================================================
-def _conekta_llaves_validas(public_key, private_key):
-    """
-    Verifica que ambas llaves tengan el formato correcto de Conekta.
-    Una llave válida:
-      - No está vacía
-      - Empieza con 'key_'
-      - Tiene al menos 25 caracteres
-    """
-    def es_valida(k):
-        return bool(
-            k
-            and isinstance(k, str)
-            and k.strip().startswith('key_')
-            and len(k.strip()) >= 25
-        )
-    return es_valida(public_key) and es_valida(private_key)
+SANDBOX_MODE = True
+CONEKTA_MSI_PLAZOS = [3, 6, 9, 12, 18, 24]  # plazos MSI permitidos en sandbox
+PAYMENT_GATEWAY = 'sandbox'                  # 'sandbox' | 'stripe' | 'mercadopago' | ...
 
 
 def create_app():
@@ -63,6 +52,19 @@ def create_app():
         os.makedirs(upload_folder)
         print(f"📁 Carpeta de uploads creada: {upload_folder}")
 
+    # ============================================================
+    # ⭐⭐⭐ RUTA EXPLÍCITA PARA SERVIR /static/uploads/
+    # (Necesario cuando Express y Flask comparten la misma carpeta)
+    # ============================================================
+    @app.route('/static/uploads/<path:filename>')
+    def serve_upload(filename):
+        return send_from_directory(
+            os.path.join(app.root_path, 'static', 'uploads'),
+            filename
+        )
+
+    print("✅ Ruta explícita /static/uploads/<filename> registrada")
+
     # Configuración de Correo (desde .env)
     app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
     app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
@@ -77,33 +79,23 @@ def create_app():
         print("⚠️  Correo no configurado (faltan MAIL_USERNAME o MAIL_PASSWORD)")
 
     # ============================================================
-    # ⭐ CONFIGURACIÓN DE CONEKTA (MSI - Meses Sin Intereses)
+    # ⭐ CONFIG SANDBOX (reemplaza la config de Conekta)
     # ============================================================
-    app.config['CONEKTA_PUBLIC_KEY'] = (os.getenv('CONEKTA_PUBLIC_KEY') or '').strip()
-    app.config['CONEKTA_PRIVATE_KEY'] = (os.getenv('CONEKTA_PRIVATE_KEY') or '').strip()
+    app.config['SANDBOX_MODE'] = SANDBOX_MODE
+    app.config['CONEKTA_MSI_PLAZOS'] = CONEKTA_MSI_PLAZOS
+    app.config['PAYMENT_GATEWAY'] = PAYMENT_GATEWAY
 
-    if _conekta_llaves_validas(
-        app.config['CONEKTA_PUBLIC_KEY'],
-        app.config['CONEKTA_PRIVATE_KEY']
-    ):
-        pk = app.config['CONEKTA_PUBLIC_KEY']
-        print(f"💳 Conekta configurado (Public Key: {pk[:14]}...{pk[-4:]})")
-        print(f"   📏 Longitud total de la public key: {len(pk)} caracteres")
-    else:
-        print("⚠️  Conekta NO configurado (falta CONEKTA_PUBLIC_KEY o CONEKTA_PRIVATE_KEY en .env)")
-        print(f"   CONEKTA_PUBLIC_KEY presente: {bool(app.config['CONEKTA_PUBLIC_KEY'])}")
-        print(f"   CONEKTA_PRIVATE_KEY presente: {bool(app.config['CONEKTA_PRIVATE_KEY'])}")
+    print(f"🧪 Modo SANDBOX activo: {app.config['SANDBOX_MODE']}")
+    print(f"💳 Plazos MSI disponibles: {app.config['CONEKTA_MSI_PLAZOS']}")
+    print(f"🔌 Pasarela: {app.config['PAYMENT_GATEWAY']} (no se llama a ninguna API externa)")
 
     # ============================================================
-    # ⭐⭐⭐ EXPONER CONEKTA COMO VARIABLE GLOBAL DE JINJA
+    # ⭐ EXPONER SANDBOX Y MSI COMO VARIABLES GLOBALES DE JINJA
     # ============================================================
-    app.jinja_env.globals['CONEKTA_PUBLIC_KEY'] = app.config.get('CONEKTA_PUBLIC_KEY', '')
-    app.jinja_env.globals['CONEKTA_PRIVATE_KEY'] = app.config.get('CONEKTA_PRIVATE_KEY', '')
-    app.jinja_env.globals['CONEKTA_PUBLIC_KEY_CONFIGURED'] = _conekta_llaves_validas(
-        app.config.get('CONEKTA_PUBLIC_KEY', ''),
-        app.config.get('CONEKTA_PRIVATE_KEY', '')
-    )
-    print(f"🌐 CONEKTA_PUBLIC_KEY expuesta como variable global de Jinja")
+    app.jinja_env.globals['SANDBOX_MODE'] = app.config['SANDBOX_MODE']
+    app.jinja_env.globals['MSI_PLAZOS'] = app.config['CONEKTA_MSI_PLAZOS']
+    app.jinja_env.globals['PAYMENT_GATEWAY'] = app.config['PAYMENT_GATEWAY']
+    print(f"🌐 SANDBOX_MODE y MSI_PLAZOS expuestos como variables globales de Jinja")
 
     # ============================================================
     # ⭐ EXPONER datetime / timedelta A TODOS LOS TEMPLATES
@@ -111,6 +103,63 @@ def create_app():
     app.jinja_env.globals['timedelta'] = timedelta
     app.jinja_env.globals['datetime'] = datetime
     print("🕐 datetime y timedelta expuestos como globales de Jinja")
+
+    # ============================================================
+    # ⭐⭐⭐ FILTROS JINJA PARA FOTOS / VIDEOS (base64 y URLs)
+    # ============================================================
+    from flask import url_for as _url_for
+    import os as _os
+
+    def _foto_src(foto):
+        if not foto:
+            return ''
+        s = str(foto).strip()
+        if not s:
+            return ''
+
+        # 1. Si ya es una URL completa o base64, devolverla tal cual
+        if s.startswith(('data:', 'http://', 'https://', 'blob:')):
+            return s
+
+        # 2. Si ya incluye /static/ o static/, devolverla corregida
+        if s.startswith('/static/'):
+            return s
+        if s.startswith('static/'):
+            return '/' + s
+
+        # 3. ⭐ Detectar la carpeta REAL del archivo en disco
+        #    - Fotos de perfil → app/static/uploads/<archivo>
+        #    - Fotos de producto → app/static/uploads/productos/<archivo>
+        #    Se comprueba si existe en cada carpeta para no adivinar por prefijo.
+        try:
+            uploads_dir = _os.path.join(app.static_folder, 'uploads')
+            productos_dir = _os.path.join(uploads_dir, 'productos')
+
+            # 3a. ¿Existe en uploads/ (foto de perfil)?
+            if _os.path.isfile(_os.path.join(uploads_dir, s)):
+                return _url_for('static', filename='uploads/' + s)
+
+            # 3b. ¿Existe en uploads/productos/ (foto de producto)?
+            if _os.path.isfile(_os.path.join(productos_dir, s)):
+                return _url_for('static', filename='uploads/productos/' + s)
+        except Exception:
+            pass
+
+        # 4. Fallback: si no se pudo comprobar en disco, mantener
+        #    la heurística por prefijo (fotos de perfil nuevas).
+        if s.startswith('u') or s.startswith('user_'):
+            return _url_for('static', filename='uploads/' + s)
+        return _url_for('static', filename='uploads/productos/' + s)
+
+    # Registrar como FILTRO (permite: {{ foto | foto_src }})
+    app.add_template_filter(_foto_src, name='foto_src')
+    app.add_template_filter(_foto_src, name='video_src')
+
+    # ⭐ Registrar como FUNCIÓN GLOBAL (permite: {{ foto_src(foto) }})
+    app.jinja_env.globals['foto_src'] = _foto_src
+    app.jinja_env.globals['video_src'] = _foto_src
+
+    print("🖼️  Filtros y globales Jinja registrados: foto_src, video_src")
 
     # ============================================================
     # CONFIGURACIÓN DE FLASK-BABEL (idiomas)
@@ -148,32 +197,21 @@ def create_app():
         )
 
     # ============================================================
-    # ⭐ INJECTAR CONEKTA EN TODAS LAS PLANTILLAS (context processor)
+    # ⭐ INJECTAR SANDBOX EN TODAS LAS PLANTILLAS
     # ============================================================
     @app.context_processor
-    def inject_conekta():
-        pub = app.config.get('CONEKTA_PUBLIC_KEY', '')
-        priv = app.config.get('CONEKTA_PRIVATE_KEY', '')
+    def inject_sandbox():
         return dict(
-            CONEKTA_PUBLIC_KEY=pub,
-            CONEKTA_PRIVATE_KEY=priv,
-            CONEKTA_PUBLIC_KEY_CONFIGURED=_conekta_llaves_validas(pub, priv)
+            SANDBOX_MODE=app.config.get('SANDBOX_MODE', True),
+            MSI_PLAZOS=app.config.get('CONEKTA_MSI_PLAZOS', []),
+            PAYMENT_GATEWAY=app.config.get('PAYMENT_GATEWAY', 'sandbox'),
         )
 
     # ============================================================
-    # ⭐ INJECTAR CONFIGURACIÓN DE LA TIENDA EN TODAS LAS PLANTILLAS
+    # ⭐ INJECTAR CONFIGURACIÓN DE LA TIENDA
     # ============================================================
     @app.context_processor
     def inject_configuracion():
-        """
-        Expone `site_config` a TODAS las plantillas con los datos generales
-        de la tienda (nombre, moneda, email, teléfono, dirección).
-
-        Uso en cualquier template:
-            {{ site_config.nombre_tienda }}
-            {{ site_config.moneda }}
-            {{ site_config.email_tienda }}
-        """
         defaults = {
             'nombre_tienda': 'ORION System',
             'email_tienda': '',
@@ -184,10 +222,8 @@ def create_app():
         try:
             from app.models.configuracion_model import Configuracion
             cfg = Configuracion.obtener_general() or {}
-            # Fusionar con defaults para que nunca falte ninguna clave
             return dict(site_config={**defaults, **cfg})
         except Exception:
-            # Si el modelo no existe o falla, devolvemos defaults sin romper
             return dict(site_config=defaults)
 
     # ========== MONGODB ==========
@@ -198,12 +234,52 @@ def create_app():
     except Exception as e:
         print(f"❌ Error conectando a MongoDB: {e}")
 
+    # ============================================================
+    # ⭐⭐⭐ INYECTAR FOTO FRESCA DE LA BD PARA EL NAVBAR
+    # ============================================================
+    @app.context_processor
+    def inject_user_foto():
+        """Asegura que el navbar siempre use la foto más reciente de la BD, no la sesión."""
+        if 'user_id' in session:
+            try:
+                # Buscar el ID del usuario en la sesión
+                raw_uid = session.get('user_id')
+
+                # Manejar si el ID guardado es string o ObjectId
+                query_id = ObjectId(raw_uid) if ObjectId.is_valid(raw_uid) else raw_uid
+
+                user = app.db.usuarios.find_one({'_id': query_id}, {'foto': 1})
+                if user:
+                    return dict(current_user_foto=user.get('foto'))
+            except Exception as e:
+                print(f"⚠️ Error obteniendo foto fresca de BD en navbar: {e}")
+        return dict(current_user_foto=None)
+
     # ========== INICIALIZAR EXTENSIONES ==========
     mail.init_app(app)
 
     # ========== REGISTRAR BLUEPRINTS ==========
     from .routes.web import web
+
+    try:
+        from .controllers import resenas_controller  # noqa: F401
+        print("✅ Controlador de reseñas importado (rutas registradas en blueprint 'web')")
+    except Exception as e:
+        print(f"⚠️ No se pudo importar resenas_controller: {e}")
+
     app.register_blueprint(web)
+
+    # ============================================================
+    # ⭐⭐⭐ REGISTRAR RUTAS DE LA API PARA LA APP MÓVIL
+    # ============================================================
+    from .controllers import cuenta_controller
+
+    # API: Subir foto de perfil (base64)
+    @app.route('/api/v1/cuenta/foto', methods=['POST'])
+    def subir_foto_api():
+        return cuenta_controller.api_subir_foto()
+
+    print("✅ Rutas de API de la cuenta registradas (incluyendo subida de foto)")
 
     # ========== SCHEDULER ==========
     def actualizar_productos_por_temporada():
@@ -230,7 +306,7 @@ def create_app():
         print("⏰ Scheduler ya estaba en ejecución.")
 
     # ============================================================
-    # ⭐ MANEJO DE ERROR 413 (Request Entity Too Large)
+    # ⭐ MANEJO DE ERROR 413
     # ============================================================
     @app.errorhandler(413)
     def request_entity_too_large(error):
@@ -248,6 +324,26 @@ def create_app():
             f'<p><a href="/admin/productos">Volver al inventario</a></p>',
             413
         )
+
+    # ============================================================
+    # ⭐ NUEVO: MANEJO DE ERROR 500 EN JSON (útil para la app móvil)
+    # ============================================================
+    @app.errorhandler(500)
+    def internal_error(error):
+        from flask import jsonify, request as req
+        if req.accept_mimetypes.accept_json and not req.accept_mimetypes.accept_html:
+            return jsonify({
+                'success': False,
+                'message': 'Error interno del servidor',
+                'error': str(error),
+            }), 500
+        return render_template_500()
+
+    def render_template_500():
+        try:
+            return app.jinja_env.get_template('errores/500.html').render(), 500
+        except Exception:
+            return '<h1>500 - Error interno</h1>', 500
 
     # ============================================================
     # ✅ RUTA DE DIAGNÓSTICO i18n
@@ -270,121 +366,64 @@ def create_app():
         }
 
     # ============================================================
-    # ✅ RUTA DE DIAGNÓSTICO Conekta
+    # ✅ RUTA DE DIAGNÓSTICO SANDBOX
     # ============================================================
-    @app.route('/test-conekta')
-    def test_conekta():
-        public_key = (app.config.get('CONEKTA_PUBLIC_KEY') or '').strip()
-        private_key = (app.config.get('CONEKTA_PRIVATE_KEY') or '').strip()
-
-        def mask(k):
-            if not k:
-                return 'NO CONFIGURADA'
-            if len(k) < 20:
-                return k
-            return k[:14] + '...' + k[-4:]
-
-        def es_valida(k):
-            return bool(k and k.startswith('key_') and len(k) >= 25)
-
-        valida_public = es_valida(public_key)
-        valida_private = es_valida(private_key)
-        configurado = valida_public and valida_private
-
+    @app.route('/test-sandbox')
+    def test_sandbox():
         return {
-            'conekta_public_key': mask(public_key),
-            'conekta_private_key': mask(private_key),
-            'public_valida': valida_public,
-            'private_valida': valida_private,
-            'longitud_public': len(public_key),
-            'longitud_private': len(private_key),
-            'configurado': configurado,
+            'sandbox_mode': app.config.get('SANDBOX_MODE', True),
+            'payment_gateway': app.config.get('PAYMENT_GATEWAY', 'sandbox'),
+            'msi_plazos': app.config.get('CONEKTA_MSI_PLAZOS', []),
             'mensaje': (
-                '✅ Conekta está listo para procesar pagos.'
-                if configurado else
-                '⚠️ Falta una o ambas llaves en el archivo .env.'
+                '✅ Modo SANDBOX activo. Los pagos se simulan localmente, '
+                'sin llamar a ninguna pasarela externa.'
             ),
         }
 
     # ============================================================
-    # ⭐⭐⭐ DIAGNÓSTICO — Qué llave recibe el template
+    # ⭐⭐⭐ DIAGNÓSTICO — Qué recibe el template (SANDBOX)
     # ============================================================
-    @app.route('/test-conekta-template')
-    def test_conekta_template():
+    @app.route('/test-sandbox-template')
+    def test_sandbox_template():
         from flask import render_template_string
         template_test = """
         <!DOCTYPE html>
         <html>
-        <body>
-        <h1>🔍 Diagnóstico de Conekta en Templates</h1>
-        <table border="1" cellpadding="8" style="border-collapse:collapse;font-family:monospace;">
-            <tr><th>Variable</th><th>Valor</th><th>Longitud</th></tr>
+        <body style="font-family:monospace;padding:20px;">
+        <h1>🔍 Diagnóstico de SANDBOX en Templates</h1>
+        <table border="1" cellpadding="8" style="border-collapse:collapse;">
+            <tr><th>Variable</th><th>Valor</th></tr>
             <tr>
-                <td><code>CONEKTA_PUBLIC_KEY</code></td>
-                <td><code>{{ CONEKTA_PUBLIC_KEY }}</code></td>
-                <td>{{ CONEKTA_PUBLIC_KEY|length if CONEKTA_PUBLIC_KEY else 0 }}</td>
+                <td><code>SANDBOX_MODE</code></td>
+                <td><code>{{ SANDBOX_MODE }}</code></td>
             </tr>
             <tr>
-                <td><code>config.CONEKTA_PUBLIC_KEY</code></td>
-                <td><code>{{ config.CONEKTA_PUBLIC_KEY }}</code></td>
-                <td>{{ config.CONEKTA_PUBLIC_KEY|length if config.CONEKTA_PUBLIC_KEY else 0 }}</td>
+                <td><code>PAYMENT_GATEWAY</code></td>
+                <td><code>{{ PAYMENT_GATEWAY }}</code></td>
             </tr>
             <tr>
-                <td><code>CONEKTA_PUBLIC_KEY_CONFIGURED</code></td>
-                <td><code>{{ CONEKTA_PUBLIC_KEY_CONFIGURED }}</code></td>
-                <td>—</td>
+                <td><code>MSI_PLAZOS</code></td>
+                <td><code>{{ MSI_PLAZOS }}</code></td>
             </tr>
         </table>
         <h2>Según el servidor (Python):</h2>
         <ul>
-            <li><code>app.config['CONEKTA_PUBLIC_KEY']</code>: {{ pk_python }}</li>
-            <li>Longitud en Python: {{ pk_len }}</li>
+            <li><code>app.config['SANDBOX_MODE']</code>: {{ sandbox_python }}</li>
+            <li><code>app.config['PAYMENT_GATEWAY']</code>: {{ gateway_python }}</li>
         </ul>
-        <p style="color:#dc2626;"><b>⚠️ Si las 3 primeras filas están vacías pero "Según el servidor" tiene valor → el problema es la caché del navegador o que esta ruta es la del servidor, y el HTML lo tiene el navegador.</b></p>
-        <p style="color:#16a34a;"><b>✅ Si las 3 primeras filas tienen la llave → todo OK. El problema es caché del navegador en el carrito.</b></p>
-        </body>
-        </html>
-        """
-        pk = app.config.get('CONEKTA_PUBLIC_KEY', '')
-        return render_template_string(
-            template_test,
-            pk_python=pk[:14] + '...' + pk[-4:] if len(pk) > 20 else (pk or 'VACÍO'),
-            pk_len=len(pk)
-        )
-
-    # ============================================================
-    # ⭐⭐⭐ DIAGNÓSTICO — Línea HTML del carrito
-    # ============================================================
-    @app.route('/test-carrito-html')
-    def test_carrito_html():
-        from flask import render_template_string
-        template_check = """
-        <!DOCTYPE html>
-        <html>
-        <head><title>Check HTML</title></head>
-        <body>
-        <h1>🔍 Línea exacta que recibiría Conekta.setPublicKey</h1>
-        <p>Si abres el carrito y ves el mismo texto, todo OK:</p>
-        <pre style="background:#f0f0f0;padding:15px;font-family:monospace;font-size:14px;">Conekta.setPublicKey("{{ CONEKTA_PUBLIC_KEY }}");</pre>
-        <p><b>Longitud de la llave inyectada:</b> {{ CONEKTA_PUBLIC_KEY|length }}</p>
-
-        <h2>Comparación:</h2>
-        <ul>
-            <li>Valor de <code>CONEKTA_PUBLIC_KEY</code> (jinja): <code>{{ CONEKTA_PUBLIC_KEY }}</code></li>
-            <li>Valor de <code>config.CONEKTA_PUBLIC_KEY</code>: <code>{{ config.CONEKTA_PUBLIC_KEY }}</code></li>
-        </ul>
-
-        {% if CONEKTA_PUBLIC_KEY %}
-            <p style="color:green;font-size:20px;">✅ La llave LLEGA al template. Todo OK.</p>
-            <p>➡️ Si en el carrito aún ves "vacío", presiona <b>Ctrl+Shift+R</b> para recargar sin caché.</p>
+        {% if SANDBOX_MODE %}
+            <p style="color:green;font-size:20px;">✅ El modo SANDBOX llega al template.</p>
         {% else %}
-            <p style="color:red;font-size:20px;">❌ La llave NO llega al template. Problema real.</p>
-            <p>➡️ Reinicia el servidor (Ctrl+C, python run.py) e inténtalo de nuevo.</p>
+            <p style="color:red;font-size:20px;">❌ SANDBOX_MODE NO llega al template.</p>
         {% endif %}
         </body>
         </html>
         """
-        return render_template_string(template_check)
+        return render_template_string(
+            template_test,
+            sandbox_python=app.config.get('SANDBOX_MODE', True),
+            gateway_python=app.config.get('PAYMENT_GATEWAY', 'sandbox'),
+        )
 
     # ============================================================
     # ⭐⭐⭐ DIAGNÓSTICO — Configuración de la tienda
@@ -398,11 +437,9 @@ def create_app():
         <head><title>Config check</title></head>
         <body style="font-family:monospace;padding:20px;">
         <h1>🔍 Diagnóstico del módulo de Configuración</h1>
-
         <h2>1. ¿Existe el modelo?</h2>
         <p>{{ modelo_ok }}</p>
-
-        <h2>2. Valores en `site_config` (context processor global)</h2>
+        <h2>2. Valores en `site_config`</h2>
         <table border="1" cellpadding="8" style="border-collapse:collapse;">
             <tr><th>Clave</th><th>Valor</th></tr>
             <tr><td>nombre_tienda</td><td>{{ site_config.nombre_tienda }}</td></tr>
@@ -411,14 +448,8 @@ def create_app():
             <tr><td>direccion_tienda</td><td>{{ site_config.direccion_tienda }}</td></tr>
             <tr><td>moneda</td><td>{{ site_config.moneda }}</td></tr>
         </table>
-
-        <h2>3. Documento crudo en la BD (colección `configuracion`, _id='general')</h2>
+        <h2>3. Documento crudo en la BD</h2>
         <pre>{{ doc_raw }}</pre>
-
-        <p style="color:#16a34a;margin-top:20px;">
-            ✅ Si los valores se ven bien aquí, `{{ '{{ site_config.nombre_tienda }}' }}`
-            funcionará en cualquier template.
-        </p>
         </body>
         </html>
         """
@@ -435,6 +466,82 @@ def create_app():
         return render_template_string(template_cfg, modelo_ok=modelo_ok, doc_raw=doc_raw)
 
     # ============================================================
-    # ✅ RETURN FINAL (con indentación correcta)
+    # ⭐ FILTROS DE FECHAS Y TEMPORADAS
+    # ============================================================
+    from datetime import datetime as _dt
+
+    def _to_datetime(value):
+        if value is None:
+            return None
+        if isinstance(value, _dt):
+            return value
+        try:
+            s = str(value).strip().replace('Z', '+00:00')
+            if len(s) == 10:
+                return _dt.strptime(s, '%Y-%m-%d')
+            return _dt.fromisoformat(s)
+        except Exception:
+            return None
+
+    @app.template_filter('fmt_fecha')
+    def fmt_fecha(value, fmt='%d/%m/%Y'):
+        d = _to_datetime(value)
+        return d.strftime(fmt) if d else '—'
+
+    @app.template_filter('fmt_fecha_input')
+    def fmt_fecha_input(value):
+        d = _to_datetime(value)
+        return d.strftime('%Y-%m-%d') if d else ''
+
+    @app.template_filter('estado_temporada')
+    def estado_temporada(temp):
+        from datetime import datetime as _d
+        activa = temp.get('activa', True) is not False
+        fi = _to_datetime(temp.get('fecha_inicio'))
+        ff = _to_datetime(temp.get('fecha_fin'))
+        ahora = _d.now()
+
+        if not activa:
+            return 'inactiva', 'Inactiva'
+        if fi and ahora < fi:
+            return 'proxima', 'Próxima'
+        if ff and ahora > ff:
+            return 'finalizada', 'Finalizada'
+        if fi and ff and fi <= ahora <= ff:
+            return 'en_curso', 'En curso'
+        return 'activa', 'Activa'
+
+    # ============================================================
+    # ⭐ RUTA TEMPORAL: actualizar .avif → .jpg en MongoDB
+    # ============================================================
+    @app.route('/admin/fix-fotos-avif')
+    def fix_fotos_avif():
+        from flask import jsonify
+        total = 0
+        detalles = []
+        for p in app.db.productos.find({}):
+            cambios = False
+            fotos = p.get('fotos') or []
+            videos = p.get('videos') or []
+
+            nuevas_fotos = [f.replace('.avif', '.jpg') if isinstance(f, str) else f for f in fotos]
+            nuevos_videos = [v.replace('.avif', '.jpg') if isinstance(v, str) else v for v in videos]
+
+            if nuevas_fotos != fotos or nuevos_videos != videos:
+                app.db.productos.update_one(
+                    {'_id': p['_id']},
+                    {'$set': {'fotos': nuevas_fotos, 'videos': nuevos_videos}}
+                )
+                total += 1
+                detalles.append(p.get('nombre', 'sin nombre'))
+
+        return jsonify({
+            'ok': True,
+            'actualizados': total,
+            'productos': detalles,
+        })
+
+    # ============================================================
+    # ✅ RETURN FINAL
     # ============================================================
     return app

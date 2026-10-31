@@ -1,6 +1,7 @@
 # app/controllers/monedero_admin_controller.py
 # ================================================================
 # CONTROLADOR ADMIN — MONEDERO DIGITAL ORION
+# (opcional: el monedero funciona sin esto)
 # ================================================================
 
 import csv
@@ -12,7 +13,6 @@ from flask import (
 from bson import ObjectId
 from datetime import datetime
 
-# ⭐ FIX: MonederoAdmin vive en monedero_admin_model, NO en monedero_model
 from app.models.monedero_admin_model import MonederoAdmin
 
 
@@ -172,7 +172,9 @@ def admin_monedero_ajustar(usuario_id):
 def admin_monedero_toggle(usuario_id):
     admin, redir = _verificar_admin()
     if redir:
-        return redir
+        return redirect(url_for('web.login')) if request.method == 'GET' else (
+            jsonify({'success': False, 'error': 'No autorizado'}), 403
+        )
 
     data = request.get_json(silent=True) or request.form
     accion = (data.get('accion') or '').strip().lower()
@@ -252,10 +254,6 @@ def api_admin_monedero_top():
     return jsonify({'success': True, 'top': resultado})
 
 
-# ================================================================
-# API del gráfico (para recargar sin refresh)
-# ================================================================
-
 def api_admin_monedero_grafico():
     usuario, redir = _verificar_admin()
     if redir:
@@ -281,10 +279,8 @@ def admin_monedero_exportar_csv():
 
     filas = MonederoAdmin.exportar_csv()
 
-    # Crear CSV en memoria
     output = io.StringIO()
-    # BOM para que Excel abra bien con acentos
-    output.write('\ufeff')
+    output.write('\ufeff')  # BOM para Excel
 
     if filas:
         campos = list(filas[0].keys())

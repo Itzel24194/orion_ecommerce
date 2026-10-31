@@ -37,6 +37,19 @@ def _vendedor_es_valido(v):
     return v and v.get('estado') == 'aprobado' and v.get('activo')
 
 
+def _filtro_productos_vendedor(vendedor_id):
+    """
+    Construye el filtro Mongo para productos de un vendedor.
+    Soporta vendedor_id como string u ObjectId.
+    NO filtra por 'activo' (igual que el dashboard).
+    """
+    vid_str = str(vendedor_id)
+    filtro = {'$or': [{'vendedor_id': vid_str}]}
+    if ObjectId.is_valid(vid_str):
+        filtro['$or'].append({'vendedor_id': ObjectId(vid_str)})
+    return filtro
+
+
 # ============================================================
 # ⭐ HELPER: CALCULAR MÉTRICAS REALES DE UN VENDEDOR
 # ============================================================
@@ -44,17 +57,6 @@ def _calcular_metricas_reales(vendedor_id, db=None):
     """
     Calcula las métricas REALES de un vendedor leyendo directamente
     las colecciones `productos` y `pedidos`.
-
-    Sirve como fallback cuando el doc del vendedor tiene `metricas`
-    en 0 (porque se crearon productos vía vendedor_controller sin
-    incrementar el contador).
-
-    Args:
-        vendedor_id: str o ObjectId del documento en 'vendedores'
-        db: instancia de Mongo (opcional)
-
-    Returns:
-        dict con {productos, ventas, ingresos, comisiones}
     """
     if db is None:
         db = _db()
@@ -64,20 +66,10 @@ def _calcular_metricas_reales(vendedor_id, db=None):
 
     vid_str = str(vendedor_id)
 
-    # 1. Contar productos activos del vendedor
-    # El vendedor_id puede estar guardado como string o como ObjectId
+    # 1. Contar productos del vendedor (mismo criterio que el dashboard)
     total_productos = 0
     try:
-        filtros_productos = {
-            '$or': [
-                {'vendedor_id': vid_str},
-            ],
-            'activo': True,
-        }
-        # Intentar también como ObjectId si es válido
-        if ObjectId.is_valid(vid_str):
-            filtros_productos['$or'].append({'vendedor_id': ObjectId(vid_str)})
-
+        filtros_productos = _filtro_productos_vendedor(vendedor_id)
         total_productos = db.productos.count_documents(filtros_productos)
     except Exception as e:
         current_app.logger.warning(f'[_calcular_metricas_reales] Error contando productos: {e}')
@@ -101,12 +93,10 @@ def _calcular_metricas_reales(vendedor_id, db=None):
         pedidos = list(db.pedidos.find(filtro_pedidos))
 
         for pedido in pedidos:
-            # Recorrer items (soporta 'items' e 'items_list')
             items = pedido.get('items') or pedido.get('items_list') or []
             for item in items:
                 item_vid = str(item.get('vendedor_id') or '')
                 if item_vid == vid_str:
-                    # 1 venta = 1 item vendido del vendedor
                     total_ventas += int(item.get('cantidad') or 1)
                     precio = float(item.get('precio') or 0)
                     cantidad = int(item.get('cantidad') or 1)
@@ -114,7 +104,7 @@ def _calcular_metricas_reales(vendedor_id, db=None):
     except Exception as e:
         current_app.logger.warning(f'[_calcular_metricas_reales] Error contando ventas: {e}')
 
-    # 3. Comisiones (usando comision_pct del vendedor)
+    # 3. Comisiones
     comision_pct = 15.0
     try:
         v = Vendedor.obtener_por_id(db, vendedor_id)
@@ -134,10 +124,7 @@ def _calcular_metricas_reales(vendedor_id, db=None):
 
 
 def _formatear_vendedor_con_metricas(v):
-    """
-    Toma un doc de vendedor, lo formatea y le inyecta métricas reales.
-    Devuelve un dict listo para el template.
-    """
+    """Toma un doc de vendedor, lo formatea y le inyecta métricas reales."""
     if not v:
         return {}
     try:
@@ -152,52 +139,205 @@ def _formatear_vendedor_con_metricas(v):
     return v_fmt
 
 
+def _precio_de_producto(p):
+    """
+    Devuelve el precio "mostrado" de un producto.
+    Si tiene variantes, toma el precio de la primera con stock > 0.
+    Si no, usa el campo 'precio'.
+    """
+    variables = p.get('variables') or []
+    if variables:
+        con_stock = [var for var in variables if (var.get('stock') or 0) > 0]
+        if con_stock:
+            return float(con_stock[0].get('precio') or 0)
+        return float(variables[0].get('precio') or 0)
+    return float(p.get('precio') or 0)
+
+
+def _normalizar_producto(p, cat_map=None, marca_map=None):
+    """
+    Normaliza un documento de producto para su uso en templates:
+    - str _id
+    - precio_mostrado
+    - foto_principal
+    - nombre_categoria / nombre_marca (si se pasan los mapas)
+    """
+    p['_id'] = str(p['_id'])
+
+    p['precio_mostrado'] = _precio_de_producto(p)
+
+    fotos = p.get('fotos') or []
+    p['foto_principal'] = fotos[0] if fotos else None
+
+    # Categoría / marca (nombres legibles)
+    if cat_map is not None:
+        cat_id = p.get('categoria_id')
+        p['nombre_categoria'] = cat_map.get(str(cat_id), '') if cat_id else ''
+    if marca_map is not None:
+        marca_id = p.get('marca_id')
+        p['nombre_marca'] = marca_map.get(str(marca_id), '') if marca_id else ''
+
+    return p
+
+
 # ============================================================
-# VISTA PÚBLICA — LANDING MARKETPLACE
+# ⭐ PÁGINA PRINCIPAL DEL MARKETPLACE
 # ============================================================
 def index():
-    """Landing pública del marketplace con vendedores destacados."""
+    """
+    Página pública principal del marketplace.
+    Muestra:
+      - Vendedores aprobados (destacados)
+      - Productos activos (con filtro de búsqueda)
+      - Categorías y marcas para filtros
+      - Stats reales: vendedores activos + productos disponibles
+    """
     db = _db()
 
-    # Vendedores aprobados y activos
-    try:
-        vendedores_raw = Vendedor.listar(db, estado='aprobado', limite=24)
-    except Exception as e:
-        current_app.logger.error(f'[marketplace.index] Error listando vendedores: {e}')
-        vendedores_raw = []
+    # ---------- Parámetros ----------
+    q = (request.args.get('q') or '').strip()
+    categoria_id = (request.args.get('categoria') or '').strip()
+    marca_id = (request.args.get('marca') or '').strip()
+    orden = (request.args.get('orden') or 'recientes').strip()
 
-    # ⭐ Inyectar métricas reales a cada vendedor
-    vendedores = []
-    for v in vendedores_raw:
-        v_fmt = _formatear_vendedor_con_metricas(v)
-        if v_fmt:
-            vendedores.append(v_fmt)
-
-    # Productos del marketplace (los que tengan vendedor_id)
+    # ---------- Vendedores aprobados ----------
     try:
-        productos_mkt = list(
-            db.productos.find({
-                'vendedor_id': {'$exists': True, '$ne': None},
+        vendedores_raw = list(
+            db[Vendedor.COLLECTION].find({
+                'estado': 'aprobado',
                 'activo': True,
-            }).limit(12).sort('created_at', -1)
+            }).sort('created_at', -1).limit(8)
         )
-        # Serializar _id
-        for p in productos_mkt:
-            p['_id'] = str(p['_id'])
+        vendedores = []
+        for v in vendedores_raw:
+            v_fmt = _formatear_vendedor_con_metricas(v)
+            if v_fmt:
+                vendedores.append(v_fmt)
     except Exception as e:
-        current_app.logger.warning(f'[marketplace.index] Error cargando productos: {e}')
-        productos_mkt = []
+        current_app.logger.warning(f'[marketplace.index] vendedores: {e}')
+        vendedores = []
+
+    # ---------- Categorías y marcas (para selects) ----------
+    try:
+        categorias = list(db.categorias.find({}).sort('nombre', 1))
+    except Exception:
+        categorias = []
+
+    try:
+        marcas = list(db.marcas.find({
+            '$or': [
+                {'estado': 'aprobada'},
+                {'estado': 'aprobado'},
+                {'estado': 'activa'},
+                {'estado': 'activo'},
+                {'activa': True},
+                {'estado': {'$exists': False}},
+            ]
+        }).sort('nombre_comercial', 1).limit(50))
+    except Exception:
+        marcas = []
+
+    cat_map = {str(c['_id']): c.get('nombre', '') for c in categorias}
+    marca_map = {str(m['_id']): m.get('nombre_comercial', m.get('nombre', '')) for m in marcas}
+
+    # ---------- Productos ----------
+    filtro_prod = {'activo': True, 'estado': 'activo'}
+
+    if q:
+        import re
+        filtro_prod['nombre'] = {'$regex': re.escape(q), '$options': 'i'}
+
+    if categoria_id and ObjectId.is_valid(categoria_id):
+        filtro_prod['categoria_id'] = ObjectId(categoria_id)
+
+    if marca_id and ObjectId.is_valid(marca_id):
+        filtro_prod['marca_id'] = ObjectId(marca_id)
+
+    orden_map = {
+        'recientes':   ('created_at', -1),
+        'precio_asc':  ('precio', 1),
+        'precio_desc': ('precio', -1),
+        'nombre':      ('nombre', 1),
+    }
+    sort_field, sort_dir = orden_map.get(orden, ('created_at', -1))
+
+    try:
+        productos_raw = list(
+            db.productos.find(filtro_prod)
+                       .sort(sort_field, sort_dir)
+                       .limit(48)
+        )
+    except Exception as e:
+        current_app.logger.warning(f'[marketplace.index] productos: {e}')
+        productos_raw = []
+
+    productos = [_normalizar_producto(p, cat_map, marca_map) for p in productos_raw]
+
+    # ============================================================
+    # ⭐ STATS REALES para la landing (vendedores + productos)
+    # ============================================================
+    total_vendedores = 0
+    try:
+        total_vendedores = db[Vendedor.COLLECTION].count_documents({
+            'estado': 'aprobado',
+            'activo': True,
+        })
+    except Exception as e:
+        current_app.logger.warning(f'[marketplace.index] contando vendedores: {e}')
+
+    total_productos = 0
+    try:
+        total_productos = db.productos.count_documents({
+            'activo': True,
+            'estado': 'activo',
+        })
+    except Exception as e:
+        current_app.logger.warning(f'[marketplace.index] contando productos: {e}')
+
+    # Fallback por si tu esquema no tiene 'estado' en productos
+    if total_productos == 0:
+        try:
+            total_productos = db.productos.count_documents({'activo': True})
+        except Exception:
+            total_productos = 0
 
     stats = {
-        'vendedores':  len(vendedores),
-        'productos':   len(productos_mkt),
+        'vendedores': total_vendedores,
+        'productos':  total_productos,
     }
+
+    # ---------- Usuario actual (opcional) ----------
+    usuario = None
+    if _uid():
+        try:
+            usuario = db.usuarios.find_one({'_id': ObjectId(_uid())})
+            if usuario:
+                usuario.pop('password', None)
+                usuario.pop('password_hash', None)
+                usuario.pop('contrasena', None)
+        except Exception:
+            usuario = None
+
+    # ---------- Vendedor actual (opcional, para el sidebar) ----------
+    vendedor_mkt = None
+    if _uid():
+        v_raw = _vendedor_actual()
+        if _vendedor_es_valido(v_raw):
+            vendedor_mkt = _formatear_vendedor_con_metricas(v_raw)
 
     return render_template(
         'tienda/marketplace/index.html',
         vendedores=vendedores,
-        productos=productos_mkt,
-        stats=stats,
+        productos=productos,
+        categorias=categorias,
+        marcas=marcas,
+        usuario=usuario,
+        vendedor=vendedor_mkt,
+        stats=stats,                    # ⭐ NUEVO — conteos reales
+        q=q,
+        categoria_id=categoria_id,
+        marca_id=marca_id,
+        orden=orden,
     )
 
 
@@ -212,7 +352,6 @@ def registro():
 
     db = _db()
 
-    # Si ya tiene una tienda, redirige al dashboard
     existing = Vendedor.obtener_por_user(db, _uid())
     if existing:
         estado = existing.get('estado', 'pendiente')
@@ -244,7 +383,6 @@ def registro():
             },
         }
 
-        # Validaciones básicas
         if not data['nombre_tienda']:
             flash('El nombre de la tienda es obligatorio', 'danger')
             return render_template('tienda/marketplace/registro.html', form=data)
@@ -260,7 +398,6 @@ def registro():
         try:
             vid = Vendedor.crear(db, data, _uid())
 
-            # Actualizar el rol del usuario a "vendedor" (sin quitarle el de cliente)
             db.usuarios.update_one(
                 {'_id': ObjectId(_uid())},
                 {'$set': {'es_vendedor': True, 'updated_at': datetime.now(timezone.utc)}}
@@ -273,7 +410,6 @@ def registro():
             current_app.logger.error(f'[marketplace_registro] ERROR: {e}')
             flash(f'Error al crear la tienda: {e}', 'danger')
 
-    # GET
     return render_template('tienda/marketplace/registro.html', form={})
 
 
@@ -305,19 +441,18 @@ def dashboard():
     if v_raw.get('estado') != 'aprobado':
         return redirect(url_for('web.marketplace_estado'))
 
-    # ⭐ Formatear con métricas reales
     v = _formatear_vendedor_con_metricas(v_raw)
     db = _db()
 
     # Productos del vendedor
     try:
         productos = list(
-            db.productos.find({'vendedor_id': v['_id']}).sort('created_at', -1)
+            db.productos.find(_filtro_productos_vendedor(v['_id'])).sort('created_at', -1)
         )
     except Exception:
         productos = []
 
-    # Ventas recientes (pedidos que incluyan productos de este vendedor)
+    # Ventas recientes
     try:
         pedidos_recientes = list(
             db.pedidos.find({
@@ -330,7 +465,6 @@ def dashboard():
     except Exception:
         pedidos_recientes = []
 
-    # ⭐ Métricas reales
     metricas = v.get('metricas', {}) or {}
     total_ventas     = metricas.get('ventas', 0)
     total_ingresos   = metricas.get('ingresos', 0)
@@ -338,7 +472,7 @@ def dashboard():
     saldo_neto       = round(total_ingresos - total_comisiones, 2)
 
     return render_template(
-        'tienda/marketplace/dashboard.html',
+        'admin/marketplace/dashboard.html',
         vendedor=v,
         productos=productos,
         pedidos=pedidos_recientes,
@@ -360,14 +494,12 @@ def admin_lista():
     estado_filtro = request.args.get('estado', 'todos')
     vendedores_raw = Vendedor.listar(db, estado=estado_filtro, solo_activos=False, limite=200)
 
-    # ⭐ Formatear con métricas reales
     vendedores = []
     for v in vendedores_raw:
         v_fmt = _formatear_vendedor_con_metricas(v)
         if v_fmt:
             vendedores.append(v_fmt)
 
-    # Contadores por estado
     counts = {
         'todos':      db[Vendedor.COLLECTION].count_documents({}),
         'pendiente':  db[Vendedor.COLLECTION].count_documents({'estado': 'pendiente'}),
@@ -392,17 +524,14 @@ def admin_detalle(vid):
     if not v_raw:
         abort(404)
 
-    # ⭐ Formatear con métricas reales
     v = _formatear_vendedor_con_metricas(v_raw)
     db = _db()
 
-    # Productos del vendedor
     try:
-        productos = list(db.productos.find({'vendedor_id': v['_id']}))
+        productos = list(db.productos.find(_filtro_productos_vendedor(v['_id'])))
     except Exception:
         productos = []
 
-    # Info del usuario dueño
     usuario = None
     if v.get('user_id'):
         try:
@@ -476,36 +605,29 @@ def admin_eliminar(vid):
 def ver_tienda_publica(slug):
     """
     Vista pública de la tienda de un vendedor.
-    URL: /marketplace/tienda/<slug>
-    Ej: /marketplace/tienda/mi-tienda-fitness-abc123
+    URL: /marketplace/tienda_vendedor/<slug>
     """
     db = _db()
 
-    # Buscar al vendedor por slug
     v_raw = Vendedor.obtener_por_slug(db, slug)
     if not v_raw:
         abort(404)
 
-    # Solo mostrar tiendas aprobadas y activas
     if v_raw.get('estado') != 'aprobado' or not v_raw.get('activo', True):
         abort(404)
 
-    # ⭐ Formatear con métricas reales
     v = _formatear_vendedor_con_metricas(v_raw)
 
-    # Productos del vendedor (activos)
     try:
         productos = list(
-            db.productos.find({
-                'vendedor_id': v['_id'],
-                'activo': True,
-            }).sort('created_at', -1).limit(48)
+            db.productos.find(_filtro_productos_vendedor(v['_id']))
+              .sort('created_at', -1)
+              .limit(48)
         )
     except Exception as e:
         current_app.logger.warning(f'[ver_tienda_publica] Error buscando productos: {e}')
         productos = []
 
-    # Normalizar precios de los productos (variantes)
     for p in productos:
         p['_id'] = str(p['_id'])
         variables = p.get('variables') or []
@@ -518,15 +640,13 @@ def ver_tienda_publica(slug):
         else:
             p['precio_mostrado'] = float(p.get('precio') or 0)
 
-        # Foto principal
         fotos = p.get('fotos') or []
         p['foto_principal'] = fotos[0] if fotos else None
 
-    # Categorías únicas que vende
     try:
         categorias_ids = db.productos.distinct(
             'categoria_id',
-            {'vendedor_id': v['_id'], 'activo': True, 'categoria_id': {'$ne': None}}
+            dict(_filtro_productos_vendedor(v['_id']), categoria_id={'$ne': None})
         )
         categorias = list(db.categorias.find({
             '_id': {'$in': [ObjectId(cid) for cid in categorias_ids if cid]}
@@ -535,7 +655,7 @@ def ver_tienda_publica(slug):
         categorias = []
 
     return render_template(
-        'tienda/marketplace/tienda_vendedor.html',
+        'tienda/marketplace/vendedor_tienda.html',
         vendedor=v,
         productos=productos,
         categorias=categorias,
@@ -548,11 +668,6 @@ def ver_tienda_publica(slug):
 def api_vendedores():
     """
     GET /api/marketplace/vendedores
-    Params opcionales:
-      - limite:      int (default 24, máx 100)
-      - categoria:   str (filtra por categoría)
-      - destacados:  1  (solo vendedores marcados como destacados)
-      - q:           str (búsqueda por nombre de tienda)
     """
     try:
         db = _db()
@@ -580,7 +695,6 @@ def api_vendedores():
               .limit(limite)
         )
 
-        # ⭐ Inyectar métricas reales
         vendedores = []
         for v in vendedores_raw:
             v_fmt = _formatear_vendedor_con_metricas(v)
@@ -604,8 +718,6 @@ def api_vendedores():
 def api_vendedor(vid):
     """
     GET /api/marketplace/vendedor/<vid>
-    Devuelve el detalle público de un vendedor aprobado,
-    más la lista de sus productos activos (máx 20).
     """
     try:
         db = _db()
@@ -617,16 +729,12 @@ def api_vendedor(vid):
         if v_raw.get('estado') != 'aprobado' or not v_raw.get('activo', True):
             return jsonify({'success': False, 'error': 'Vendedor no disponible'}), 404
 
-        # ⭐ Formatear con métricas reales
         v = _formatear_vendedor_con_metricas(v_raw)
 
-        # Productos del vendedor (máx 20 para el detalle)
         try:
             productos = list(
-                db.productos.find({
-                    'vendedor_id': v['_id'],
-                    'activo': True,
-                }).limit(20).sort('created_at', -1)
+                db.productos.find(_filtro_productos_vendedor(v['_id']))
+                  .limit(20).sort('created_at', -1)
             )
             for p in productos:
                 p['_id'] = str(p['_id'])

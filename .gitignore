@@ -1,17 +1,42 @@
-﻿.env
+﻿# Variables de entorno y archivos privados
+.env
 .env.*
 !.env.example
 
+# Python
 __pycache__/
 *.py[cod]
-
+*.pyc
 .venv/
 venv/
 env/
 
+# Entornos de Conda
+conda-meta/
+DLLs/
+Lib/
+Library/
+Scripts/
+Tools/
+include/
+libs/
+share/
+etc/
+
+# Node.js
+node_modules/
+**/node_modules/
+
+# Editores
 .vscode/
 .idea/
 
+# Archivos de registro
 *.log
 
+# Archivos temporales y respaldos
+*.respaldo
+desktop.ini
+
+# Archivos de depuración
 app/static/debug_impi/

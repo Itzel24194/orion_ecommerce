@@ -18,7 +18,7 @@ class Lealtad:
     NIVELES = [
         {
             'nombre': 'Bronce',
-            'emoji': '🥉',
+            'emoji': '',
             'min_gasto': 0,
             'max_gasto': 5000,
             'multiplicador_puntos': 1.0,

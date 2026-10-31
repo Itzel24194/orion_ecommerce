@@ -115,26 +115,95 @@ def _extraer_complexion_del_form():
 
 
 # ================================================================
-# HELPER: OBTENER USUARIO ACTUAL DESDE LA SESIÓN
+# HELPER: OBTENER USUARIO ACTUAL DESDE LA SESIÓN + JWT (app móvil)
 # ================================================================
 
 def _get_usuario_actual():
+    """
+    Devuelve el usuario autenticado soportando DOS vías:
+      1. Sesión de Flask (web): session['user_id']
+      2. JWT en header Authorization: Bearer <token>  (app móvil / SPA)
+    """
+    db = current_app.db
+
+    # --- Vía 1: sesión Flask (web) ---
     user_id = session.get('user_id')
-    if not user_id:
-        return None
+    if user_id:
+        try:
+            return db.usuarios.find_one({'_id': ObjectId(user_id)})
+        except Exception:
+            pass
+
+    # --- Vía 2: JWT en Authorization (app móvil) ---
     try:
-        db = current_app.db
-        return db.usuarios.find_one({'_id': ObjectId(user_id)})
-    except Exception:
+        from app.jwt_utils import get_current_user_from_request
+        payload = get_current_user_from_request()
+        if payload and payload.get('user_id'):
+            return db.usuarios.find_one({'_id': ObjectId(payload['user_id'])})
+    except Exception as e:
+        try:
+            current_app.logger.warning(f'[_get_usuario_actual] JWT inválido: {e}')
+        except Exception:
+            pass
+
+    return None
+
+
+# ================================================================
+# ⭐ HELPER: construir URL pública de la foto del usuario
+# ================================================================
+
+def _foto_url_publica(usuario):
+    """
+    Devuelve la URL absoluta de la foto del usuario.
+    En la BD `foto` guarda SOLO el nombre del archivo (ej. "abc.jpg").
+    La web lo sirve como /static/uploads/<foto>.
+    También soporta que ya venga una URL completa (por si algún día migras).
+    """
+    if not usuario:
         return None
+    foto = usuario.get('foto') or usuario.get('fotoUrl') or usuario.get('avatar')
+    if not foto:
+        return None
+    foto = str(foto).strip()
+    if not foto:
+        return None
+
+    # Si ya es URL absoluta o data:, la dejamos tal cual
+    if foto.startswith(('http://', 'https://', 'data:', 'blob:')):
+        return foto
+
+    # Si ya empieza con /static o /uploads, solo anteponer origen
+    try:
+        base = request.host_url.rstrip('/')  # ej. https://api.orion.com
+    except Exception:
+        base = ''
+
+    if foto.startswith('/'):
+        return f"{base}{foto}"
+    return f"{base}/static/uploads/{foto}"
+
+
+def _serializar_usuario_publico(usuario):
+    """
+    Copia segura del usuario para devolver por JSON:
+    - quita password
+    - agrega fotoUrl absoluta (la que necesita la app móvil)
+    - serializa _id a string
+    """
+    if not usuario:
+        return None
+    u = dict(usuario)
+    u.pop('password', None)
+    if '_id' in u:
+        u['_id'] = str(u['_id'])
+    u['fotoUrl'] = _foto_url_publica(usuario)
+    return u
 
 
 # ================================================================
 # ⭐ MONEDERO — HELPERS INTERNOS
 # ================================================================
-# Pequeños helpers que reutilizan las colecciones del monedero
-# sin depender del controlador específico. Útiles para el dashboard
-# y para cualquier vista que necesite datos agregados.
 
 def _monedero_saldo_total():
     """Suma todos los saldos del monedero (saldo en circulación)."""
@@ -235,13 +304,22 @@ def enviar_correo_smtp(destinatario, asunto, contenido_html):
 
 def lista_usuarios():
     usuarios = UsuarioModel.obtener_todos()
+    # ✅ Normalizar sexo/genero para que el template siempre compare contra valores canónicos
+    for u in usuarios:
+        u['sexo'] = normalizar_genero(u.get('sexo') or u.get('genero'))
     edit_id = request.args.get('edit_id')
     return render_template('admin/usuarios.html', usuarios=usuarios, edit_id=edit_id)
 
 
 def ver_usuario(id):
     usuarios = UsuarioModel.obtener_todos()
+    for u in usuarios:
+        u['sexo'] = normalizar_genero(u.get('sexo') or u.get('genero'))
     usuario_seleccionado = UsuarioModel.obtener_por_id(id)
+    if usuario_seleccionado:
+        usuario_seleccionado['sexo'] = normalizar_genero(
+            usuario_seleccionado.get('sexo') or usuario_seleccionado.get('genero')
+        )
     return render_template('admin/usuarios.html',
                            usuarios=usuarios,
                            usuario_seleccionado=usuario_seleccionado)
@@ -256,7 +334,8 @@ def agregar_usuario():
             "email": request.form.get('email', '').strip(),
             "telefono": request.form.get('telefono', '').strip(),
             "fecha_nacimiento": request.form.get('fecha_nacimiento', ''),
-            "sexo": normalizar_genero(request.form.get('genero', 'Indefinido')),
+            # ✅ Lee 'sexo' (antes leía 'genero' que no existía en el form)
+            "sexo": normalizar_genero(request.form.get('sexo', 'Indefinido')),
             "rol": request.form.get('rol', 'cliente'),
             "password": request.form.get('password', ''),
             "foto": None,
@@ -368,7 +447,8 @@ def editar_usuario(id):
             "email": request.form.get('email', '').strip(),
             "telefono": request.form.get('telefono', '').strip(),
             "fecha_nacimiento": request.form.get('fecha_nacimiento', ''),
-            "sexo": normalizar_genero(request.form.get('genero', 'Indefinido')),
+            # ✅ Lee 'sexo' (antes leía 'genero' que no existía en el form)
+            "sexo": normalizar_genero(request.form.get('sexo', 'Indefinido')),
             "rol": request.form.get('rol', 'cliente'),
         }
 
@@ -419,7 +499,7 @@ def editar_usuario(id):
             usuario_actualizado = UsuarioModel.obtener_por_id(id)
             if usuario_actualizado:
                 cambios = False
-                for key in ['nombre', 'apellido_paterno', 'apellido_materno', 'email', 'telefono', 'rol']:
+                for key in ['nombre', 'apellido_paterno', 'apellido_materno', 'email', 'telefono', 'rol', 'sexo']:
                     if usuario_actual.get(key) != usuario_actualizado.get(key):
                         cambios = True
                         break
@@ -580,7 +660,8 @@ def actualizar_perfil():
         "apellido_paterno": request.form.get('apellido_paterno', '').strip(),
         "apellido_materno": request.form.get('apellido_materno', '').strip(),
         "fecha_nacimiento": request.form.get('fecha_nacimiento', ''),
-        "sexo": normalizar_genero(request.form.get('genero', 'Indefinido'))
+        # ✅ Lee 'sexo' (antes leía 'genero' que no existía en el form)
+        "sexo": normalizar_genero(request.form.get('sexo', 'Indefinido'))
     }
 
     if 'foto' in request.files and request.files['foto'].filename != '':
@@ -598,6 +679,189 @@ def actualizar_perfil():
     session['nombre'] = datos_actualizados.get('nombre', session.get('nombre'))
     flash("Perfil actualizado correctamente.", "success")
     return redirect(url_for('web.perfil'))
+
+
+# ================================================================
+# ⭐ FOTO DE PERFIL — subir / quitar (para la app móvil)
+# ================================================================
+
+def subir_foto_perfil():
+    """
+    POST /api/v1/cuenta/foto
+    multipart/form-data con campo 'foto'
+    Devuelve { success:true, fotoUrl, usuario } para que la app actualice el avatar.
+    """
+    usuario = _get_usuario_actual()
+    if not usuario:
+        return jsonify({'success': False, 'message': 'No autenticado'}), 401
+
+    try:
+        file = (
+            request.files.get('foto')
+            or request.files.get('avatar')
+            or request.files.get('file')
+        )
+        if not file or not file.filename:
+            return jsonify({'success': False, 'message': 'Falta el archivo (campo "foto")'}), 400
+
+        # Extensiones permitidas
+        nombre_original = secure_filename(file.filename)
+        ext = nombre_original.rsplit('.', 1)[-1].lower() if '.' in nombre_original else ''
+        if ext not in ('jpg', 'jpeg', 'png', 'webp', 'gif'):
+            return jsonify({
+                'success': False,
+                'message': 'Formato no permitido (jpg, jpeg, png, webp, gif)',
+            }), 400
+
+        # Nombre único para evitar colisiones
+        filename = f"u{usuario['_id']}_{secrets.token_hex(6)}.{ext}"
+
+        upload_folder = current_app.config.get('UPLOAD_FOLDER')
+        if not upload_folder:
+            upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+        os.makedirs(upload_folder, exist_ok=True)
+
+        ruta = os.path.join(upload_folder, filename)
+        file.save(ruta)
+
+        db = current_app.db
+
+        # Borrar la foto anterior si existía y era distinta
+        foto_anterior = usuario.get('foto')
+        if foto_anterior and foto_anterior != filename:
+            try:
+                ruta_vieja = os.path.join(upload_folder, foto_anterior)
+                if os.path.isfile(ruta_vieja):
+                    os.remove(ruta_vieja)
+            except Exception as e:
+                current_app.logger.warning(
+                    f'[subir_foto_perfil] no se pudo borrar foto vieja: {e}'
+                )
+
+        db.usuarios.update_one(
+            {'_id': usuario['_id']},
+            {'$set': {
+                'foto': filename,
+                'updated_at': datetime.now(timezone.utc),
+            }}
+        )
+
+        actualizado = db.usuarios.find_one({'_id': usuario['_id']})
+        serializado = _serializar_usuario_publico(actualizado)
+
+        return jsonify({
+            'success': True,
+            'message': 'Foto de perfil actualizada',
+            'fotoUrl': serializado['fotoUrl'],
+            'usuario': serializado,
+        }), 200
+
+    except Exception as e:
+        current_app.logger.error(f'[subir_foto_perfil] ERROR: {e}')
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+def eliminar_foto_perfil():
+    """
+    DELETE /api/v1/cuenta/foto
+    Quita la foto del usuario y borra el archivo.
+    """
+    usuario = _get_usuario_actual()
+    if not usuario:
+        return jsonify({'success': False, 'message': 'No autenticado'}), 401
+
+    try:
+        foto = usuario.get('foto')
+        if foto:
+            upload_folder = current_app.config.get('UPLOAD_FOLDER')
+            if not upload_folder:
+                upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+            try:
+                ruta = os.path.join(upload_folder, foto)
+                if os.path.isfile(ruta):
+                    os.remove(ruta)
+            except Exception:
+                pass
+
+        db = current_app.db
+        db.usuarios.update_one(
+            {'_id': usuario['_id']},
+            {'$unset': {'foto': ''}, '$set': {'updated_at': datetime.now(timezone.utc)}}
+        )
+
+        return jsonify({'success': True, 'message': 'Foto eliminada'})
+
+    except Exception as e:
+        current_app.logger.error(f'[eliminar_foto_perfil] ERROR: {e}')
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+def actualizar_perfil_api():
+    """
+    PUT /api/v1/cuenta/perfil
+    JSON con: nombre, apellido_paterno, apellido_materno, email, telefono,
+              fecha_nacimiento, sexo/genero, avatar (URL, opcional)
+    Devuelve el usuario completo con fotoUrl para que la app refresque.
+    """
+    usuario = _get_usuario_actual()
+    if not usuario:
+        return jsonify({'success': False, 'message': 'No autenticado'}), 401
+
+    try:
+        data = request.get_json(silent=True) or request.form or {}
+
+        set_data = {}
+
+        for campo in ('nombre', 'apellido_paterno', 'apellido_materno',
+                      'telefono', 'fecha_nacimiento'):
+            if data.get(campo) is not None:
+                set_data[campo] = str(data[campo]).strip()
+
+        if data.get('email') is not None:
+            nuevo_email = str(data['email']).strip().lower()
+            if nuevo_email and nuevo_email != (usuario.get('email') or '').lower():
+                db = current_app.db
+                if db.usuarios.find_one(
+                    {'email': nuevo_email, '_id': {'$ne': usuario['_id']}}
+                ):
+                    return jsonify({
+                        'success': False,
+                        'message': 'Ese email ya está en uso',
+                    }), 409
+                set_data['email'] = nuevo_email
+
+        genero_raw = data.get('sexo', data.get('genero'))
+        if genero_raw is not None:
+            g = normalizar_genero(genero_raw)
+            set_data['sexo'] = g
+            set_data['genero'] = g
+
+        if data.get('avatar') is not None:
+            set_data['foto'] = str(data['avatar']).strip() or None
+
+        if not set_data:
+            return jsonify({'success': False, 'message': 'Nada que actualizar'}), 400
+
+        set_data['updated_at'] = datetime.now(timezone.utc)
+
+        db = current_app.db
+        db.usuarios.update_one({'_id': usuario['_id']}, {'$set': set_data})
+
+        if 'nombre' in set_data:
+            session['nombre'] = set_data['nombre']
+
+        actualizado = db.usuarios.find_one({'_id': usuario['_id']})
+        return jsonify({
+            'success': True,
+            'message': 'Perfil actualizado',
+            'usuario': _serializar_usuario_publico(actualizado),
+        })
+
+    except Exception as e:
+        current_app.logger.error(f'[actualizar_perfil_api] ERROR: {e}')
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 # ================================================================
@@ -1198,7 +1462,6 @@ def dashboard():
     pedidos_pendientes = db.pedidos.count_documents({'estado': 'pendiente'}) if 'pedidos' in db.list_collection_names() else 0
 
     # ⭐ MARKETPLACE: total de vendedores aprobados
-    # Usamos $ne: False para incluir documentos sin el campo 'activo'
     try:
         total_vendedores = db['vendedores'].count_documents({
             'estado': 'aprobado',
@@ -1691,13 +1954,18 @@ def editar_usuario_admin(id):
         return jsonify({'success': False, 'message': 'No autorizado'}), 403
     data = request.get_json() or request.form
     update_data = {}
-    campos = ['nombre', 'email', 'telefono', 'rol', 'activo']
+    campos = ['nombre', 'email', 'telefono', 'rol', 'activo', 'foto']
     for campo in campos:
         if data.get(campo) is not None:
             update_data[campo] = data.get(campo)
     update_data['updated_at'] = datetime.now(timezone.utc)
     db.usuarios.update_one({'_id': ObjectId(id)}, {'$set': update_data})
-    return jsonify({'success': True, 'message': 'Usuario actualizado'})
+    actualizado = db.usuarios.find_one({'_id': ObjectId(id)})
+    return jsonify({
+        'success': True,
+        'message': 'Usuario actualizado',
+        'usuario': _serializar_usuario_publico(actualizado),
+    })
 
 
 def eliminar_usuario_admin(id):
@@ -1813,9 +2081,7 @@ def api_usuario():
     db = current_app.db
     usuario = db.usuarios.find_one({'_id': ObjectId(session['user_id'])})
     if usuario:
-        usuario['_id'] = str(usuario['_id'])
-        usuario.pop('password', None)
-        return jsonify(usuario)
+        return jsonify(_serializar_usuario_publico(usuario))
     return jsonify({'error': 'Usuario no encontrado'}), 404
 
 
@@ -2080,7 +2346,8 @@ def verificar_autenticacion():
             'usuario_id': session['user_id'],
             'nombre': session.get('nombre', ''),
             'rol': session.get('rol', 'cliente'),
-            'email': usuario.get('email') if usuario else ''
+            'email': usuario.get('email') if usuario else '',
+            'fotoUrl': _foto_url_publica(usuario) if usuario else None,
         })
     return jsonify({'autenticado': False})
 
@@ -2118,9 +2385,7 @@ def obtener_usuario_actual():
     db = current_app.db
     usuario = db.usuarios.find_one({'_id': ObjectId(session['user_id'])})
     if usuario:
-        usuario['_id'] = str(usuario['_id'])
-        usuario.pop('password', None)
-        return jsonify(usuario)
+        return jsonify(_serializar_usuario_publico(usuario))
     return jsonify({'error': 'Usuario no encontrado'}), 404
 
 
@@ -2550,7 +2815,7 @@ def vista_previa_idioma():
 
 
 # ================================================================
-# ⭐ MÉTODOS DE PAGO (TARJETAS GUARDADAS) — CON NO-CACHE + CONEKTA
+# ⭐ MÉTODOS DE PAGO (TARJETAS GUARDADAS) — SANDBOX
 # ================================================================
 
 def _safe_oid(val):
@@ -2609,9 +2874,10 @@ def obtener_metodos_pago():
                 'titular': m.get('titular', ''),
                 'expira': m.get('expira', ''),
                 'email': m.get('email', ''),
+                'referencia': m.get('referencia'),
                 'predeterminado': bool(m.get('predeterminado', False)),
-                'conekta_customer_id': m.get('conekta_customer_id'),
-                'conekta_payment_source_id': m.get('conekta_payment_source_id'),
+                'sandbox': True,
+                'sandbox_token_id': m.get('sandbox_token_id'),
                 'created_at': created_iso,
             })
 
@@ -2633,9 +2899,10 @@ def agregar_metodo_pago():
     """
     POST /mi-cuenta/metodos-pago
 
-    ⭐ FIX: ahora recibe `token_id` (generado por Conekta.js en el navegador)
-    y crea el customer + payment_source en Conekta, guardando los IDs.
-    Sin `token_id` no se puede vincular la tarjeta a Conekta.
+    Modo SANDBOX: no se llama a ninguna API externa.
+    - tarjeta: valida token_id (sandbox) + ultimos4, guarda sandbox_token_id
+    - paypal: valida email, guarda como sandbox
+    - oxxo: genera referencia aleatoria, guarda como sandbox
     """
     usuario = _get_usuario_actual()
     if not usuario:
@@ -2652,6 +2919,7 @@ def agregar_metodo_pago():
             'usuario_id': uid_str,
             'tipo': tipo,
             'predeterminado': predeterminado,
+            'sandbox': True,
             'created_at': datetime.now(timezone.utc),
         }
 
@@ -2665,68 +2933,31 @@ def agregar_metodo_pago():
             if not ultimos4 or len(ultimos4) != 4 or not ultimos4.isdigit():
                 return _json_no_cache({'success': False, 'message': 'Últimos 4 dígitos inválidos'}, 400)
 
-            # ⭐ OBLIGATORIO: sin token no se puede vincular a Conekta
+            # En sandbox se exige un token_id simbólico (ej. 'tok_test_xxx')
             if not token_id:
                 return _json_no_cache({
                     'success': False,
-                    'message': ('Falta el token de Conekta. '
-                                'La tarjeta debe tokenizarse en el navegador antes de guardarla.')
+                    'message': ('Falta el token de sandbox. '
+                                'La tarjeta debe tokenizarse localmente antes de guardarla.')
                 }, 400)
-
-            from app.services.conekta_service import (
-                crear_o_actualizar_customer, crear_payment_source
-            )
-
-            # 1) Crear/actualizar el customer en Conekta
-            cust_res = crear_o_actualizar_customer(
-                usuario_id=uid_str,
-                nombre=usuario.get('nombre', 'Cliente'),
-                email=usuario.get('email', ''),
-                telefono=usuario.get('telefono', ''),
-                conekta_customer_id=usuario.get('conekta_customer_id'),
-            )
-            if not cust_res.get('success'):
-                return _json_no_cache({
-                    'success': False,
-                    'message': f'Error creando customer: {cust_res.get("error")}'
-                }, 500)
-
-            customer_id = cust_res['customer_id']
-
-            # 2) Crear el payment_source
-            ps_res = crear_payment_source(customer_id, token_id)
-            if not ps_res.get('success'):
-                return _json_no_cache({
-                    'success': False,
-                    'message': f'Error creando payment source: {ps_res.get("error")}'
-                }, 500)
-
-            payment_source_id = ps_res['payment_source_id']
-
-            # 3) Persistir el customer_id en el usuario
-            db = current_app.db
-            db.usuarios.update_one(
-                {'_id': usuario['_id']},
-                {'$set': {'conekta_customer_id': customer_id}}
-            )
 
             nuevo.update({
                 'marca': marca,
                 'ultimos4': ultimos4,
                 'titular': titular,
                 'expira': expira,
-                'conekta_customer_id': customer_id,           # ⭐
-                'conekta_payment_source_id': payment_source_id,  # ⭐
+                'sandbox_token_id': token_id,
             })
 
         elif tipo == 'paypal':
             email = (data.get('email') or '').strip()
-            if not email:
-                return _json_no_cache({'success': False, 'message': 'Email de PayPal requerido'}, 400)
+            if not email or '@' not in email:
+                return _json_no_cache({'success': False, 'message': 'Email de PayPal inválido'}, 400)
             nuevo['email'] = email
 
         elif tipo == 'oxxo':
-            pass
+            nuevo['referencia'] = str(uuid.uuid4())[:10].upper()
+
         else:
             return _json_no_cache({'success': False, 'message': 'Tipo inválido'}, 400)
 
@@ -2744,13 +2975,12 @@ def agregar_metodo_pago():
         db.metodos_pago.insert_one(nuevo)
 
         print(f"💾 [metodos-pago] POST nuevo método id='{nuevo['id']}' tipo='{nuevo['tipo']}' "
-              f"conekta_customer_id={nuevo.get('conekta_customer_id')} "
-              f"conekta_payment_source_id={nuevo.get('conekta_payment_source_id')}",
+              f"sandbox_token_id={nuevo.get('sandbox_token_id')}",
               file=sys.stderr)
 
         return _json_no_cache({
             'success': True,
-            'message': 'Método guardado correctamente',
+            'message': 'Método guardado correctamente (modo sandbox)',
             'metodo': {
                 'id': nuevo['id'], 'tipo': nuevo['tipo'],
                 'marca': nuevo.get('marca'), 'ultimos4': nuevo.get('ultimos4'),

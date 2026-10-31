@@ -1,13 +1,13 @@
 # ================================================================
 # app/controllers/pedido_controller.py
-# COMPLETO — con MSI: soporta tarjeta guardada (MIT) y tarjeta nueva (token)
+# COMPLETO — MSI en modo SANDBOX + flujo Liverpool (cupón al pagar)
 # ================================================================
 
 from flask import (
     current_app, session, request, jsonify, render_template,
     flash, redirect, url_for, send_file
 )
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from bson import ObjectId
 from io import BytesIO
 import random
@@ -18,7 +18,7 @@ import time
 from app.models.pedidos_model import Pedido
 from app.models.productos_model import Producto
 
-# ⭐ MARKETPLACE (opcional, con try/except para no romper si no está)
+# ⭐ MARKETPLACE (opcional)
 try:
     from app.models.marketplace_model import Vendedor
     MARKETPLACE_OK = True
@@ -26,6 +26,14 @@ except ImportError:
     Vendedor = None
     MARKETPLACE_OK = False
     print("ℹ️ Módulo Marketplace no disponible (opcional)")
+
+
+# ================================================================
+# CONFIG SANDBOX
+# ================================================================
+
+CONEKTA_MSI_PLAZOS = [3, 6, 9, 12, 18, 24]
+SANDBOX_MODE = True
 
 
 # ================================================================
@@ -95,33 +103,12 @@ def calcular_descuento_volumen(total_unidades, subtotal):
 # ================================================================
 
 def _generar_numero_pedido(year=None):
-    """
-    Genera un número de pedido único usando un contador atómico
-    en la colección 'contadores' de MongoDB.
-
-    Esto evita duplicados cuando dos compras se procesan
-    simultáneamente (race condition).
-
-    Formato: ORION-{año}-{secuencia 4 dígitos}
-
-    Si el contador del año no existe, se inicializa a partir del
-    número más alto ya registrado para ese año, para no colisionar
-    con pedidos previos (por ejemplo, ORION-2026-0015).
-
-    Si el contador atómico falla por cualquier motivo, se cae a un
-    método de respaldo que verifica existencia antes de devolver
-    el número.
-    """
     db = current_app.db
     if year is None:
         year = datetime.utcnow().year
 
     contador_id = f'contador_pedidos_{year}'
 
-    # ------------------------------------------------------------
-    # 1. Inicializar el contador si no existe, partiendo del
-    #    máximo número ya registrado para ese año.
-    # ------------------------------------------------------------
     try:
         if not db.contadores.find_one({'_id': contador_id}):
             ultimo = db.pedidos.find_one(
@@ -145,9 +132,6 @@ def _generar_numero_pedido(year=None):
         print(f"⚠️ [Pedido] No se pudo inicializar contador: {e}",
               file=sys.stderr)
 
-    # ------------------------------------------------------------
-    # 2. Incremento atómico del contador
-    # ------------------------------------------------------------
     try:
         resultado = db.contadores.find_one_and_update(
             {'_id': contador_id},
@@ -157,11 +141,9 @@ def _generar_numero_pedido(year=None):
         )
         if resultado and 'secuencia' in resultado:
             numero = f"ORION-{year}-{str(resultado['secuencia']).zfill(4)}"
-            # Defensa extra: verificar que no exista
             if not db.pedidos.find_one({'numero_pedido': numero}):
                 return numero
 
-            # Si por alguna razón ya existe, seguir incrementando
             for _ in range(50):
                 resultado = db.contadores.find_one_and_update(
                     {'_id': contador_id},
@@ -175,9 +157,6 @@ def _generar_numero_pedido(year=None):
         print(f"⚠️ [Pedido] Error con contador atómico: {e}",
               file=sys.stderr)
 
-    # ------------------------------------------------------------
-    # 3. Fallback: método clásico con verificación de existencia
-    # ------------------------------------------------------------
     print("⚠️ [Pedido] Usando fallback para número de pedido",
           file=sys.stderr)
     for _ in range(100):
@@ -186,9 +165,6 @@ def _generar_numero_pedido(year=None):
         if not db.pedidos.find_one({'numero_pedido': numero}):
             return numero
 
-    # ------------------------------------------------------------
-    # 4. Último recurso: timestamp
-    # ------------------------------------------------------------
     return f"ORION-{year}-{int(time.time() * 1000) % 1000000:06d}"
 
 
@@ -197,24 +173,6 @@ def _generar_numero_pedido(year=None):
 # ================================================================
 
 def _procesar_comisiones_marketplace(items, pedido_id=None, numero_pedido=None):
-    """
-    Recorre los items del pedido, agrupa por vendedor_id y actualiza
-    las métricas del vendedor (ventas, ingresos, comisiones).
-
-    ⭐ Debe llamarse DESPUÉS de insertar el pedido en Mongo.
-
-    Args:
-        items: lista de dicts (normalizada) con campo 'vendedor_id' opcional
-        pedido_id: str o ObjectId del pedido (para auditoría)
-        numero_pedido: str del número de pedido (para auditoría)
-
-    Returns:
-        dict con resumen: {
-            'procesados': int,
-            'vendedores': {vid: {ventas, subtotal, comision}},
-            'errores': [str]
-        }
-    """
     if not MARKETPLACE_OK or Vendedor is None:
         return {'procesados': 0, 'vendedores': {}, 'errores': ['Marketplace no disponible']}
 
@@ -224,7 +182,6 @@ def _procesar_comisiones_marketplace(items, pedido_id=None, numero_pedido=None):
     db = current_app.db
     resumen = {'procesados': 0, 'vendedores': {}, 'errores': []}
 
-    # 1. Agrupar items por vendedor_id
     agrupado = {}
     for item in items:
         vid = item.get('vendedor_id')
@@ -261,10 +218,8 @@ def _procesar_comisiones_marketplace(items, pedido_id=None, numero_pedido=None):
 
     ahora = datetime.utcnow()
 
-    # 2. Procesar cada vendedor
     for vid, data in agrupado.items():
         try:
-            # Buscar vendedor
             vendedor = None
             try:
                 vendedor = Vendedor.obtener_por_id(db, vid)
@@ -283,12 +238,10 @@ def _procesar_comisiones_marketplace(items, pedido_id=None, numero_pedido=None):
                 print(f"⚠️ [Marketplace] {msg}", file=sys.stderr)
                 continue
 
-            # Calcular comisión
             comision_pct = float(vendedor.get('comision_pct', 15.0))
             comision     = round(data['subtotal'] * (comision_pct / 100.0), 2)
             subtotal     = round(data['subtotal'], 2)
 
-            # Actualizar métricas en el vendedor
             db[Vendedor.COLLECTION].update_one(
                 {'_id': vendedor['_id']},
                 {
@@ -301,7 +254,6 @@ def _procesar_comisiones_marketplace(items, pedido_id=None, numero_pedido=None):
                 }
             )
 
-            # Registrar transacción de comisión (opcional, para auditoría)
             try:
                 db['comisiones_marketplace'].insert_one({
                     'vendedor_id':   str(vendedor['_id']),
@@ -318,7 +270,6 @@ def _procesar_comisiones_marketplace(items, pedido_id=None, numero_pedido=None):
                     'created_at':    ahora,
                 })
             except Exception as e:
-                # La colección es opcional — no bloqueamos si falla
                 print(f"ℹ️ [Marketplace] No se pudo registrar auditoría: {e}",
                       file=sys.stderr)
 
@@ -495,7 +446,6 @@ def _normalizar_items_para_guardar(carrito_items):
             if isinstance(v, str):
                 atributos[k] = ' '.join(v.split())
 
-        # ⭐ MARKETPLACE: preservar vendedor_id desde el producto o el item
         vendedor_id = None
         vendedor_nombre = ''
         if item.get('vendedor_id'):
@@ -516,7 +466,6 @@ def _normalizar_items_para_guardar(carrito_items):
             'sku': str(item.get('sku', ''))
         }
 
-        # ⭐ Agregar vendedor solo si existe
         if vendedor_id:
             item_normalizado['vendedor_id']     = str(vendedor_id)
             item_normalizado['vendedor_nombre'] = vendedor_nombre
@@ -538,14 +487,6 @@ def _es_oid_valido(s):
 
 
 def _buscar_tarjeta_guardada(usuario_id, tarjeta_id):
-    """
-    Busca una tarjeta guardada del usuario soportando:
-      1. Match exacto por 'id'
-      2. Match exacto por '_id' (ObjectId)
-      3. Match parcial (prefijo/sufijo/substring)
-      4. Regex laxo
-      5. FALLBACK: si el usuario tiene UNA sola tarjeta, la devuelve.
-    """
     db = current_app.db
     usuario_id_str = str(usuario_id)
     tarjeta_id = (tarjeta_id or '').strip()
@@ -566,19 +507,16 @@ def _buscar_tarjeta_guardada(usuario_id, tarjeta_id):
         print(f"   → id='{t.get('id')}' | _id='{t.get('_id')}' | ultimos4='{t.get('ultimos4')}'",
               file=sys.stderr)
 
-    # 1. Exacto por 'id'
     for t in todas:
         if str(t.get('id') or '') == tarjeta_id:
             print(f"✅ [Tarjeta] Match exacto por 'id'", file=sys.stderr)
             return t
 
-    # 2. Exacto por '_id'
     for t in todas:
         if str(t.get('_id') or '') == tarjeta_id:
             print(f"✅ [Tarjeta] Match exacto por '_id'", file=sys.stderr)
             return t
 
-    # 3. Match parcial
     if len(tarjeta_id) >= 6:
         for t in todas:
             stored_id = str(t.get('id') or '')
@@ -602,7 +540,6 @@ def _buscar_tarjeta_guardada(usuario_id, tarjeta_id):
                       file=sys.stderr)
                 return t
 
-    # 4. Regex laxo
     try:
         patron = re.compile(re.escape(tarjeta_id), re.IGNORECASE)
         for t in todas:
@@ -614,7 +551,6 @@ def _buscar_tarjeta_guardada(usuario_id, tarjeta_id):
     except Exception:
         pass
 
-    # 5. FALLBACK: única tarjeta del usuario
     if len(todas) == 1:
         unica = todas[0]
         print(
@@ -625,7 +561,6 @@ def _buscar_tarjeta_guardada(usuario_id, tarjeta_id):
         )
         return unica
 
-    # 6. Último intento: sin filtro de usuario
     try:
         t = db.metodos_pago.find_one({'id': tarjeta_id})
         if t and str(t.get('usuario_id')) == usuario_id_str:
@@ -669,7 +604,6 @@ def carrito_checkout():
                 if isinstance(v, str):
                     atributos[k] = ' '.join(v.split())
 
-            # ⭐ MARKETPLACE: preservar vendedor
             vend_id = item.get('vendedor_id') or producto.get('vendedor_id')
             vend_nombre = item.get('vendedor_nombre') or producto.get('vendedor_nombre', '')
 
@@ -720,12 +654,6 @@ def carrito_checkout():
         tiendas = config.get('tiendas', [])
     categorias = list(db.categorias.find({}))
 
-    conekta_public_key = current_app.config.get('CONEKTA_PUBLIC_KEY', '')
-    conekta_private_key = current_app.config.get('CONEKTA_PRIVATE_KEY', '')
-    conekta_configured = bool(
-        conekta_public_key and conekta_public_key.startswith('key_') and len(conekta_public_key) >= 25
-    )
-
     return render_template('tienda/carrito.html',
                          usuario=usuario,
                          carrito_items=items_enriquecidos,
@@ -740,12 +668,15 @@ def carrito_checkout():
                          subtotal_con_descuentos=subtotal_con_descuentos,
                          beneficios_lealtad=beneficios_lealtad,
                          descuento_lealtad=descuento_lealtad,
-                         CONEKTA_PUBLIC_KEY=conekta_public_key,
-                         CONEKTA_PRIVATE_KEY=conekta_private_key,
-                         CONEKTA_PUBLIC_KEY_CONFIGURED=conekta_configured)
+                         SANDBOX_MODE=True,
+                         MSI_PLAZOS=CONEKTA_MSI_PLAZOS)
 
 
 def procesar_checkout():
+    """
+    Crea el pedido en estado 'pendiente' y SIN tocar el cupón.
+    ⭐ El cupón se marca como usado hasta confirmar_pago() (estilo Liverpool).
+    """
     if 'user_id' not in session:
         flash('Inicia sesión para procesar tu pedido', 'warning')
         return redirect(url_for('web.login'))
@@ -802,7 +733,6 @@ def procesar_checkout():
 
         total = subtotal_con_descuentos + iva + envio
 
-        # ⭐ NÚMERO DE PEDIDO ÚNICO (contador atómico)
         numero_pedido = _generar_numero_pedido()
         fecha_entrega = datetime.utcnow() + timedelta(days=1 if total_unidades >= 50 else 5)
 
@@ -822,6 +752,7 @@ def procesar_checkout():
             'descuento_total': round(descuento_total, 2), 'total': round(total, 2),
             'metodo_pago': metodo_pago, 'tipo_envio': tipo_envio,
             'estado': 'pendiente', 'pago_estado': 'pendiente',
+            'pago_confirmado': False,
             'notas': notas, 'total_unidades': total_unidades,
             'es_mayorista': total_unidades >= 50,
             'fecha_entrega_estimada': fecha_entrega,
@@ -843,20 +774,11 @@ def procesar_checkout():
             pedido['tienda_recogida'] = request.form.get('tienda_recogida')
             pedido['codigo_recogida'] = generar_codigo_recogida()
 
-        if codigo_cupon:
-            from app.models.cupon_model import CuponUsuario
-            r = db.pedidos.insert_one(pedido)
-            pedido_id = str(r.inserted_id)
-            CuponUsuario.registrar_uso(
-                usuario_id=session['user_id'], cupon_codigo=codigo_cupon,
-                pedido_id=pedido_id, descuento_aplicado=descuento_cupon
-            )
-            session.pop('cupon_aplicado', None)
-        else:
-            r = db.pedidos.insert_one(pedido)
-            pedido_id = str(r.inserted_id)
+        # ⭐ Insertar pedido (SIN tocar cupón)
+        r = db.pedidos.insert_one(pedido)
+        pedido_id = str(r.inserted_id)
 
-        # ⭐ MARKETPLACE: procesar comisiones de vendedores
+        # Comisiones marketplace
         try:
             comisiones_resumen = _procesar_comisiones_marketplace(
                 items=items_para_guardar,
@@ -903,9 +825,10 @@ def procesar_checkout():
         session['carrito'] = []
         session['carrito_para_guardar'] = []
         session.pop('promocion_aplicada', None)
+        # ⭐ NO borrar 'cupon_aplicado': se borra al confirmar el pago.
         session.modified = True
 
-        mensaje = '¡Pedido realizado con éxito!'
+        mensaje = '¡Pedido creado! Confirma el pago para completar tu compra.'
         if resultado_lealtad and resultado_lealtad.get('puntos_ganados', 0) > 0:
             mensaje += f" Ganaste {resultado_lealtad['puntos_ganados']} puntos 👑"
         if cashback_ganado > 0:
@@ -920,6 +843,109 @@ def procesar_checkout():
         traceback.print_exc()
         flash(f'Error: {str(e)}', 'danger')
         return redirect(url_for('web.ver_carrito'))
+
+
+# ================================================================
+# ⭐ CONFIRMAR PAGO (aquí se quema el cupón, estilo Liverpool)
+# ================================================================
+
+def confirmar_pago(pedido_id):
+    """
+    Confirma el pago de un pedido Pendiente.
+    AQUÍ y solo aquí se quema el cupón.
+    """
+    if 'user_id' not in session:
+        flash('Inicia sesión para confirmar tu pago', 'warning')
+        return redirect(url_for('web.login'))
+
+    db = current_app.db
+
+    try:
+        pedido = db.pedidos.find_one({'_id': ObjectId(pedido_id)})
+    except Exception:
+        pedido = None
+
+    if not pedido:
+        flash('Pedido no encontrado', 'danger')
+        return redirect(url_for('web.mis_pedidos_clientes'))
+
+    if str(pedido.get('usuario_id')) != str(session['user_id']):
+        usuario = db.usuarios.find_one({'_id': ObjectId(session['user_id'])})
+        if not usuario or normalizar_rol(usuario.get('rol')) != 'admin':
+            flash('No puedes confirmar este pedido', 'danger')
+            return redirect(url_for('web.mis_pedidos_clientes'))
+
+    if pedido.get('pago_confirmado') or pedido.get('pago_estado') == 'pagado':
+        flash('Este pedido ya está pagado', 'info')
+        return redirect(url_for('web.ver_pedido', id=pedido_id))
+
+    codigo_cupon = pedido.get('codigo_cupon')
+    descuento_cupon = float(pedido.get('descuento_cupon', 0) or 0)
+
+    # 1) Marcar pedido como pagado
+    try:
+        db.pedidos.update_one(
+            {'_id': ObjectId(pedido_id)},
+            {'$set': {
+                'estado': 'confirmado',
+                'pago_estado': 'pagado',
+                'pago_confirmado': True,
+                'fecha_pago': datetime.utcnow(),
+                'updated_at': datetime.utcnow(),
+            }}
+        )
+    except Exception as e:
+        flash(f'Error al confirmar pago: {e}', 'danger')
+        return redirect(url_for('web.ver_pedido', id=pedido_id))
+
+    # 2) ⭐ AQUÍ se quema el cupón
+    if codigo_cupon:
+        try:
+            from app.models.cupon_model import CuponUsuario
+            CuponUsuario.registrar_uso(
+                usuario_id=session['user_id'],
+                cupon_codigo=codigo_cupon,
+                pedido_id=pedido_id,
+                descuento_aplicado=descuento_cupon,
+            )
+            print(f'✅ [Pago] Cupón {codigo_cupon} quemado en pedido {pedido_id}',
+                  file=sys.stderr)
+        except Exception as e:
+            print(f'⚠️ [Pago] No se pudo quemar cupón: {e}', file=sys.stderr)
+
+        # Marcar en db.lealtad
+        try:
+            from app.controllers.carrito_controller import (
+                _normalizar_codigo, _buscar_registro_lealtad,
+            )
+            registro = _buscar_registro_lealtad(session['user_id'])
+            if registro:
+                cupones = registro.get('cupones_personalizados') or []
+                codigo_norm = _normalizar_codigo(codigo_cupon)
+                modificado = False
+                for i, c in enumerate(cupones):
+                    if not isinstance(c, dict):
+                        continue
+                    cid = _normalizar_codigo(c.get('id') or c.get('codigo') or '')
+                    if cid == codigo_norm and not c.get('usado'):
+                        cupones[i]['usado'] = True
+                        cupones[i]['usado_en'] = datetime.utcnow()
+                        cupones[i]['pedido_id'] = str(pedido_id)
+                        modificado = True
+                        break
+                if modificado:
+                    db.lealtad.update_one(
+                        {'_id': registro['_id']},
+                        {'$set': {'cupones_personalizados': cupones}}
+                    )
+        except Exception as e:
+            print(f'⚠️ [Pago] Error marcando lealtad: {e}', file=sys.stderr)
+
+        session.pop('cupon_aplicado', None)
+        session.modified = True
+
+    flash('¡Pago confirmado! Tu pedido está en preparación.', 'success')
+    return redirect(url_for('web.ver_pedido', id=pedido_id))
 
 
 # ================================================================
@@ -1402,11 +1428,9 @@ def _generar_factura_pdf_interno(pedido, usuario):
 
     cliente_nombre = pedido.get('usuario_nombre') or (usuario or {}).get('nombre', 'Cliente')
     cliente_email = pedido.get('usuario_email') or (usuario or {}).get('email', '')
-    cliente_tel = pedido.get('usuario_telefono') or (usuario or {}).get('telefono', '')
 
     rfc = df.get('rfc', 'XAXX010101000')
     razon = df.get('razon_social', cliente_nombre)
-    regimen = df.get('regimen_fiscal', '616')
     uso = df.get('uso_cfdi', 'G03')
 
     metodo = (pedido.get('metodo_pago') or 'N/A').title()
@@ -1579,32 +1603,15 @@ def test_admin_pedidos():
 
 
 # ================================================================
-# 💳 CHECKOUT MSI — soporta tarjeta guardada (MIT) y tarjeta nueva (token)
+# 💳 CHECKOUT MSI — SANDBOX (ahora también respeta cupón de sesión)
 # ================================================================
 
 def procesar_checkout_msi():
     """
-    Flujo MSI con DOS rutas:
-
-      A) TARJETA GUARDADA (MIT — Merchant Initiated Transaction)
-         Frontend → solo `tarjeta_guardada_id`
-         Backend  → resuelve customer_id + payment_source_id
-                  → crea orden CON customer_id asociado
-                  → cobra con payment_source_id (SIN cvc)
-         ✅ No requiere re-tokenización ni CVC.
-
-      B) TARJETA NUEVA
-         Frontend → `token_id` (Conekta.Token.create)
-         Backend  → crea orden + cobra con `token_id`
+    Flujo MSI en SANDBOX. A diferencia de procesar_checkout(), aquí SÍ
+    se confirma el pago inmediatamente (es el flujo de pago con tarjeta),
+    pero se respeta el cupón de sesión y se quema en el mismo paso.
     """
-    from app.services.conekta_service import (
-        crear_orden_con_msi,
-        crear_cargo_con_token,
-        cobrar_orden_con_payment_source,
-    )
-    from app.config.payment_config import CONEKTA_MSI_PLAZOS
-    from datetime import timezone
-
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Debes iniciar sesión'}), 401
 
@@ -1614,7 +1621,7 @@ def procesar_checkout_msi():
         tarjeta_guardada_id = (data.get('tarjeta_guardada_id') or '').strip()
         meses_msi           = int(data.get('meses_msi', 0))
 
-        print(f"📥 [MSI] token_id={bool(token_id)} | "
+        print(f"📥 [MSI-SANDBOX] token_id={bool(token_id)} | "
               f"tarjeta_guardada_id='{tarjeta_guardada_id}' | "
               f"msi={meses_msi}", file=sys.stderr)
 
@@ -1624,7 +1631,6 @@ def procesar_checkout_msi():
                 'error': f'Plazo MSI inválido. Válidos: {CONEKTA_MSI_PLAZOS}'
             }), 400
 
-        # Debe haber AL MENOS uno de los dos
         if not token_id and not tarjeta_guardada_id:
             return jsonify({
                 'success': False,
@@ -1641,146 +1647,51 @@ def procesar_checkout_msi():
         subtotal = sum(float(i.get('precio', 0)) * int(i.get('cantidad', 1))
                        for i in items_normalizados)
         iva = subtotal * 0.16
-        total = subtotal + iva
 
-        print(f"💰 [MSI] Total: ${total:.2f}", file=sys.stderr)
+        # ⭐ Respetar cupón / promoción / lealtad de la sesión
+        cupon_aplicado = session.get('cupon_aplicado') or {}
+        descuento_cupon = float(cupon_aplicado.get('descuento', 0) or 0)
+        codigo_cupon = cupon_aplicado.get('codigo')
 
-        # ---------------------------------------------------------
-        # Resolver tarjeta guardada (si aplica)
-        # ---------------------------------------------------------
-        tarjeta = None
-        customer_id_orden = None
-        payment_source_id_orden = None
+        promocion_aplicada = session.get('promocion_aplicada') or {}
+        descuento_promocion = float(promocion_aplicada.get('descuento', 0) or 0)
+        promocion_id = promocion_aplicada.get('id')
 
-        if tarjeta_guardada_id and not token_id:
-            print(f"🔍 [MSI] Resolviendo tarjeta guardada (flujo MIT)...",
-                  file=sys.stderr)
+        beneficios = _obtener_beneficios_lealtad(session['user_id'], subtotal, 'domicilio')
+        descuento_lealtad = float(beneficios.get('descuento_lealtad', 0) or 0)
 
-            tarjeta = _buscar_tarjeta_guardada(session['user_id'], tarjeta_guardada_id)
-            if not tarjeta:
-                return jsonify({
-                    'success': False,
-                    'error': f'No encontramos la tarjeta (ID: {tarjeta_guardada_id}). '
-                             f'Recarga la página e intenta de nuevo.'
-                }), 404
-
-            customer_id_orden       = tarjeta.get('conekta_customer_id')
-            payment_source_id_orden = tarjeta.get('conekta_payment_source_id')
-
-            print(f"💳 [MSI] Tarjeta: ••••{tarjeta.get('ultimos4')} | "
-                  f"customer={customer_id_orden} | "
-                  f"payment_source={payment_source_id_orden}", file=sys.stderr)
-
-            if not customer_id_orden or not payment_source_id_orden:
-                return jsonify({
-                    'success': False,
-                    'error': 'Esta tarjeta no está vinculada a Conekta. '
-                             'Elimínala desde Mi Cuenta → Métodos de Pago y vuelve a guardarla.'
-                }), 400
-
-        # ---------------------------------------------------------
-        # line_items
-        # ---------------------------------------------------------
-        line_items = []
-        for item in items_normalizados:
-            line_items.append({
-                'name':       item.get('nombre', 'Producto'),
-                'unit_price': float(item.get('precio', 0)),
-                'quantity':   int(item.get('cantidad', 1)),
-            })
-        if iva > 0:
-            line_items.append({
-                'name':       'IVA (16%)',
-                'unit_price': round(iva, 2),
-                'quantity':   1
-            })
-
-        # ---------------------------------------------------------
-        # customer_info — incluir customer_id si hay tarjeta guardada
-        # ---------------------------------------------------------
-        customer_info = {
-            'nombre':   data.get('nombre', session.get('nombre', 'Cliente')),
-            'email':    data.get('email', session.get('email', '')),
-            'telefono': data.get('telefono', '+525555555555'),
-        }
-        if customer_id_orden:
-            customer_info['customer_id'] = customer_id_orden
-            print(f"👤 [MSI] customer_info.customer_id = {customer_id_orden}",
-                  file=sys.stderr)
-
-        # ---------------------------------------------------------
-        # Crear orden en Conekta
-        # ---------------------------------------------------------
-        resultado_orden = crear_orden_con_msi(
-            monto_total=total,
-            descripcion=f'Compra ORION ({len(items_normalizados)} productos)',
-            customer_info=customer_info,
-            line_items=line_items,
-            meses_sin_intereses=meses_msi,
-        )
-        if not resultado_orden.get('success'):
-            return jsonify({
-                'success': False,
-                'error': f'Error al crear orden: {resultado_orden.get("error")}'
-            }), 500
-
-        order_id = resultado_orden['order_id']
-        print(f"✅ [MSI] Orden Conekta: {order_id}", file=sys.stderr)
-
-        # ---------------------------------------------------------
-        # Cobrar — rama según el flujo
-        # ---------------------------------------------------------
-        if tarjeta:
-            # ⭐ TARJETA GUARDADA → MIT sin CVC
-            resultado_cargo = cobrar_orden_con_payment_source(
-                order_id=order_id,
-                customer_id=customer_id_orden,
-                payment_source_id=payment_source_id_orden,
-                cvc=None,                      # ⭐ SIN CVC
-                meses_sin_intereses=meses_msi,
-            )
-            if not resultado_cargo.get('success'):
-                return jsonify({
-                    'success': False,
-                    'error': f'Pago rechazado: {resultado_cargo.get("error")}'
-                }), 400
-
-            print(f"💳 [MSI] Aprobado (guardada, MIT, sin cvc) {order_id}",
-                  file=sys.stderr)
-        else:
-            # ⭐ TARJETA NUEVA → cobrar con token
-            resultado_cargo = crear_cargo_con_token(
-                order_id=order_id,
-                token_id=token_id,
-                monto_total=total,
-                meses_sin_intereses=meses_msi,
-            )
-            if not resultado_cargo.get('success'):
-                return jsonify({
-                    'success': False,
-                    'error': f'Pago rechazado: {resultado_cargo.get("error")}'
-                }), 400
-
-            print(f"💳 [MSI] Aprobado (token) {order_id}", file=sys.stderr)
-
-        # ---------------------------------------------------------
-        # Guardar pedido
-        # ---------------------------------------------------------
-        usuario = db.usuarios.find_one({'_id': ObjectId(session['user_id'])})
-
-        # ⭐ NÚMERO DE PEDIDO ÚNICO (contador atómico)
-        numero_pedido = _generar_numero_pedido(datetime.now(timezone.utc).year)
-
-        # ⭐ Calcular envío, fecha de entrega y unidades
         total_unidades = sum(int(i.get('cantidad', 0)) for i in items_normalizados)
+        descuento_volumen, _ = calcular_descuento_volumen(total_unidades, subtotal)
+
+        descuento_total = descuento_volumen + descuento_cupon + descuento_promocion + descuento_lealtad
+        subtotal_con_descuentos = subtotal - descuento_total
 
         tipo_envio_final = data.get('tipo_envio', 'domicilio')
-
         if tipo_envio_final == 'click_collect':
             envio = 0
         else:
             envio = 199.00 if total_unidades >= 50 else 99.00
 
+        total = round(subtotal_con_descuentos + iva + envio, 2)
+        print(f"💰 [MSI-SANDBOX] Total: ${total:.2f} (desc: ${descuento_total:.2f})", file=sys.stderr)
+
+        # Resolver tarjeta guardada
+        tarjeta = None
+        if tarjeta_guardada_id and not token_id:
+            tarjeta = _buscar_tarjeta_guardada(session['user_id'], tarjeta_guardada_id)
+            if not tarjeta:
+                return jsonify({
+                    'success': False,
+                    'error': f'No encontramos la tarjeta (ID: {tarjeta_guardada_id}).'
+                }), 404
+            print(f"💳 [MSI-SANDBOX] Tarjeta: ••••{tarjeta.get('ultimos4')}", file=sys.stderr)
+
+        # Simulación de aprobación
+        order_id = f"ord_sandbox_{int(time.time() * 1000)}"
+        print(f"✅ [MSI-SANDBOX] Orden simulada: {order_id}", file=sys.stderr)
+
+        usuario = db.usuarios.find_one({'_id': ObjectId(session['user_id'])})
+        numero_pedido = _generar_numero_pedido(datetime.now(timezone.utc).year)
         dias_entrega = 1 if total_unidades >= 50 else 5
         fecha_entrega_estimada = datetime.now(timezone.utc) + timedelta(days=dias_entrega)
 
@@ -1794,17 +1705,23 @@ def procesar_checkout_msi():
             'subtotal':          round(subtotal, 2),
             'iva':               round(iva, 2),
             'envio':             round(envio, 2),
-            'descuento':         0.0,
-            'descuento_total':   0.0,
-            'porcentaje_descuento': 0,
-            'total':             round(total, 2),
+            'descuento_volumen': round(descuento_volumen, 2),
+            'descuento_cupon':   round(descuento_cupon, 2),
+            'codigo_cupon':      codigo_cupon,
+            'descuento_promocion': round(descuento_promocion, 2),
+            'promocion_id':      promocion_id,
+            'descuento_lealtad': round(descuento_lealtad, 2),
+            'descuento_total':   round(descuento_total, 2),
+            'total':             total,
             'msi_meses':         meses_msi,
             'metodo_pago':       'tarjeta_credito',
             'tipo_envio':        tipo_envio_final,
-            'conekta_order_id':  order_id,
-            'conekta_status':    resultado_cargo.get('raw', {}).get('status'),
-            'estado':            'pendiente',
+            'sandbox_order_id':  order_id,
+            'sandbox_status':    'paid',
+            'estado':            'confirmado',
             'pago_estado':       'pagado',
+            'pago_confirmado':   True,
+            'fecha_pago':        datetime.now(timezone.utc),
             'notas':             data.get('notas', ''),
             'direccion':         data.get('direccion', {}) or {},
             'tienda_recogida':   data.get('tienda_recogida') or None,
@@ -1814,15 +1731,14 @@ def procesar_checkout_msi():
             'updated_at':        datetime.now(timezone.utc),
         }
 
-        # Generar código de recogida si es click_collect
         if tipo_envio_final == 'click_collect':
             pedido['codigo_recogida'] = generar_codigo_recogida()
 
         r = db.pedidos.insert_one(pedido)
         pedido_id = str(r.inserted_id)
-        print(f"✅ [MSI] Pedido: {numero_pedido} (id: {pedido_id})", file=sys.stderr)
+        print(f"✅ [MSI-SANDBOX] Pedido: {numero_pedido} (id: {pedido_id})", file=sys.stderr)
 
-        # ⭐ MARKETPLACE: procesar comisiones de vendedores
+        # Marketplace
         try:
             comisiones_resumen = _procesar_comisiones_marketplace(
                 items=items_normalizados,
@@ -1830,50 +1746,59 @@ def procesar_checkout_msi():
                 numero_pedido=numero_pedido,
             )
             if comisiones_resumen['procesados'] > 0:
-                print(
-                    f"🏪 [MSI] [Marketplace] {comisiones_resumen['procesados']} vendedor(es) "
-                    f"acreditados en pedido {numero_pedido}",
-                    file=sys.stderr
-                )
-            if comisiones_resumen['errores']:
-                for err in comisiones_resumen['errores']:
-                    print(f"   ⚠️ {err}", file=sys.stderr)
+                print(f"🏪 [MSI-SANDBOX] {comisiones_resumen['procesados']} vendedor(es) acreditados",
+                      file=sys.stderr)
         except Exception as e:
-            print(f"⚠️ [MSI] [Marketplace] Error procesando comisiones: {e}",
-                  file=sys.stderr)
+            print(f"⚠️ [MSI-SANDBOX] Marketplace: {e}", file=sys.stderr)
 
-        # ---------------------------------------------------------
-        # Guardar tarjeta NUEVA si el usuario lo pidió
-        # ---------------------------------------------------------
+        # ⭐ Quemar cupón inmediatamente (el MSI es pago real)
+        if codigo_cupon:
+            try:
+                from app.models.cupon_model import CuponUsuario
+                CuponUsuario.registrar_uso(
+                    usuario_id=session['user_id'],
+                    cupon_codigo=codigo_cupon,
+                    pedido_id=pedido_id,
+                    descuento_aplicado=descuento_cupon,
+                )
+                print(f'✅ [MSI-SANDBOX] Cupón {codigo_cupon} quemado', file=sys.stderr)
+            except Exception as e:
+                print(f'⚠️ [MSI-SANDBOX] No se pudo quemar cupón: {e}', file=sys.stderr)
+
+            try:
+                from app.controllers.carrito_controller import (
+                    _normalizar_codigo, _buscar_registro_lealtad,
+                )
+                registro = _buscar_registro_lealtad(session['user_id'])
+                if registro:
+                    cupones = registro.get('cupones_personalizados') or []
+                    codigo_norm = _normalizar_codigo(codigo_cupon)
+                    modificado = False
+                    for i, c in enumerate(cupones):
+                        if not isinstance(c, dict):
+                            continue
+                        cid = _normalizar_codigo(c.get('id') or c.get('codigo') or '')
+                        if cid == codigo_norm and not c.get('usado'):
+                            cupones[i]['usado'] = True
+                            cupones[i]['usado_en'] = datetime.utcnow()
+                            cupones[i]['pedido_id'] = pedido_id
+                            modificado = True
+                            break
+                    if modificado:
+                        db.lealtad.update_one(
+                            {'_id': registro['_id']},
+                            {'$set': {'cupones_personalizados': cupones}}
+                        )
+            except Exception as e:
+                print(f'⚠️ [MSI-SANDBOX] Error lealtad: {e}', file=sys.stderr)
+
+        # Guardar tarjeta nueva si se pidió
         try:
             guardar_tarjeta = bool(data.get('guardar_tarjeta', False))
             tarjeta_info = data.get('tarjeta_info') or {}
 
             if guardar_tarjeta and tarjeta_info.get('ultimos4') and token_id:
-                from app.services.conekta_service import (
-                    crear_o_actualizar_customer, crear_payment_source
-                )
                 usuario_id_str = str(session['user_id'])
-
-                cust_res = crear_o_actualizar_customer(
-                    usuario_id=usuario_id_str,
-                    nombre=customer_info['nombre'],
-                    email=customer_info['email'],
-                    telefono=customer_info['telefono'],
-                    conekta_customer_id=(usuario or {}).get('conekta_customer_id'),
-                )
-                if not cust_res.get('success'):
-                    raise Exception(cust_res.get('error'))
-
-                customer_id = cust_res['customer_id']
-                db.usuarios.update_one(
-                    {'_id': ObjectId(session['user_id'])},
-                    {'$set': {'conekta_customer_id': customer_id}}
-                )
-
-                ps_res = crear_payment_source(customer_id, token_id)
-                if not ps_res.get('success'):
-                    raise Exception(ps_res.get('error'))
 
                 nuevo_metodo = {
                     'id': str(ObjectId()),
@@ -1883,8 +1808,8 @@ def procesar_checkout_msi():
                     'ultimos4': tarjeta_info.get('ultimos4', ''),
                     'titular': tarjeta_info.get('titular', ''),
                     'expira': tarjeta_info.get('expira', ''),
-                    'conekta_customer_id': customer_id,
-                    'conekta_payment_source_id': ps_res['payment_source_id'],
+                    'sandbox': True,
+                    'sandbox_token_id': token_id,
                     'predeterminado': False,
                     'created_at': datetime.now(timezone.utc),
                 }
@@ -1892,22 +1817,46 @@ def procesar_checkout_msi():
                     nuevo_metodo['predeterminado'] = True
 
                 db.metodos_pago.insert_one(nuevo_metodo)
-                print(f"💾 [MSI] Tarjeta guardada: "
+                print(f"💾 [MSI-SANDBOX] Tarjeta guardada: "
                       f"{nuevo_metodo['marca']} •••• {nuevo_metodo['ultimos4']}",
                       file=sys.stderr)
         except Exception as e:
-            print(f"⚠️ No se pudo guardar tarjeta: {e}", file=sys.stderr)
+            print(f"⚠️ [MSI-SANDBOX] No se pudo guardar tarjeta: {e}", file=sys.stderr)
             import traceback; traceback.print_exc()
 
+        # Lealtad y cashback
+        resultado_lealtad = _procesar_lealtad_compra(session['user_id'], total, numero_pedido)
+        if resultado_lealtad:
+            db.pedidos.update_one(
+                {'_id': ObjectId(pedido_id)},
+                {'$set': {
+                    'puntos_ganados': resultado_lealtad.get('puntos_ganados', 0),
+                    'puntos_multiplicador': resultado_lealtad.get('multiplicador', 1.0),
+                    'cupones_generados': resultado_lealtad.get('cupones_generados', 0)
+                }}
+            )
+
+        nivel_cliente = beneficios.get('nivel', 'Bronce')
+        cashback_ganado = _procesar_cashback_monedero(session['user_id'], total, nivel_cliente, pedido_id)
+        if cashback_ganado > 0:
+            db.pedidos.update_one(
+                {'_id': ObjectId(pedido_id)},
+                {'$set': {'cashback_ganado': round(cashback_ganado, 2)}}
+            )
+
         _vaciar_carrito_usuario(session['user_id'])
+        session.pop('cupon_aplicado', None)
+        session.pop('promocion_aplicada', None)
+        session.modified = True
 
         return jsonify({
             'success': True,
-            'message': 'Pago exitoso',
+            'message': 'Pago exitoso (sandbox)',
             'pedido_id': pedido_id,
             'numero_pedido': numero_pedido,
             'redirect': url_for('web.ver_pedido', id=pedido_id),
             'msi_meses': meses_msi,
+            'sandbox': True,
         })
 
     except Exception as e:

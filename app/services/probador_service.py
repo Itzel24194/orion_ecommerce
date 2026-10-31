@@ -133,10 +133,7 @@ class ProbadorService:
                     ""
                 )
             ),
-            "genero": producto.get(
-                "genero",
-                ""
-            ),
+            "sexo": producto.get("sexo") or producto.get("genero", ""),
             "marca": producto.get(
                 "marca",
                 ""

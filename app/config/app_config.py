@@ -38,4 +38,3 @@ class Config:
     # Debug mode
     DEBUG = os.environ.get('FLASK_DEBUG', 'True') == 'True'
 
-    CONEKTA_PUBLIC_KEY = 'key_JgXL03KIZGKjAzwPzG4UElh'

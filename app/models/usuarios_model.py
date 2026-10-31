@@ -8,17 +8,36 @@ from flask import current_app
 
 bcrypt = Bcrypt()
 
-
-def normalizar_genero(valor):
-    """Función auxiliar para normalizar género (también usada en el modelo)"""
+# ================================================================
+# ⭐ NORMALIZACIÓN DE SEXO
+# ================================================================
+def normalizar_sexo(valor):
+    """Normaliza cualquier variante a Masculino/Femenino/Indefinido."""
     if not valor:
         return 'Indefinido'
-    v = valor.strip().lower()
+    v = str(valor).strip().lower()
     if v in ['masculino', 'hombre', 'm', 'male', 'man']:
         return 'Masculino'
     if v in ['femenino', 'mujer', 'f', 'female', 'woman']:
         return 'Femenino'
     return 'Indefinido'
+
+# Alias de compatibilidad (por si algún archivo viejo la llama)
+normalizar_genero = normalizar_sexo
+
+
+def _normalizar_sexo_en_doc(doc):
+    """
+    Asegura que el documento tenga 'sexo' normalizado.
+    Acepta 'genero' como alias de entrada y elimina duplicados.
+    Modifica el doc in-place y lo devuelve.
+    """
+    if not doc:
+        return doc
+    sexo_raw = doc.get('sexo') or doc.get('genero')
+    doc['sexo'] = normalizar_sexo(sexo_raw)
+    doc.pop('genero', None)
+    return doc
 
 
 class Usuario:
@@ -28,18 +47,23 @@ class Usuario:
 
     @staticmethod
     def obtener_todos():
-        return list(usuarios_col.find())
+        usuarios = list(usuarios_col.find())
+        # ✅ Normalizar sexo en cada doc para que el template siempre compare canónico
+        for u in usuarios:
+            _normalizar_sexo_en_doc(u)
+        return usuarios
 
     @staticmethod
     def obtener_por_id(id):
         try:
-            return usuarios_col.find_one({"_id": ObjectId(id)})
+            usuario = usuarios_col.find_one({"_id": ObjectId(id)})
+            return _normalizar_sexo_en_doc(usuario)
         except:
             return None
 
     @staticmethod
     def obtener_por_email(email):
-        if pd.isnull(email): 
+        if pd.isnull(email):
             return None
         return usuarios_col.find_one({"email": email})
 
@@ -48,15 +72,15 @@ class Usuario:
         """Verifica si la contraseña coincide con el hash almacenado para el email dado."""
         if not email or not password_plano:
             return False
-        
+
         usuario = Usuario.obtener_por_email(email)
         if not usuario:
             return False
-        
+
         password_hash = usuario.get('password')
         if not password_hash or not isinstance(password_hash, str):
             return False
-        
+
         try:
             return bcrypt.check_password_hash(password_hash, password_plano)
         except Exception as e:
@@ -72,17 +96,16 @@ class Usuario:
         data['apellido_paterno'] = Usuario._limpiar_valor(data.get('apellido_paterno'))
         data['apellido_materno'] = Usuario._limpiar_valor(data.get('apellido_materno'))
         data['telefono'] = Usuario._limpiar_valor(data.get('telefono'))
-        
-        # Normalizar género (por si acaso)
-        if 'sexo' in data:
-            data['sexo'] = normalizar_genero(data['sexo'])
-        if 'genero' in data:
-            data['genero'] = normalizar_genero(data['genero'])  # por compatibilidad
-        
+
+        # ⭐ Normalizar SEXO (aceptar `genero` como alias)
+        sexo_raw = data.get('sexo') or data.get('genero')
+        data['sexo'] = normalizar_sexo(sexo_raw)  # siempre setea, aunque sea 'Indefinido'
+        data.pop('genero', None)
+
         # Encriptar contraseña si existe
         if data.get('password'):
             data['password'] = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-        
+
         # Agregar fechas si no existen
         if 'created_at' not in data:
             data['created_at'] = datetime.utcnow()
@@ -92,26 +115,22 @@ class Usuario:
             data['activo'] = True
         if 'confirmado' not in data:
             data['confirmado'] = False
-        
-        # Inicializar direcciones si no existe
+
+        # Inicializar colecciones
         if 'direcciones' not in data:
             data['direcciones'] = []
-        
-        # Inicializar favoritos si no existe
         if 'favoritos' not in data:
             data['favoritos'] = []
-        
-        # Inicializar notificaciones si no existe
         if 'notificaciones' not in data:
             data['notificaciones'] = []
-        
+
         return usuarios_col.insert_one(data)
 
     @staticmethod
     def marcar_como_confirmado(email):
         """Marca al usuario como confirmado en la base de datos."""
         return usuarios_col.update_one(
-            {"email": email}, 
+            {"email": email},
             {"$set": {"confirmado": True, "updated_at": datetime.utcnow()}}
         )
 
@@ -122,13 +141,13 @@ class Usuario:
             data['password'] = bcrypt.generate_password_hash(data['password']).decode('utf-8')
         elif 'password' in data:
             del data['password']
-        
-        # Normalizar género si se envía
-        if 'sexo' in data:
-            data['sexo'] = normalizar_genero(data['sexo'])
-        if 'genero' in data:
-            data['genero'] = normalizar_genero(data['genero'])
-        
+
+        # ⭐ Normalizar SEXO. Aceptar `genero` como alias.
+        sexo_raw = data.get('sexo') or data.get('genero')
+        if sexo_raw:
+            data['sexo'] = normalizar_sexo(sexo_raw)
+        data.pop('genero', None)
+
         data['updated_at'] = datetime.utcnow()
         return usuarios_col.update_one({"email": email}, {"$set": data})
 
@@ -141,7 +160,7 @@ class Usuario:
     def actualizar_usuario(id, data):
         """Actualiza un usuario por su ID."""
         update_fields = data.copy()
-        
+
         # Limpiar campos
         if 'foto' in update_fields:
             update_fields['foto'] = Usuario._limpiar_valor(update_fields.get('foto'))
@@ -153,13 +172,14 @@ class Usuario:
             update_fields['apellido_materno'] = Usuario._limpiar_valor(update_fields.get('apellido_materno'))
         if 'telefono' in update_fields:
             update_fields['telefono'] = Usuario._limpiar_valor(update_fields.get('telefono'))
-        
-        # Normalizar género
-        if 'sexo' in update_fields:
-            update_fields['sexo'] = normalizar_genero(update_fields['sexo'])
-        if 'genero' in update_fields:
-            update_fields['genero'] = normalizar_genero(update_fields['genero'])
-        
+
+        # ⭐ Normalizar SEXO. Aceptar `genero` como alias.
+        # Solo se toca si viene un valor truthy (evita sobreescribir con None en updates parciales)
+        sexo_raw = update_fields.get('sexo') or update_fields.get('genero')
+        if sexo_raw:
+            update_fields['sexo'] = normalizar_sexo(sexo_raw)
+        update_fields.pop('genero', None)
+
         # Manejar contraseña
         if 'password' in update_fields:
             pwd = update_fields['password']
@@ -167,10 +187,10 @@ class Usuario:
                 update_fields.pop('password', None)
             else:
                 update_fields['password'] = bcrypt.generate_password_hash(pwd).decode('utf-8')
-        
+
         # Agregar fecha de actualización
         update_fields['updated_at'] = datetime.utcnow()
-        
+
         return usuarios_col.update_one({"_id": ObjectId(id)}, {"$set": update_fields})
 
     @staticmethod
@@ -186,10 +206,10 @@ class Usuario:
         """Calcula el segmento de un usuario basado en sus pedidos"""
         db = current_app.db
         pedidos = list(db.pedidos.find({"usuario_id": str(usuario_id)}))
-        
+
         cantidad = len(pedidos)
         total_gastado = sum(float(p.get("total", 0)) for p in pedidos)
-        
+
         if total_gastado >= 10000:
             return "VIP"
         elif cantidad >= 5:
@@ -211,10 +231,10 @@ class Usuario:
         usuario = Usuario.obtener_por_id(usuario_id)
         if not usuario:
             return "Inactivo"
-        
+
         if usuario.get("segmento"):
             return usuario.get("segmento")
-        
+
         segmento = Usuario.calcular_segmento(usuario_id)
         Usuario.actualizar_usuario(usuario_id, {"segmento": segmento})
         return segmento
@@ -228,7 +248,7 @@ class Usuario:
         """Agrega una nueva dirección al usuario con todos los campos"""
         if '_id' not in data:
             data['_id'] = ObjectId()
-        
+
         data['calle'] = data.get('calle', '')
         data['numero'] = data.get('numero', '')
         data['colonia'] = data.get('colonia', '')
@@ -238,15 +258,15 @@ class Usuario:
         data['referencias'] = data.get('referencias', '')
         data['nombre'] = data.get('nombre', '')
         data['predeterminada'] = data.get('predeterminada', False)
-        
+
         if data['predeterminada']:
             usuarios_col.update_one(
                 {"_id": ObjectId(usuario_id)},
                 {"$set": {"direcciones.$[].predeterminada": False}}
             )
-        
+
         return usuarios_col.update_one(
-            {"_id": ObjectId(usuario_id)}, 
+            {"_id": ObjectId(usuario_id)},
             {"$push": {"direcciones": data}}
         )
 
@@ -256,11 +276,11 @@ class Usuario:
         usuario = Usuario.obtener_por_id(usuario_id)
         if not usuario or not usuario.get('direcciones'):
             return None
-        
+
         direcciones = list(usuario.get('direcciones', []))
         if direccion_id >= len(direcciones):
             return None
-        
+
         direccion_actualizada = direcciones[direccion_id].copy()
         direccion_actualizada.update({
             'calle': data.get('calle', direccion_actualizada.get('calle', '')),
@@ -273,14 +293,14 @@ class Usuario:
             'nombre': data.get('nombre', direccion_actualizada.get('nombre', '')),
             'predeterminada': data.get('predeterminada', direccion_actualizada.get('predeterminada', False))
         })
-        
+
         if data.get('predeterminada', False):
             for i, d in enumerate(direcciones):
                 if i != direccion_id:
                     d['predeterminada'] = False
-        
+
         direcciones[direccion_id] = direccion_actualizada
-        
+
         return usuarios_col.update_one(
             {"_id": ObjectId(usuario_id)},
             {"$set": {"direcciones": direcciones, "updated_at": datetime.utcnow()}}
@@ -290,33 +310,33 @@ class Usuario:
     def borrar_direccion(usuario_id, direccion_id):
         """Elimina una dirección por ID o índice"""
         u_id = ObjectId(usuario_id)
-        
+
         try:
             if isinstance(direccion_id, str) and ObjectId.is_valid(direccion_id):
                 res = usuarios_col.update_one(
-                    {"_id": u_id}, 
+                    {"_id": u_id},
                     {"$pull": {"direcciones": {"_id": ObjectId(direccion_id)}}}
                 )
                 if res.modified_count > 0:
                     return res
         except:
             pass
-        
+
         if str(direccion_id).isdigit():
             index = int(direccion_id)
             usuario = Usuario.obtener_por_id(usuario_id)
             if usuario and usuario.get('direcciones') and index < len(usuario['direcciones']):
                 era_predeterminada = usuario['direcciones'][index].get('predeterminada', False)
-                
+
                 usuarios_col.update_one(
-                    {"_id": u_id}, 
+                    {"_id": u_id},
                     {"$unset": {f"direcciones.{index}": 1}}
                 )
                 result = usuarios_col.update_one(
-                    {"_id": u_id}, 
+                    {"_id": u_id},
                     {"$pull": {"direcciones": None}}
                 )
-                
+
                 if era_predeterminada:
                     usuario_actualizado = Usuario.obtener_por_id(usuario_id)
                     if usuario_actualizado and usuario_actualizado.get('direcciones'):
@@ -327,9 +347,9 @@ class Usuario:
                                 {"_id": u_id},
                                 {"$set": {"direcciones": nuevas_dirs, "updated_at": datetime.utcnow()}}
                             )
-                
+
                 return result
-        
+
         return None
 
     @staticmethod
@@ -338,11 +358,11 @@ class Usuario:
         usuario = Usuario.obtener_por_id(usuario_id)
         if not usuario or not usuario.get('direcciones'):
             return None
-        
+
         for dir in usuario['direcciones']:
             if dir.get('predeterminada', False):
                 return dir
-        
+
         return usuario['direcciones'][0] if usuario['direcciones'] else None
 
     @staticmethod
@@ -420,7 +440,7 @@ class Usuario:
         usuario = Usuario.obtener_por_id(id)
         if not usuario:
             return False
-        
+
         nuevo_estado = not usuario.get('activo', True)
         result = usuarios_col.update_one(
             {"_id": ObjectId(id)},
@@ -448,7 +468,7 @@ class Usuario:
         admins = usuarios_col.count_documents({"rol": "admin"})
         vendedores = usuarios_col.count_documents({"rol": "vendedor"})
         clientes = usuarios_col.count_documents({"rol": "cliente"})
-        
+
         return {
             "total": total,
             "activos": activos,
@@ -461,7 +481,10 @@ class Usuario:
     @staticmethod
     def obtener_ultimos_registrados(limite=5):
         """Obtiene los últimos usuarios registrados"""
-        return list(usuarios_col.find().sort("created_at", -1).limit(limite))
+        usuarios = list(usuarios_col.find().sort("created_at", -1).limit(limite))
+        for u in usuarios:
+            _normalizar_sexo_en_doc(u)
+        return usuarios
 
     @staticmethod
     def obtener_por_mes(anio=None, mes=None):
@@ -470,11 +493,14 @@ class Usuario:
             anio = datetime.utcnow().year
         if mes is None:
             mes = datetime.utcnow().month
-        
+
         mes_str = f"{anio}-{str(mes).zfill(2)}"
-        return list(usuarios_col.find({
+        usuarios = list(usuarios_col.find({
             'created_at': {'$regex': mes_str}
         }))
+        for u in usuarios:
+            _normalizar_sexo_en_doc(u)
+        return usuarios
 
     @staticmethod
     def contar_por_mes(anio=None, mes=None):
@@ -483,7 +509,7 @@ class Usuario:
             anio = datetime.utcnow().year
         if mes is None:
             mes = datetime.utcnow().month
-        
+
         mes_str = f"{anio}-{str(mes).zfill(2)}"
         return usuarios_col.count_documents({
             'created_at': {'$regex': mes_str}
@@ -499,7 +525,7 @@ class Usuario:
         notificacion['_id'] = ObjectId()
         notificacion['created_at'] = datetime.utcnow()
         notificacion['leida'] = False
-        
+
         return usuarios_col.update_one(
             {"_id": ObjectId(usuario_id)},
             {"$push": {"notificaciones": notificacion}, "$set": {"updated_at": datetime.utcnow()}}
@@ -519,7 +545,7 @@ class Usuario:
         usuario = Usuario.obtener_por_id(usuario_id)
         if not usuario:
             return []
-        
+
         notificaciones = usuario.get('notificaciones', [])
         return [n for n in notificaciones if not n.get('leida', False)]
 
