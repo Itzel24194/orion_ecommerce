@@ -15,7 +15,7 @@
             color: #1a1a2e;
         }
         .layout { display: flex; min-height: 100vh; }
-        
+
         /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px;
@@ -362,6 +362,23 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
         }
+        .btn-auto {
+            background: linear-gradient(135deg, #a855f7, #7C3AED);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-auto:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+            color: white;
+        }
 
         /* ===== TABLA ===== */
         .table-container {
@@ -455,6 +472,17 @@
             margin: 2px;
             display: inline-block;
         }
+        .badge-auto {
+            background: linear-gradient(135deg, #a855f7, #7C3AED);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            margin-left: 6px;
+            display: inline-block;
+            vertical-align: middle;
+        }
 
         /* ===== EMPTY STATE ===== */
         .empty-state {
@@ -498,6 +526,150 @@
             flex-wrap: wrap;
             margin-top: 10px;
         }
+
+        /* ===== MODAL GENERACIÓN AUTOMÁTICA ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 720px;
+            width: 100%;
+            padding: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: fadeUp 0.25s ease;
+        }
+        @keyframes fadeUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-box h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .modal-box h3 i { color: #a855f7; }
+        .modal-box p.modal-sub {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .seg-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .seg-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .seg-item:hover { border-color: #a855f7; }
+        .seg-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #a855f7;
+            cursor: pointer;
+        }
+        .seg-info { flex: 1; }
+        .seg-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .seg-desc {
+            font-size: 0.78rem;
+            color: #666;
+            margin-top: 3px;
+        }
+        .seg-count {
+            font-size: 0.72rem;
+            color: #a855f7;
+            font-weight: 700;
+        }
+        .seg-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .btn-modal {
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-modal.primary {
+            background: linear-gradient(135deg, #a855f7, #7C3AED);
+            color: #fff;
+        }
+        .btn-modal.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+        }
+        .btn-modal.secondary {
+            background: #f1f5f9;
+            color: #333;
+        }
+        .btn-modal.secondary:hover { background: #e2e8f0; }
+        .btn-modal.ghost {
+            background: transparent;
+            color: #666;
+            border: 2px solid #e8e8e8;
+        }
+        .btn-modal.ghost:hover { border-color: #a855f7; color: #a855f7; }
+        .preview-box {
+            background: #f8f5ff;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 8px;
+            font-size: 0.78rem;
+            color: #5b21b6;
+        }
+        .results-box {
+            background: #f9fafb;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 14px;
+        }
+        .results-box h4 {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e8e8e8;
+            font-size: 0.82rem;
+        }
+        .result-row:last-child { border-bottom: none; }
+        .result-row.ok { color: #155724; }
+        .result-row.warn { color: #856404; }
+        .result-row.err { color: #721c24; }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
@@ -552,25 +724,25 @@
             <a href="{{ url_for('web.admin_listar_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Pedidos</span></a>
             <a href="{{ url_for('web.reporte_ventas') }}"><i class="fas fa-chart-line"></i> <span>Ventas</span></a>
             <a href="{{ url_for('web.lista_atributos') }}"><i class="fas fa-list-ul"></i> <span>Atributos</span></a>
-            
+
             <div class="divider"></div>
             <div class="panel-title">PROMOCIONES</div>
             <a href="{{ url_for('web.admin_listar_cupones') }}" class="active"><i class="fas fa-ticket-alt"></i> <span>Cupones</span></a>
-            
+
             <div class="divider"></div>
             <div class="panel-title">INTELIGENCIA ARTIFICIAL</div>
             <a href="{{ url_for('web.segmentacion_clientes') }}"><i class="fas fa-pie-chart"></i> <span>Segmentación</span></a>
             <a href="{{ url_for('web.prediccion_ventas') }}"><i class="fas fa-chart-bar"></i> <span>Predicción Ventas</span></a>
             <a href="{{ url_for('web.prediccion_abandono') }}"><i class="fas fa-exclamation-triangle"></i> <span>Predicción Abandono</span></a>
             <a href="{{ url_for('web.deteccion_fraude') }}"><i class="fas fa-shield-alt"></i> <span>Detección Fraude</span></a>
-            
+
             <div class="divider"></div>
             <div class="panel-title">CONFIGURACIÓN</div>
             <a href="{{ url_for('web.analisis') }}"><i class="fas fa-chart-pie"></i> <span>Análisis</span></a>
             <a href="{{ url_for('web.inteligencia') }}"><i class="fas fa-brain"></i> <span>Inteligencia</span></a>
             <a href="{{ url_for('web.reportes') }}"><i class="fas fa-file-alt"></i> <span>Reportes</span></a>
             <a href="{{ url_for('web.configuracion') }}"><i class="fas fa-cog"></i> <span>Configuración</span></a>
-            
+
             <div class="divider"></div>
             <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
                 <button type="submit" class="logout-btn">
@@ -657,6 +829,9 @@
             <a href="{{ url_for('web.admin_crear_cupon') }}" class="btn-primary-custom">
                 <i class="fas fa-plus"></i> Nuevo Cupón
             </a>
+            <button class="btn-auto" onclick="abrirModalAuto()">
+                <i class="fas fa-robot"></i> Generar automáticos
+            </button>
             <button onclick="location.reload()" class="btn-outline-custom" style="border-color: #00d4ff; color: #00d4ff;">
                 <i class="fas fa-sync-alt"></i> Recargar
             </button>
@@ -708,10 +883,28 @@
                     </thead>
                     <tbody>
                         {% for cupon in cupones %}
-                        <tr data-codigo="{{ cupon.codigo }}" data-nombre="{{ cupon.nombre }}" 
-                            data-tipo="{{ cupon.tipo }}" data-estado="{% if cupon.activo %}{% if cupon.fecha_fin and cupon.fecha_fin < datetime.utcnow() %}expirado{% else %}activo{% endif %}{% else %}inactivo{% endif %}">
-                            <td><input type="checkbox" class="seleccionar-item" onchange="actualizarSeleccionados()"></td>
-                            <td><span class="fw-bold" style="color: #e10098;">{{ cupon.codigo }}</span></td>
+                        {% set _estado = 'inactivo' %}
+                        {% if cupon.activo %}
+                            {% if cupon.fecha_fin and cupon.fecha_fin < ahora %}
+                                {% set _estado = 'expirado' %}
+                            {% elif cupon.fecha_inicio and cupon.fecha_inicio > ahora %}
+                                {% set _estado = 'programado' %}
+                            {% else %}
+                                {% set _estado = 'activo' %}
+                            {% endif %}
+                        {% endif %}
+                        <tr data-id="{{ cupon._id }}"
+                            data-codigo="{{ cupon.codigo }}"
+                            data-nombre="{{ cupon.nombre }}"
+                            data-tipo="{{ cupon.tipo }}"
+                            data-estado="{{ _estado }}">
+                            <td><input type="checkbox" class="seleccionar-item" data-id="{{ cupon._id }}" onchange="actualizarSeleccionados()"></td>
+                            <td>
+                                <span class="fw-bold" style="color: #e10098;">{{ cupon.codigo }}</span>
+                                {% if cupon.creado_automaticamente %}
+                                    <span class="badge-auto"><i class="fas fa-robot"></i> AUTO</span>
+                                {% endif %}
+                            </td>
                             <td>{{ cupon.nombre }}</td>
                             <td>
                                 <span class="badge-tipo {{ cupon.tipo }}">
@@ -731,13 +924,13 @@
                             </td>
                             <td style="font-size:0.75rem;">
                                 {% if cupon.fecha_inicio %}
-                                    {{ cupon.fecha_inicio.strftime('%d/%m/%Y') if cupon.fecha_inicio else 'N/A' }}
+                                    {{ cupon.fecha_inicio.strftime('%d/%m/%Y') }}
                                 {% else %}
                                     <span style="color:#888;">-</span>
                                 {% endif %}
                                 <span style="color:#888;">→</span>
                                 {% if cupon.fecha_fin %}
-                                    {{ cupon.fecha_fin.strftime('%d/%m/%Y') if cupon.fecha_fin else 'N/A' }}
+                                    {{ cupon.fecha_fin.strftime('%d/%m/%Y') }}
                                 {% else %}
                                     <span style="color:#888;">∞</span>
                                 {% endif %}
@@ -757,14 +950,12 @@
                                 </span>
                             </td>
                             <td>
-                                {% if cupon.activo %}
-                                    {% if cupon.fecha_fin and cupon.fecha_fin < datetime.utcnow() %}
-                                        <span class="badge-status expired">Expirado</span>
-                                    {% elif cupon.fecha_inicio and cupon.fecha_inicio > datetime.utcnow() %}
-                                        <span class="badge-status scheduled">Programado</span>
-                                    {% else %}
-                                        <span class="badge-status active">Activo</span>
-                                    {% endif %}
+                                {% if _estado == 'activo' %}
+                                    <span class="badge-status active">Activo</span>
+                                {% elif _estado == 'expirado' %}
+                                    <span class="badge-status expired">Expirado</span>
+                                {% elif _estado == 'programado' %}
+                                    <span class="badge-status scheduled">Programado</span>
                                 {% else %}
                                     <span class="badge-status inactive">Inactivo</span>
                                 {% endif %}
@@ -791,10 +982,13 @@
             <div class="empty-state">
                 <i class="fas fa-ticket-alt"></i>
                 <p style="font-size:1.1rem; margin-top:10px;">No hay cupones registrados</p>
-                <p style="color:#aaa; font-size:0.85rem;">Crea tu primer cupón para comenzar a gestionar promociones.</p>
+                <p style="color:#aaa; font-size:0.85rem;">Crea tu primer cupón o genera automáticos por segmento.</p>
                 <a href="{{ url_for('web.admin_crear_cupon') }}" class="btn-primary-custom" style="margin-top:15px;">
                     <i class="fas fa-plus"></i> Crear primer cupón
                 </a>
+                <button class="btn-auto" style="margin-top:15px; margin-left:8px;" onclick="abrirModalAuto()">
+                    <i class="fas fa-robot"></i> Generar automáticos
+                </button>
             </div>
             {% endif %}
         </div>
@@ -802,8 +996,42 @@
     </main>
 </div>
 
+<!-- ===== MODAL GENERACIÓN AUTOMÁTICA ===== -->
+<div class="modal-overlay" id="modalAuto">
+    <div class="modal-box">
+        <h3><i class="fas fa-robot"></i> Generar cupones automáticos</h3>
+        <p class="modal-sub">
+            Se crearán cupones personalizados según el comportamiento de compra de tus clientes.
+            Previsualiza cuántos usuarios caen en cada segmento antes de generar.
+        </p>
+
+        <div class="seg-list" id="segList">
+            <div style="text-align:center; padding:20px; color:#888;">
+                <i class="fas fa-spinner fa-spin"></i> Cargando segmentos...
+            </div>
+        </div>
+
+        <div class="seg-actions">
+            <button class="btn-modal primary" onclick="generarTodos()">
+                <i class="fas fa-bolt"></i> Generar TODOS los segmentos
+            </button>
+            <button class="btn-modal secondary" onclick="previsualizarSeleccionados()">
+                <i class="fas fa-eye"></i> Previsualizar seleccionados
+            </button>
+            <button class="btn-modal ghost" onclick="cerrarModalAuto()">Cerrar</button>
+        </div>
+
+        <div class="results-box" id="resultadosAuto" style="display:none;">
+            <h4><i class="fas fa-check-circle"></i> Resultados</h4>
+            <div id="resultadosLista"></div>
+        </div>
+    </div>
+</div>
+
 <script>
-    // ===== MOSTRAR TOASTS =====
+    // ============================================================
+    // TOASTS
+    // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -818,174 +1046,316 @@
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = `toast-message ${tipo}`;
-        
         let icon = 'check-circle';
         if (tipo === 'error') icon = 'exclamation-circle';
         if (tipo === 'warning') icon = 'exclamation-triangle';
-        
         toast.innerHTML = `<i class="fas fa-${icon}"></i> ${mensaje}`;
         container.appendChild(toast);
-        
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.5s ease forwards';
-            setTimeout(() => {
-                toast.remove();
-            }, 500);
+            setTimeout(() => toast.remove(), 500);
         }, 3000);
     }
 
-    // ===== FILTROS =====
+    // ============================================================
+    // FILTROS
+    // ============================================================
     function filtrarCupones() {
-        const busqueda = document.getElementById('buscarCupon').value.toLowerCase();
-        const tipo = document.getElementById('filtroTipo').value;
-        const estado = document.getElementById('filtroEstado').value;
-        
+        const busqueda = (document.getElementById('buscarCupon')?.value || '').toLowerCase();
+        const tipo = document.getElementById('filtroTipo')?.value || '';
+        const estado = document.getElementById('filtroEstado')?.value || '';
         const filas = document.querySelectorAll('#tablaCupones tbody tr');
-        
         filas.forEach(fila => {
-            const codigo = fila.dataset.codigo.toLowerCase();
-            const nombre = fila.dataset.nombre.toLowerCase();
-            const filaTipo = fila.dataset.tipo;
-            const filaEstado = fila.dataset.estado;
-            
+            const codigo = (fila.dataset.codigo || '').toLowerCase();
+            const nombre = (fila.dataset.nombre || '').toLowerCase();
+            const filaTipo = fila.dataset.tipo || '';
+            const filaEstado = fila.dataset.estado || '';
             let mostrar = true;
-            
-            if (busqueda && !codigo.includes(busqueda) && !nombre.includes(busqueda)) {
-                mostrar = false;
-            }
-            
-            if (tipo && filaTipo !== tipo) {
-                mostrar = false;
-            }
-            
-            if (estado && filaEstado !== estado) {
-                mostrar = false;
-            }
-            
+            if (busqueda && !codigo.includes(busqueda) && !nombre.includes(busqueda)) mostrar = false;
+            if (tipo && filaTipo !== tipo) mostrar = false;
+            if (estado && filaEstado !== estado) mostrar = false;
             fila.style.display = mostrar ? '' : 'none';
         });
     }
 
     function limpiarFiltros() {
-        document.getElementById('buscarCupon').value = '';
-        document.getElementById('filtroTipo').value = '';
-        document.getElementById('filtroEstado').value = '';
-        document.querySelectorAll('#tablaCupones tbody tr').forEach(fila => {
-            fila.style.display = '';
-        });
+        const b = document.getElementById('buscarCupon');
+        const t = document.getElementById('filtroTipo');
+        const e = document.getElementById('filtroEstado');
+        if (b) b.value = '';
+        if (t) t.value = '';
+        if (e) e.value = '';
+        document.querySelectorAll('#tablaCupones tbody tr').forEach(f => f.style.display = '');
     }
 
-    // ===== ORDENAR TABLA =====
+    // ============================================================
+    // ORDENAR TABLA
+    // ============================================================
     let ordenActual = null;
     let ordenAscendente = true;
 
     function ordenarTabla(columna) {
         const tbody = document.querySelector('#tablaCupones tbody');
+        if (!tbody) return;
         const filas = Array.from(tbody.querySelectorAll('tr'));
-        
-        if (ordenActual === columna) {
-            ordenAscendente = !ordenAscendente;
-        } else {
-            ordenActual = columna;
-            ordenAscendente = true;
-        }
-        
+        if (ordenActual === columna) ordenAscendente = !ordenAscendente;
+        else { ordenActual = columna; ordenAscendente = true; }
+
         filas.sort((a, b) => {
-            let valorA, valorB;
             const columnas = ['codigo', 'nombre', 'tipo', 'valor', 'vigencia', 'usos', 'estado'];
             const index = columnas.indexOf(columna);
-            
             if (index === -1) return 0;
-            
-            const celdasA = a.querySelectorAll('td');
-            const celdasB = b.querySelectorAll('td');
-            
-            // Saltamos la primera columna (checkbox)
-            valorA = celdasA[index + 1]?.textContent.trim() || '';
-            valorB = celdasB[index + 1]?.textContent.trim() || '';
-            
+            const cA = a.querySelectorAll('td');
+            const cB = b.querySelectorAll('td');
+            let vA = cA[index + 1]?.textContent.trim() || '';
+            let vB = cB[index + 1]?.textContent.trim() || '';
             if (columna === 'valor' || columna === 'usos') {
-                valorA = parseFloat(valorA) || 0;
-                valorB = parseFloat(valorB) || 0;
-                return ordenAscendente ? valorA - valorB : valorB - valorA;
+                vA = parseFloat(vA) || 0;
+                vB = parseFloat(vB) || 0;
+                return ordenAscendente ? vA - vB : vB - vA;
             }
-            
-            return ordenAscendente ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
+            return ordenAscendente ? vA.localeCompare(vB) : vB.localeCompare(vA);
         });
-        
-        filas.forEach(fila => tbody.appendChild(fila));
+        filas.forEach(f => tbody.appendChild(f));
     }
 
-    // ===== SELECCIÓN MÚLTIPLE =====
+    // ============================================================
+    // SELECCIÓN MÚLTIPLE
+    // ============================================================
     function toggleSeleccionarTodos() {
         const todos = document.getElementById('seleccionarTodos');
-        const items = document.querySelectorAll('.seleccionar-item');
-        items.forEach(item => item.checked = todos.checked);
+        document.querySelectorAll('.seleccionar-item').forEach(i => i.checked = todos.checked);
         actualizarSeleccionados();
     }
 
     function actualizarSeleccionados() {
-        const items = document.querySelectorAll('.seleccionar-item:checked');
-        const count = items.length;
-        document.getElementById('seleccionadosCount').textContent = `${count} seleccionados`;
-        document.getElementById('accionesLote').style.display = count > 0 ? 'flex' : 'none';
+        const count = document.querySelectorAll('.seleccionar-item:checked').length;
+        const cont = document.getElementById('seleccionadosCount');
+        const acciones = document.getElementById('accionesLote');
+        if (cont) cont.textContent = `${count} seleccionados`;
+        if (acciones) acciones.style.display = count > 0 ? 'flex' : 'none';
     }
 
-    function getSeleccionados() {
-        const items = document.querySelectorAll('.seleccionar-item:checked');
-        const codigos = [];
-        items.forEach(item => {
-            const fila = item.closest('tr');
-            if (fila) {
-                codigos.push(fila.dataset.codigo);
-            }
+    function getSeleccionadosIds() {
+        const ids = [];
+        document.querySelectorAll('.seleccionar-item:checked').forEach(item => {
+            const id = item.dataset.id || item.closest('tr')?.dataset.id;
+            if (id) ids.push(id);
         });
-        return codigos;
+        return ids;
     }
 
-    function activarSeleccionados() {
-        const codigos = getSeleccionados();
-        if (codigos.length === 0) return;
-        if (confirm(`¿Activar ${codigos.length} cupón(es) seleccionado(s)?`)) {
-            // Implementar llamada AJAX para activar
-            mostrarToast(`${codigos.length} cupón(es) activado(s)`, 'success');
-            setTimeout(() => location.reload(), 1500);
+    async function toggleLote(nuevoEstado) {
+        const ids = getSeleccionadosIds();
+        if (ids.length === 0) return;
+        if (!confirm(`¿${nuevoEstado ? 'Activar' : 'Inactivar'} ${ids.length} cupón(es)?`)) return;
+        try {
+            for (const id of ids) {
+                const cupon = await fetch(`/api/v1/admin/cupones/${id}`).then(r => r.json());
+                if (cupon?.data?.activo !== nuevoEstado) {
+                    await fetch(`/api/v1/admin/cupones/${id}/toggle`, { method: 'POST' });
+                }
+            }
+            mostrarToast(`${ids.length} cupón(es) actualizados`, 'success');
+            setTimeout(() => location.reload(), 1200);
+        } catch (e) {
+            mostrarToast('Error al actualizar', 'error');
         }
     }
 
-    function inactivarSeleccionados() {
-        const codigos = getSeleccionados();
-        if (codigos.length === 0) return;
-        if (confirm(`¿Inactivar ${codigos.length} cupón(es) seleccionado(s)?`)) {
-            mostrarToast(`${codigos.length} cupón(es) inactivado(s)`, 'warning');
-            setTimeout(() => location.reload(), 1500);
+    function activarSeleccionados() { toggleLote(true); }
+    function inactivarSeleccionados() { toggleLote(false); }
+
+    async function eliminarSeleccionados() {
+        const ids = getSeleccionadosIds();
+        if (ids.length === 0) return;
+        if (!confirm(`⚠️ ¿Eliminar permanentemente ${ids.length} cupón(es)? Esta acción no se puede deshacer.`)) return;
+        try {
+            for (const id of ids) {
+                await fetch(`/api/v1/admin/cupones/${id}`, { method: 'DELETE' });
+            }
+            mostrarToast(`${ids.length} cupón(es) eliminados`, 'error');
+            setTimeout(() => location.reload(), 1200);
+        } catch (e) {
+            mostrarToast('Error al eliminar', 'error');
         }
     }
 
-    function eliminarSeleccionados() {
-        const codigos = getSeleccionados();
-        if (codigos.length === 0) return;
-        if (confirm(`⚠️ ¿Eliminar permanentemente ${codigos.length} cupón(es) seleccionado(s)? Esta acción no se puede deshacer.`)) {
-            mostrarToast(`${codigos.length} cupón(es) eliminado(s)`, 'error');
-            setTimeout(() => location.reload(), 1500);
-        }
-    }
-
-    // ===== EXPORTAR =====
+    // ============================================================
+    // EXPORTAR
+    // ============================================================
     function exportarCSV() {
-        // Implementar exportación a CSV
         mostrarToast('Exportando a CSV...', 'success');
+        setTimeout(() => location.reload(), 800);
     }
-
     function exportarPDF() {
-        // Implementar exportación a PDF
         mostrarToast('Exportando a PDF...', 'success');
     }
 
-    // ===== BÚSQUEDA EN TIEMPO REAL =====
-    document.getElementById('buscarCupon').addEventListener('keyup', filtrarCupones);
-    document.getElementById('filtroTipo').addEventListener('change', filtrarCupones);
-    document.getElementById('filtroEstado').addEventListener('change', filtrarCupones);
+    // ============================================================
+    // BÚSQUEDA EN TIEMPO REAL
+    // ============================================================
+    const _buscar = document.getElementById('buscarCupon');
+    const _tipo = document.getElementById('filtroTipo');
+    const _estado = document.getElementById('filtroEstado');
+    if (_buscar) _buscar.addEventListener('keyup', filtrarCupones);
+    if (_tipo) _tipo.addEventListener('change', filtrarCupones);
+    if (_estado) _estado.addEventListener('change', filtrarCupones);
+
+    // ============================================================
+    // MODAL GENERACIÓN AUTOMÁTICA
+    // ============================================================
+    let segmentosCache = [];
+
+    async function abrirModalAuto() {
+        document.getElementById('modalAuto').classList.add('open');
+        document.getElementById('resultadosAuto').style.display = 'none';
+        await cargarSegmentos();
+    }
+
+    function cerrarModalAuto() {
+        document.getElementById('modalAuto').classList.remove('open');
+    }
+
+    async function cargarSegmentos() {
+        const cont = document.getElementById('segList');
+        cont.innerHTML = `<div style="text-align:center; padding:20px; color:#888;">
+            <i class="fas fa-spinner fa-spin"></i> Cargando segmentos...
+        </div>`;
+        try {
+            const res = await fetch('/api/v1/admin/segmentos');
+            const json = await res.json();
+            if (!json.ok) throw new Error(json.error || 'Error al cargar segmentos');
+            segmentosCache = json.data || [];
+            renderSegmentos();
+        } catch (e) {
+            cont.innerHTML = `<div style="text-align:center; padding:20px; color:#dc3545;">
+                <i class="fas fa-exclamation-triangle"></i> ${e.message}
+            </div>`;
+        }
+    }
+
+    function renderSegmentos() {
+        const cont = document.getElementById('segList');
+        if (segmentosCache.length === 0) {
+            cont.innerHTML = `<div style="text-align:center; padding:20px; color:#888;">
+                No hay segmentos configurados.
+            </div>`;
+            return;
+        }
+        cont.innerHTML = segmentosCache.map(seg => {
+            const cupon = seg.cupon || {};
+            const valorTxt = cupon.tipo === 'porcentaje'
+                ? `${cupon.valor}% desc.`
+                : cupon.tipo === 'envio_gratis'
+                    ? 'Envío gratis'
+                    : `$${cupon.valor} desc.`;
+            return `
+                <div class="seg-item">
+                    <input type="checkbox" class="seg-check" value="${seg.id}" checked>
+                    <div class="seg-info">
+                        <div class="seg-name">${seg.nombre}</div>
+                        <div class="seg-desc">${seg.descripcion}</div>
+                        <div style="margin-top:4px; display:flex; gap:12px; align-items:center;">
+                            <span class="seg-count"><i class="fas fa-users"></i> ${seg.usuarios || 0} usuarios</span>
+                            <span class="seg-count"><i class="fas fa-ticket-alt"></i> ${valorTxt}</span>
+                        </div>
+                        <div class="preview-box" id="preview-${seg.id}" style="display:none;"></div>
+                    </div>
+                    <button class="btn-modal ghost" style="padding:6px 12px; font-size:0.72rem;"
+                            onclick="previsualizarUno('${seg.id}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function previsualizarUno(segId) {
+        const box = document.getElementById(`preview-${segId}`);
+        if (!box) return;
+        box.style.display = 'block';
+        box.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Consultando...';
+        try {
+            const res = await fetch(`/api/v1/admin/segmentos/${segId}/preview`, { method: 'POST' });
+            const json = await res.json();
+            if (!json.ok) throw new Error(json.error);
+            const d = json.data;
+            const muestra = (d.muestra || []).map(m =>
+                m.nombre || m.email || '—'
+            ).join(', ');
+            box.innerHTML = `<strong>${d.total}</strong> usuario(s) en este segmento.
+                ${muestra ? `<br><span style="color:#7c3aed;">Ej: ${muestra}</span>` : ''}`;
+        } catch (e) {
+            box.innerHTML = `<span style="color:#dc3545;">Error: ${e.message}</span>`;
+        }
+    }
+
+    function segmentosSeleccionados() {
+        return Array.from(document.querySelectorAll('.seg-check:checked')).map(c => c.value);
+    }
+
+    async function previsualizarSeleccionados() {
+        const ids = segmentosSeleccionados();
+        if (ids.length === 0) return mostrarToast('Selecciona al menos un segmento', 'warning');
+        for (const id of ids) await previsualizarUno(id);
+    }
+
+    async function generarTodos() {
+        const ids = segmentosSeleccionados();
+        if (ids.length === 0) return mostrarToast('Selecciona al menos un segmento', 'warning');
+        if (!confirm(`Se generarán cupones para ${ids.length} segmento(s). ¿Continuar?`)) return;
+
+        const btn = event.target.closest('button');
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/api/v1/admin/cupones/generar-automatico', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ segmentos: ids }),
+            });
+            const json = await res.json();
+            if (!json.ok) throw new Error(json.error || 'Error al generar');
+            renderResultados(json.data || []);
+            mostrarToast('Cupones generados correctamente', 'success');
+        } catch (e) {
+            mostrarToast(`Error: ${e.message}`, 'error');
+        } finally {
+            btn.innerHTML = original;
+            btn.disabled = false;
+        }
+    }
+
+    function renderResultados(resultados) {
+        const box = document.getElementById('resultadosAuto');
+        const lista = document.getElementById('resultadosLista');
+        box.style.display = 'block';
+        if (!resultados.length) {
+            lista.innerHTML = '<div style="color:#888; padding:8px 0;">No se generó ningún cupón.</div>';
+            return;
+        }
+        lista.innerHTML = resultados.map(r => {
+            if (r.error) {
+                return `<div class="result-row err">
+                    <span>${r.segmento}</span>
+                    <span>⚠️ ${r.error}</span>
+                </div>`;
+            }
+            if (r.creados > 0) {
+                return `<div class="result-row ok">
+                    <span>${r.segmento}</span>
+                    <span>✅ Código: <strong>${r.codigo}</strong> · ${r.usuarios_beneficiados} usuario(s)</span>
+                </div>`;
+            }
+            return `<div class="result-row warn">
+                <span>${r.segmento}</span>
+                <span>⚠️ ${r.mensaje || 'Sin usuarios'}</span>
+            </div>`;
+        }).join('');
+    }
 </script>
 
 </body>

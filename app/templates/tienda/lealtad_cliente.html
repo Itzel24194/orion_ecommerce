@@ -1,602 +1,589 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ CURRENT_LANGUAGE or 'es' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cliente Consentido | ORION</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #E6007E;
-            --primary-dark: #B8005F;
-            --primary-light: #FDE7F1;
-            --success: #00A650;
-            --success-light: #E5F7ED;
-            --warning: #FF9900;
-            --warning-light: #FFF4E5;
-            --info: #0074C2;
-            --info-light: #E5F3FB;
-            --purple: #7A5FE0;
-            --purple-light: #EFE9FD;
-            --gold: #C99B2E;
-            --bg: #F4F5F9;
-            --card-bg: #FFFFFF;
-            --border: #ECEDF2;
-            --text-dark: #14213D;
-            --text-muted: #6B7280;
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --shadow-sm: 0 1px 3px rgba(20,33,61,0.06);
-            --shadow-md: 0 6px 20px rgba(20,33,61,0.08);
-            --shadow-lg: 0 14px 34px rgba(20,33,61,0.14);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text-dark);
-            min-height: 100vh;
-        }
-
-        /* ===== HERO DEL NIVEL ===== */
-        .hero-nivel {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            padding: 40px 30px;
-            color: #fff;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-nivel::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-        .hero-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .hero-info h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .hero-info .nivel-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 6px 18px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-        .hero-info p {
-            font-size: 0.95rem;
-            opacity: 0.9;
-        }
-
-        /* ===== BARRA DE PROGRESO ===== */
-        .progreso-card {
-            background: rgba(255,255,255,0.15);
-            border-radius: 16px;
-            padding: 20px 24px;
-            min-width: 300px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .progreso-card .progreso-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            opacity: 0.9;
-        }
-        .progreso-bar {
-            height: 10px;
-            background: rgba(255,255,255,0.25);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        .progreso-bar .fill {
-            height: 100%;
-            background: #fff;
-            border-radius: 10px;
-            transition: width 0.8s ease;
-        }
-        .progreso-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        /* ===== CONTAINER ===== */
-        .container-lealtad {
-            max-width: 1200px;
-            margin: -30px auto 0;
-            padding: 0 30px 60px;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* ===== STATS CARDS ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 22px 24px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-        }
-        .stat-card .icon-circle {
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            float: right;
-            font-size: 1.15rem;
-        }
-        .stat-card .num {
-            font-size: 1.9rem;
-            font-weight: 800;
-            color: var(--text-dark);
-            display: block;
-            letter-spacing: -0.5px;
-        }
-        .stat-card .label {
-            font-size: 0.74rem;
-            color: var(--text-muted);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
-            display: block;
-        }
-        .stat-card.primary .icon-circle { background: var(--primary-light); color: var(--primary); }
-        .stat-card.success .icon-circle { background: var(--success-light); color: var(--success); }
-        .stat-card.warning .icon-circle { background: var(--warning-light); color: var(--warning); }
-        .stat-card.purple .icon-circle { background: var(--purple-light); color: var(--purple); }
-
-        /* ===== SECCIONES ===== */
-        .section-box {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 28px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            margin-bottom: 26px;
-        }
-        .section-title {
-            font-size: 1.15rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .section-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: var(--primary-light);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ===== CUPONES ===== */
-        .cupones-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 18px;
-        }
-        .cupon-card {
-            background: linear-gradient(135deg, #fff, #fafafa);
-            border-radius: 16px;
-            padding: 22px;
-            border: 2px dashed var(--border);
-            position: relative;
-            transition: all 0.25s ease;
-        }
-        .cupon-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(230,0,126,0.12);
-        }
-        .cupon-card .cupon-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            margin-bottom: 14px;
-        }
-        .cupon-card .cupon-titulo {
-            font-size: 1rem;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-        .cupon-card .cupon-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            line-height: 1.5;
-        }
-        .cupon-card .cupon-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 12px;
-            border-top: 1px solid var(--border);
-        }
-        .cupon-card .cupon-id {
-            font-family: 'Courier New', monospace;
-            font-size: 0.7rem;
-            background: var(--primary-light);
-            color: var(--primary);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 700;
-        }
-        .cupon-card .cupon-validez {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-        .cupon-card .cupon-valor {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        /* ===== NIVELES ===== */
-        .niveles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-        }
-        .nivel-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            border: 2px solid var(--border);
-            text-align: center;
-            transition: all 0.25s ease;
-        }
-        .nivel-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-        .nivel-card.actual {
-            border-color: var(--primary);
-            box-shadow: 0 8px 24px rgba(230,0,126,0.15);
-        }
-        .nivel-card .nivel-emoji {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .nivel-card .nivel-nombre {
-            font-size: 1.1rem;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-        .nivel-card .nivel-min {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 14px;
-        }
-        .nivel-card .nivel-beneficios {
-            text-align: left;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            line-height: 1.7;
-        }
-        .nivel-card .nivel-beneficios li {
-            list-style: none;
-            padding-left: 20px;
-            position: relative;
-        }
-        .nivel-card .nivel-beneficios li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: var(--success);
-            font-weight: 800;
-        }
-        .nivel-card .badge-actual {
-            display: inline-block;
-            background: var(--primary);
-            color: #fff;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 12px;
-        }
-
-        /* ===== HISTORIAL ===== */
-        .historial-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 0;
-            border-bottom: 1px solid #F5F5F7;
-        }
-        .historial-item:last-child { border-bottom: none; }
-        .historial-item .hist-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
-        .historial-item .hist-icon.positivo { background: var(--success-light); color: var(--success); }
-        .historial-item .hist-icon.negativo { background: var(--danger-light); color: var(--danger); }
-        .historial-item .hist-info { flex: 1; }
-        .historial-item .hist-desc { font-weight: 600; font-size: 0.88rem; }
-        .historial-item .hist-fecha { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-        .historial-item .hist-puntos { font-weight: 800; font-size: 0.95rem; }
-        .historial-item .hist-puntos.positivo { color: var(--success); }
-        .historial-item .hist-puntos.negativo { color: var(--danger); }
-
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state i {
-            font-size: 3rem;
-            color: var(--border);
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .hero-content { flex-direction: column; align-items: stretch; }
-            .progreso-card { min-width: 0; }
-            .container-lealtad { padding: 0 16px 40px; margin-top: -20px; }
-            .hero-nivel { padding: 30px 20px; }
-            .hero-info h1 { font-size: 1.4rem; }
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-            .stat-card { padding: 16px; }
-            .stat-card .num { font-size: 1.5rem; }
-            .section-box { padding: 20px; }
-            .cupones-grid { grid-template-columns: 1fr; }
-            .niveles-grid { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+    <title>{{ _('Cliente Consentido') }} | ORION</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/perfil.css') }}">
 </head>
 <body>
 
-    <!-- ===== HERO DEL NIVEL ===== -->
-    <div class="hero-nivel">
-        <div class="hero-content">
-            <div class="hero-info">
-                <h1>
-                    <span style="font-size: 2.5rem;">{{ info_nivel.emoji }}</span>
-                    ¡Hola, {{ nombre }}!
-                </h1>
-                <div class="nivel-badge">
-                    Nivel actual: <strong>{{ registro.nivel }}</strong>
-                </div>
-                <p style="margin-top: 10px;">Disfruta de tus beneficios exclusivos de Cliente Consentido</p>
-            </div>
+    <div class="wrapper">
 
-            <div class="progreso-card">
-                <div class="progreso-label">
-                    {% if progreso.siguiente_nivel %}
-                        Progreso hacia {{ progreso.siguiente_nivel }}
-                    {% else %}
-                        ¡Estás en el nivel máximo!
-                    {% endif %}
-                </div>
-                <div class="progreso-bar">
-                    <div class="fill" style="width: {{ progreso.progreso_pct }}%;"></div>
-                </div>
-                <div class="progreso-info">
-                    <span>Gasto: ${{ "%.0f"|format(progreso.gasto_actual) }}</span>
-                    {% if progreso.siguiente_nivel %}
-                        <span>Meta: ${{ "%.0f"|format(progreso.gasto_para_siguiente) }}</span>
-                    {% else %}
-                        <span>Nivel máximo alcanzado 🏆</span>
-                    {% endif %}
-                </div>
-                {% if progreso.siguiente_nivel and progreso.gasto_restante > 0 %}
-                <div style="margin-top: 10px; font-size: 0.8rem; opacity: 0.95;">
-                    Te faltan <strong>${{ "%.0f"|format(progreso.gasto_restante) }}</strong> para subir de nivel
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== CONTAINER ===== -->
-    <div class="container-lealtad">
-
-        <!-- ===== STATS ===== -->
-        <div class="stats-grid">
-            <div class="stat-card primary">
-                <div class="icon-circle"><i class="fas fa-star"></i></div>
-                <span class="num">{{ registro.puntos_disponibles }}</span>
-                <span class="label">Puntos disponibles</span>
-            </div>
-            <div class="stat-card success">
-                <div class="icon-circle"><i class="fas fa-dollar-sign"></i></div>
-                <span class="num">${{ "%.2f"|format(registro.puntos_disponibles * 0.1) }}</span>
-                <span class="label">Valor en pesos</span>
-            </div>
-            <div class="stat-card warning">
-                <div class="icon-circle"><i class="fas fa-shopping-bag"></i></div>
-                <span class="num">{{ registro.compras_realizadas }}</span>
-                <span class="label">Compras realizadas</span>
-            </div>
-            <div class="stat-card purple">
-                <div class="icon-circle"><i class="fas fa-trophy"></i></div>
-                <span class="num">${{ "%.0f"|format(registro.gasto_total) }}</span>
-                <span class="label">Gasto acumulado</span>
+        <div class="top-nav">
+            <div class="container d-flex justify-content-end gap-4">
+                <a href="#"><i class="bi bi-geo-alt"></i> {{ _('Encuentra tu tienda') }}</a>
+                <a href="/servicios"><i class="bi bi-truck"></i> {{ _('Servicios') }}</a>
+                <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none">Ayuda</a>
             </div>
         </div>
 
-        <!-- ===== CUPONES ===== -->
-        <div class="section-box">
-            <div class="section-title">
-                <div class="section-icon"><i class="fas fa-ticket-alt"></i></div>
-                Mis cupones ({{ total_cupones }})
-            </div>
+        <nav class="navbar navbar-expand-lg navbar-light main-navbar">
+            <div class="container">
+                <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
 
-            {% if cupones %}
-            <div class="cupones-grid">
-                {% for cupon in cupones %}
-                <div class="cupon-card" style="border-color: {{ cupon.color }}33;">
-                    <div class="cupon-icon" style="background: {{ cupon.color }}20; color: {{ cupon.color }};">
-                        {% if cupon.tipo == 'porcentaje' %}
-                            <i class="fas fa-percent"></i>
-                        {% else %}
-                            <i class="fas fa-dollar-sign"></i>
-                        {% endif %}
-                    </div>
-                    <div class="cupon-titulo" style="color: {{ cupon.color }};">{{ cupon.titulo }}</div>
-                    <div class="cupon-desc">{{ cupon.descripcion }}</div>
-                    <div class="cupon-valor">
-                        {% if cupon.tipo == 'porcentaje' %}
-                            {{ cupon.valor }}% OFF
-                        {% else %}
-                            ${{ cupon.valor }} OFF
-                        {% endif %}
-                    </div>
-                    <div class="cupon-footer">
-                        <span class="cupon-id">{{ cupon.id[:16] }}...</span>
-                        <span class="cupon-validez">
-                            {% if cupon.valido_hasta %}
-                                Válido hasta {{ cupon.valido_hasta[:10] }}
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#orionNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="orionNavbar">
+                    <div class="dropdown mx-lg-3">
+                        <button class="dropdown-toggle" data-bs-toggle="dropdown">{{ _('Categorías') }}</button>
+                        <ul class="dropdown-menu shadow border-0 py-2">
+                            {% if categorias and categorias|length > 0 %}
+                                {% for padre in categorias if not padre.padre_id %}
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item" href="/catalogo?categoria={{padre._id}}">{{ padre.nombre }}</a>
+                                    <ul class="dropdown-menu shadow border-0">
+                                        {% for hijo in categorias if hijo.padre_id == padre._id %}
+                                        <li><a class="dropdown-item" href="/catalogo?categoria={{hijo._id}}">{{ hijo.nombre }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% endfor %}
+                            {% else %}
+                                <li><a class="dropdown-item text-muted" href="#">{{ _('No hay categorías disponibles') }}</a></li>
                             {% endif %}
-                        </span>
+                        </ul>
                     </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-ticket-alt"></i>
-                <h3 style="margin-bottom: 8px;">Aún no tienes cupones disponibles</h3>
-                <p style="font-size: 0.9rem;">Sigue comprando para desbloquear beneficios exclusivos</p>
-            </div>
-            {% endif %}
-        </div>
 
-        <!-- ===== NIVELES ===== -->
-        <div class="section-box">
-            <div class="section-title">
-                <div class="section-icon"><i class="fas fa-crown"></i></div>
-                Niveles de Cliente Consentido
-            </div>
+                    <form class="d-flex flex-grow-1" action="{{ url_for('web.catalogo') }}" method="GET">
+                        <div class="input-group search-container">
+                            <input class="form-control" type="search" name="q" placeholder="{{ _('Buscar productos...') }}">
+                            <button class="btn-search" type="submit"><i class="bi bi-search"></i></button>
+                        </div>
+                    </form>
 
-            <div class="niveles-grid">
-                {% for nivel in niveles %}
-                <div class="nivel-card {% if nivel.nombre == registro.nivel %}actual{% endif %}">
-                    <div class="nivel-emoji">{{ nivel.emoji }}</div>
-                    <div class="nivel-nombre" style="color: {{ nivel.color }};">{{ nivel.nombre }}</div>
-                    <div class="nivel-min">
-                        {% if nivel.min_gasto == 0 %}
-                            Desde $0
+                    <div class="ms-3 d-flex align-items-center gap-3">
+                        {% if session.get('nombre') %}
+                            <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                                {% if current_user_foto %}
+                                    <img src="{{ foto_src(current_user_foto) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;">
+                                {% else %}
+                                    <i class="bi bi-person fs-5 me-1"></i>
+                                {% endif %}
+                                Hola, {{ session['nombre'] }}
+                            </a>
                         {% else %}
-                            Desde ${{ "{:,}".format(nivel.min_gasto) }}
+                            <a href="/login" class="user-link"><i class="bi bi-person-circle fs-3"></i> {{ _('INICIAR SESIÓN') }}</a>
                         {% endif %}
+                        <a href="{{ url_for('web.ver_carrito') }}" class="btn-cart">
+                            <i class="bi bi-bag"></i>
+                            {% if carrito_items and carrito_items|length > 0 %}
+                                <span class="badge-cart">{{ carrito_items|length }}</span>
+                            {% endif %}
+                        </a>
                     </div>
-                    <ul class="nivel-beneficios">
-                        {% for beneficio in nivel.beneficios %}
-                        <li>{{ beneficio }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% if nivel.nombre == registro.nivel %}
-                        <div class="badge-actual">Nivel actual</div>
-                    {% endif %}
                 </div>
-                {% endfor %}
             </div>
-        </div>
+        </nav>
 
-        <!-- ===== HISTORIAL DE PUNTOS ===== -->
-        <div class="section-box">
-            <div class="section-title">
-                <div class="section-icon"><i class="fas fa-history"></i></div>
-                Historial de puntos
-            </div>
+        <div class="brand-border"></div>
 
-            {% if registro.historial_puntos %}
-            <div>
-                {% for entrada in registro.historial_puntos[-20:]|reverse %}
-                <div class="historial-item">
-                    <div class="hist-icon {% if entrada.puntos >= 0 %}positivo{% else %}negativo{% endif %}">
-                        {% if entrada.puntos >= 0 %}
-                            <i class="fas fa-plus"></i>
+        <!-- ⭐ CONTENIDO PRINCIPAL -->
+        <div class="container-fluid py-4 content">
+            <div class="row g-4 align-items-stretch">
+
+                <!-- ⭐ SIDEBAR (idéntico al de perfil.html) -->
+                <div class="col-lg-3">
+                    <div class="panel-card text-center">
+
+                        {% if usuario and usuario.foto %}
+                            <img src="{{ foto_src(usuario.foto) }}" class="avatar" alt="{{ _('Perfil') }}">
                         {% else %}
-                            <i class="fas fa-minus"></i>
+                            <img src="https://ui-avatars.com/api/?name={{ (usuario.nombre if usuario else nombre) }}&size=100&background=e10098&color=fff" class="avatar" alt="{{ _('Perfil') }}">
                         {% endif %}
-                    </div>
-                    <div class="hist-info">
-                        <div class="hist-desc">{{ entrada.descripcion }}</div>
-                        <div class="hist-fecha">{{ entrada.fecha.strftime('%d/%m/%Y %H:%M') if entrada.fecha else 'N/A' }}</div>
-                    </div>
-                    <div class="hist-puntos {% if entrada.puntos >= 0 %}positivo{% else %}negativo{% endif %}">
-                        {% if entrada.puntos >= 0 %}+{% endif %}{{ entrada.puntos }} pts
+                        <div class="user-name">{{ usuario.nombre if usuario else nombre }} {{ usuario.apellido_paterno if usuario and usuario.apellido_paterno else '' }}</div>
+                        <div class="user-email">{{ usuario.email if usuario else '' }}</div>
+                        <span class="badge-rol">{{ registro.nivel }}</span>
+
+                        <div class="stats-mini">
+                            <div class="stat-item">
+                                <span class="num">{{ registro.compras_realizadas|default(0) }}</span>
+                                <span class="label">{{ _('Compras') }}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="num">{{ registro.puntos_disponibles|default(0) }}</span>
+                                <span class="label">{{ _('Puntos') }}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="num">{{ total_cupones|default(0) }}</span>
+                                <span class="label">{{ _('Cupones') }}</span>
+                            </div>
+                        </div>
+
+                        <hr style="border-color: #e0e0e0;">
+
+                        <div class="nav flex-column nav-pills text-start" role="tablist">
+                            <a href="{{ url_for('web.perfil') }}" class="nav-link">
+                                <i class="bi bi-person"></i> {{ _('Mi Perfil') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-seguridad" class="nav-link">
+                                <i class="bi bi-shield-lock"></i> {{ _('Seguridad') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-pedidos" class="nav-link">
+                                <i class="bi bi-box-seam"></i> {{ _('Mis Pedidos') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-direcciones" class="nav-link">
+                                <i class="bi bi-geo-alt"></i> {{ _('Direcciones') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-favoritos" class="nav-link">
+                                <i class="bi bi-heart"></i> {{ _('Favoritos') }}
+                            </a>
+                            <a href="{{ url_for('web.mi_lealtad') }}" class="nav-link active">
+                                <i class="bi bi-stars"></i> {{ _('Cliente Consentido') }}
+                            </a>
+                            <a href="{{ url_for('web.mi_monedero') }}" class="nav-link">
+                                <i class="bi bi-wallet2"></i> {{ _('Mi cartera') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-complexion" class="nav-link">
+                                <i class="bi bi-rulers"></i> {{ _('Mi Complexión') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-intereses" class="nav-link">
+                                <i class="bi bi-heart-pulse"></i> {{ _('Intereses') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-comunicaciones" class="nav-link">
+                                <i class="bi bi-bell"></i> {{ _('Comunicaciones') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-privacidad" class="nav-link">
+                                <i class="bi bi-shield-check"></i> {{ _('Privacidad') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-facturacion" class="nav-link">
+                                <i class="bi bi-receipt-cutoff"></i> {{ _('Facturación') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-pagos" class="nav-link">
+                                <i class="bi bi-credit-card"></i> {{ _('Métodos de Pago') }}
+                            </a>
+                            <a href="{{ url_for('web.perfil') }}#tab-idioma" class="nav-link">
+                                <i class="bi bi-translate"></i> {{ _('Idioma') }}
+                            </a>
+                        </div>
+
+                        <hr style="border-color: #e0e0e0;">
+
+                        <a href="{{ url_for('web.logout') }}" class="btn-logout"><i class="bi bi-box-arrow-right"></i> {{ _('Cerrar Sesión') }}</a>
                     </div>
                 </div>
-                {% endfor %}
+
+                <!-- ⭐ CONTENIDO PRINCIPAL (Cliente Consentido) -->
+                <div class="col-lg-9">
+                    <div class="content-panel">
+
+                        <!-- ===== HEADER HERO ===== -->
+                        <div style="
+                            background: linear-gradient(135deg, #e10098, #b8006c);
+                            border-radius: 16px;
+                            padding: 26px 28px;
+                            color: #fff;
+                            margin-bottom: 22px;
+                            position: relative;
+                            overflow: hidden;
+                        ">
+                            <div style="
+                                position: absolute; top: -60%; right: -15%;
+                                width: 300px; height: 300px;
+                                background: radial-gradient(circle, rgba(255,255,255,0.13) 0%, transparent 70%);
+                                border-radius: 50%;
+                            "></div>
+                            <div style="
+                                position: relative; z-index: 1;
+                                display: flex; justify-content: space-between;
+                                align-items: center; flex-wrap: wrap; gap: 18px;
+                            ">
+                                <div>
+                                    <h4 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 6px; display: flex; align-items: center; gap: 10px;">
+                                        <span style="font-size: 1.9rem;">{{ info_nivel.emoji|default('🥉') }}</span>
+                                        {{ _('¡Hola,') }} {{ nombre }}!
+                                    </h4>
+                                    <span style="
+                                        display: inline-block;
+                                        background: rgba(255,255,255,0.22);
+                                        padding: 4px 14px;
+                                        border-radius: 20px;
+                                        font-size: 0.78rem;
+                                        font-weight: 700;
+                                    ">
+                                        {{ _('Nivel actual:') }} <strong>{{ registro.nivel }}</strong>
+                                    </span>
+                                    <p style="font-size: 0.86rem; opacity: 0.92; margin: 8px 0 0 0;">
+                                        {{ _('Disfruta de tus beneficios exclusivos de Cliente Consentido') }}
+                                    </p>
+                                </div>
+
+                                <div style="
+                                    background: rgba(255,255,255,0.15);
+                                    border-radius: 12px;
+                                    padding: 14px 18px;
+                                    min-width: 260px;
+                                    backdrop-filter: blur(10px);
+                                    border: 1px solid rgba(255,255,255,0.2);
+                                ">
+                                    <div style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; opacity: 0.9;">
+                                        {% if progreso.siguiente_nivel %}
+                                            {{ _('Progreso hacia') }} {{ progreso.siguiente_nivel }}
+                                        {% else %}
+                                            {{ _('¡Estás en el nivel máximo!') }}
+                                        {% endif %}
+                                    </div>
+                                    <div style="height: 7px; background: rgba(255,255,255,0.25); border-radius: 10px; overflow: hidden; margin-bottom: 7px;">
+                                        <div style="height: 100%; width: {{ progreso.progreso_pct|default(0) }}%; background: #fff; border-radius: 10px; transition: width 0.8s ease;"></div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 600;">
+                                        <span>{{ _('Gasto:') }} ${{ "%.0f"|format(progreso.gasto_actual|default(0)) }}</span>
+                                        {% if progreso.siguiente_nivel %}
+                                            <span>{{ _('Meta:') }} ${{ "%.0f"|format(progreso.gasto_para_siguiente|default(0)) }}</span>
+                                        {% else %}
+                                            <span>{{ _('Nivel máximo 🏆') }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if progreso.siguiente_nivel and progreso.gasto_restante and progreso.gasto_restante > 0 %}
+                                    <div style="margin-top: 7px; font-size: 0.75rem; opacity: 0.95;">
+                                        {{ _('Te faltan') }} <strong>${{ "%.0f"|format(progreso.gasto_restante) }}</strong> {{ _('para subir de nivel') }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== STATS ===== -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-md-3">
+                                <div class="pref-card text-center" style="padding: 18px;">
+                                    <div style="
+                                        width: 42px; height: 42px; border-radius: 10px;
+                                        background: #fde7f1; color: #e10098;
+                                        display: inline-flex; align-items: center; justify-content: center;
+                                        font-size: 1.05rem; margin-bottom: 8px;
+                                    "><i class="bi bi-star-fill"></i></div>
+                                    <div style="font-size: 1.5rem; font-weight: 800; color: #14213d; letter-spacing: -0.5px;">{{ registro.puntos_disponibles|default(0) }}</div>
+                                    <div style="font-size: 0.68rem; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px;">{{ _('Puntos disponibles') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="pref-card text-center" style="padding: 18px;">
+                                    <div style="
+                                        width: 42px; height: 42px; border-radius: 10px;
+                                        background: #e5f7ed; color: #198754;
+                                        display: inline-flex; align-items: center; justify-content: center;
+                                        font-size: 1.05rem; margin-bottom: 8px;
+                                    "><i class="bi bi-currency-dollar"></i></div>
+                                    <div style="font-size: 1.5rem; font-weight: 800; color: #14213d; letter-spacing: -0.5px;">${{ "%.2f"|format((registro.puntos_disponibles or 0) * 0.1) }}</div>
+                                    <div style="font-size: 0.68rem; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px;">{{ _('Valor en pesos') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="pref-card text-center" style="padding: 18px;">
+                                    <div style="
+                                        width: 42px; height: 42px; border-radius: 10px;
+                                        background: #fff4e5; color: #ffc107;
+                                        display: inline-flex; align-items: center; justify-content: center;
+                                        font-size: 1.05rem; margin-bottom: 8px;
+                                    "><i class="bi bi-bag-fill"></i></div>
+                                    <div style="font-size: 1.5rem; font-weight: 800; color: #14213d; letter-spacing: -0.5px;">{{ registro.compras_realizadas|default(0) }}</div>
+                                    <div style="font-size: 0.68rem; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px;">{{ _('Compras realizadas') }}</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="pref-card text-center" style="padding: 18px;">
+                                    <div style="
+                                        width: 42px; height: 42px; border-radius: 10px;
+                                        background: #efe9fd; color: #6c5ce7;
+                                        display: inline-flex; align-items: center; justify-content: center;
+                                        font-size: 1.05rem; margin-bottom: 8px;
+                                    "><i class="bi bi-trophy-fill"></i></div>
+                                    <div style="font-size: 1.5rem; font-weight: 800; color: #14213d; letter-spacing: -0.5px;">${{ "%.0f"|format(registro.gasto_total|default(0)) }}</div>
+                                    <div style="font-size: 0.68rem; color: #6b7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px;">{{ _('Gasto acumulado') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== ⭐ MESAS DE REGALO (BONIFICACIÓN) ⭐ ===== -->
+                        <!-- CAMBIO AQUÍ: Validamos el monto, no la lista de mesas -->
+                        {% if bonificacion_mesas|default(0) > 0 %}
+                        <div class="pref-card mb-3" style="background: linear-gradient(135deg, #e5f7ed, #d1f2e0); border: 1px solid #198754;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="pref-title" style="color: #198754; margin-bottom: 4px;">
+                                        <i class="bi bi-gift-fill"></i> {{ _('Bonificación por Mesas de Regalo') }}
+                                    </div>
+                                    <div class="pref-desc" style="color: #146c43; margin-bottom: 8px;">
+                                        {{ _('Recibes un 10% de bonificación en tu monedero por tus mesas activas.') }}
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div style="font-size: 1.8rem; font-weight: 900; color: #198754; line-height: 1;">
+                                        +${{ "%.2f"|format(bonificacion_mesas) }}
+                                    </div>
+                                    <div style="font-size: 0.7rem; color: #146c43; font-weight: 700; text-transform: uppercase;">
+                                        {{ _('Acumulado') }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 pt-3" style="border-top: 1px dashed #198754;">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div style="font-size: 0.82rem; color: #146c43; font-weight: 600;">
+                                        <i class="bi bi-check-circle-fill"></i> {{ _('Tus mesas están generando bonificación') }}
+                                    </div>
+                                    <a href="{{ url_for('web.mis_mesas_regalos') }}" class="btn btn-sm" style="background: #198754; color: #fff; border-radius: 50px; font-weight: 700; padding: 6px 18px;">
+                                        <i class="bi bi-arrow-right"></i> {{ _('Ver mis mesas') }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- ===== ⭐ CUPONES ⭐ ===== -->
+                        <div class="pref-card mb-3">
+                            <div class="pref-title">
+                                <i class="bi bi-ticket-perforated-fill"></i>
+                                {{ _('Mis cupones') }} ({{ total_cupones|default(0) }})
+                            </div>
+                            <div class="pref-desc">{{ _('Cupones personalizados según tu nivel y comportamiento.') }}</div>
+
+                            {% if cupones and cupones|length > 0 %}
+                            <div class="row g-3 mt-2">
+                                {% for cupon in cupones %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div style="
+                                        background: linear-gradient(135deg, #fff, #fafafa);
+                                        border-radius: 12px;
+                                        padding: 18px;
+                                        border: 2px dashed {{ cupon.color|default('#e10098') }}55;
+                                        transition: all 0.25s ease;
+                                        height: 100%;
+                                    ">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                            <div style="
+                                                width: 42px; height: 42px; border-radius: 10px;
+                                                background: {{ cupon.color|default('#e10098') }}20; color: {{ cupon.color|default('#e10098') }};
+                                                display: flex; align-items: center; justify-content: center;
+                                                font-size: 1.2rem;
+                                            ">
+                                                {% if cupon.tipo == 'porcentaje' %}
+                                                    <i class="bi bi-percent"></i>
+                                                {% else %}
+                                                    <i class="bi bi-currency-dollar"></i>
+                                                {% endif %}
+                                            </div>
+                                            <span style="
+                                                background: {{ cupon.color|default('#e10098') }}20;
+                                                color: {{ cupon.color|default('#e10098') }};
+                                                padding: 3px 9px;
+                                                border-radius: 6px;
+                                                font-size: 0.62rem;
+                                                font-weight: 700;
+                                                text-transform: uppercase;
+                                                letter-spacing: 0.4px;
+                                            ">
+                                                {% if cupon.tipo_regla == 'bienvenida' %}{{ _('Bienvenida') }}
+                                                {% elif cupon.tipo_regla == 'nivel' %}{{ _('Nivel') }}
+                                                {% elif cupon.tipo_regla == 'reactivacion' %}{{ _('Reactivación') }}
+                                                {% elif cupon.tipo_regla == 'proximo_nivel' %}{{ _('Próximo nivel') }}
+                                                {% else %}{{ _('Cupón') }}{% endif %}
+                                            </span>
+                                        </div>
+
+                                        <div style="font-size: 0.9rem; font-weight: 800; margin-bottom: 4px; color: {{ cupon.color|default('#e10098') }};">
+                                            {{ cupon.titulo }}
+                                        </div>
+                                        <div style="font-size: 0.78rem; color: #6b7280; margin-bottom: 10px; line-height: 1.5;">
+                                            {{ cupon.descripcion }}
+                                        </div>
+
+                                        {% if cupon.motivo %}
+                                        <div style="font-size: 0.68rem; color: #9ca3af; font-style: italic; margin-bottom: 10px;">
+                                            <i class="bi bi-info-circle"></i> {{ cupon.motivo }}
+                                        </div>
+                                        {% endif %}
+
+                                        <div style="font-size: 1.4rem; font-weight: 800; color: #e10098; margin-bottom: 8px;">
+                                            {% if cupon.tipo == 'porcentaje' %}
+                                                {{ cupon.valor|default(0) }}% OFF
+                                            {% else %}
+                                                ${{ cupon.valor|default(0) }} OFF
+                                            {% endif %}
+                                        </div>
+
+                                        {% if cupon.envio_gratis or cupon.regalo %}
+                                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
+                                            {% if cupon.envio_gratis %}
+                                            <span style="background: #e5f7ed; color: #198754; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;">
+                                                <i class="bi bi-truck"></i> {{ _('Envío gratis') }}
+                                            </span>
+                                            {% endif %}
+                                            {% if cupon.regalo %}
+                                            <span style="background: #fde7f1; color: #e10098; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;">
+                                                <i class="bi bi-gift"></i> {{ _('Regalo') }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        {% endif %}
+
+                                        <div style="
+                                            display: flex; justify-content: space-between; align-items: center;
+                                            padding-top: 10px; border-top: 1px solid #ecedf2; margin-top: 8px;
+                                        ">
+                                            <span style="
+                                                font-family: 'Courier New', monospace;
+                                                font-size: 0.65rem;
+                                                background: #fde7f1;
+                                                color: #e10098;
+                                                padding: 3px 8px;
+                                                border-radius: 6px;
+                                                font-weight: 700;
+                                            ">{{ (cupon.codigo or cupon.id or 'CUPON')[:16] }}</span>
+                                            <span style="font-size: 0.68rem; color: #6b7280; font-weight: 600;">
+                                                {% if cupon.valido_hasta %}
+                                                    {{ _('Válido hasta') }} {{ cupon.valido_hasta[:10] }}
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4" style="color: #6b7280;">
+                                <i class="bi bi-ticket-perforated" style="font-size: 2.2rem; color: #ecedf2; display: block; margin-bottom: 10px;"></i>
+                                <h6 style="font-size: 0.9rem; margin-bottom: 6px; color: #14213d;">{{ _('Aún no tienes cupones disponibles') }}</h6>
+                                <p style="font-size: 0.8rem; margin: 0;">{{ _('Sigue comprando para desbloquear beneficios exclusivos') }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- ===== NIVELES ===== -->
+                        <div class="pref-card mb-3">
+                            <div class="pref-title">
+                                <i class="bi bi-crown-fill"></i>
+                                {{ _('Niveles de Cliente Consentido') }}
+                            </div>
+                            <div class="pref-desc">{{ _('Acumula compras y sube de nivel para desbloquear más beneficios.') }}</div>
+
+                            <div class="row g-3 mt-2">
+                                {% for nivel in niveles %}
+                                <div class="col-md-6 col-lg-3">
+                                    <div style="
+                                        background: #fff;
+                                        border-radius: 12px;
+                                        padding: 16px;
+                                        border: 2px solid {% if nivel.nombre == registro.nivel %}#e10098{% else %}#ecedf2{% endif %};
+                                        text-align: center;
+                                        transition: all 0.25s ease;
+                                        {% if nivel.nombre == registro.nivel %}box-shadow: 0 8px 24px rgba(225,0,152,0.15);{% endif %}
+                                    ">
+                                        <div style="font-size: 2rem; margin-bottom: 6px;">{{ nivel.emoji|default('🏅') }}</div>
+                                        <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 3px; color: {{ nivel.color|default('#e10098') }};">{{ nivel.nombre }}</div>
+                                        <div style="font-size: 0.7rem; color: #6b7280; font-weight: 600; margin-bottom: 10px;">
+                                            {% if nivel.min_gasto == 0 %}
+                                                {{ _('Desde $0') }}
+                                            {% else %}
+                                                {{ _('Desde') }} ${{ "{:,}".format(nivel.min_gasto|default(0)) }}
+                                            {% endif %}
+                                        </div>
+                                        <ul style="list-style: none; padding: 0; text-align: left; font-size: 0.72rem; color: #6b7280; line-height: 1.6;">
+                                            {% for beneficio in (nivel.beneficios|default([])) %}
+                                            <li style="padding-left: 16px; position: relative;">
+                                                <span style="position: absolute; left: 0; color: #198754; font-weight: 800;">✓</span>
+                                                {{ beneficio }}
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% if nivel.nombre == registro.nivel %}
+                                            <div style="
+                                                display: inline-block;
+                                                background: #e10098;
+                                                color: #fff;
+                                                padding: 3px 11px;
+                                                border-radius: 20px;
+                                                font-size: 0.62rem;
+                                                font-weight: 700;
+                                                text-transform: uppercase;
+                                                letter-spacing: 0.5px;
+                                                margin-top: 8px;
+                                            ">{{ _('Nivel actual') }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- ===== HISTORIAL ===== -->
+                        <div class="pref-card">
+                            <div class="pref-title">
+                                <i class="bi bi-clock-history"></i>
+                                {{ _('Historial de puntos') }}
+                            </div>
+                            <div class="pref-desc">{{ _('Últimos movimientos de tu cuenta.') }}</div>
+
+                            {% if registro.historial_puntos and registro.historial_puntos|length > 0 %}
+                            <div class="mt-2">
+                                {% for entrada in (registro.historial_puntos[-20:]|reverse) %}
+                                <div style="
+                                    display: flex; align-items: center; gap: 12px;
+                                    padding: 11px 0;
+                                    border-bottom: 1px solid #f5f5f7;
+                                ">
+                                    <div style="
+                                        width: 34px; height: 34px; border-radius: 8px;
+                                        display: flex; align-items: center; justify-content: center;
+                                        font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
+                                        {% if (entrada.puntos|default(0)) >= 0 %}background: #e5f7ed; color: #198754;{% else %}background: #fde8ec; color: #dc3545;{% endif %}
+                                    ">
+                                        {% if (entrada.puntos|default(0)) >= 0 %}
+                                            <i class="bi bi-plus-lg"></i>
+                                        {% else %}
+                                            <i class="bi bi-dash-lg"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; font-size: 0.82rem;">{{ entrada.descripcion|default('Movimiento') }}</div>
+                                        <div style="font-size: 0.68rem; color: #6b7280; margin-top: 2px;">
+                                            {% if entrada.fecha %}
+                                                {% if entrada.fecha.strftime %}
+                                                    {{ entrada.fecha.strftime('%d/%m/%Y %H:%M') }}
+                                                {% else %}
+                                                    {{ entrada.fecha|string|truncate(16, True, '') }}
+                                                {% endif %}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div style="
+                                        font-weight: 800; font-size: 0.86rem;
+                                        {% if (entrada.puntos|default(0)) >= 0 %}color: #198754;{% else %}color: #dc3545;{% endif %}
+                                    ">
+                                        {% if (entrada.puntos|default(0)) >= 0 %}+{% endif %}{{ entrada.puntos|default(0) }} pts
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4" style="color: #6b7280;">
+                                <i class="bi bi-clock-history" style="font-size: 2.2rem; color: #ecedf2; display: block; margin-bottom: 10px;"></i>
+                                <p style="margin: 0; font-size: 0.85rem;">{{ _('Aún no tienes movimientos de puntos') }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-history"></i>
-                <p>Aún no tienes movimientos de puntos</p>
-            </div>
-            {% endif %}
         </div>
 
+        <footer>
+            <div class="container">
+                <p>{{ _('© 2026 ORION SYSTEM. Todos los derechos reservados.') }}</p>
+            </div>
+        </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

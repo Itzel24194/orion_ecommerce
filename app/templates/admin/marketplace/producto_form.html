@@ -16,10 +16,9 @@
         body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
         .layout { display: flex; min-height: 100vh; }
 
-        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
-            padding: 0; height: 100vh; position: fixed; left: 0; top: 0;
+            height: 100vh; position: fixed; left: 0; top: 0;
             overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
             box-shadow: 2px 0 20px rgba(0,0,0,0.05);
             display: flex; flex-direction: column;
@@ -27,7 +26,7 @@
         .sidebar .admin-profile {
             padding: 25px 20px 20px; text-align: center;
             border-bottom: 1px solid #e8e8e8;
-            background: linear-gradient(135deg, #e10098, #c00080);
+            background: linear-gradient(135deg, #0284c7, #0369a1);
             margin-bottom: 10px; flex-shrink: 0;
         }
         .sidebar .admin-profile .avatar {
@@ -43,8 +42,7 @@
         }
         .sidebar .logo {
             font-size: 1.8rem; font-weight: 900; color: #e10098;
-            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
-            flex-shrink: 0;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px; flex-shrink: 0;
         }
         .sidebar .logo span { color: #1a1a2e; }
         .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
@@ -70,7 +68,6 @@
         .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
         .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
 
-        /* ===== MAIN ===== */
         .main {
             margin-left: 280px; padding: 30px 35px 20px;
             width: 100%; min-height: 100vh; display: flex; flex-direction: column;
@@ -85,7 +82,7 @@
             font-size: 1.6rem; font-weight: 800; color: #1a1a2e;
             display: flex; align-items: center; gap: 10px;
         }
-        .top-bar h1 i { color: #e10098; }
+        .top-bar h1 i { color: #0284c7; }
         .top-bar .tag {
             background: #0284c7; color: #fff; padding: 5px 18px;
             border-radius: 20px; font-size: 0.7rem; font-weight: 700;
@@ -93,28 +90,21 @@
         }
 
         .hero {
-            background: linear-gradient(135deg, #fff, #faf0f5);
+            background: linear-gradient(135deg, #fff, #f0f9ff);
             padding: 25px 30px; border-radius: 16px; border: 1px solid #e8e8e8;
             margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); flex-shrink: 0;
         }
         .hero h2 { color: #1a1a2e; margin-bottom: 8px; font-weight: 800; font-size: 1.3rem; }
-        .hero h2 i { color: #e10098; }
+        .hero h2 i { color: #0284c7; }
         .hero p { color: #666; margin-bottom: 15px; font-size: 0.95rem; line-height: 1.6; }
-        .hero strong { color: #e10098; }
+        .hero strong { color: #0284c7; }
 
         .btn-primary-custom {
-            background: #e10098; color: white; padding: 10px 25px; border-radius: 50px;
+            background: #0284c7; color: white; padding: 10px 25px; border-radius: 50px;
             text-decoration: none; font-weight: 700; font-size: 0.85rem;
             display: inline-block; transition: all 0.3s ease; border: none; cursor: pointer;
         }
-        .btn-primary-custom:hover { background: #c00080; color: white; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(225, 0, 152, 0.3); }
-
-        .btn-success-custom {
-            background: #28a745; color: white; padding: 10px 25px; border-radius: 50px;
-            text-decoration: none; font-weight: 700; font-size: 0.85rem;
-            display: inline-block; transition: all 0.3s ease; border: none; cursor: pointer;
-        }
-        .btn-success-custom:hover { background: #218838; color: white; transform: translateY(-2px); }
+        .btn-primary-custom:hover { background: #0369a1; color: white; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(2,132,199,.3); }
 
         .btn-gray-custom {
             background: #6c757d; color: white; padding: 10px 25px; border-radius: 50px;
@@ -130,7 +120,6 @@
         }
         .btn-blue-custom:hover { background: #0369a1; color: white; transform: translateY(-2px); }
 
-        /* ===== SECTION BOX ===== */
         .section-box {
             background: #ffffff; border-radius: 16px; padding: 25px;
             border: 1px solid #e8e8e8; margin-bottom: 25px;
@@ -140,7 +129,7 @@
             font-size: 1.1rem; font-weight: 800; margin-bottom: 20px;
             color: #1a1a2e; display: flex; align-items: center; gap: 10px;
         }
-        .section-box h2 i { color: #e10098; }
+        .section-box h2 i { color: #0284c7; }
 
         .form-label-custom {
             font-size: 0.72rem; font-weight: 700; color: #555;
@@ -153,7 +142,7 @@
             transition: all 0.3s ease; background: white; width: 100%;
         }
         .form-control-custom:focus, .form-select-custom:focus {
-            border-color: #e10098; box-shadow: 0 0 0 4px rgba(225, 0, 152, 0.1);
+            border-color: #0284c7; box-shadow: 0 0 0 4px rgba(2,132,199,.1);
             outline: none;
         }
 
@@ -178,16 +167,15 @@
             justify-content: space-between; gap: 10px; flex-wrap: wrap;
         }
         .subsection-title-left { display: flex; align-items: center; gap: 8px; }
-        .subsection-title i { color: #e10098; }
+        .subsection-title i { color: #0284c7; }
         .subsection-hint { font-size: 0.72rem; color: #94a3b8; font-weight: 500; }
 
-        /* ===== VARIANTES ===== */
         .color-group {
             background: #f8fafc; border-radius: 12px; padding: 14px;
             margin-bottom: 12px; border: 2px solid #e2e8f0;
             position: relative; transition: all 0.3s ease;
         }
-        .color-group:hover { border-color: #e10098; }
+        .color-group:hover { border-color: #0284c7; }
         .variant-group-title {
             font-weight: 700; color: #1a1a2e; margin-bottom: 10px;
             padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;
@@ -200,53 +188,36 @@
             margin-bottom: 8px; border: 1px solid #e2e8f0;
             transition: all 0.2s ease;
         }
-        .variant-row:hover { border-color: #e10098; background: #fdf7fb; }
+        .variant-row:hover { border-color: #0284c7; background: #f0f9ff; }
 
         .empty-colors-message {
             text-align: center; color: #94a3b8;
             padding: 30px 20px; background: #f8fafc;
             border-radius: 10px; border: 2px dashed #cbd5e1;
         }
-        .empty-colors-message i {
-            font-size: 2.4rem; display: block; margin-bottom: 10px; color: #cbd5e1;
-        }
+        .empty-colors-message i { font-size: 2.4rem; display: block; margin-bottom: 10px; color: #cbd5e1; }
         .empty-colors-message p { font-size: 0.88rem; margin-bottom: 4px; }
         .empty-colors-message small { font-size: 0.75rem; }
 
-        /* ===== FOTOS/VIDEOS ===== */
-        .fotos-counter {
-            font-size: 0.75rem; color: #6366f1; font-weight: 600; margin-top: 4px;
-        }
+        .fotos-counter { font-size: 0.75rem; color: #0284c7; font-weight: 600; margin-top: 4px; }
         .fotos-counter.completo { color: #10b981; }
 
-        .preview-img {
-            width: 60px; height: 60px; object-fit: cover;
-            border-radius: 12px; border: 2px solid #e2e8f0;
-        }
-        .preview-video {
-            width: 140px; height: 90px;
-            border-radius: 12px; border: 2px solid #e2e8f0;
-            object-fit: cover; background: #000;
-        }
+        .preview-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; border: 2px solid #e2e8f0; }
+        .preview-video { width: 140px; height: 90px; border-radius: 12px; border: 2px solid #e2e8f0; object-fit: cover; background: #000; }
 
-        /* ===== CATEGORÍA VISUAL ===== */
         .categoria-selector-visual {
             border: 2px solid #e2e8f0; border-radius: 10px;
             padding: 8px 12px; background: #f8fafc; min-height: 40px;
             margin-top: 6px;
         }
         .selected-path { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .path-item {
-            padding: 3px 10px; border-radius: 8px;
-            font-size: 0.75rem; font-weight: 600;
-        }
+        .path-item { padding: 3px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; }
         .path-item.nivel-1 { background: #6366f1; color: white; }
         .path-item.nivel-2 { background: #8b5cf6; color: white; }
         .path-item.nivel-3 { background: #a78bfa; color: white; }
         .path-arrow { color: #94a3b8; font-size: 0.95rem; font-weight: 700; }
         .empty-selection { color: #94a3b8; font-style: italic; font-size: 0.78rem; }
 
-        /* ===== TEMPORADA ===== */
         .temporada-selector {
             border: 2px solid #e2e8f0; border-radius: 10px;
             padding: 8px 12px; background: #f8fafc;
@@ -258,20 +229,11 @@
         .temporada-selector select:focus { outline: none; }
         .info-temporada { font-size: 0.65rem; color: #94a3b8; margin-top: 3px; display: block; }
 
-        /* ===== LIGHTBOX ===== */
-        #lightbox {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.85); z-index: 9999;
-            align-items: center; justify-content: center;
-        }
+        #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; }
         #lightbox.open { display: flex; }
         #lightbox img { max-width: 90vw; max-height: 85vh; border-radius: 12px; object-fit: contain; }
-        #lightbox .close-lb {
-            position: absolute; top: 20px; right: 25px; color: white;
-            font-size: 2rem; cursor: pointer; background: none; border: none;
-        }
+        #lightbox .close-lb { position: absolute; top: 20px; right: 25px; color: white; font-size: 2rem; cursor: pointer; background: none; border: none; }
 
-        /* ===== FOOTER ===== */
         .footer-info {
             background: #ffffff; padding: 15px 25px; border-radius: 16px;
             border: 1px solid #e8e8e8; text-align: center;
@@ -283,7 +245,7 @@
             display: flex; align-items: center; justify-content: center;
             gap: 15px; flex-wrap: wrap;
         }
-        .footer-info i { color: #e10098; }
+        .footer-info i { color: #0284c7; }
         .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
         @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
@@ -305,7 +267,6 @@
 
 <div class="layout">
 
-    <!-- ===== SIDEBAR VENDEDOR ===== -->
     <nav class="sidebar">
         <div class="admin-profile">
             {% if session.get('foto') %}
@@ -322,49 +283,29 @@
 
         <div class="menu-scroll">
             <div class="panel-title">MI TIENDA</div>
-            <a href="{{ url_for('web.marketplace_dashboard') }}">
-                <i class="fas fa-home"></i> <span>Dashboard</span>
-            </a>
-            <a href="{{ url_for('web.marketplace_mis_productos') }}" class="active">
-                <i class="fas fa-box"></i> <span>Mis productos</span>
-            </a>
-            <a href="{{ url_for('web.marketplace_mis_pedidos') }}">
-                <i class="fas fa-shopping-cart"></i> <span>Mis pedidos</span>
-            </a>
+            <a href="{{ url_for('web.marketplace_dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.marketplace_mis_productos') }}" class="active"><i class="fas fa-box"></i> <span>Mis productos</span></a>
+            <a href="{{ url_for('web.marketplace_mis_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Mis pedidos</span></a>
 
             <div class="divider"></div>
             <div class="panel-title">TIENDA</div>
-
             {% if vendedor.slug %}
-            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank">
-                <i class="fas fa-eye"></i> <span>Ver mi tienda</span>
-            </a>
+            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank"><i class="fas fa-eye"></i> <span>Ver mi tienda</span></a>
             {% endif %}
-            <a href="{{ url_for('web.marketplace') }}">
-                <i class="fas fa-store"></i> <span>Marketplace</span>
-            </a>
+            <a href="{{ url_for('web.marketplace') }}"><i class="fas fa-store"></i> <span>Marketplace</span></a>
 
             <div class="divider"></div>
             <div class="panel-title">CLIENTE</div>
-
-            <a href="{{ url_for('web.raiz_tienda') }}">
-                <i class="fas fa-home"></i> <span>Ir a tienda ORION</span>
-            </a>
-            <a href="{{ url_for('web.perfil') }}">
-                <i class="fas fa-user"></i> <span>Mi perfil</span>
-            </a>
+            <a href="{{ url_for('web.raiz_tienda') }}"><i class="fas fa-home"></i> <span>Ir a tienda ORION</span></a>
+            <a href="{{ url_for('web.perfil') }}"><i class="fas fa-user"></i> <span>Mi perfil</span></a>
 
             <div class="divider"></div>
-
             <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
-                <button type="submit" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
-                </button>
+                <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></button>
             </form>
         </div>
     </nav>
 
-    <!-- ===== MAIN ===== -->
     <main class="main">
 
         <header class="top-bar">
@@ -372,15 +313,13 @@
                 <i class="fas fa-{{ 'edit' if producto else 'plus-circle' }}"></i>
                 {{ 'Editar Producto' if producto else 'Nuevo Producto' }}
             </h1>
-            <div class="tag">
-                <i class="fas fa-shop"></i> {{ vendedor.nombre_tienda }}
-            </div>
+            <div class="tag"><i class="fas fa-shop"></i> {{ vendedor.nombre_tienda }}</div>
         </header>
 
         <section class="hero">
             <h2>
                 <i class="fas fa-{{ 'pencil-square' if producto else 'box' }}"></i>
-                {{ 'Actualiza la información del producto' if producto else 'Publica un nuevo producto en el marketplace' }}
+                {{ 'Actualiza la información del producto' if producto else 'Publica un nuevo producto' }}
             </h2>
             <p>
                 Agrega <strong>variantes por color y talla</strong>, sube <strong>fotos</strong>,
@@ -392,7 +331,7 @@
                 </a>
                 {% if vendedor.slug %}
                 <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank" class="btn-blue-custom">
-                    <i class="fas fa-eye"></i> Ver mi tienda pública
+                    <i class="fas fa-eye"></i> Ver tienda pública
                 </a>
                 {% endif %}
             </div>
@@ -401,7 +340,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for cat, msg in messages %}
-                    <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+                    <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert" style="border-radius:10px;">
                         {{ msg }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
@@ -409,9 +348,6 @@
             {% endif %}
         {% endwith %}
 
-        <!-- ============================================== -->
-        <!-- FORMULARIO DE PRODUCTO                        -->
-        <!-- ============================================== -->
         <div class="section-box">
             <h2><i class="fas fa-{{ 'edit' if producto else 'plus-circle' }}"></i>
                 {{ 'Editar Producto' if producto else 'Nuevo Producto' }}
@@ -421,7 +357,6 @@
                   action="{{ url_for('web.marketplace_editar_producto', producto_id=producto._id) if producto else url_for('web.marketplace_nuevo_producto') }}"
                   method="POST" enctype="multipart/form-data" onsubmit="return validarFormulario()">
 
-                <!-- FILA 1: Nombre + Estado -->
                 <div class="form-grid-2">
                     <div>
                         <label class="form-label-custom">Nombre del Producto *</label>
@@ -438,7 +373,6 @@
                     </div>
                 </div>
 
-                <!-- FILA 2: Categoría + Marca + Temporada -->
                 <div class="form-grid-3">
                     <div>
                         <label class="form-label-custom">Categoría *</label>
@@ -507,21 +441,18 @@
                                     </option>
                                 {% endfor %}
                             </select>
-                            <span class="info-temporada">
-                                <i class="bi bi-info-circle"></i> Auto-activación por fechas
-                            </span>
+                            <span class="info-temporada"><i class="bi bi-info-circle"></i> Auto-activación por fechas</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- FILA 3: Descripción -->
                 <div style="margin-bottom: 14px;">
                     <label class="form-label-custom">Descripción</label>
                     <textarea name="descripcion" class="form-control-custom" rows="3" maxlength="1000"
                               placeholder="Describe el producto, materiales, características...">{{ producto.descripcion or '' if producto else '' }}</textarea>
                 </div>
 
-                <!-- ============ SUBSECCIÓN: FOTOS ============ -->
+                <!-- FOTOS -->
                 <div class="subsection">
                     <div class="subsection-title">
                         <div class="subsection-title-left">
@@ -531,10 +462,7 @@
                         </div>
                         <span class="fotos-counter" id="fotosCounter">0/6 fotos</span>
                     </div>
-
-                    <input type="file" name="fotos[]" id="input-fotos" class="form-control-custom"
-                           multiple accept="image/*">
-
+                    <input type="file" name="fotos[]" id="input-fotos" class="form-control-custom" multiple accept="image/*">
                     <div id="preview-fotos" class="d-flex flex-wrap gap-3 mt-3">
                         {% if producto and producto.fotos %}
                             {% for foto in producto.fotos %}
@@ -550,7 +478,7 @@
                     </div>
                 </div>
 
-                <!-- ============ SUBSECCIÓN: VIDEOS ============ -->
+                <!-- VIDEOS -->
                 <div class="subsection">
                     <div class="subsection-title">
                         <div class="subsection-title-left">
@@ -560,10 +488,7 @@
                         </div>
                         <span class="fotos-counter" id="videosCounter">0/3 videos</span>
                     </div>
-
-                    <input type="file" name="videos[]" id="input-videos" class="form-control-custom"
-                           multiple accept="video/*">
-
+                    <input type="file" name="videos[]" id="input-videos" class="form-control-custom" multiple accept="video/*">
                     <div id="preview-videos" class="d-flex flex-wrap gap-3 mt-3">
                         {% if producto and producto.videos %}
                             {% for video in producto.videos %}
@@ -580,7 +505,7 @@
                     </div>
                 </div>
 
-                <!-- ============ SUBSECCIÓN: VARIANTES ============ -->
+                <!-- VARIANTES -->
                 <div class="subsection">
                     <div class="subsection-title">
                         <div class="subsection-title-left">
@@ -598,9 +523,7 @@
                         {% if producto and producto.variables %}
                             {% set colores_dict = {} %}
                             {% for v in producto.variables %}
-                                {% if v.color not in colores_dict %}
-                                    {% set _ = colores_dict.update({v.color: []}) %}
-                                {% endif %}
+                                {% if v.color not in colores_dict %}{% set _ = colores_dict.update({v.color: []}) %}{% endif %}
                                 {% set _ = colores_dict[v.color].append(v) %}
                             {% endfor %}
                             {% for color, variantes in colores_dict.items() %}
@@ -649,7 +572,6 @@
                     </div>
                 </div>
 
-                <!-- BOTONES -->
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
                     <button type="submit" class="btn-primary-custom" style="padding: 12px 40px;">
                         <i class="fas fa-save"></i> {{ 'ACTUALIZAR PRODUCTO' if producto else 'PUBLICAR PRODUCTO' }}
@@ -670,13 +592,10 @@
                 <span class="heart"><i class="fas fa-heart"></i></span>
             </p>
         </div>
-
     </main>
 </div>
 
-<!-- ==================================================== -->
 <!-- MODAL AGREGAR COLOR -->
-<!-- ==================================================== -->
 <div class="modal fade" id="modalAgregarColor" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius:16px;border:none;">
@@ -696,7 +615,6 @@
     </div>
 </div>
 
-<!-- LIGHTBOX -->
 <div id="lightbox">
     <button class="close-lb" onclick="document.getElementById('lightbox').classList.remove('open')">×</button>
     <img id="lightbox-img" src="" alt="Foto ampliada">
@@ -718,17 +636,11 @@ categoriasData['{{ cat._id }}'] = {
 };
 {% endfor %}
 
-/* ========== VALIDACIONES ========== */
 function validarFormulario() {
     let valido = true;
-    const nombre = document.getElementById('nombre');
-    if (!nombre.value.trim()) { alert('⚠️ El nombre es obligatorio'); valido = false; }
-
-    const categoria = document.getElementById('categoriaSelect');
-    if (!categoria.value) { alert('⚠️ Debes seleccionar una categoría'); valido = false; }
-
-    const marca = document.getElementById('marca_id');
-    if (!marca.value) { alert('⚠️ Debes seleccionar una marca'); valido = false; }
+    if (!document.getElementById('nombre').value.trim()) { alert('⚠️ El nombre es obligatorio'); valido = false; }
+    if (!document.getElementById('categoriaSelect').value) { alert('⚠️ Debes seleccionar una categoría'); valido = false; }
+    if (!document.getElementById('marca_id').value) { alert('⚠️ Debes seleccionar una marca'); valido = false; }
 
     const grupos = document.querySelectorAll('#grupos-colores .color-group');
     if (grupos.length === 0) {
@@ -736,12 +648,12 @@ function validarFormulario() {
         valido = false;
     } else {
         let variantesValidas = true;
-        grupos.forEach(grupo => {
-            grupo.querySelectorAll('.variant-row').forEach(fila => {
-                const sku = fila.querySelector('input[name="sku[]"]');
-                const talla = fila.querySelector('input[name="tamano[]"]');
-                const precio = fila.querySelector('input[name="precio[]"]');
-                const stock = fila.querySelector('input[name="stock[]"]');
+        grupos.forEach(g => {
+            g.querySelectorAll('.variant-row').forEach(f => {
+                const sku = f.querySelector('input[name="sku[]"]');
+                const talla = f.querySelector('input[name="tamano[]"]');
+                const precio = f.querySelector('input[name="precio[]"]');
+                const stock = f.querySelector('input[name="stock[]"]');
                 if (!sku.value.trim() || !talla.value.trim() || precio.value === '' || stock.value === '') {
                     variantesValidas = false;
                 }
@@ -752,7 +664,6 @@ function validarFormulario() {
     return valido;
 }
 
-/* ========== FOTOS ========== */
 function actualizarContadorFotos() {
     const count = document.querySelectorAll('#preview-fotos .item-foto').length;
     const c = document.getElementById('fotosCounter');
@@ -762,34 +673,30 @@ function actualizarContadorFotos() {
     document.getElementById('input-fotos').disabled = count >= MAX_FOTOS;
 }
 
-const inputFotos = document.getElementById('input-fotos');
-if (inputFotos) {
-    inputFotos.addEventListener('change', function(e) {
-        const container = document.getElementById('preview-fotos');
-        const existentes = container.querySelectorAll('.item-foto').length;
-        const files = Array.from(e.target.files);
-        if (existentes + files.length > MAX_FOTOS) {
-            alert('⚠️ Máximo 6 fotos. Solo puedes agregar ' + (MAX_FOTOS - existentes) + ' más.');
-            this.value = '';
-            return;
-        }
-        files.forEach(file => {
-            if (!file.type.startsWith('image/')) { alert('⚠️ Solo se permiten imágenes.'); return; }
-            if (file.size > 5 * 1024 * 1024) { alert('⚠️ La imagen "' + file.name + '" supera los 5MB.'); return; }
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                const div = document.createElement('div');
-                div.className = 'position-relative d-inline-block item-foto';
-                div.innerHTML = '<img src="' + ev.target.result + '" class="preview-img"><button type="button" class="btn btn-danger btn-sm position-absolute" style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;line-height:1;" onclick="this.parentElement.remove();actualizarContadorFotos();">×</button>';
-                container.appendChild(div);
-                actualizarContadorFotos();
-            };
-            reader.readAsDataURL(file);
-        });
+document.getElementById('input-fotos').addEventListener('change', function(e) {
+    const container = document.getElementById('preview-fotos');
+    const existentes = container.querySelectorAll('.item-foto').length;
+    const files = Array.from(e.target.files);
+    if (existentes + files.length > MAX_FOTOS) {
+        alert('⚠️ Máximo 6 fotos. Solo puedes agregar ' + (MAX_FOTOS - existentes) + ' más.');
+        this.value = '';
+        return;
+    }
+    files.forEach(file => {
+        if (!file.type.startsWith('image/')) { alert('⚠️ Solo se permiten imágenes.'); return; }
+        if (file.size > 5 * 1024 * 1024) { alert('⚠️ La imagen "' + file.name + '" supera los 5MB.'); return; }
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const div = document.createElement('div');
+            div.className = 'position-relative d-inline-block item-foto';
+            div.innerHTML = '<img src="' + ev.target.result + '" class="preview-img"><button type="button" class="btn btn-danger btn-sm position-absolute" style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;line-height:1;" onclick="this.parentElement.remove();actualizarContadorFotos();">×</button>';
+            container.appendChild(div);
+            actualizarContadorFotos();
+        };
+        reader.readAsDataURL(file);
     });
-}
+});
 
-/* ========== VIDEOS ========== */
 function actualizarContadorVideos() {
     const count = document.querySelectorAll('#preview-videos .item-video').length;
     const c = document.getElementById('videosCounter');
@@ -799,34 +706,30 @@ function actualizarContadorVideos() {
     document.getElementById('input-videos').disabled = count >= MAX_VIDEOS;
 }
 
-const inputVideos = document.getElementById('input-videos');
-if (inputVideos) {
-    inputVideos.addEventListener('change', function(e) {
-        const container = document.getElementById('preview-videos');
-        const existentes = container.querySelectorAll('.item-video').length;
-        const files = Array.from(e.target.files);
-        if (existentes + files.length > MAX_VIDEOS) {
-            alert('⚠️ Máximo 3 videos. Solo puedes agregar ' + (MAX_VIDEOS - existentes) + ' más.');
-            this.value = '';
-            return;
-        }
-        files.forEach(file => {
-            if (!file.type.startsWith('video/')) { alert('⚠️ Solo se permiten videos.'); return; }
-            if (file.size > 100 * 1024 * 1024) { alert('⚠️ El video "' + file.name + '" supera los 100MB.'); return; }
-            const url = URL.createObjectURL(file);
-            const div = document.createElement('div');
-            div.className = 'position-relative d-inline-block item-video';
-            div.innerHTML = '<video src="' + url + '" class="preview-video" controls muted preload="metadata"></video>' +
-                '<button type="button" class="btn btn-danger btn-sm position-absolute" ' +
-                'style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;line-height:1;" ' +
-                'onclick="this.parentElement.remove();actualizarContadorVideos();">×</button>';
-            container.appendChild(div);
-            actualizarContadorVideos();
-        });
+document.getElementById('input-videos').addEventListener('change', function(e) {
+    const container = document.getElementById('preview-videos');
+    const existentes = container.querySelectorAll('.item-video').length;
+    const files = Array.from(e.target.files);
+    if (existentes + files.length > MAX_VIDEOS) {
+        alert('⚠️ Máximo 3 videos. Solo puedes agregar ' + (MAX_VIDEOS - existentes) + ' más.');
+        this.value = '';
+        return;
+    }
+    files.forEach(file => {
+        if (!file.type.startsWith('video/')) { alert('⚠️ Solo se permiten videos.'); return; }
+        if (file.size > 100 * 1024 * 1024) { alert('⚠️ El video "' + file.name + '" supera los 100MB.'); return; }
+        const url = URL.createObjectURL(file);
+        const div = document.createElement('div');
+        div.className = 'position-relative d-inline-block item-video';
+        div.innerHTML = '<video src="' + url + '" class="preview-video" controls muted preload="metadata"></video>' +
+            '<button type="button" class="btn btn-danger btn-sm position-absolute" ' +
+            'style="top:-8px;right:-8px;border-radius:50%;width:24px;height:24px;padding:0;line-height:1;" ' +
+            'onclick="this.parentElement.remove();actualizarContadorVideos();">×</button>';
+        container.appendChild(div);
+        actualizarContadorVideos();
     });
-}
+});
 
-/* ========== CATEGORÍA PREVIEW ========== */
 function actualizarVistaPreviaCategoria() {
     const sel = document.getElementById('categoriaSelect');
     const opt = sel.options[sel.selectedIndex];
@@ -855,7 +758,6 @@ function escHtml(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* ========== AGREGAR COLOR ========== */
 function abrirModalColor() {
     document.getElementById('inputNuevoColor').value = '';
     if (!modalColor) modalColor = new bootstrap.Modal(document.getElementById('modalAgregarColor'));
@@ -942,22 +844,14 @@ function actualizarContadorTallas() {
     });
 }
 
-/* ========== INICIALIZACIÓN ========== */
 document.addEventListener('DOMContentLoaded', function() {
     actualizarContadorFotos();
     actualizarContadorVideos();
     actualizarContadorTallas();
-
-    const btnAgregar = document.getElementById('btnAgregarColor');
-    if (btnAgregar) btnAgregar.addEventListener('click', agregarColor);
-
-    const inputColor = document.getElementById('inputNuevoColor');
-    if (inputColor) {
-        inputColor.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') { e.preventDefault(); agregarColor(); }
-        });
-    }
-
+    document.getElementById('btnAgregarColor').addEventListener('click', agregarColor);
+    document.getElementById('inputNuevoColor').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); agregarColor(); }
+    });
     if (document.getElementById('categoriaSelect').value) actualizarVistaPreviaCategoria();
 });
 </script>

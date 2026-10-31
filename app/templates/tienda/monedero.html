@@ -1,824 +1,462 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ CURRENT_LANGUAGE or 'es' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi cartera | ORION</title>
+    <title>{{ _('Mi cartera') }} | ORION</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/perfil.css') }}">
+
     <style>
-        * { box-sizing: border-box; }
+        .monedero-layout { display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: start; }
+        @media (max-width: 900px) { .monedero-layout { grid-template-columns: 1fr; } }
+        .lv-card { border-radius: 14px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,.08); background: #fff; border: 1px solid #eee; max-width: 340px; }
+        .lv-card-top { background: linear-gradient(135deg, #d6006e 0%, #b4006c 50%, #8a0052 100%); padding: 22px 22px 18px; position: relative; height: 145px; overflow: hidden; }
+        .lv-card-top::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.15) 0px, rgba(255,255,255,.15) 8px, transparent 8px, transparent 20px); pointer-events: none; }
+        .lv-card-top::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 45%; background: repeating-linear-gradient(90deg, rgba(255,255,255,.28) 0px, rgba(255,255,255,.28) 3px, transparent 3px, transparent 10px); pointer-events: none; }
+        .lv-card-label { position: relative; z-index: 2; font-size: .7rem; color: #fff; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: .95; line-height: 1.3; }
+        .lv-card-label small { display: block; font-size: .62rem; font-weight: 500; letter-spacing: 2px; opacity: .8; }
+        .lv-card-number { position: relative; z-index: 2; color: #fff; font-size: 1rem; font-weight: 700; letter-spacing: 1.5px; margin-top: 50px; text-align: right; }
+        .lv-card-bottom { background: #fff; padding: 14px 22px 16px; display: flex; align-items: center; justify-content: space-between; }
+        .lv-card-brand { font-weight: 900; color: #b4006c; font-size: 1.15rem; letter-spacing: -0.5px; }
+        .lv-card-brand small { display: block; font-size: .55rem; letter-spacing: 3px; color: #b4006c; font-weight: 500; margin-top: 2px; }
+        .lv-card-cvv { font-size: .68rem; color: #999; letter-spacing: 1px; }
+        .lv-info-panel { display: flex; flex-direction: column; gap: 14px; }
+        .lv-info-card { background: #f7f7f7; border-radius: 10px; padding: 18px 20px; border: 1px solid #eee; }
+        .lv-info-label { font-size: .82rem; color: #555; margin-bottom: 4px; }
+        .lv-info-value { font-size: 1.5rem; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
+        
+        .saldo-breakdown { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ccc; display: flex; flex-direction: column; gap: 6px; }
+        .saldo-breakdown .row-item { display: flex; justify-content: space-between; gap: 12px; font-size: .85rem; color: #555; }
+        .saldo-breakdown .row-item.bonus { color: #e10098; font-weight: 700; }
+        .saldo-breakdown .row-item.total { font-weight: 900; font-size: 1.1rem; color: #1a1a1a; margin-top: 4px; }
 
-        body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: #fff;
-            color: #1a1a1a;
-            min-height: 100vh;
-        }
+        .lv-transfer-card { background: #f7f7f7; border-radius: 10px; padding: 18px 20px; border: 1px solid #eee; cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+        .lv-transfer-card:hover { background: #faf0f6; border-color: #f0c8de; }
+        .lv-transfer-title { font-size: .9rem; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+        .lv-transfer-desc { font-size: .72rem; color: #777; line-height: 1.4; }
+        .lv-transfer-arrow { color: #b4006c; font-size: 1.3rem; flex-shrink: 0; }
 
-        /* ===== BARRA SUPERIOR (imitando Liverpool) ===== */
-        .lv-topbar {
-            background: #fff;
-            border-bottom: 1px solid #e6e6e6;
-            padding: 10px 0;
-            font-size: .78rem;
-            color: #777;
-        }
-        .lv-topbar a {
-            color: #777;
-            text-decoration: none;
-            margin-right: 18px;
-        }
-        .lv-topbar a:hover { color: #b4006c; }
-
-        .lv-mainbar {
-            background: #b4006c;
-            padding: 14px 0;
-        }
-        .lv-logo {
-            font-weight: 900;
-            color: #fff;
-            font-size: 1.4rem;
-            letter-spacing: -1px;
-            text-decoration: none;
-        }
-        .lv-search {
-            background: #fff;
-            border-radius: 4px;
-            border: none;
-            padding: 9px 14px;
-            width: 100%;
-            font-size: .85rem;
-        }
-        .lv-user {
-            color: #fff;
-            font-size: .85rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-        .lv-user:hover { color: #fff; }
-
-        /* ===== LAYOUT ===== */
-        .lv-wrap {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px 20px 60px;
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 30px;
-        }
-        @media (max-width: 900px) {
-            .lv-wrap { grid-template-columns: 1fr; }
-        }
-
-        /* ===== SIDEBAR ===== */
-        .lv-side-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 4px;
-        }
-        .lv-breadcrumb {
-            font-size: .75rem;
-            color: #999;
-            margin-bottom: 24px;
-        }
-        .lv-breadcrumb a {
-            color: #b4006c;
-            text-decoration: none;
-        }
-
-        .lv-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .lv-menu li {
-            margin-bottom: 4px;
-        }
-        .lv-menu a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            border-radius: 6px;
-            font-size: .85rem;
-            color: #333;
-            text-decoration: none;
-            transition: all .15s;
-        }
-        .lv-menu a:hover {
-            background: #faf0f6;
-            color: #b4006c;
-        }
-        .lv-menu a.active {
-            background: #faf0f6;
-            color: #b4006c;
-            font-weight: 600;
-        }
-        .lv-menu i { font-size: 1rem; width: 20px; }
-
-        .lv-submenu {
-            list-style: none;
-            padding-left: 30px;
-            margin: 2px 0 8px 0;
-            font-size: .8rem;
-        }
-        .lv-submenu a {
-            padding: 6px 10px;
-            color: #666;
-        }
-
-        /* ===== CONTENIDO PRINCIPAL ===== */
-        .lv-content-grid {
-            display: grid;
-            grid-template-columns: 340px 1fr;
-            gap: 24px;
-            align-items: start;
-        }
-        @media (max-width: 700px) {
-            .lv-content-grid { grid-template-columns: 1fr; }
-        }
-
-        /* ===== TARJETA MONEDERO ===== */
-        .lv-card {
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 4px 18px rgba(0,0,0,.08);
-            background: #fff;
-            border: 1px solid #eee;
-            max-width: 340px;
-        }
-        .lv-card-top {
-            background: linear-gradient(135deg, #d6006e 0%, #b4006c 50%, #8a0052 100%);
-            padding: 22px 22px 18px;
-            position: relative;
-            height: 145px;
-            overflow: hidden;
-        }
-        /* Rayas verticales estilo Liverpool */
-        .lv-card-top::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(
-                90deg,
-                rgba(255,255,255,.15) 0px,
-                rgba(255,255,255,.15) 8px,
-                transparent 8px,
-                transparent 20px
-            );
-            pointer-events: none;
-        }
-        .lv-card-top::after {
-            content: "";
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 45%;
-            background: repeating-linear-gradient(
-                90deg,
-                rgba(255,255,255,.28) 0px,
-                rgba(255,255,255,.28) 3px,
-                transparent 3px,
-                transparent 10px
-            );
-            pointer-events: none;
-        }
-        .lv-card-label {
-            position: relative;
-            z-index: 2;
-            font-size: .7rem;
-            color: #fff;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            opacity: .95;
-            line-height: 1.3;
-        }
-        .lv-card-label small {
-            display: block;
-            font-size: .62rem;
-            font-weight: 500;
-            letter-spacing: 2px;
-            opacity: .8;
-        }
-        .lv-card-number {
-            position: relative;
-            z-index: 2;
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            margin-top: 50px;
-            text-align: right;
-        }
-        .lv-card-bottom {
-            background: #fff;
-            padding: 14px 22px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .lv-card-brand {
-            font-weight: 900;
-            color: #b4006c;
-            font-size: 1.15rem;
-            letter-spacing: -0.5px;
-        }
-        .lv-card-brand small {
-            display: block;
-            font-size: .55rem;
-            letter-spacing: 3px;
-            color: #b4006c;
-            font-weight: 500;
-            margin-top: 2px;
-        }
-        .lv-card-cvv {
-            font-size: .68rem;
-            color: #999;
-            letter-spacing: 1px;
-        }
-
-        /* ===== PANEL DERECHO (saldo / transferir) ===== */
-        .lv-info-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-        .lv-info-card {
-            background: #f7f7f7;
-            border-radius: 10px;
-            padding: 18px 20px;
-            border: 1px solid #eee;
-        }
-        .lv-info-label {
-            font-size: .82rem;
-            color: #555;
-            margin-bottom: 4px;
-        }
-        .lv-info-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #1a1a1a;
-            letter-spacing: -0.5px;
-        }
-
-        .lv-transfer-card {
-            background: #f7f7f7;
-            border-radius: 10px;
-            padding: 18px 20px;
-            border: 1px solid #eee;
-            cursor: pointer;
-            transition: all .15s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-        }
-        .lv-transfer-card:hover {
-            background: #faf0f6;
-            border-color: #f0c8de;
-        }
-        .lv-transfer-title {
-            font-size: .9rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 4px;
-        }
-        .lv-transfer-desc {
-            font-size: .72rem;
-            color: #777;
-            line-height: 1.4;
-        }
-        .lv-transfer-arrow {
-            color: #b4006c;
-            font-size: 1.3rem;
-            flex-shrink: 0;
-        }
-
-        /* ===== DRAWER ===== */
-        .lv-drawer-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,.35);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .25s;
-            z-index: 1040;
-        }
-        .lv-drawer-backdrop.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .lv-drawer {
-            position: fixed;
-            top: 0;
-            right: 0;
-            height: 100vh;
-            width: 480px;
-            max-width: 95vw;
-            background: #fff;
-            box-shadow: -6px 0 24px rgba(0,0,0,.12);
-            transform: translateX(100%);
-            transition: transform .28s ease;
-            z-index: 1050;
-            display: flex;
-            flex-direction: column;
-        }
-        .lv-drawer.open {
-            transform: translateX(0);
-        }
-
-        .lv-drawer-header {
-            padding: 18px 22px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        .lv-drawer-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin: 0;
-        }
-        .lv-drawer-close {
-            background: none;
-            border: none;
-            font-size: 1.4rem;
-            color: #888;
-            cursor: pointer;
-            line-height: 1;
-            padding: 0;
-        }
+        .lv-drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 1040; }
+        .lv-drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+        .lv-drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 480px; max-width: 95vw; background: #fff; box-shadow: -6px 0 24px rgba(0,0,0,.12); transform: translateX(100%); transition: transform .28s ease; z-index: 1050; display: flex; flex-direction: column; }
+        .lv-drawer.open { transform: translateX(0); }
+        .lv-drawer-header { padding: 18px 22px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .lv-drawer-title { font-size: 1rem; font-weight: 700; color: #1a1a1a; margin: 0; }
+        .lv-drawer-close { background: none; border: none; font-size: 1.4rem; color: #888; cursor: pointer; line-height: 1; padding: 0; }
         .lv-drawer-close:hover { color: #333; }
-
-        .lv-drawer-body {
-            padding: 20px 22px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .lv-drawer-subtitle {
-            font-size: .82rem;
-            color: #666;
-            margin-bottom: 18px;
-        }
-
-        /* Mini tarjeta dentro del drawer */
-        .lv-mini-card {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 14px rgba(0,0,0,.1);
-            margin-bottom: 22px;
-            max-width: 320px;
-        }
-        .lv-mini-card .lv-card-top {
-            height: 130px;
-            padding: 18px 20px 14px;
-        }
-        .lv-mini-card .lv-card-label {
-            font-size: .65rem;
-        }
-        .lv-mini-card .lv-card-number {
-            margin-top: 42px;
-            font-size: .92rem;
-        }
-        .lv-mini-card .lv-card-bottom {
-            padding: 12px 20px 14px;
-        }
+        .lv-drawer-body { padding: 20px 22px; overflow-y: auto; flex: 1; }
+        .lv-drawer-subtitle { font-size: .82rem; color: #666; margin-bottom: 18px; }
+        .lv-mini-card { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,.1); margin-bottom: 22px; max-width: 320px; }
+        .lv-mini-card .lv-card-top { height: 130px; padding: 18px 20px 14px; }
+        .lv-mini-card .lv-card-label { font-size: .65rem; }
+        .lv-mini-card .lv-card-number { margin-top: 42px; font-size: .92rem; }
+        .lv-mini-card .lv-card-bottom { padding: 12px 20px 14px; }
         .lv-mini-card .lv-card-brand { font-size: 1.05rem; }
 
-        /* Formulario */
-        .lv-field {
-            margin-bottom: 16px;
-        }
-        .lv-field label {
-            display: block;
-            font-size: .82rem;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 6px;
-        }
-        .lv-field label .req {
-            color: #d4006e;
-        }
-        .lv-field input {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: .88rem;
-            transition: border-color .15s;
-        }
-        .lv-field input:focus {
-            outline: none;
-            border-color: #b4006c;
-        }
-        .lv-field-hint {
-            font-size: .72rem;
-            color: #888;
-            margin-top: 5px;
-        }
-
-        /* Fila serie + cvv */
-        .lv-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
+        .lv-field { margin-bottom: 16px; }
+        .lv-field label { display: block; font-size: .82rem; font-weight: 500; color: #333; margin-bottom: 6px; }
+        .lv-field label .req { color: #d4006e; }
+        .lv-field input { width: 100%; padding: 11px 14px; border: 1px solid #ccc; border-radius: 6px; font-size: .88rem; transition: border-color .15s; }
+        .lv-field input:focus { outline: none; border-color: #b4006c; }
+        .lv-field-hint { font-size: .72rem; color: #888; margin-top: 5px; }
+        .lv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .lv-row .lv-field { margin-bottom: 0; }
+        .lv-help { display: inline-flex; align-items: center; gap: 4px; font-size: .72rem; color: #b4006c; text-decoration: none; margin-left: 6px; vertical-align: middle; }
+        .lv-help i { font-size: .82rem; border: 1px solid #b4006c; border-radius: 50%; width: 15px; height: 15px; display: inline-flex; align-items: center; justify-content: center; }
+        .lv-error { color: #d4006e; font-size: .78rem; margin-top: 6px; display: none; }
+        .lv-drawer-footer { padding: 16px 22px; border-top: 1px solid #eee; background: #fff; }
+        .lv-btn-continue { width: 100%; background: #e6e6e6; color: #fff; border: none; padding: 13px 20px; border-radius: 6px; font-size: .9rem; font-weight: 600; cursor: not-allowed; transition: background .15s; }
+        .lv-btn-continue.enabled { background: #b4006c; cursor: pointer; }
+        .lv-btn-continue.enabled:hover { background: #97005a; }
 
-        .lv-help {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: .72rem;
-            color: #b4006c;
-            text-decoration: none;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
-        .lv-help i {
-            font-size: .82rem;
-            border: 1px solid #b4006c;
-            border-radius: 50%;
-            width: 15px;
-            height: 15px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .lv-error {
-            color: #d4006e;
-            font-size: .78rem;
-            margin-top: 6px;
-            display: none;
-        }
-
-        /* Footer del drawer */
-        .lv-drawer-footer {
-            padding: 16px 22px;
-            border-top: 1px solid #eee;
-            background: #fff;
-        }
-        .lv-btn-continue {
-            width: 100%;
-            background: #e6e6e6;
-            color: #fff;
-            border: none;
-            padding: 13px 20px;
-            border-radius: 6px;
-            font-size: .9rem;
-            font-weight: 600;
-            cursor: not-allowed;
-            transition: background .15s;
-        }
-        .lv-btn-continue.enabled {
-            background: #b4006c;
-            cursor: pointer;
-        }
-        .lv-btn-continue.enabled:hover {
-            background: #97005a;
-        }
-
-        /* Toast */
-        .lv-toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: #1a1a1a;
-            color: #fff;
-            padding: 12px 18px;
-            border-radius: 8px;
-            font-size: .85rem;
-            z-index: 1100;
-            box-shadow: 0 6px 20px rgba(0,0,0,.2);
-            opacity: 0;
-            transform: translateY(12px);
-            transition: all .25s;
-        }
+        .lv-toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 8px; font-size: .85rem; z-index: 4000; box-shadow: 0 6px 20px rgba(0,0,0,.2); opacity: 0; transform: translateY(12px); transition: all .25s; }
         .lv-toast.show { opacity: 1; transform: translateY(0); }
         .lv-toast.success { background: #0a7b3a; }
         .lv-toast.error { background: #c1121f; }
+
+        .mesas-regalos-section { margin-top: 28px; padding: 24px; background: linear-gradient(135deg, #fff7fb 0%, #ffffff 100%); border: 1px solid #f2cadd; border-radius: 14px; box-shadow: 0 4px 18px rgba(0,0,0,.05); }
+        .mesas-regalos-content { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+        .mesas-regalos-info { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 220px; }
+        .mesas-regalos-icon { width: 56px; height: 56px; min-width: 56px; display: flex; align-items: center; justify-content: center; background: #fce7f3; color: #b4006c; border-radius: 14px; font-size: 1.8rem; }
+        .mesas-regalos-title { margin: 0 0 6px; color: #292129; font-size: 1.05rem; font-weight: 800; }
+        .mesas-regalos-description { margin: 0; color: #777; font-size: .85rem; line-height: 1.6; }
+        .btn-mesas-regalos { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 12px 20px; border-radius: 8px; background: #b4006c; color: #fff; font-size: .88rem; font-weight: 700; text-decoration: none; transition: background .2s, transform .2s; white-space: nowrap; }
+        .btn-mesas-regalos:hover { background: #97005a; color: #fff; transform: translateY(-2px); }
+
+        @media (max-width: 576px) {
+            .mesas-regalos-section { padding: 18px; }
+            .mesas-regalos-content { align-items: flex-start; }
+            .mesas-regalos-info { align-items: flex-start; }
+            .btn-mesas-regalos { width: 100%; }
+            .saldo-breakdown .row-item { font-size: .8rem; }
+        }
     </style>
 </head>
+
 <body>
-
-<!-- ===== TOPBAR ===== -->
-<div class="lv-topbar">
-    <div class="container d-flex justify-content-between align-items-center">
-        <div><i class="bi bi-shop"></i> Elige una tienda</div>
-        <div>
-            <a href="#">Servicios</a>
-            <a href="#">Otros sitios</a>
-            <a href="#">Mesa de regalos</a>
-        </div>
-    </div>
-</div>
-
-<!-- ===== MAINBAR ===== -->
-<div class="lv-mainbar">
-    <div class="container d-flex align-items-center gap-3">
-        <a href="{{ url_for('web.raiz_tienda') }}" class="lv-logo">ORION</a>
-        <div style="flex: 1;">
-            <input type="text" class="lv-search" placeholder="Buscar por producto, categoría y más...">
-        </div>
-        <a href="{{ url_for('web.perfil') }}" class="lv-user">
-            <i class="bi bi-person-circle fs-4"></i>
-            {{ usuario.nombre|default('Mi cuenta') }}
-        </a>
-    </div>
-</div>
-
-<!-- ===== LAYOUT ===== -->
-<div class="lv-wrap">
-
-    <!-- SIDEBAR -->
-    <aside>
-        <div class="lv-side-title">Mi Cartera</div>
-        <div class="lv-breadcrumb">
-            <a href="{{ url_for('web.raiz_tienda') }}">Home</a> ›
-            <a href="{{ url_for('web.perfil') }}">Mi Cuenta</a> ›
-            Mi cartera
+    <div class="wrapper">
+        <!-- BARRA SUPERIOR -->
+        <div class="top-nav">
+            <div class="container d-flex justify-content-between align-items-center gap-4">
+                <a href="{{ url_for('web.perfil') }}" class="text-decoration-none">
+                    <i class="bi bi-arrow-left"></i> {{ _('Volver a Mi Cuenta') }}
+                </a>
+                <div class="d-flex gap-4">
+                    <a href="#"><i class="bi bi-geo-alt"></i> {{ _('Encuentra tu tienda') }}</a>
+                    <a href="/servicios"><i class="bi bi-truck"></i> {{ _('Servicios') }}</a>
+                    <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none">Ayuda</a>
+                </div>
+            </div>
         </div>
 
-        <ul class="lv-menu">
-            <li><a href="{{ url_for('web.perfil') }}"><i class="bi bi-grid"></i> Mi Cuenta</a></li>
-            <li>
-                <a href="#"><i class="bi bi-person"></i> Datos y preferencias <i class="bi bi-chevron-down ms-auto"></i></a>
-                <ul class="lv-submenu">
-                    <li><a href="{{ url_for('web.perfil') }}">Actualizar datos personales</a></li>
-                    <li><a href="{{ url_for('web.perfil') }}">Cambiar contraseña</a></li>
-                    <li><a href="{{ url_for('web.perfil') }}">Mis intereses</a></li>
-                </ul>
-            </li>
-            <li><a href="{{ url_for('web.mi_monedero') }}" class="active"><i class="bi bi-wallet2"></i> Mi cartera</a></li>
-            <li><a href="{{ url_for('web.perfil') }}"><i class="bi bi-geo-alt"></i> Direcciones</a></li>
-            <li><a href="{{ url_for('web.mis_pedidos_clientes') }}"><i class="bi bi-bag"></i> Mis compras</a></li>
-            <li><a href="{{ url_for('web.perfil') }}"><i class="bi bi-heart"></i> Wishlist</a></li>
-            <li><a href="{{ url_for('web.perfil') }}"><i class="bi bi-stars"></i> Cliente Consentido</a></li>
-            <li><a href="{{ url_for('web.perfil') }}"><i class="bi bi-receipt"></i> Facturación</a></li>
-        </ul>
-    </aside>
-
-    <!-- CONTENIDO -->
-    <main>
-        <div class="lv-content-grid">
-
-            <!-- TARJETA MONEDERO -->
-            <div>
-                <div class="lv-card">
-                    <div class="lv-card-top">
-                        <div class="lv-card-label">
-                            MONEDERO
-                            <small>DIGITAL</small>
-                        </div>
-                        <div class="lv-card-number">
-                            {{ resumen.numero_tarjeta }}
-                        </div>
+        <!-- NAVEGACIÓN PRINCIPAL -->
+        <nav class="navbar navbar-expand-lg navbar-light main-navbar">
+            <div class="container">
+                <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#orionNavbar" aria-controls="orionNavbar" aria-expanded="false" aria-label="{{ _('Abrir menú') }}">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="orionNavbar">
+                    <div class="dropdown mx-lg-3">
+                        <button class="dropdown-toggle" data-bs-toggle="dropdown">{{ _('Categorías') }}</button>
+                        <ul class="dropdown-menu shadow border-0 py-2">
+                            {% if categorias and categorias|length > 0 %}
+                                {% for padre in categorias if not padre.padre_id %}
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item" href="/catalogo?categoria={{ padre._id }}">{{ padre.nombre }}</a>
+                                        <ul class="dropdown-menu shadow border-0">
+                                            {% for hijo in categorias if hijo.padre_id == padre._id %}
+                                                <li><a class="dropdown-item" href="/catalogo?categoria={{ hijo._id }}">{{ hijo.nombre }}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li><a class="dropdown-item text-muted" href="#">{{ _('No hay categorías disponibles') }}</a></li>
+                            {% endif %}
+                        </ul>
                     </div>
-                    <div class="lv-card-bottom">
-                        <div class="lv-card-brand">
-                            ORION
-                            <small>XXXX XXXX XXXX</small>
+                    <form class="d-flex flex-grow-1" action="{{ url_for('web.catalogo') }}" method="GET">
+                        <div class="input-group search-container">
+                            <input class="form-control" type="search" name="q" placeholder="{{ _('Buscar productos...') }}" aria-label="{{ _('Buscar productos') }}">
+                            <button class="btn-search" type="submit" aria-label="{{ _('Buscar') }}"><i class="bi bi-search"></i></button>
                         </div>
-                        <div class="lv-card-cvv">CVV •••</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PANEL DERECHO -->
-            <div class="lv-info-panel">
-
-                <div class="lv-info-card">
-                    <div class="lv-info-label">Saldo monedero digital</div>
-                    <div class="lv-info-value">${{ "%.2f"|format(resumen.saldo) }}</div>
-                </div>
-
-                <div class="lv-transfer-card" onclick="abrirDrawer()">
-                    <div>
-                        <div class="lv-transfer-title">Transferir saldo a mi monedero digital</div>
-                        <div class="lv-transfer-desc">
-                            Úsalo para realizar compras por internet y pagos con Monedero Pocket en tienda
-                        </div>
-                    </div>
-                    <i class="bi bi-chevron-right lv-transfer-arrow"></i>
-                </div>
-
-            </div>
-        </div>
-    </main>
-</div>
-
-<!-- ===== DRAWER ===== -->
-<div class="lv-drawer-backdrop" id="lvBackdrop" onclick="cerrarDrawer()"></div>
-
-<aside class="lv-drawer" id="lvDrawer" aria-hidden="true">
-    <header class="lv-drawer-header">
-        <h5 class="lv-drawer-title">Transferir saldo a mi monedero</h5>
-        <button class="lv-drawer-close" onclick="cerrarDrawer()" aria-label="Cerrar">&times;</button>
-    </header>
-
-    <div class="lv-drawer-body">
-
-        <div class="lv-drawer-subtitle">Transfiere el saldo de un monedero electrónico</div>
-
-        <!-- Mini tarjeta -->
-        <div class="lv-mini-card">
-            <div class="lv-card-top">
-                <div class="lv-card-label">
-                    MONEDERO
-                    <small>DIGITAL</small>
-                </div>
-                <div class="lv-card-number">
-                    {{ resumen.numero_tarjeta }}
-                </div>
-            </div>
-            <div class="lv-card-bottom">
-                <div class="lv-card-brand">
-                    ORION
-                    <small>XXXX XXXX XXXX</small>
-                </div>
-                <div class="lv-card-cvv">{{ resumen.numero_tarjeta.split(' ')[-1] if resumen.numero_tarjeta else '' }}</div>
-            </div>
-        </div>
-
-        <!-- Formulario -->
-        <form id="lvTransferForm" onsubmit="enviarTransferencia(event)">
-
-            <div class="lv-field">
-                <label for="lvMonto">Monto a transferir <span class="req">*</span></label>
-                <input type="number" id="lvMonto" min="1" step="0.01" placeholder="$0.00" required>
-            </div>
-
-            <div class="lv-field">
-                <label for="lvMonedero">Monedero <span class="req">*</span></label>
-                <input type="text" id="lvMonedero" placeholder="Nombre del monedero" required>
-            </div>
-
-            <div class="lv-row">
-                <div class="lv-field">
-                    <label for="lvSerie">Número de serie <span class="req">*</span></label>
-                    <input type="text" id="lvSerie" maxlength="4" inputmode="numeric" placeholder="XXXX" required>
-                    <div class="lv-field-hint">
-                        Primeros 4 dígitos del número inferior en tu tarjeta
-                        <a href="#" class="lv-help" onclick="alert('Son los últimos 4 dígitos impresos al reverso de tu tarjeta.'); return false;">
-                            <i>?</i> Qué es esto
+                    </form>
+                    <div class="ms-3 d-flex align-items-center gap-3">
+                        {% if session.get('nombre') %}
+                            <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                                {% if current_user_foto %}
+                                    <img src="{{ foto_src(current_user_foto) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;" alt="{{ _('Foto de perfil') }}">
+                                {% else %}
+                                    <i class="bi bi-person fs-5 me-1"></i>
+                                {% endif %}
+                                Hola, {{ session['nombre'] }}
+                            </a>
+                        {% else %}
+                            <a href="/login" class="user-link"><i class="bi bi-person-circle fs-3"></i> {{ _('INICIAR SESIÓN') }}</a>
+                        {% endif %}
+                        <a href="{{ url_for('web.ver_carrito') }}" class="btn-cart" aria-label="{{ _('Ver carrito') }}">
+                            <i class="bi bi-bag"></i>
+                            {% if carrito_items|length > 0 %}
+                                <span class="badge-cart">{{ carrito_items|length }}</span>
+                            {% endif %}
                         </a>
                     </div>
                 </div>
-                <div class="lv-field">
-                    <label for="lvCvv">CVV <span class="req">*</span></label>
-                    <input type="text" id="lvCvv" maxlength="3" inputmode="numeric" placeholder="•••" required>
-                    <div class="lv-field-hint">Código de seguridad</div>
+            </div>
+        </nav>
+
+        <div class="brand-border"></div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="container-fluid py-4 content">
+            <div class="row g-4 align-items-stretch">
+                <!-- PERFIL Y MENÚ LATERAL -->
+                <div class="col-lg-3">
+                    <div class="panel-card text-center">
+                        {% if usuario.foto %}
+                            <img src="{{ foto_src(usuario.foto) }}" class="avatar" alt="{{ _('Perfil') }}">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ usuario.nombre }}&size=100&background=e10098&color=fff" class="avatar" alt="{{ _('Perfil') }}">
+                        {% endif %}
+                        <div class="user-name">{{ usuario.nombre }} {{ usuario.apellido_paterno or '' }}</div>
+                        <div class="user-email">{{ usuario.email }}</div>
+                        <span class="badge-rol">{{ usuario.rol or _('Cliente') }}</span>
+                        <div class="stats-mini">
+                            <div class="stat-item"><span class="num">{{ pedidos|length if pedidos else 0 }}</span><span class="label">{{ _('Pedidos') }}</span></div>
+                            <div class="stat-item"><span class="num">{{ usuario.direcciones|length if usuario.direcciones else 0 }}</span><span class="label">{{ _('Direcciones') }}</span></div>
+                            <div class="stat-item"><span class="num">{{ favoritos|length if favoritos else 0 }}</span><span class="label">{{ _('Favoritos') }}</span></div>
+                        </div>
+                        <hr style="border-color: #e0e0e0;">
+                        <div class="nav flex-column nav-pills text-start" role="tablist">
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}"><i class="bi bi-person"></i> {{ _('Mi Perfil') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-seguridad"><i class="bi bi-shield-lock"></i> {{ _('Seguridad') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-pedidos"><i class="bi bi-box-seam"></i> {{ _('Mis Pedidos') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-direcciones"><i class="bi bi-geo-alt"></i> {{ _('Direcciones') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-favoritos"><i class="bi bi-heart"></i> {{ _('Favoritos') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-consentido"><i class="bi bi-stars"></i> {{ _('Cliente Consentido') }}</a>
+                            <a class="nav-link active" href="{{ url_for('web.mi_monedero') }}"><i class="bi bi-wallet2"></i> {{ _('Mi cartera') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-complexion"><i class="bi bi-rulers"></i> {{ _('Mi Complexión') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-intereses"><i class="bi bi-heart-pulse"></i> {{ _('Intereses') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-comunicaciones"><i class="bi bi-bell"></i> {{ _('Comunicaciones') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-privacidad"><i class="bi bi-shield-check"></i> {{ _('Privacidad') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-facturacion"><i class="bi bi-receipt-cutoff"></i> {{ _('Facturación') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-pagos"><i class="bi bi-credit-card"></i> {{ _('Métodos de Pago') }}</a>
+                            <a class="nav-link" href="{{ url_for('web.perfil') }}#tab-idioma"><i class="bi bi-translate"></i> {{ _('Idioma') }}</a>
+                        </div>
+                        <hr style="border-color: #e0e0e0;">
+                        <a href="{{ url_for('web.logout') }}" class="btn-logout"><i class="bi bi-box-arrow-right"></i> {{ _('Cerrar Sesión') }}</a>
+                    </div>
+                </div>
+
+                <!-- CARTERA Y MESAS DE REGALOS -->
+                <div class="col-lg-9">
+                    <div class="content-panel">
+                        <h4 class="mb-1"><i class="bi bi-wallet2"></i> {{ _('Mi Cartera') }}</h4>
+                        <p class="text-muted small mb-4">{{ _('Saldo, tarjeta y recargas de tu monedero digital ORION.') }}</p>
+
+                        {# ⭐ Forzamos la conversión a float por si vienen como string #}
+                        {% set saldo_base = resumen.saldo|default(0)|float %}
+                        {% set bonif = bonificacion_mesas|default(0)|float %}
+                        {% set saldo_total = saldo_base + bonif %}
+
+                        <!-- TARJETA Y SALDO DEL MONEDERO -->
+                        <div class="monedero-layout">
+                            <div>
+                                <div class="lv-card">
+                                    <div class="lv-card-top">
+                                        <div class="lv-card-label">MONEDERO<small>DIGITAL</small></div>
+                                        <div class="lv-card-number">{{ resumen.numero_tarjeta }}</div>
+                                    </div>
+                                    <div class="lv-card-bottom">
+                                        <div class="lv-card-brand">ORION<small>XXXX XXXX XXXX</small></div>
+                                        <div class="lv-card-cvv">CVV •••</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lv-info-panel">
+                                <!-- SALDO DISPONIBLE -->
+                                <div class="lv-info-card">
+                                    <div class="lv-info-label">{{ _('Saldo monedero digital') }}</div>
+                                    <div class="lv-info-value" id="lvSaldo">${{ "%.2f"|format(saldo_total) }}</div>
+
+                                    {% if bonif > 0 %}
+                                        <div class="saldo-breakdown">
+                                            <div class="row-item">
+                                                <span>Saldo propio:</span>
+                                                <span>${{ "%.2f"|format(saldo_base) }}</span>
+                                            </div>
+                                            <div class="row-item bonus">
+                                                <span><i class="bi bi-gift-fill"></i> Bonificación Mesas:</span>
+                                                <span>+${{ "%.2f"|format(bonif) }}</span>
+                                            </div>
+                                            <div class="row-item total">
+                                                <span>Total disponible:</span>
+                                                <span>${{ "%.2f"|format(saldo_total) }}</span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- RECARGAR MONEDERO -->
+                                <div class="lv-transfer-card" onclick="abrirDrawer()" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); abrirDrawer(); }">
+                                    <div>
+                                        <div class="lv-transfer-title">{{ _('Recargar mi monedero digital') }}</div>
+                                        <div class="lv-transfer-desc">{{ _('Transfiere saldo desde tu tarjeta al monedero ORION. Úsalo para compras en línea y pagos en tienda.') }}</div>
+                                    </div>
+                                    <i class="bi bi-chevron-right lv-transfer-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MIS MESAS DE REGALOS -->
+                        <section class="mesas-regalos-section" aria-labelledby="mesasRegalosTitulo">
+                            <div class="mesas-regalos-content">
+                                <div class="mesas-regalos-info">
+                                    <div class="mesas-regalos-icon"><i class="bi bi-gift"></i></div>
+                                    <div>
+                                        <h5 class="mesas-regalos-title" id="mesasRegalosTitulo">{{ _('Mis Mesas de Regalos') }}</h5>
+                                        <p class="mesas-regalos-description">{{ _('Crea y administra tus mesas de regalos, comparte tus eventos y consulta las aportaciones recibidas.') }}</p>
+                                    </div>
+                                </div>
+                                <a href="{{ url_for('web.mis_mesas_regalos') }}" class="btn-mesas-regalos">
+                                    <i class="bi bi-gift"></i> {{ _('Ver mis mesas') }} <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PIE DE PÁGINA -->
+        <footer>
+            <div class="container">
+                <p>{{ _('© 2026 ORION SYSTEM. Todos los derechos reservados.') }}</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- FONDO DEL PANEL DE RECARGA -->
+    <div class="lv-drawer-backdrop" id="lvBackdrop" onclick="cerrarDrawer()"></div>
+
+    <!-- PANEL LATERAL DE RECARGA -->
+    <aside class="lv-drawer" id="lvDrawer" aria-hidden="true">
+        <header class="lv-drawer-header">
+            <h5 class="lv-drawer-title">{{ _('Recargar mi monedero') }}</h5>
+            <button class="lv-drawer-close" type="button" onclick="cerrarDrawer()" aria-label="{{ _('Cerrar') }}">&times;</button>
+        </header>
+        <div class="lv-drawer-body">
+            <div class="lv-drawer-subtitle">{{ _('Transfiere saldo desde tu tarjeta al monedero ORION.') }}</div>
+            <div class="lv-mini-card">
+                <div class="lv-card-top">
+                    <div class="lv-card-label">MONEDERO<small>DIGITAL</small></div>
+                    <div class="lv-card-number">{{ resumen.numero_tarjeta }}</div>
+                </div>
+                <div class="lv-card-bottom">
+                    <div class="lv-card-brand">ORION<small>XXXX XXXX XXXX</small></div>
+                    <div class="lv-card-cvv">{{ resumen.numero_tarjeta.split(' ')[-1] if resumen.numero_tarjeta else '' }}</div>
                 </div>
             </div>
 
-            <div class="lv-error" id="lvError"></div>
-        </form>
+            <form id="lvTransferForm" onsubmit="enviarTransferencia(event)">
+                <div class="lv-field">
+                    <label for="lvMonto">{{ _('Monto a recargar') }} <span class="req">*</span></label>
+                    <input type="number" id="lvMonto" min="1" step="0.01" placeholder="$0.00" required>
+                </div>
+                <div class="lv-row">
+                    <div class="lv-field">
+                        <label for="lvSerie">{{ _('Últimos 4 dígitos') }} <span class="req">*</span></label>
+                        <input type="text" id="lvSerie" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="XXXX" required>
+                        <div class="lv-field-hint">{{ _('Los 4 dígitos al reverso de tu tarjeta') }} <a href="#" class="lv-help" onclick="alert('{{ _('Son los últimos 4 dígitos impresos al reverso de tu tarjeta.') }}'); return false;"><i>?</i> {{ _('Qué es esto') }}</a></div>
+                    </div>
+                    <div class="lv-field">
+                        <label for="lvCvv">CVV <span class="req">*</span></label>
+                        <input type="password" id="lvCvv" maxlength="3" inputmode="numeric" pattern="[0-9]{3}" placeholder="•••" autocomplete="off" required>
+                        <div class="lv-field-hint">{{ _('Código de seguridad') }}</div>
+                    </div>
+                </div>
+                <div class="lv-error" id="lvError" role="alert"></div>
+            </form>
+        </div>
+        <footer class="lv-drawer-footer">
+            <button type="button" class="lv-btn-continue" id="lvBtnContinuar" disabled onclick="enviarTransferencia(event)">{{ _('Recargar') }}</button>
+        </footer>
+    </aside>
 
-    </div>
+    <!-- NOTIFICACIONES -->
+    <div class="lv-toast" id="lvToast" role="status" aria-live="polite"></div>
 
-    <footer class="lv-drawer-footer">
-        <button type="button" class="lv-btn-continue" id="lvBtnContinuar" disabled onclick="enviarTransferencia(event)">
-            Continuar
-        </button>
-    </footer>
-</aside>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const drawer = document.getElementById('lvDrawer');
+        const backdrop = document.getElementById('lvBackdrop');
+        const btnContinuar = document.getElementById('lvBtnContinuar');
 
-<!-- ===== TOAST ===== -->
-<div class="lv-toast" id="lvToast"></div>
+        function abrirDrawer() {
+            drawer.classList.add('open');
+            backdrop.classList.add('open');
+            drawer.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            const monto = document.getElementById('lvMonto');
+            if (monto) monto.focus();
+        }
 
-<script>
-// ============================================================
-// DRAWER
-// ============================================================
-const drawer   = document.getElementById('lvDrawer');
-const backdrop = document.getElementById('lvBackdrop');
+        function cerrarDrawer() {
+            drawer.classList.remove('open');
+            backdrop.classList.remove('open');
+            drawer.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            const form = document.getElementById('lvTransferForm');
+            if (form) form.reset();
+            const errorBox = document.getElementById('lvError');
+            if (errorBox) { errorBox.textContent = ''; errorBox.style.display = 'none'; }
+            btnContinuar.textContent = '{{ _("Recargar") }}';
+            validarFormulario();
+        }
 
-function abrirDrawer() {
-    drawer.classList.add('open');
-    backdrop.classList.add('open');
-    drawer.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-}
+        document.addEventListener('keydown', function(event) { if (event.key === 'Escape') cerrarDrawer(); });
 
-function cerrarDrawer() {
-    drawer.classList.remove('open');
-    backdrop.classList.remove('open');
-    drawer.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-}
+        const inputs = ['lvMonto', 'lvSerie', 'lvCvv'];
 
-document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') cerrarDrawer();
-});
+        function validarFormulario() {
+            const monto = parseFloat(document.getElementById('lvMonto').value) > 0;
+            const serie = /^[0-9]{4}$/.test(document.getElementById('lvSerie').value.trim());
+            const cvv = /^[0-9]{3}$/.test(document.getElementById('lvCvv').value.trim());
+            const correcto = monto && serie && cvv;
+            btnContinuar.classList.toggle('enabled', correcto);
+            btnContinuar.disabled = !correcto;
+        }
 
-// ============================================================
-// VALIDACIÓN DEL FORMULARIO
-// ============================================================
-const inputs = ['lvMonto', 'lvMonedero', 'lvSerie', 'lvCvv'];
-const btnContinuar = document.getElementById('lvBtnContinuar');
-
-function validarFormulario() {
-    const monto    = parseFloat(document.getElementById('lvMonto').value) > 0;
-    const monedero = document.getElementById('lvMonedero').value.trim().length > 0;
-    const serie    = document.getElementById('lvSerie').value.trim().length === 4;
-    const cvv      = document.getElementById('lvCvv').value.trim().length === 3;
-
-    const ok = monto && monedero && serie && cvv;
-    btnContinuar.classList.toggle('enabled', ok);
-    btnContinuar.disabled = !ok;
-}
-
-inputs.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', validarFormulario);
-});
-
-// ============================================================
-// ENVÍO
-// ============================================================
-async function enviarTransferencia(ev) {
-    ev.preventDefault();
-
-    const monto    = parseFloat(document.getElementById('lvMonto').value);
-    const serie    = document.getElementById('lvSerie').value.trim();
-    const cvv      = document.getElementById('lvCvv').value.trim();
-    const errorBox = document.getElementById('lvError');
-
-    errorBox.style.display = 'none';
-
-    if (!monto || monto <= 0) {
-        errorBox.textContent = 'Ingresa un monto válido';
-        errorBox.style.display = 'block';
-        return;
-    }
-    if (serie.length !== 4) {
-        errorBox.textContent = 'El número de serie debe tener 4 dígitos';
-        errorBox.style.display = 'block';
-        return;
-    }
-    if (cvv.length !== 3) {
-        errorBox.textContent = 'El CVV debe tener 3 dígitos';
-        errorBox.style.display = 'block';
-        return;
-    }
-
-    btnContinuar.disabled = true;
-    btnContinuar.textContent = 'Procesando...';
-
-    try {
-        const r = await fetch("{{ url_for('web.api_monedero_transferir') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify({
-                monto: monto,
-                numero_serie: serie,
-                cvv: cvv
-            })
+        inputs.forEach(function(id) {
+            const elemento = document.getElementById(id);
+            if (elemento) elemento.addEventListener('input', validarFormulario);
         });
 
-        const data = await r.json();
+        async function enviarTransferencia(event) {
+            event.preventDefault();
+            if (btnContinuar.disabled) return;
 
-        if (data.success) {
-            mostrarToast(data.message || 'Transferencia exitosa', 'success');
-            cerrarDrawer();
-            setTimeout(() => location.reload(), 1200);
-        } else {
-            errorBox.textContent = data.error || data.message || 'Error en la transferencia';
-            errorBox.style.display = 'block';
+            const monto = parseFloat(document.getElementById('lvMonto').value);
+            const serie = document.getElementById('lvSerie').value.trim();
+            const cvv = document.getElementById('lvCvv').value.trim();
+            const errorBox = document.getElementById('lvError');
+
+            errorBox.style.display = 'none';
+            errorBox.textContent = '';
+
+            if (!Number.isFinite(monto) || monto <= 0) { errorBox.textContent = '{{ _("Ingresa un monto válido") }}'; errorBox.style.display = 'block'; return; }
+            if (!/^[0-9]{4}$/.test(serie)) { errorBox.textContent = '{{ _("Los últimos 4 dígitos de la tarjeta deben ser 4 números") }}'; errorBox.style.display = 'block'; return; }
+            if (!/^[0-9]{3}$/.test(cvv)) { errorBox.textContent = '{{ _("El CVV debe tener 3 dígitos") }}'; errorBox.style.display = 'block'; return; }
+
+            btnContinuar.disabled = true;
+            btnContinuar.textContent = '{{ _("Procesando...") }}';
+
+            try {
+                const respuesta = await fetch("{{ url_for('web.api_monedero_transferir') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ monto: monto, numero_serie: serie, cvv: cvv })
+                });
+
+                let data;
+                try { data = await respuesta.json(); } catch (errorJson) { throw new Error('{{ _("El servidor devolvió una respuesta no válida") }}'); }
+
+                if (!respuesta.ok) {
+                    errorBox.textContent = data.error || data.message || '{{ _("No fue posible procesar la recarga") }}';
+                    errorBox.style.display = 'block';
+                    return;
+                }
+
+                if (data.success) {
+                    mostrarToast(data.message || '{{ _("Recarga exitosa") }}', 'success');
+                    setTimeout(function() { location.reload(); }, 1000);
+                } else {
+                    errorBox.textContent = data.error || data.message || '{{ _("Error en la recarga") }}';
+                    errorBox.style.display = 'block';
+                }
+            } catch (error) {
+                errorBox.textContent = error.message || '{{ _("Error de conexión") }}';
+                errorBox.style.display = 'block';
+            } finally {
+                btnContinuar.textContent = '{{ _("Recargar") }}';
+                validarFormulario();
+            }
         }
-    } catch (e) {
-        errorBox.textContent = 'Error de conexión';
-        errorBox.style.display = 'block';
-    } finally {
-        btnContinuar.textContent = 'Continuar';
-        validarFormulario();
-    }
-}
 
-// ============================================================
-// TOAST
-// ============================================================
-function mostrarToast(mensaje, tipo = 'success') {
-    const t = document.getElementById('lvToast');
-    t.textContent = mensaje;
-    t.className = 'lv-toast show ' + tipo;
-    setTimeout(() => t.classList.remove('show'), 3200);
-}
-</script>
-
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.getElementById('lvToast');
+            toast.textContent = mensaje;
+            toast.classList.add('show', tipo);
+            setTimeout(function() { toast.classList.remove('show', tipo); }, 3200);
+        }
+    </script>
 </body>
 </html>

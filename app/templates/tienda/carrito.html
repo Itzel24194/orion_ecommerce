@@ -155,6 +155,101 @@
         }
         .tarjeta-guardada-links a:hover { text-decoration: underline; }
         .tarjeta-guardada-links a.danger { color: #dc3545; }
+
+        /* ===== WIDGET CUPÓN ===== */
+        .cupon-widget {
+            border: 1.5px dashed #ecedf2;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: #fff;
+        }
+        .cupon-widget-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .cupon-widget-title {
+            font-weight: 700; font-size: 0.9rem; color: #1a1a2e;
+        }
+        .cupon-widget-title i { color: #e10098; }
+        .cupon-link-ver {
+            background: none; border: none; color: #e10098;
+            font-size: 0.78rem; font-weight: 700; cursor: pointer;
+        }
+        .cupon-link-ver:hover { text-decoration: underline; }
+        .cupon-form-row { display: flex; gap: 8px; }
+        .cupon-form-row input {
+            flex: 1; padding: 10px 14px;
+            border: 1.5px solid #ecedf2; border-radius: 8px;
+            font-size: 0.85rem; font-family: inherit;
+        }
+        .cupon-form-row input:focus {
+            outline: none; border-color: #e10098;
+            box-shadow: 0 0 0 3px rgba(225,0,152,0.08);
+        }
+        .cupon-btn-aplicar {
+            padding: 10px 20px; background: #e10098; color: #fff;
+            border: none; border-radius: 8px; font-weight: 700;
+            cursor: pointer; font-size: 0.85rem;
+        }
+        .cupon-btn-aplicar:hover { background: #b8006c; }
+        .cupon-btn-aplicar:disabled { opacity: 0.6; cursor: not-allowed; }
+        .cupon-msg { font-size: 0.78rem; margin-top: 8px; }
+        .cupon-aplicado-card {
+            background: #e5f7ed; border: 1px solid #198754;
+            border-radius: 8px; padding: 10px 14px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .cupon-aplicado-titulo {
+            font-weight: 800; color: #198754; font-size: 0.85rem;
+        }
+        .cupon-aplicado-desc {
+            font-size: 0.75rem; color: #198754;
+        }
+        .cupon-btn-quitar {
+            background: none; border: none; color: #198754;
+            font-size: 1.2rem; cursor: pointer;
+        }
+        .cupon-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(20,33,61,0.5); z-index: 9999;
+            align-items: center; justify-content: center;
+        }
+        .cupon-modal-overlay.activo { display: flex; }
+        .cupon-modal-box {
+            background: #fff; border-radius: 16px;
+            padding: 24px; max-width: 560px; width: 90%;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .cupon-modal-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 16px;
+        }
+        .cupon-modal-header h5 { margin: 0; font-weight: 800; }
+        .cupon-modal-close {
+            background: none; border: none; font-size: 1.5rem;
+            cursor: pointer; color: #666;
+        }
+        .cupon-item-modal {
+            background: #fafafa; border: 1.5px dashed #ecedf2;
+            border-radius: 10px; padding: 14px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; gap: 10px;
+        }
+        .cupon-item-modal .ci-titulo { font-weight: 800; font-size: 0.9rem; }
+        .cupon-item-modal .ci-desc { font-size: 0.78rem; color: #6b7280; }
+        .cupon-item-modal .ci-meta { font-size: 0.72rem; color: #9ca3af; margin-top: 4px; }
+        .cupon-item-modal .ci-valor {
+            font-weight: 800; color: #e10098; font-size: 1.1rem;
+            text-align: right;
+        }
+        .cupon-item-modal .ci-btn-usar {
+            margin-top: 6px; padding: 6px 14px;
+            background: #e10098; color: #fff; border: none;
+            border-radius: 6px; font-size: 0.72rem;
+            font-weight: 700; cursor: pointer;
+        }
+        .cupon-item-modal .ci-btn-usar:hover { background: #b8006c; }
     </style>
 
     <!-- ⭐ POLYFILL DE STORAGE -->
@@ -213,7 +308,6 @@
     ];
     </script>
 
-    <script src="https://cdn.conekta.io/js/latest/conekta.js"></script>
 </head>
 <body>
 
@@ -221,7 +315,7 @@
         <div class="container">
             <div class="d-flex justify-content-end">
                 <a href="#"><i class="bi bi-geo-alt me-1"></i> Tiendas</a>
-                <a href="#"><i class="bi bi-question-circle me-1"></i> Ayuda</a>
+                <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none">Ayuda</a>
                 <a href="#"><i class="bi bi-person me-1"></i> Mi cuenta</a>
             </div>
         </div>
@@ -261,15 +355,15 @@
                 </div>
 
                 <div class="d-flex align-items-center gap-2">
-                    {% if session.get('nombre') %}
-                        <a href="/perfil" class="nav-icon d-flex align-items-center gap-1 text-decoration-none">
-                            {% if session.get('foto') %}
-                                <img src="{{ url_for('static', filename='uploads/' + session['foto']) }}?t={{ range(1, 10000) | random }}" class="user-avatar" alt="Perfil">
-                            {% else %}
-                                <i class="bi bi-person-circle fs-5"></i>
-                            {% endif %}
-                            <span class="small fw-bold text-dark" style="font-size:0.7rem;">{{ session['nombre'] }}</span>
-                        </a>
+                     {% if session.get('nombre') %}
+                <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                    {% if current_user_foto %}
+                        <img src="{{ foto_src(current_user_foto) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;">
+                    {% else %}
+                        <i class="bi bi-person-circle fs-5 me-1"></i>
+                    {% endif %}
+                    Hola, {{ session['nombre'] }}
+                </a>
                     {% else %}
                         <a href="/login" class="nav-icon">
                             <i class="bi bi-person-circle fs-5"></i>
@@ -390,22 +484,42 @@
                             <i class="bi bi-receipt me-2"></i> Resumen
                         </div>
 
-                        {% if cupon_aplicado and descuento_cupon > 0 %}
-                        <div class="cupon-aplicado-box">
-                            <div class="cupon-info">
-                                <span class="badge-cupon"><i class="bi bi-ticket-perforated"></i> Cupón</span>
-                                <span class="cupon-code">{{ cupon_aplicado.codigo }}</span>
-                                <span class="cupon-desc">({{ cupon_aplicado.nombre }})</span>
+                        <!-- ===== ⭐ WIDGET DE CUPÓN (ÚNICO, el que funciona) ===== -->
+                        <div class="cupon-widget">
+                            <div class="cupon-widget-header">
+                                <div class="cupon-widget-title">
+                                    <i class="bi bi-ticket-perforated"></i> ¿Tienes un cupón?
+                                </div>
+                                <button type="button" class="cupon-link-ver" onclick="verMisCupones()">
+                                    Ver mis cupones
+                                </button>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="descuento-cupon">-${{ "%.2f"|format(descuento_cupon) }}</span>
-                                <a href="{{ url_for('web.quitar_cupon') }}" class="btn-quitar-cupon">
-                                    <i class="bi bi-x-circle"></i> Quitar
-                                </a>
-                            </div>
-                        </div>
-                        {% endif %}
 
+                            {% if cupon_aplicado %}
+                            <div class="cupon-aplicado-card">
+                                <div>
+                                    <div class="cupon-aplicado-titulo">
+                                        {{ cupon_aplicado.titulo }} (-${{ "%.2f"|format(cupon_aplicado.descuento) }})
+                                    </div>
+                                    <div class="cupon-aplicado-desc">{{ cupon_aplicado.codigo }}</div>
+                                </div>
+                                <button type="button" class="cupon-btn-quitar" onclick="quitarCupon()" title="Quitar cupón">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </div>
+                            {% else %}
+                            <div class="cupon-form-row">
+                                <input type="text" id="cuponInput" placeholder="Ej: PLATA-ABC12345" autocomplete="off">
+                                <button type="button" class="cupon-btn-aplicar" id="btnAplicarCupon" onclick="aplicarCupon()">
+                                    Aplicar
+                                </button>
+                            </div>
+                            <div class="cupon-msg" id="cuponMsg"></div>
+                            {% endif %}
+                        </div>
+                        <!-- ===== /WIDGET DE CUPÓN ===== -->
+
+                        <!-- ⭐ PROMOCIÓN (solo lectura, sin url_for viejo) -->
                         {% if promocion_aplicada %}
                         <div class="promocion-aplicado-box">
                             <div class="promocion-info">
@@ -425,9 +539,9 @@
                                         Aplicada
                                     {% endif %}
                                 </span>
-                                <a href="{{ url_for('web.quitar_promocion') }}" class="btn-quitar-promo">
+                                <button type="button" class="btn-quitar-promo" onclick="quitarPromocion()" title="Quitar promoción">
                                     <i class="bi bi-x-circle"></i> Quitar
-                                </a>
+                                </button>
                             </div>
                         </div>
                         {% endif %}
@@ -539,6 +653,21 @@
             </div>
 
             {% endif %}
+        </div>
+    </div>
+
+    <!-- ===== MODAL MIS CUPONES ===== -->
+    <div class="cupon-modal-overlay" id="modalMisCupones">
+        <div class="cupon-modal-box">
+            <div class="cupon-modal-header">
+                <h5><i class="bi bi-ticket-perforated" style="color:#e10098;"></i> Mis cupones</h5>
+                <button type="button" class="cupon-modal-close" onclick="cerrarModalCupones()">&times;</button>
+            </div>
+            <div id="listaMisCupones">
+                <div style="text-align:center; padding:20px; color:#6b7280;">
+                    <i class="bi bi-hourglass-split"></i> Cargando...
+                </div>
+            </div>
         </div>
     </div>
 
@@ -714,7 +843,7 @@
                             <div class="pm-saved-list" id="pmGuardadasList"></div>
                             <small class="text-muted d-block mt-2" style="font-size:0.65rem;">
                                 <i class="bi bi-info-circle"></i>
-                                Selecciona una tarjeta para usarla. Se cobrará de forma segura.
+                                Selecciona una tarjeta para usarla. Se cobrará de forma segura (modo sandbox).
                             </small>
                         </div>
 
@@ -812,6 +941,13 @@
                             <textarea name="notas" class="form-control form-control-modal" rows="1" placeholder="Comentarios sobre tu pedido..."></textarea>
                         </div>
 
+                        <!-- ⭐ Cupón oculto para enviarlo al backend -->
+                        {% if cupon_aplicado %}
+                        <input type="hidden" name="cupon_codigo" id="cuponCodigoHidden" value="{{ cupon_aplicado.codigo }}">
+                        {% else %}
+                        <input type="hidden" name="cupon_codigo" id="cuponCodigoHidden" value="">
+                        {% endif %}
+
                         <button type="submit" class="btn-modal-submit" id="btnSubmitCheckout">
                             <i class="bi bi-check-circle"></i> Realizar pedido
                         </button>
@@ -857,18 +993,168 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- ===== ⭐ SCRIPT CUPONES ===== -->
     <script>
-    (function() {
-        var KEY_FROM_CONFIG = "{{ config.CONEKTA_PUBLIC_KEY if config else '' }}";
-        var KEY_FROM_CTX    = "{{ CONEKTA_PUBLIC_KEY if CONEKTA_PUBLIC_KEY is defined else '' }}";
-        var CONEKTA_KEY = (KEY_FROM_CONFIG || KEY_FROM_CTX || '').trim();
+    async function aplicarCupon() {
+        const input = document.getElementById('cuponInput');
+        const btn = document.getElementById('btnAplicarCupon');
+        const msg = document.getElementById('cuponMsg');
+        if (!input || !msg) return;
 
-        if (typeof Conekta !== 'undefined' && CONEKTA_KEY && CONEKTA_KEY.length >= 20) {
-            Conekta.setPublicKey(CONEKTA_KEY);
-            Conekta.setLanguage("es");
+        const codigo = input.value.trim().toUpperCase();
+        if (!codigo) {
+            msg.textContent = 'Ingresa un código';
+            msg.style.color = '#dc3545';
+            return;
         }
-    })();
+
+        msg.textContent = 'Validando...';
+        msg.style.color = '#6b7280';
+        if (btn) { btn.disabled = true; btn.textContent = 'Aplicando...'; }
+
+        try {
+            const r = await fetch('/api/cupon/aplicar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ codigo: codigo })
+            });
+            const data = await r.json();
+
+            if (data.success) {
+                msg.textContent = data.message || 'Cupón aplicado';
+                msg.style.color = '#198754';
+                setTimeout(() => location.reload(), 700);
+                return;
+            }
+
+            // ⭐ MENSAJE DE DIAGNÓSTICO DETALLADO
+            let detalle = data.message || 'Cupón no válido';
+            if (data.debug === 'registro_lealtad_no_encontrado') {
+                detalle = '❌ No encontramos tu registro de lealtad. Visita /mi-lealtad primero.';
+            } else if (data.debug === 'no_encontrado') {
+                const disp = (data.cupones_disponibles || []).map(c => c.id).filter(Boolean);
+                detalle = disp.length
+                    ? `❌ Cupón "${data.codigo_buscado}" no existe. Tus cupones: ${disp.join(', ')}`
+                    : '❌ No tienes cupones disponibles. Pide al admin que genere uno.';
+            } else if (data.debug === 'cupon_usado') {
+                detalle = '❌ Este cupón ya fue utilizado.';
+            } else if (data.debug === 'cupon_vencido' || data.debug === 'cupon_general_vencido') {
+                detalle = '❌ Este cupón ya expiró.';
+            } else if (data.debug === 'min_compra_no_alcanzado') {
+                detalle = `❌ Compra mínima: $${(data.min_compra || 0).toFixed(2)}. Tu subtotal: $${(data.subtotal || 0).toFixed(2)}`;
+            }
+
+            msg.textContent = detalle;
+            msg.style.color = '#dc3545';
+            console.warn('[Cupón] Debug:', data);
+            if (btn) { btn.disabled = false; btn.textContent = 'Aplicar'; }
+
+        } catch (e) {
+            msg.textContent = 'Error de conexión';
+            msg.style.color = '#dc3545';
+            if (btn) { btn.disabled = false; btn.textContent = 'Aplicar'; }
+        }
+    }
+
+    async function quitarCupon() {
+        try {
+            await fetch('/api/cupon/quitar', {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
+        } catch (e) {}
+        location.reload();
+    }
+
+    async function quitarPromocion() {
+        try {
+            await fetch('/api/promociones/quitar', {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
+        } catch (e) {}
+        location.reload();
+    }
+
+    async function verMisCupones() {
+        const modal = document.getElementById('modalMisCupones');
+        const lista = document.getElementById('listaMisCupones');
+        if (!modal || !lista) return;
+
+        modal.classList.add('activo');
+        lista.innerHTML = '<div style="text-align:center; padding:20px; color:#6b7280;"><i class="bi bi-hourglass-split"></i> Cargando...</div>';
+
+        try {
+            const r = await fetch('/api/cupon/mis-cupones', {
+                credentials: 'same-origin'
+            });
+            const data = await r.json();
+
+            if (!data.cupones || !data.cupones.length) {
+                lista.innerHTML = '<div style="text-align:center; padding:30px; color:#6b7280;">No tienes cupones disponibles.</div>';
+                return;
+            }
+
+            lista.innerHTML = data.cupones.map(function(c) {
+                return `
+                    <div class="cupon-item-modal">
+                        <div style="flex:1;">
+                            <div class="ci-titulo">${c.titulo}</div>
+                            <div class="ci-desc">${c.descripcion || ''}</div>
+                            <div class="ci-meta">
+                                ${c.min_compra > 0 ? 'Mín. $' + Number(c.min_compra).toFixed(2) : 'Sin mínimo'}
+                                ${c.valido_hasta ? ' · Vence ' + c.valido_hasta : ''}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="ci-valor">
+                                ${c.tipo === 'porcentaje' ? c.valor + '%' : '$' + c.valor}
+                            </div>
+                            <button type="button" class="ci-btn-usar" onclick="usarCupon('${c.codigo}')">
+                                Usar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) {
+            lista.innerHTML = '<div style="text-align:center; color:#dc3545; padding:20px;">Error al cargar cupones</div>';
+        }
+    }
+
+    function cerrarModalCupones() {
+        const modal = document.getElementById('modalMisCupones');
+        if (modal) modal.classList.remove('activo');
+    }
+
+    function usarCupon(codigo) {
+        const input = document.getElementById('cuponInput');
+        if (input) input.value = codigo;
+        cerrarModalCupones();
+        aplicarCupon();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const cuponInput = document.getElementById('cuponInput');
+        if (cuponInput) {
+            cuponInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    aplicarCupon();
+                }
+            });
+        }
+
+        const modal = document.getElementById('modalMisCupones');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) cerrarModalCupones();
+            });
+        }
+    });
     </script>
+    <!-- ===== /SCRIPT CUPONES ===== -->
 
     <script>
     function cambiarCantidad(id, delta) {
@@ -1053,7 +1339,7 @@
         });
     })();
 
-    /* ⭐ Tarjetas guardadas: carga, selección y vista compacta */
+    /* ⭐ Tarjetas guardadas: carga, selección y vista compacta — SANDBOX */
     (function () {
 
         window.__tarjetaGuardadaSeleccionada = null;
@@ -1093,12 +1379,10 @@
                 const data = await r.json();
 
                 const todas = (data.metodos || []).filter(m => m.tipo === 'tarjeta');
-                const cobrables = todas.filter(m =>
-                    m.conekta_customer_id && m.conekta_payment_source_id
-                );
+                const cobrables = todas.filter(m => !!m.id);
 
                 console.log('[Tarjetas] Total:', todas.length,
-                            '| Cobrables:', cobrables.length);
+                            '| Usables (sandbox):', cobrables.length);
 
                 if (!cobrables.length) {
                     seccion.style.display = 'none';
@@ -1124,8 +1408,8 @@
                     html += `
                         <div class="pm-saved-card"
                              data-id="${m.id}"
-                             data-payment-source="${m.conekta_payment_source_id || ''}"
-                             data-customer-id="${m.conekta_customer_id || ''}"
+                             data-payment-source=""
+                             data-customer-id=""
                              data-titular="${titular}"
                              data-marca="${marca}"
                              data-ultimos4="${last4}"
@@ -1171,8 +1455,7 @@
             const titular      = el.getAttribute('data-titular') || '';
             const expira       = el.getAttribute('data-expira') || '';
 
-            console.log('[Tarjeta] Seleccionada id="' + id + '"');
-            console.log('[Tarjeta] payment_source_id="' + paymentSrcId + '"');
+            console.log('[Tarjeta-SANDBOX] Seleccionada id="' + id + '"');
 
             window.__tarjetaGuardadaSeleccionada = {
                 id, paymentSrcId, customerId, marca, ultimos4, titular, expira
@@ -1378,7 +1661,7 @@
         const tarjetaGuardadaId = (document.getElementById('tarjetaGuardadaId')?.value || '').trim();
         const usaTarjetaGuardada = !!tarjetaGuardadaId;
 
-        console.log('[Checkout] tarjeta_guardada_id="' + tarjetaGuardadaId + '" (len=' + tarjetaGuardadaId.length + ')');
+        console.log('[Checkout-SANDBOX] tarjeta_guardada_id="' + tarjetaGuardadaId + '" (len=' + tarjetaGuardadaId.length + ')');
 
         const btnOriginal = btn ? btn.innerHTML : 'Realizar pedido';
         if (btn) {
@@ -1388,9 +1671,7 @@
 
         try {
             if (usaTarjetaGuardada) {
-                // ⭐ MIT: cobrar sin CVC, sin re-tokenizar
                 await enviarAlBackendTarjetaGuardada(tarjetaGuardadaId, form, btn, btnOriginal);
-
             } else {
                 const formData = new FormData(form);
                 const cardNumber = (formData.get('card_number') || '').replace(/\s/g, '');
@@ -1420,36 +1701,13 @@
                     return false;
                 }
 
-                const anioCompleto = cardExpYear.length === 2 ? ('20' + cardExpYear) : cardExpYear;
+                const tokenId = 'tok_sandbox_' +
+                    Date.now().toString(36) + '_' +
+                    Math.random().toString(36).slice(2, 10);
 
-                if (typeof Conekta === 'undefined') {
-                    alert('El SDK de pagos no se cargó. Recarga la página.');
-                    if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
-                    return false;
-                }
+                console.log('[Checkout-SANDBOX] Token local generado:', tokenId);
 
-                const tokenParams = {
-                    card: {
-                        number: cardNumber,
-                        name: cardName,
-                        exp_year: anioCompleto,
-                        exp_month: cardExpMonth,
-                        cvc: cardCvc
-                    }
-                };
-
-                Conekta.Token.create(
-                    tokenParams,
-                    async function (token) {
-                        await enviarAlBackendNuevaTarjeta(token.id, form, btn, btnOriginal);
-                    },
-                    function (error) {
-                        console.error('[Conekta] Error:', error);
-                        const msg = (error && (error.message_to_purchaser || error.message)) || 'Error al validar la tarjeta';
-                        alert('Error con la tarjeta: ' + msg);
-                        if (btn) { btn.disabled = false; btn.innerHTML = btnOriginal; }
-                    }
-                );
+                await enviarAlBackendNuevaTarjeta(tokenId, form, btn, btnOriginal);
             }
 
         } catch (err) {
@@ -1461,7 +1719,6 @@
         return false;
     }
 
-    /* ⭐ Cobra tarjeta guardada — SIN CVC, SIN re-tokenizar (MIT) */
     async function enviarAlBackendTarjetaGuardada(tarjetaId, form, btn, btnOriginal) {
         const formData = new FormData(form);
         const mesesMsi = parseInt(formData.get('meses_msi')) || 0;
@@ -1475,6 +1732,7 @@
             tipo_envio:          formData.get('tipo_envio') || 'domicilio',
             tienda_recogida:     formData.get('tienda_recogida') || '',
             notas:               formData.get('notas') || '',
+            cupon_codigo:        formData.get('cupon_codigo') || '',
             direccion: {
                 calle:       formData.get('calle') || '',
                 numero:      formData.get('numero') || '',
@@ -1486,7 +1744,7 @@
             }
         };
 
-        console.log('[MSI] Enviando a backend (MIT, sin cvc):', payload);
+        console.log('[MSI-SANDBOX] Enviando a backend (tarjeta guardada):', payload);
 
         try {
             const res = await fetch('/api/checkout/msi', {
@@ -1510,7 +1768,6 @@
         }
     }
 
-    /* ⭐ Envío al backend con token de tarjeta nueva */
     async function enviarAlBackendNuevaTarjeta(tokenId, form, btn, btnOriginal) {
         const formData = new FormData(form);
         const mesesMsi = parseInt(formData.get('meses_msi')) || 0;
@@ -1537,6 +1794,7 @@
             tipo_envio: formData.get('tipo_envio') || 'domicilio',
             tienda_recogida: formData.get('tienda_recogida') || '',
             notas: formData.get('notas') || '',
+            cupon_codigo: formData.get('cupon_codigo') || '',
             guardar_tarjeta: guardarTarjeta,
             tarjeta_info: guardarTarjeta ? {
                 marca: marca,
@@ -1554,6 +1812,8 @@
                 referencias: formData.get('referencias') || ''
             }
         };
+
+        console.log('[MSI-SANDBOX] Enviando a backend (tarjeta nueva):', payload);
 
         try {
             const res = await fetch('/api/checkout/msi', {

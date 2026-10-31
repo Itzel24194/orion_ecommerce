@@ -15,7 +15,6 @@
         body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
         .layout { display: flex; min-height: 100vh; }
 
-        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
             padding: 0; height: 100vh; position: fixed; left: 0; top: 0;
@@ -72,7 +71,6 @@
         .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
         .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
 
-        /* ===== MAIN ===== */
         .main { margin-left: 280px; padding: 30px 35px 20px; width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #e8e8e8; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0; }
         .top-bar h1 { font-size: 1.6rem; font-weight: 800; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
@@ -85,7 +83,6 @@
         .top-bar__crumb i { font-size: 0.6rem; margin: 0 6px; }
         .content-wrapper { flex: 1; display: flex; flex-direction: column; }
 
-        /* ===== HERO ===== */
         .hero { background: linear-gradient(135deg, #fff, #faf0f5); padding: 25px 30px; border-radius: 16px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); flex-shrink: 0; }
         .hero h2 { color: #1a1a2e; margin-bottom: 8px; font-weight: 800; font-size: 1.3rem; }
         .hero h2 i { color: #e10098; }
@@ -93,23 +90,20 @@
         .hero strong { color: #e10098; }
         .hero__actions { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
 
-        /* ===== BOTONES ===== */
         .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border: 1px solid #e8e8e8; background: #fff; border-radius: 50px; font-family: inherit; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #666; text-decoration: none; cursor: pointer; transition: all 0.3s ease; }
         .btn:hover { border-color: #e10098; color: #e10098; transform: translateY(-2px); }
         .btn--primary { background: #e10098; border-color: #e10098; color: #fff; }
         .btn--primary:hover { background: #c00080; border-color: #c00080; color: #fff; box-shadow: 0 4px 15px rgba(225,0,152,.3); }
         .btn--ghost { background: #fff; color: #666; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
-        /* ===== SECTION BOX ===== */
         .section-box { background: #ffffff; border-radius: 16px; padding: 25px 28px; border: 1px solid #e8e8e8; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0; }
         .section-box h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
         .section-box h2 i { color: #e10098; }
         .section-box .sub { font-size: 0.78rem; color: #999; margin-bottom: 22px; }
 
-        /* ===== GRID ===== */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
 
-        /* ===== FIELD ===== */
         .field label { display: block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: #666; margin-bottom: 8px; }
         .field input[type="number"],
         .field input[type="text"] {
@@ -118,9 +112,12 @@
             transition: all 0.2s ease; outline: none;
         }
         .field input:focus { border-color: #e10098; background: #fff; box-shadow: 0 0 0 3px rgba(225,0,152,.08); }
+        .field input.error { border-color: #dc2626; background: #fef2f2; }
+        .field input.saved { border-color: #16a34a; background: #f0fdf4; }
         .field .hint { font-size: 0.72rem; color: #999; margin-top: 6px; }
+        .field .error-msg { font-size: 0.72rem; color: #dc2626; margin-top: 4px; display: none; }
+        .field .error-msg.show { display: block; }
 
-        /* ===== SWITCH ===== */
         .switch {
             display: flex; align-items: center; justify-content: space-between; gap: 20px;
             padding: 18px 20px; background: #fafafa; border: 1px solid #f0f0f0;
@@ -142,16 +139,30 @@
         .switch input[type="checkbox"]:checked { background: linear-gradient(135deg, #e10098, #b80064); }
         .switch input[type="checkbox"]:checked::after { transform: translateX(22px); }
 
-        /* ===== ACTIONS ===== */
         .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
 
-        /* ===== FLASH ===== */
         .flash { padding: 14px 18px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 600; border-left: 4px solid #16a34a; background: #dcfce7; color: #166534; }
         .flash.warn { background: #fef3c7; color: #92400e; border-left-color: #f59e0b; }
         .flash.err { background: #fee2e2; color: #991b1b; border-left-color: #dc2626; }
         .flash i { font-size: 1rem; }
 
-        /* ===== FOOTER ===== */
+        /* ===== ESTADO DE AUTOSAVE (esquina) ===== */
+        .autosave-badge {
+            position: fixed; top: 22px; right: 30px; z-index: 3000;
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 16px; border-radius: 50px; font-size: 0.78rem; font-weight: 700;
+            background: #e8e8e8; color: #666; border: 1px solid #ddd;
+            box-shadow: 0 4px 14px rgba(0,0,0,.08); transition: all .25s ease;
+            opacity: 0; transform: translateY(-8px); pointer-events: none;
+        }
+        .autosave-badge.show { opacity: 1; transform: translateY(0); }
+        .autosave-badge.saving { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
+        .autosave-badge.saved  { background: #dcfce7; color: #166534; border-color: #16a34a; }
+        .autosave-badge.error  { background: #fee2e2; color: #991b1b; border-color: #dc2626; }
+        .autosave-badge i { font-size: 0.9rem; }
+        .autosave-badge .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         .footer-info { background: #ffffff; padding: 15px 25px; border-radius: 16px; border: 1px solid #e8e8e8; text-align: center; margin-top: auto; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
         .footer-info p { color: #888; font-size: 0.75rem; margin: 0; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; }
         .footer-info p .separator { color: #ddd; }
@@ -159,7 +170,6 @@
         .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
         @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .sidebar { width: 70px; }
             .sidebar .logo, .sidebar .panel-title, .sidebar a span,
@@ -173,6 +183,7 @@
             .sidebar .logout-btn i { font-size: 1.3rem; margin: 0; }
             .main { margin-left: 70px; padding: 15px; }
             .footer-info p { font-size: 0.65rem; gap: 8px; }
+            .autosave-badge { top: 10px; right: 10px; }
         }
         @media (max-width: 480px) {
             .top-bar h1 { font-size: 1.2rem; }
@@ -190,6 +201,12 @@
 </head>
 
 <body>
+
+{# ⭐ Badge de autosave, fuera del layout para que quede fijo #}
+<div id="autosave-badge" class="autosave-badge">
+    <i class="fas fa-circle-notch spin"></i>
+    <span id="autosave-text">Guardando…</span>
+</div>
 
 <div class="layout">
 
@@ -286,7 +303,14 @@
 
         <div class="content-wrapper">
 
-            <!-- HERO -->
+            {% set c = config or {} %}
+            {% set saldo_maximo       = c.get('saldo_maximo', 50000) or 50000 %}
+            {% set saldo_minimo_recarga = c.get('saldo_minimo_recarga', 50) or 50 %}
+            {% set recarga_maxima     = c.get('recarga_maxima', 20000) or 20000 %}
+            {% set permitir_transferencias = c.get('permitir_transferencias', True) %}
+            {% set comision_transferencia  = c.get('comision_transferencia', 0) or 0 %}
+            {% set cashback_porcentaje     = c.get('cashback_porcentaje', 0) or 0 %}
+
             <section class="hero">
                 <h2><i class="fas fa-sliders-h"></i> Reglas del Monedero ORION</h2>
                 <p>
@@ -294,7 +318,7 @@
                     <strong>transferencias entre usuarios</strong>, la
                     <strong>comisión por envío</strong> y el porcentaje de
                     <strong>cashback</strong> que se abona en cada compra.
-                    Estos valores aplican a todos los monederos del sistema.
+                    Los cambios <strong>se guardan automáticamente</strong> al modificar cada campo.
                 </p>
                 <div class="hero__actions">
                     <a href="{{ url_for('web.admin_monedero_panel') }}" class="btn"><i class="fas fa-arrow-left"></i> Volver al panel</a>
@@ -302,7 +326,6 @@
                 </div>
             </section>
 
-            <!-- FLASH MESSAGES -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for cat, msg in messages %}
@@ -313,38 +336,44 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="POST" action="{{ url_for('web.admin_monedero_config') }}">
+            <div id="error-cliente" class="flash err" style="display:none;">
+                <i class="fas fa-triangle-exclamation"></i>
+                <span id="error-cliente-msg">Revisa los campos marcados.</span>
+            </div>
 
-                <!-- LÍMITES DE SALDO -->
+            <form id="form-config" method="POST" action="{{ url_for('web.admin_monedero_config') }}">
+
                 <div class="section-box">
                     <h2><i class="fas fa-sliders-h"></i> Límites de saldo</h2>
                     <p class="sub">Montos máximos y mínimos permitidos en el monedero.</p>
 
                     <div class="grid">
                         <div class="field">
-                            <label>Saldo máximo por monedero</label>
-                            <input type="number" step="0.01" min="0" name="saldo_maximo"
-                                   value="{{ config.saldo_maximo }}" required>
+                            <label for="saldo_maximo">Saldo máximo por monedero</label>
+                            <input type="number" step="0.01" min="0" id="saldo_maximo" name="saldo_maximo"
+                                   value="{{ saldo_maximo }}" required autosave>
                             <div class="hint">Monto tope que puede acumular un usuario.</div>
+                            <div class="error-msg" id="err-saldo_maximo">Debe ser mayor a 0.</div>
                         </div>
 
                         <div class="field">
-                            <label>Recarga mínima</label>
-                            <input type="number" step="0.01" min="0" name="saldo_minimo_recarga"
-                                   value="{{ config.saldo_minimo_recarga }}" required>
+                            <label for="saldo_minimo_recarga">Recarga mínima</label>
+                            <input type="number" step="0.01" min="0" id="saldo_minimo_recarga" name="saldo_minimo_recarga"
+                                   value="{{ saldo_minimo_recarga }}" required autosave>
                             <div class="hint">Monto mínimo por operación de recarga.</div>
+                            <div class="error-msg" id="err-saldo_minimo_recarga">Debe ser mayor o igual a 0.</div>
                         </div>
 
                         <div class="field">
-                            <label>Recarga máxima</label>
-                            <input type="number" step="0.01" min="0" name="recarga_maxima"
-                                   value="{{ config.recarga_maxima }}" required>
+                            <label for="recarga_maxima">Recarga máxima</label>
+                            <input type="number" step="0.01" min="0" id="recarga_maxima" name="recarga_maxima"
+                                   value="{{ recarga_maxima }}" required autosave>
                             <div class="hint">Monto máximo por operación de recarga.</div>
+                            <div class="error-msg" id="err-recarga_maxima">Debe ser mayor o igual a la mínima y menor o igual al saldo máximo.</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- TRANSFERENCIAS -->
                 <div class="section-box">
                     <h2><i class="fas fa-exchange-alt"></i> Transferencias</h2>
                     <p class="sub">Reglas para transferencias entre monederos.</p>
@@ -356,48 +385,47 @@
                                     <h4>Permitir transferencias entre usuarios</h4>
                                     <p>Si se desactiva, los clientes no podrán enviar saldo a otros monederos.</p>
                                 </div>
-                                <input type="checkbox" name="permitir_transferencias"
-                                       {{ 'checked' if config.permitir_transferencias else '' }}>
+                                <input type="checkbox" id="permitir_transferencias" name="permitir_transferencias"
+                                       {{ 'checked' if permitir_transferencias else '' }} autosave>
                             </div>
                         </div>
 
                         <div class="field">
-                            <label>Comisión por transferencia (%)</label>
-                            <input type="number" step="0.01" min="0" max="100" name="comision_transferencia"
-                                   value="{{ config.comision_transferencia }}">
-                            <div class="hint">Porcentaje que se descuenta al emisor.</div>
+                            <label for="comision_transferencia">Comisión por transferencia (%)</label>
+                            <input type="number" step="0.01" min="0" max="100" id="comision_transferencia" name="comision_transferencia"
+                                   value="{{ comision_transferencia }}" autosave>
+                            <div class="hint">Porcentaje que se descuenta al emisor. 0 = sin comisión.</div>
+                            <div class="error-msg" id="err-comision_transferencia">Debe estar entre 0 y 100.</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- RECOMPENSAS -->
                 <div class="section-box">
                     <h2><i class="fas fa-gift"></i> Recompensas</h2>
                     <p class="sub">Programas de cashback y beneficios automáticos.</p>
 
                     <div class="grid">
                         <div class="field">
-                            <label>Cashback por compra (%)</label>
-                            <input type="number" step="0.01" min="0" max="100" name="cashback_porcentaje"
-                                   value="{{ config.cashback_porcentaje }}">
-                            <div class="hint">Porcentaje que se abona al monedero en cada compra.</div>
+                            <label for="cashback_porcentaje">Cashback por compra (%)</label>
+                            <input type="number" step="0.01" min="0" max="100" id="cashback_porcentaje" name="cashback_porcentaje"
+                                   value="{{ cashback_porcentaje }}" autosave>
+                            <div class="hint">Porcentaje que se abona al monedero en cada compra. 0 = sin cashback.</div>
+                            <div class="error-msg" id="err-cashback_porcentaje">Debe estar entre 0 y 100.</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ACCIONES -->
                 <div class="form-actions">
                     <a href="{{ url_for('web.admin_monedero_panel') }}" class="btn">
                         <i class="fas fa-times"></i> Cancelar
                     </a>
-                    <button type="submit" class="btn btn--primary">
-                        <i class="fas fa-save"></i> Guardar configuración
+                    <button type="submit" class="btn btn--primary" id="btn-guardar">
+                        <i class="fas fa-save"></i> Guardar ahora
                     </button>
                 </div>
 
             </form>
 
-            <!-- FOOTER -->
             <div class="footer-info">
                 <p>
                     <i class="fas fa-clock"></i>
@@ -424,6 +452,250 @@
             if (link.getAttribute('href') === currentPath) link.classList.add('active');
         });
     });
+</script>
+
+<script>
+    (function () {
+        const form = document.getElementById('form-config');
+        if (!form) return;
+
+        const btnGuardar = document.getElementById('btn-guardar');
+        const errBoxGlobal = document.getElementById('error-cliente');
+        const errBoxMsg = document.getElementById('error-cliente-msg');
+        const badge = document.getElementById('autosave-badge');
+        const badgeText = document.getElementById('autosave-text');
+
+        const campos = {
+            saldo_maximo: document.getElementById('saldo_maximo'),
+            saldo_minimo_recarga: document.getElementById('saldo_minimo_recarga'),
+            recarga_maxima: document.getElementById('recarga_maxima'),
+            comision_transferencia: document.getElementById('comision_transferencia'),
+            cashback_porcentaje: document.getElementById('cashback_porcentaje'),
+            permitir_transferencias: document.getElementById('permitir_transferencias'),
+        };
+
+        const errs = {
+            saldo_maximo: document.getElementById('err-saldo_maximo'),
+            saldo_minimo_recarga: document.getElementById('err-saldo_minimo_recarga'),
+            recarga_maxima: document.getElementById('err-recarga_maxima'),
+            comision_transferencia: document.getElementById('err-comision_transferencia'),
+            cashback_porcentaje: document.getElementById('err-cashback_porcentaje'),
+        };
+
+        function num(id) {
+            const el = campos[id];
+            if (!el) return NaN;
+            const v = parseFloat(String(el.value ?? '').replace(',', '.'));
+            return Number.isFinite(v) ? v : NaN;
+        }
+
+        function setError(id, show) {
+            if (campos[id]) campos[id].classList.toggle('error', show);
+            if (errs[id]) errs[id].classList.toggle('show', show);
+        }
+
+        function limpiarErrores() {
+            Object.keys(campos).forEach(id => setError(id, false));
+            errBoxGlobal.style.display = 'none';
+        }
+
+        function validar() {
+            limpiarErrores();
+            const errores = [];
+
+            const saldoMax = num('saldo_maximo');
+            const saldoMin = num('saldo_minimo_recarga');
+            const recargaMax = num('recarga_maxima');
+            const comision = num('comision_transferencia');
+            const cashback = num('cashback_porcentaje');
+
+            if (!Number.isFinite(saldoMax) || saldoMax <= 0) {
+                setError('saldo_maximo', true);
+                errores.push('El saldo máximo debe ser mayor a 0.');
+            }
+
+            if (!Number.isFinite(saldoMin) || saldoMin < 0) {
+                setError('saldo_minimo_recarga', true);
+                errores.push('La recarga mínima debe ser mayor o igual a 0.');
+            }
+
+            if (!Number.isFinite(recargaMax) || recargaMax < 0) {
+                setError('recarga_maxima', true);
+                errores.push('La recarga máxima debe ser mayor o igual a 0.');
+            }
+
+            if (Number.isFinite(saldoMin) && Number.isFinite(recargaMax) && recargaMax < saldoMin) {
+                setError('recarga_maxima', true);
+                errores.push('La recarga máxima no puede ser menor que la recarga mínima.');
+            }
+
+            if (Number.isFinite(saldoMax) && Number.isFinite(recargaMax) && recargaMax > saldoMax) {
+                setError('recarga_maxima', true);
+                errores.push('La recarga máxima no puede superar el saldo máximo.');
+            }
+
+            if (!Number.isFinite(comision) || comision < 0 || comision > 100) {
+                setError('comision_transferencia', true);
+                errores.push('La comisión debe estar entre 0 y 100.');
+            }
+
+            if (!Number.isFinite(cashback) || cashback < 0 || cashback > 100) {
+                setError('cashback_porcentaje', true);
+                errores.push('El cashback debe estar entre 0 y 100.');
+            }
+
+            if (errores.length) {
+                errBoxMsg.textContent = errores[0];
+                errBoxGlobal.style.display = 'flex';
+                return false;
+            }
+            return true;
+        }
+
+        // ===== Badge de autosave =====
+        let badgeTimer = null;
+        function showBadge(estado, texto) {
+            if (badgeTimer) clearTimeout(badgeTimer);
+            badge.classList.remove('saving', 'saved', 'error');
+            badge.classList.add(estado, 'show');
+            badgeText.textContent = texto;
+            // Solo "guardado" y "error" se ocultan solos; "guardando" queda visible
+            if (estado === 'saved') {
+                badgeTimer = setTimeout(() => badge.classList.remove('show'), 1800);
+            } else if (estado === 'error') {
+                badgeTimer = setTimeout(() => badge.classList.remove('show'), 4000);
+            }
+        }
+
+        function setBadgeSaving() {
+            badge.innerHTML = '<i class="fas fa-circle-notch spin"></i><span id="autosave-text">Guardando…</span>';
+            showBadge('saving', 'Guardando…');
+        }
+        function setBadgeSaved() {
+            badge.innerHTML = '<i class="fas fa-check-circle"></i><span id="autosave-text">Guardado</span>';
+            showBadge('saved', 'Guardado');
+        }
+        function setBadgeError(msg) {
+            badge.innerHTML = '<i class="fas fa-triangle-exclamation"></i><span id="autosave-text">Error</span>';
+            showBadge('error', 'Error');
+            errBoxMsg.textContent = msg || 'No se pudo guardar.';
+            errBoxGlobal.style.display = 'flex';
+        }
+
+        // ===== Auto-save =====
+        let debounceTimer = null;
+        let guardando = false;
+        let pendiente = false;
+
+        async function guardarAuto() {
+            if (guardando) {
+                pendiente = true;
+                return;
+            }
+            if (!validar()) return;
+
+            guardando = true;
+            setBadgeSaving();
+
+            try {
+                const fd = new FormData(form);
+
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    body: fd,
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+
+                if (!res.ok) {
+                    // El backend puede devolver HTML (redirect). Si status no es 2xx, error.
+                    throw new Error('HTTP ' + res.status);
+                }
+
+                // El endpoint normalmente redirige (302) al guardar con form normal.
+                // Con fetch, un 302 se sigue y llega 200 al HTML de config. Como
+                // solo nos importa que guardó, tratamos 2xx como éxito.
+                // Si el backend devuelve JSON, también lo aceptamos.
+                let data = null;
+                const ct = res.headers.get('content-type') || '';
+                if (ct.includes('application/json')) {
+                    data = await res.json().catch(() => null);
+                }
+
+                if (data && data.success === false) {
+                    throw new Error(data.error || 'No se pudo guardar');
+                }
+
+                // Marcar visualmente los campos como guardados
+                Object.keys(campos).forEach(id => {
+                    const el = campos[id];
+                    if (!el) return;
+                    if (el.type !== 'checkbox') {
+                        el.classList.add('saved');
+                        setTimeout(() => el.classList.remove('saved'), 1500);
+                    }
+                });
+
+                setBadgeSaved();
+            } catch (e) {
+                console.error('[autosave]', e);
+                setBadgeError(e.message || 'Error de red');
+            } finally {
+                guardando = false;
+                if (pendiente) {
+                    pendiente = false;
+                    // Si hubo cambios mientras se guardaba, volvemos a guardar
+                    debounceTimer = setTimeout(guardarAuto, 300);
+                }
+            }
+        }
+
+        function programarGuardado() {
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(guardarAuto, 600);
+        }
+
+        // ===== Listeners de auto-save =====
+        Object.keys(campos).forEach(id => {
+            const el = campos[id];
+            if (!el) return;
+            el.addEventListener('input', function () {
+                setError(id, false);
+                if (errBoxGlobal.style.display !== 'none') {
+                    const quedan = Object.keys(errs).some(k => errs[k]?.classList.contains('show'));
+                    if (!quedan) errBoxGlobal.style.display = 'none';
+                }
+                programarGuardado();
+            });
+            // checkbox usa 'change'
+            if (el.type === 'checkbox') {
+                el.addEventListener('change', programarGuardado);
+            }
+        });
+
+        // ===== Botón "Guardar ahora" (submit normal, fallback) =====
+        form.addEventListener('submit', function (e) {
+            if (!validar()) {
+                e.preventDefault();
+                const primerError = document.querySelector('.field input.error');
+                if (primerError) primerError.focus();
+                return;
+            }
+            if (btnGuardar) {
+                btnGuardar.disabled = true;
+                btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            }
+            // Deja que el form se envíe normal (POST → redirect → flash)
+        });
+
+        // Si el usuario cierra/recarga con cambios pendientes, avisar
+        window.addEventListener('beforeunload', function (e) {
+            if (debounceTimer || guardando) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    })();
 </script>
 
 </body>

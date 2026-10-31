@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Mi Tienda | ORION</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    {# ⭐ Catálogo compacto de temas (1 línea por tema) #}
+    {% set temas_disponibles = {
+        'azul':       {'nombre': 'Azul',       'grad': 'linear-gradient(135deg, #0284c7, #0369a1)'},
+        'morado':     {'nombre': 'Morado',     'grad': 'linear-gradient(135deg, #7c3aed, #5b21b6)'},
+        'rosa':       {'nombre': 'Rosa',       'grad': 'linear-gradient(135deg, #e10098, #c00080)'},
+        'verde':      {'nombre': 'Verde',      'grad': 'linear-gradient(135deg, #059669, #047857)'},
+        'naranja':    {'nombre': 'Naranja',    'grad': 'linear-gradient(135deg, #ea580c, #c2410c)'},
+        'rojo':       {'nombre': 'Rojo',       'grad': 'linear-gradient(135deg, #dc2626, #b91c1c)'},
+        'turquesa':   {'nombre': 'Turquesa',   'grad': 'linear-gradient(135deg, #0891b2, #0e7490)'},
+        'negro':      {'nombre': 'Negro',      'grad': 'linear-gradient(135deg, #1a1a2e, #0f172a)'},
+        'lavanda':    {'nombre': 'Lavanda',    'grad': 'linear-gradient(135deg, #a78bfa, #8b5cf6)'},
+        'menta':      {'nombre': 'Menta',      'grad': 'linear-gradient(135deg, #34d399, #10b981)'},
+        'cielo':      {'nombre': 'Cielo',      'grad': 'linear-gradient(135deg, #60a5fa, #3b82f6)'},
+        'durazno':    {'nombre': 'Durazno',    'grad': 'linear-gradient(135deg, #fdba74, #f97316)'},
+        'rosa-suave': {'nombre': 'Rosa suave', 'grad': 'linear-gradient(135deg, #f9a8d4, #ec4899)'},
+        'coral':      {'nombre': 'Coral',      'grad': 'linear-gradient(135deg, #fda4af, #f43f5e)'},
+        'oliva':      {'nombre': 'Oliva',      'grad': 'linear-gradient(135deg, #a3e635, #65a30d)'},
+        'jade':       {'nombre': 'Jade',       'grad': 'linear-gradient(135deg, #5eead4, #14b8a6)'},
+    } %}
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .sidebar .vendedor-profile {
+            padding: 25px 20px 20px; text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            margin-bottom: 10px; flex-shrink: 0;
+        }
+        .sidebar .vendedor-profile .avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .vendedor-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .vendedor-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .vendedor-profile .rol {
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f0f9ff; color: #0284c7; border-left-color: #0284c7; }
+        .sidebar a:hover i, .sidebar a.active i { color: #0284c7; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 280px; padding: 30px 35px 20px;
+            width: 100%; min-height: 100vh; display: flex; flex-direction: column;
+        }
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 20px; border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem; font-weight: 800; color: #1a1a2e;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .top-bar h1 i { color: #0284c7; }
+        .top-bar .tag {
+            background: #0284c7; color: #fff; padding: 5px 18px;
+            border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; display: flex; align-items: center; gap: 6px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, #fff, #f0f9ff);
+            padding: 25px 30px; border-radius: 16px; border: 1px solid #e8e8e8;
+            margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .hero h2 { color: #1a1a2e; margin-bottom: 8px; font-weight: 800; font-size: 1.3rem; }
+        .hero h2 i { color: #0284c7; }
+        .hero p { color: #666; margin-bottom: 0; font-size: 0.95rem; line-height: 1.6; }
+        .hero strong { color: #0284c7; }
+
+        /* ===== CARDS ===== */
+        .form-card {
+            background: #fff; border-radius: 16px; padding: 30px;
+            border: 1px solid #e8e8e8; margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .form-section-title {
+            font-weight: 800; font-size: 1.05rem; color: #1a1a2e;
+            margin-bottom: 20px; padding-bottom: 12px;
+            border-bottom: 2px solid #f0f9ff;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .form-section-title i { color: #0284c7; }
+
+        .form-label {
+            font-size: .78rem; font-weight: 700; color: #1a1a2e;
+            margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px;
+        }
+        .form-label .req { color: #ef4444; }
+        .form-control, .form-select {
+            padding: 11px 16px; border: 2px solid #e2e8f0; border-radius: 10px;
+            font-size: .88rem; font-family: inherit; background: #f8fafc;
+            transition: all .2s; color: #1a1a2e;
+        }
+        .form-control:focus, .form-select:focus {
+            outline: none; border-color: #0284c7;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(2,132,199,.1);
+        }
+        .form-control:disabled {
+            background: #f1f5f9; color: #64748b; cursor: not-allowed;
+        }
+
+        /* ===== LOGO UPLOAD ===== */
+        .logo-upload-wrap {
+            display: flex; align-items: center; gap: 22px;
+            padding: 20px; background: #f8fafc; border-radius: 14px;
+            border: 2px dashed #cbd5e1; flex-wrap: wrap;
+        }
+        .logo-preview {
+            width: 110px; height: 110px; border-radius: 50%;
+            object-fit: cover; border: 4px solid #fff;
+            box-shadow: 0 4px 16px rgba(2,132,199,.15);
+            background: #fff; flex-shrink: 0;
+        }
+        .logo-upload-info { flex: 1; min-width: 200px; }
+        .logo-upload-info h4 { font-size: .95rem; font-weight: 800; margin-bottom: 4px; }
+        .logo-upload-info p { font-size: .78rem; color: #64748b; margin-bottom: 10px; }
+        .logo-upload-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #0284c7; color: #fff;
+            padding: 9px 20px; border-radius: 50px;
+            font-size: .82rem; font-weight: 700; border: none;
+            cursor: pointer; transition: all .25s;
+        }
+        .logo-upload-btn:hover { background: #0369a1; transform: translateY(-1px); }
+        input[type="file"] { display: none; }
+
+        /* ============================================================
+           ⭐ SELECTOR DE TEMA — más compacto (grids más chicos)
+           ============================================================ */
+        .temas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tema-option {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all .2s;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,.04);
+        }
+        .tema-option:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+        .tema-option input[type="radio"] { display: none; }
+        .tema-option .tema-preview {
+            height: 55px;
+        }
+        .tema-option .tema-name {
+            padding: 6px 8px;
+            font-size: .68rem;
+            font-weight: 700;
+            text-align: center;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .tema-option .tema-check {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            color: #0284c7;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: .65rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,.15);
+        }
+        .tema-option:has(input:checked) {
+            border-color: #0284c7;
+            box-shadow: 0 6px 18px rgba(2,132,199,.25);
+        }
+        .tema-option input:checked ~ .tema-check { display: flex; }
+
+        /* Fallback sin :has() */
+        .tema-option.selected { border-color: #0284c7; box-shadow: 0 6px 18px rgba(2,132,199,.25); }
+        .tema-option.selected .tema-check { display: flex; }
+
+        /* ============================================================
+           ⭐ VISTA PREVIA DEL HERO
+           ============================================================ */
+        .preview-hero {
+            border-radius: 16px;
+            padding: 30px;
+            color: #fff;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 8px;
+            transition: all .3s ease;
+        }
+        .preview-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 100%);
+            pointer-events: none;
+        }
+        .preview-hero .prev-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .preview-hero .prev-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            background: #fff;
+            color: #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            flex-shrink: 0;
+            box-shadow: 0 6px 20px rgba(0,0,0,.2);
+            border: 3px solid rgba(255,255,255,.4);
+            overflow: hidden;
+        }
+        .preview-hero .prev-logo img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .preview-hero .prev-nombre {
+            font-size: 1.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+        .preview-hero .prev-desc {
+            font-size: .85rem;
+            opacity: .9;
+            max-width: 400px;
+            line-height: 1.4;
+        }
+        .preview-label {
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: .5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== BOTONES ===== */
+        .btn-save {
+            background: #0284c7; color: #fff; border: none;
+            padding: 13px 32px; border-radius: 50px;
+            font-weight: 800; font-size: .9rem;
+            display: inline-flex; align-items: center; gap: 8px;
+            cursor: pointer; transition: all .25s;
+            box-shadow: 0 6px 20px rgba(2,132,199,.3);
+        }
+        .btn-save:hover { background: #0369a1; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(2,132,199,.4); }
+        .btn-cancel {
+            background: #fff; color: #64748b; border: 2px solid #e2e8f0;
+            padding: 13px 26px; border-radius: 50px;
+            font-weight: 700; font-size: .9rem;
+            display: inline-flex; align-items: center; gap: 8px;
+            text-decoration: none; transition: all .25s;
+        }
+        .btn-cancel:hover { background: #f1f5f9; color: #334155; }
+
+        .info-box {
+            background: #f0f9ff; border-left: 4px solid #0284c7;
+            padding: 14px 18px; border-radius: 10px;
+            font-size: .82rem; color: #1a1a2e;
+            line-height: 1.6; margin-bottom: 24px;
+        }
+        .info-box i { color: #0284c7; }
+
+        .readonly-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #fef3c7; color: #92400e;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: .65rem; font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-info {
+            background: #fff; padding: 15px 25px; border-radius: 16px;
+            border: 1px solid #e8e8e8; text-align: center;
+            margin-top: auto; box-shadow: 0 -2px 10px rgba(0,0,0,.03);
+        }
+        .footer-info p {
+            color: #888; font-size: .75rem; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; flex-wrap: wrap;
+        }
+        .footer-info i { color: #0284c7; }
+        .footer-info .heart { color: #e10098; }
+
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .vendedor-profile .name, .sidebar .vendedor-profile .email,
+            .sidebar .vendedor-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .vendedor-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .vendedor-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="vendedor-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Vendedor">
+            {% elif vendedor.logo %}
+                <img src="{{ url_for('static', filename='uploads/vendedores/' + vendedor.logo) }}" class="avatar" alt="Vendedor">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ (vendedor.nombre_tienda or 'ORION')|urlencode }}&background=0284c7&color=fff&size=80&bold=true" class="avatar" alt="Vendedor">
+            {% endif %}
+            <div class="name">{{ vendedor.nombre_tienda|default('Mi Tienda') }}</div>
+            <div class="email">{{ session.get('email', '') }}</div>
+            <div class="rol"><i class="fas fa-shop"></i> Vendedor</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+            <div class="panel-title">MI TIENDA</div>
+            <a href="{{ url_for('web.marketplace_dashboard') }}" class="{% if request.endpoint == 'web.marketplace_dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_productos') }}" class="{% if request.endpoint == 'web.marketplace_mis_productos' %}active{% endif %}">
+                <i class="fas fa-box"></i> <span>Mis productos</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_pedidos') }}" class="{% if request.endpoint == 'web.marketplace_mis_pedidos' %}active{% endif %}">
+                <i class="fas fa-shopping-cart"></i> <span>Mis pedidos</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_ventas') }}" class="{% if request.endpoint == 'web.marketplace_mis_ventas' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> <span>Mis ventas</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_clientes') }}" class="{% if request.endpoint == 'web.marketplace_mis_clientes' %}active{% endif %}">
+                <i class="fas fa-users"></i> <span>Mis clientes</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_resenas') }}" class="{% if request.endpoint == 'web.marketplace_resenas' %}active{% endif %}">
+                <i class="fas fa-star"></i> <span>Reseñas</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">LOGÍSTICA</div>
+            <a href="{{ url_for('web.marketplace_envios') }}" class="{% if request.endpoint == 'web.marketplace_envios' %}active{% endif %}">
+                <i class="fas fa-truck"></i> <span>Envíos</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.marketplace_mi_tienda') }}" class="{% if request.endpoint == 'web.marketplace_mi_tienda' %}active{% endif %}">
+                <i class="fas fa-cog"></i> <span>Mi tienda</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">TIENDA PÚBLICA</div>
+            {% if vendedor.slug %}
+            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank">
+                <i class="fas fa-eye"></i> <span>Ver mi tienda pública</span>
+            </a>
+            {% endif %}
+
+            <div class="divider"></div>
+            <div class="panel-title">CUENTA</div>
+            <a href="{{ url_for('web.raiz_tienda') }}"><i class="fas fa-home"></i> <span>Ir a tienda ORION</span></a>
+            <a href="{{ url_for('web.marketplace_perfil') }}" class="{% if request.endpoint == 'web.marketplace_perfil' %}active{% endif %}">
+                <i class="fas fa-user"></i> <span>Mi perfil</span>
+            </a>
+
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-cog"></i> Configuración de mi tienda</h1>
+            <div class="tag"><i class="fas fa-shop"></i> {{ vendedor.nombre_tienda|default('Mi Tienda') }}</div>
+        </header>
+
+        <section class="hero">
+            <h2><i class="fas fa-store"></i> Datos de tu tienda</h2>
+            <p>
+                Actualiza la información que ven tus clientes. Los campos marcados con
+                <strong>candado</strong> solo puede cambiarlos un administrador.
+            </p>
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for cat, msg in messages %}
+                    <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert" style="border-radius:12px;">
+                        {{ msg }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('web.marketplace_mi_tienda') }}" enctype="multipart/form-data">
+
+            <!-- ===== LOGO + NOMBRE ===== -->
+            <div class="form-card">
+                <div class="form-section-title">
+                    <i class="fas fa-image"></i> Imagen y nombre
+                </div>
+
+                <div class="logo-upload-wrap">
+                    {% if vendedor.logo %}
+                        <img src="{{ url_for('static', filename='uploads/vendedores/' + vendedor.logo) }}"
+                             class="logo-preview" id="logoPreview" alt="Logo actual">
+                    {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ (vendedor.nombre_tienda or 'ORION')|urlencode }}&background=0284c7&color=fff&size=200&bold=true"
+                             class="logo-preview" id="logoPreview" alt="Logo por defecto">
+                    {% endif %}
+
+                    <div class="logo-upload-info">
+                        <h4>Logo de tu tienda</h4>
+                        <p>PNG, JPG o WEBP · Máx 5MB · Recomendado 500×500px</p>
+                        <label for="logoInput" class="logo-upload-btn">
+                            <i class="fas fa-camera"></i> Cambiar logo
+                        </label>
+                        <input type="file" id="logoInput" name="logo" accept="image/*">
+                    </div>
+                </div>
+
+                <div style="margin-top: 22px;">
+                    <label class="form-label">Nombre de la tienda <span class="req">*</span></label>
+                    <input type="text" name="nombre_tienda" class="form-control" required
+                           value="{{ vendedor.nombre_tienda|default('') }}"
+                           placeholder="Ej: Mi Tienda Fitness">
+                </div>
+            </div>
+
+            <!-- ===== DESCRIPCIÓN ===== -->
+            <div class="form-card">
+                <div class="form-section-title">
+                    <i class="fas fa-align-left"></i> Descripción
+                </div>
+
+                <label class="form-label">Sobre tu tienda</label>
+                <textarea name="descripcion" class="form-control" rows="4"
+                          placeholder="Cuéntales a tus clientes qué ofreces, tu propuesta y por qué elegirte.">{{ vendedor.descripcion|default('') }}</textarea>
+                <small style="color:#94a3b8; font-size:.75rem; display:block; margin-top:6px;">
+                    Aparecerá en tu tienda pública y en el marketplace.
+                </small>
+            </div>
+
+            <!-- ============================================================
+                 ⭐ PERSONALIZACIÓN DEL HERO
+                 ============================================================ -->
+            <div class="form-card">
+                <div class="form-section-title">
+                    <i class="fas fa-palette"></i> Personalización de tu tienda
+                </div>
+
+                <div class="info-box">
+                    <i class="fas fa-lightbulb"></i>
+                    Elige el <strong>color o gradiente</strong> del encabezado de tu tienda pública.
+                    También puedes subir una <strong>imagen de fondo</strong> que reemplace el color.
+                </div>
+
+                <!-- VISTA PREVIA -->
+                <div class="preview-label">
+                    <i class="fas fa-eye"></i> Vista previa
+                </div>
+                <div class="preview-hero" id="previewHero">
+                    <div class="prev-content">
+                        <div class="prev-logo" id="previewLogo">
+                            {% if vendedor.logo %}
+                                <img src="{{ url_for('static', filename='uploads/vendedores/' + vendedor.logo) }}" alt="logo">
+                            {% else %}
+                                {{ (vendedor.nombre_tienda|default('T'))[0]|upper }}
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="prev-nombre">{{ vendedor.nombre_tienda|default('Mi Tienda') }}</div>
+                            <div class="prev-desc">{{ vendedor.descripcion|default('Tu descripción aparecerá aquí.') }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SELECTOR DE TEMAS (loop compacto) -->
+                <div style="margin-top: 24px;">
+                    <label class="form-label">
+                        <i class="fas fa-fill-drip" style="color:#0284c7;"></i>
+                        Color o gradiente
+                    </label>
+
+                    {% set tema_actual = vendedor.tema_hero|default('azul') %}
+
+                    <div class="temas-grid">
+                        {% for key, info in temas_disponibles.items() %}
+                        <label class="tema-option {% if tema_actual == key %}selected{% endif %}">
+                            <input type="radio" name="tema_hero" value="{{ key }}" {% if tema_actual == key %}checked{% endif %}>
+                            <div class="tema-preview" style="background: {{ info.grad }};"></div>
+                            <div class="tema-name">{{ info.nombre }}</div>
+                            <div class="tema-check"><i class="fas fa-check"></i></div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- IMAGEN DE FONDO (OPCIONAL) -->
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed #e2e8f0;">
+                    <label class="form-label">
+                        <i class="fas fa-image" style="color:#0284c7;"></i>
+                        Imagen de fondo (opcional)
+                    </label>
+                    <p style="font-size:.8rem; color:#64748b; margin-bottom:10px;">
+                        Si subes una imagen, reemplazará el color de arriba. Recomendado: 1600×400px.
+                    </p>
+
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                        {% if vendedor.hero_imagen %}
+                            <img src="{{ url_for('static', filename='uploads/vendedores/' + vendedor.hero_imagen) }}"
+                                 id="heroImgPreview"
+                                 style="width:120px; height:60px; object-fit:cover; border-radius:10px; border:2px solid #e2e8f0;">
+                        {% else %}
+                            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'><rect fill='%23f1f5f9' width='120' height='60'/><text x='60' y='34' font-family='sans-serif' font-size='11' fill='%2394a3b8' text-anchor='middle'>Sin imagen</text></svg>"
+                                 id="heroImgPreview"
+                                 style="width:120px; height:60px; object-fit:cover; border-radius:10px; border:2px solid #e2e8f0;">
+                        {% endif %}
+
+                        <label for="heroImgInput" class="logo-upload-btn">
+                            <i class="fas fa-upload"></i> Subir imagen de fondo
+                        </label>
+                        <input type="file" id="heroImgInput" name="hero_imagen" accept="image/*">
+
+                        {% if vendedor.hero_imagen %}
+                            <button type="button" onclick="quitarImagenFondo()"
+                                    style="background:#fff; color:#dc3545; border:2px solid #fee2e2; padding:9px 18px; border-radius:50px; font-size:.82rem; font-weight:700; cursor:pointer;">
+                                <i class="fas fa-trash"></i> Quitar imagen
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <input type="hidden" name="quitar_hero_imagen" id="quitarHeroImagen" value="0">
+                </div>
+            </div>
+
+            <!-- ===== DATOS FISCALES ===== -->
+            <div class="form-card">
+                <div class="form-section-title">
+                    <i class="fas fa-receipt"></i> Datos fiscales
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">RFC</label>
+                        <input type="text" name="rfc" class="form-control"
+                               value="{{ vendedor.rfc|default('') }}"
+                               maxlength="13" style="text-transform: uppercase;"
+                               placeholder="XAXX010101000">
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Razón social</label>
+                        <input type="text" name="razon_social" class="form-control"
+                               value="{{ vendedor.razon_social|default('') }}"
+                               placeholder="Nombre legal o empresa">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== CONTACTO ===== -->
+            <div class="form-card">
+                <div class="form-section-title">
+                    <i class="fas fa-address-book"></i> Información de contacto
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Email de contacto</label>
+                        <input type="email" name="email_contacto" class="form-control"
+                               value="{{ vendedor.email_contacto|default(session.get('email', '')) }}"
+                               placeholder="contacto@mitienda.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">WhatsApp / Teléfono</label>
+                        <input type="tel" name="whatsapp" class="form-control"
+                               value="{{ vendedor.whatsapp|default('') }}"
+                               placeholder="+52 55 1234 5678">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== UBICACIÓN ===== -->
+            <div class="form-card">
+                <div class="form-section-title">
+                    <i class="fas fa-map-marker-alt"></i> Ubicación
+                </div>
+
+                <label class="form-label">Ubicación de tu tienda</label>
+                <input type="text" name="ubicacion" class="form-control"
+                       value="{{ vendedor.ubicacion|default('') }}"
+                       placeholder="Ej: CDMX, México · Envíos a todo el país">
+                <small style="color:#94a3b8; font-size:.75rem; display:block; margin-top:6px;">
+                    Puede ser ciudad, zona o cobertura de envíos.
+                </small>
+            </div>
+
+            <!-- ===== DATOS SOLO LECTURA (ADMIN) ===== -->
+            <div class="form-card" style="background: #fafbfc;">
+                <div class="form-section-title" style="border-bottom-color:#fef3c7;">
+                    <i class="fas fa-lock" style="color:#d97706;"></i>
+                    Información administrativa
+                    <span class="readonly-badge"><i class="fas fa-lock"></i> Solo admin</span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Estado de la tienda</label>
+                        <input type="text" class="form-control"
+                               value="{{ vendedor.estado|default('pendiente')|capitalize }}" disabled>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Comisión</label>
+                        <input type="text" class="form-control"
+                               value="{{ vendedor.comision_pct|default(15) }}%" disabled>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Slug público</label>
+                        <input type="text" class="form-control"
+                               value="{{ vendedor.slug|default('—') }}" disabled>
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top:18px; margin-bottom:0;">
+                    <i class="fas fa-info-circle"></i>
+                    Si necesitas cambiar tu RFC, comisión o estado, contacta al administrador.
+                </div>
+            </div>
+
+            <!-- ===== BOTONES ===== -->
+            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom: 30px;">
+                <a href="{{ url_for('web.marketplace_dashboard') }}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> Guardar cambios
+                </button>
+            </div>
+
+        </form>
+
+        <div class="footer-info">
+            <p>
+                <i class="fas fa-shield-alt"></i> ORION
+                <span>|</span>
+                <i class="fas fa-store"></i> {{ vendedor.nombre_tienda|default('Mi Tienda') }}
+                <span>|</span>
+                <span class="heart"><i class="fas fa-heart"></i></span>
+            </p>
+        </div>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function() {
+    // ⭐ Gradientes leídos directo del catálogo Jinja
+    const TEMAS = {{ temas_disponibles | tojson }};
+
+    let heroImagenActual = {% if vendedor.hero_imagen %}'{{ url_for("static", filename="uploads/vendedores/" + vendedor.hero_imagen) }}'{% else %}null{% endif %};
+
+    const previewHero = document.getElementById('previewHero');
+
+    function actualizarPreview() {
+        const radio = document.querySelector('input[name="tema_hero"]:checked');
+        const info = radio ? TEMAS[radio.value] : TEMAS.azul;
+        const gradiente = info ? info.grad : TEMAS.azul.grad;
+
+        if (heroImagenActual) {
+            previewHero.style.background = gradiente;
+            previewHero.style.backgroundImage = `linear-gradient(135deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 100%), url('${heroImagenActual}')`;
+            previewHero.style.backgroundSize = 'cover';
+            previewHero.style.backgroundPosition = 'center';
+        } else {
+            previewHero.style.background = gradiente;
+            previewHero.style.backgroundImage = 'none';
+        }
+    }
+
+    // Escuchar cambios en los radios de tema
+    document.querySelectorAll('input[name="tema_hero"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.tema-option').forEach(o => o.classList.remove('selected'));
+            this.closest('.tema-option').classList.add('selected');
+            actualizarPreview();
+        });
+    });
+
+    // Preview del logo
+    var inputLogo = document.getElementById('logoInput');
+    var previewLogoImg = document.getElementById('logoPreview');
+    var previewLogoMini = document.getElementById('previewLogo');
+    if (inputLogo) {
+        inputLogo.addEventListener('change', function() {
+            var file = this.files && this.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                previewLogoImg.src = e.target.result;
+                if (previewLogoMini) {
+                    previewLogoMini.innerHTML = '<img src="' + e.target.result + '" alt="logo">';
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Preview de la imagen de fondo
+    var inputHeroImg = document.getElementById('heroImgInput');
+    var previewHeroImg = document.getElementById('heroImgPreview');
+    if (inputHeroImg) {
+        inputHeroImg.addEventListener('change', function() {
+            var file = this.files && this.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                previewHeroImg.src = e.target.result;
+                heroImagenActual = e.target.result;
+                actualizarPreview();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Estado inicial
+    actualizarPreview();
+
+    // Quitar imagen de fondo
+    window.quitarImagenFondo = function() {
+        if (!confirm('¿Quitar la imagen de fondo? Se usará el color seleccionado.')) return;
+        heroImagenActual = null;
+        document.getElementById('quitarHeroImagen').value = '1';
+        document.getElementById('heroImgInput').value = '';
+        previewHeroImg.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'><rect fill='%23f1f5f9' width='120' height='60'/><text x='60' y='34' font-family='sans-serif' font-size='11' fill='%2394a3b8' text-anchor='middle'>Sin imagen</text></svg>";
+        actualizarPreview();
+    };
+})();
+</script>
+</body>
+</html>

@@ -46,86 +46,45 @@
         }
         .layout { display: flex; min-height: 100vh; }
 
-        /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 280px;
-            background: var(--card-bg);
+            width: 280px; background: var(--card-bg);
             box-shadow: 2px 0 12px rgba(20,33,61,0.05);
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
+            height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000;
+            display: flex; flex-direction: column;
         }
         .sidebar .admin-profile {
-            padding: 28px 20px 22px;
-            text-align: center;
+            padding: 28px 20px 22px; text-align: center;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            position: relative;
         }
         .sidebar .admin-profile .avatar {
-            width: 76px;
-            height: 76px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255,255,255,0.85);
+            width: 76px; height: 76px; border-radius: 50%;
+            object-fit: cover; border: 3px solid rgba(255,255,255,0.85);
             box-shadow: 0 6px 18px rgba(0,0,0,0.22);
         }
-        .sidebar .admin-profile .name {
-            font-weight: 700;
-            font-size: 1.05rem;
-            color: #fff;
-            margin-top: 12px;
-        }
-        .sidebar .admin-profile .email {
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.85);
-        }
+        .sidebar .admin-profile .name { font-weight: 700; font-size: 1.05rem; color: #fff; margin-top: 12px; }
+        .sidebar .admin-profile .email { font-size: 0.72rem; color: rgba(255,255,255,0.85); }
         .sidebar .admin-profile .rol {
-            font-size: 0.62rem;
-            color: #fff;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            font-size: 0.62rem; color: #fff; text-transform: uppercase;
+            font-weight: 700; letter-spacing: 0.5px;
             background: rgba(255,255,255,0.22);
-            padding: 3px 14px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 8px;
+            padding: 3px 14px; border-radius: 20px;
+            display: inline-block; margin-top: 8px;
         }
-        .sidebar .logo {
-            font-size: 1.7rem;
-            font-weight: 900;
-            color: var(--primary);
-            text-align: center;
-            padding: 16px 0 6px;
-            letter-spacing: -1px;
-        }
+        .sidebar .logo { font-size: 1.7rem; font-weight: 900; color: var(--primary); text-align: center; padding: 16px 0 6px; letter-spacing: -1px; }
         .sidebar .logo span { color: var(--text-dark); }
         .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 14px; }
         .sidebar .panel-title {
-            font-size: 0.63rem;
-            text-transform: uppercase;
-            color: #9AA1B1;
-            padding: 14px 25px 6px;
-            letter-spacing: 1.6px;
-            font-weight: 700;
+            font-size: 0.63rem; text-transform: uppercase;
+            color: #9AA1B1; padding: 14px 25px 6px;
+            letter-spacing: 1.6px; font-weight: 700;
         }
         .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 25px;
-            margin: 1px 12px;
-            color: #555;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 500;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 25px; margin: 1px 12px;
+            color: #555; text-decoration: none;
+            transition: all 0.2s ease; border-radius: 10px;
+            font-size: 0.85rem; font-weight: 500;
         }
         .sidebar a i { width: 20px; font-size: 1rem; color: #9AA1B1; }
         .sidebar a:hover { background: var(--primary-light); color: var(--primary); }
@@ -134,163 +93,92 @@
         .sidebar a.active i { color: var(--primary); }
         .sidebar .divider { height: 1px; background: var(--border); margin: 10px 24px; }
         .sidebar .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 25px;
-            margin: 1px 12px 8px;
-            color: var(--danger);
-            text-decoration: none;
-            transition: all 0.2s ease;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            width: calc(100% - 24px);
-            text-align: left;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 25px; margin: 1px 12px 8px;
+            color: var(--danger); text-decoration: none;
+            transition: all 0.2s ease; border-radius: 10px;
+            font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none;
+            width: calc(100% - 24px); text-align: left;
         }
         .sidebar .logout-btn i { color: var(--danger); }
         .sidebar .logout-btn:hover { background: var(--danger-light); }
 
-        /* ===== MAIN ===== */
         .main {
-            margin-left: 280px;
-            padding: 28px 34px 30px;
-            width: 100%;
-            min-height: 100vh;
+            margin-left: 280px; padding: 28px 34px 30px;
+            width: 100%; min-height: 100vh;
         }
         .breadcrumb {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-size: 0.75rem; color: var(--text-muted);
+            font-weight: 600; margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
         }
         .breadcrumb .sep { color: #C6CAD6; }
         .breadcrumb .current { color: var(--primary); }
         .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding-bottom: 18px;
-            margin-bottom: 22px;
-            flex-wrap: wrap;
-            gap: 15px;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            padding-bottom: 18px; margin-bottom: 22px;
+            flex-wrap: wrap; gap: 15px;
         }
-        .top-bar h1 {
-            font-size: 1.65rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .top-bar h1 { font-size: 1.65rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
         .top-bar h1 i { color: var(--primary); }
-        .top-bar .subtitulo {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        .top-bar .acciones {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+        .top-bar .subtitulo { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+        .top-bar .acciones { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .btn-volver {
-            background: var(--card-bg);
-            border: 1.5px solid var(--border);
-            padding: 9px 18px;
-            border-radius: var(--radius-sm);
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
+            background: var(--card-bg); border: 1.5px solid var(--border);
+            padding: 9px 18px; border-radius: var(--radius-sm);
+            font-size: 0.78rem; font-weight: 700; color: var(--text-muted);
+            text-decoration: none; transition: all 0.2s ease;
+            display: inline-flex; align-items: center; gap: 7px;
         }
-        .btn-volver:hover {
-            background: var(--primary-light);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
+        .btn-volver:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
         .btn-primary-top {
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            padding: 9px 18px;
-            border-radius: var(--radius-sm);
-            font-size: 0.78rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            font-family: inherit;
+            background: var(--primary); color: #fff; border: none;
+            padding: 9px 18px; border-radius: var(--radius-sm);
+            font-size: 0.78rem; font-weight: 700; cursor: pointer;
+            transition: all 0.2s ease; display: inline-flex;
+            align-items: center; gap: 7px; font-family: inherit;
         }
-        .btn-primary-top:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 6px 16px rgba(230,0,126,0.28);
+        .btn-primary-top:hover { background: var(--primary-dark); box-shadow: 0 6px 16px rgba(230,0,126,0.28); }
+        .btn-primary-top:disabled { opacity: .6; cursor: not-allowed; }
+        .btn-secondary-top {
+            background: var(--card-bg); color: var(--text-muted);
+            border: 1.5px solid var(--border);
+            padding: 9px 18px; border-radius: var(--radius-sm);
+            font-size: 0.78rem; font-weight: 700; cursor: pointer;
+            transition: all 0.2s ease; display: inline-flex;
+            align-items: center; gap: 7px; font-family: inherit;
         }
+        .btn-secondary-top:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
 
-        /* ===== STATS CARDS ===== */
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px; margin-bottom: 24px;
         }
         .stat-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 20px 22px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-            transition: box-shadow 0.25s ease, transform 0.25s ease;
+            background: var(--card-bg); border-radius: var(--radius-lg);
+            padding: 20px 22px; box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border); position: relative;
+            overflow: hidden; transition: box-shadow 0.25s ease, transform 0.25s ease;
         }
-        .stat-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
+        .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
         .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
             background: var(--accent, var(--primary));
         }
         .stat-card .icon-circle {
-            width: 42px; height: 42px;
-            border-radius: 12px;
+            width: 42px; height: 42px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            float: right;
-            font-size: 1.05rem;
+            float: right; font-size: 1.05rem;
             background: var(--accent-light, var(--primary-light));
             color: var(--accent, var(--primary));
         }
-        .stat-card .num {
-            font-size: 1.9rem;
-            font-weight: 800;
-            display: block;
-            letter-spacing: -0.5px;
-            line-height: 1.1;
-        }
+        .stat-card .num { font-size: 1.9rem; font-weight: 800; display: block; letter-spacing: -0.5px; line-height: 1.1; }
         .stat-card .label {
-            font-size: 0.74rem;
-            color: var(--text-muted);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
-            display: block;
+            font-size: 0.74rem; color: var(--text-muted);
+            font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-top: 4px; display: block;
         }
         .stat-card.primary { --accent: var(--primary); --accent-light: var(--primary-light); }
         .stat-card.success { --accent: var(--success); --accent-light: var(--success-light); }
@@ -298,30 +186,19 @@
         .stat-card.info { --accent: var(--info); --accent-light: var(--info-light); }
         .stat-card.purple { --accent: var(--purple); --accent-light: var(--purple-light); }
 
-        /* ===== SECCIONES ===== */
         .section-box {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 22px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            margin-bottom: 22px;
+            background: var(--card-bg); border-radius: var(--radius-lg);
+            padding: 22px; box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border); margin-bottom: 22px;
         }
         .section-title {
-            font-size: 1rem;
-            font-weight: 800;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1rem; font-weight: 800;
+            margin-bottom: 18px; display: flex;
+            align-items: center; gap: 10px;
         }
         .section-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 9px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            width: 32px; height: 32px; border-radius: 9px;
+            display: inline-flex; align-items: center; justify-content: center;
             font-size: 0.85rem;
         }
         .icon-badge-primary { background: var(--primary-light); color: var(--primary); }
@@ -330,34 +207,22 @@
         .icon-badge-warning { background: var(--warning-light); color: var(--warning); }
         .icon-badge-purple { background: var(--purple-light); color: var(--purple); }
 
-        /* ===== GRÁFICOS ===== */
         .charts-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 22px;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 20px; margin-bottom: 22px;
         }
         .chart-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 22px;
-            border: 1px solid var(--border);
+            background: var(--card-bg); border-radius: var(--radius-lg);
+            padding: 22px; border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
         }
         .chart-card h5 {
-            font-weight: 700;
-            font-size: 0.92rem;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: 700; font-size: 0.92rem;
+            margin-bottom: 16px; display: flex;
+            align-items: center; gap: 8px;
         }
-        .chart-container {
-            position: relative;
-            height: 260px;
-        }
+        .chart-container { position: relative; height: 260px; }
 
-        /* ===== ACCIONES MASIVAS ===== */
         .acciones-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -367,317 +232,321 @@
             background: var(--bg);
             border: 1.5px dashed var(--border);
             border-radius: var(--radius-md);
-            padding: 18px;
-            transition: all 0.2s ease;
+            padding: 18px; transition: all 0.2s ease;
         }
-        .accion-card:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
+        .accion-card:hover { border-color: var(--primary); background: var(--primary-light); }
         .accion-card h6 {
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 0.85rem; font-weight: 700;
+            margin-bottom: 12px; display: flex;
+            align-items: center; gap: 8px;
             color: var(--text-dark);
         }
         .accion-card input,
         .accion-card select {
-            width: 100%;
-            padding: 8px 12px;
+            width: 100%; padding: 8px 12px;
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
-            font-size: 0.8rem;
-            font-family: inherit;
-            margin-bottom: 10px;
-            background: #fff;
+            font-size: 0.8rem; font-family: inherit;
+            margin-bottom: 10px; background: #fff;
         }
         .accion-card input:focus,
-        .accion-card select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
+        .accion-card select:focus { outline: none; border-color: var(--primary); }
         .accion-card button {
-            width: 100%;
-            padding: 9px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 0.78rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            width: 100%; padding: 9px;
+            border: none; border-radius: var(--radius-sm);
+            font-size: 0.78rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s ease;
             font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            display: inline-flex; align-items: center;
+            justify-content: center; gap: 6px;
         }
-        .btn-accion-primary {
-            background: var(--primary);
-            color: #fff;
-        }
-        .btn-accion-primary:hover {
-            background: var(--primary-dark);
-        }
-        .btn-accion-info {
-            background: var(--info);
-            color: #fff;
-        }
-        .btn-accion-info:hover {
-            background: #005A99;
-        }
+        .accion-card button:disabled { opacity: .6; cursor: not-allowed; }
+        .btn-accion-primary { background: var(--primary); color: #fff; }
+        .btn-accion-primary:hover { background: var(--primary-dark); }
+        .btn-accion-info { background: var(--info); color: #fff; }
+        .btn-accion-info:hover { background: #005A99; }
 
-        /* ===== TABLA CLIENTES ===== */
         .table-container {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
+            background: var(--card-bg); border-radius: var(--radius-lg);
             border: 1px solid var(--border);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
+            overflow: hidden; box-shadow: var(--shadow-sm);
         }
         .table-header {
-            padding: 18px 22px;
-            background: var(--card-bg);
+            padding: 18px 22px; background: var(--card-bg);
             border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
+            display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 12px;
         }
         .table-header h5 {
-            font-weight: 700;
-            font-size: 0.95rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-weight: 700; font-size: 0.95rem; margin: 0;
+            display: flex; align-items: center; gap: 10px;
         }
-        .filtros-tabla {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .filtros-tabla { display: flex; gap: 8px; flex-wrap: wrap; }
         .filtros-tabla select,
         .filtros-tabla input {
             padding: 7px 14px;
             border: 1.5px solid var(--border);
-            border-radius: 20px;
-            font-size: 0.78rem;
-            font-family: inherit;
-            background: var(--bg);
+            border-radius: 20px; font-size: 0.78rem;
+            font-family: inherit; background: var(--bg);
             color: var(--text-dark);
         }
         .filtros-tabla select:focus,
-        .filtros-tabla input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: #fff;
-        }
+        .filtros-tabla input:focus { outline: none; border-color: var(--primary); background: #fff; }
 
-        table.lealtad-tabla {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        table.lealtad-tabla { width: 100%; border-collapse: collapse; }
         table.lealtad-tabla thead th {
-            background: var(--bg);
-            font-weight: 700;
-            font-size: 0.68rem;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: var(--text-muted);
+            background: var(--bg); font-weight: 700;
+            font-size: 0.68rem; text-transform: uppercase;
+            letter-spacing: 0.6px; color: var(--text-muted);
             padding: 12px 18px;
             border-bottom: 1px solid var(--border);
             text-align: left;
         }
         table.lealtad-tabla tbody td {
-            padding: 12px 18px;
-            font-size: 0.82rem;
+            padding: 12px 18px; font-size: 0.82rem;
             border-bottom: 1px solid #F5F5F7;
-            color: var(--text-dark);
-            vertical-align: middle;
+            color: var(--text-dark); vertical-align: middle;
         }
         table.lealtad-tabla tbody tr:nth-child(even) { background: #FAFAFC; }
         table.lealtad-tabla tbody tr:hover { background: var(--primary-light); }
 
-        .cliente-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .cliente-cell { display: flex; align-items: center; gap: 10px; }
         .cliente-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: var(--info-light);
-            color: var(--info);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.72rem;
-            font-weight: 800;
-            flex-shrink: 0;
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--info-light); color: var(--info);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 800; flex-shrink: 0;
         }
         .badge-nivel {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 12px; border-radius: 50px;
+            font-size: 0.7rem; font-weight: 700; white-space: nowrap;
         }
         .badge-nivel.Bronce { background: #F5E6D3; color: #8B5A2B; }
         .badge-nivel.Plata { background: #F0F1F5; color: #6B7280; }
         .badge-nivel.Oro { background: #FFF4CC; color: #A67C00; }
         .badge-nivel.Diamante { background: var(--purple-light); color: var(--purple); }
 
-        .puntos-cell {
-            font-weight: 800;
-            color: var(--primary);
-        }
-        .gasto-cell {
-            font-weight: 700;
-            color: var(--success);
-        }
-        .btn-mini {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: inherit;
-            color: var(--text-muted);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .btn-mini:hover {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-        }
+        .puntos-cell { font-weight: 800; color: var(--primary); }
+        .gasto-cell { font-weight: 700; color: var(--success); }
 
-        /* ===== MODAL ===== */
+        .badge-tipo {
+            display: inline-block; padding: 2px 9px; border-radius: 6px;
+            font-size: 0.65rem; font-weight: 700; margin-right: 4px; margin-bottom: 2px;
+        }
+        .badge-tipo.bienvenida { background: var(--success-light); color: var(--success); }
+        .badge-tipo.nivel { background: var(--warning-light); color: var(--warning); }
+        .badge-tipo.reactivacion { background: var(--danger-light); color: var(--danger); }
+        .badge-tipo.proximo_nivel { background: var(--primary-light); color: var(--primary); }
+
+        .btn-mini {
+            background: var(--bg); border: 1px solid var(--border);
+            padding: 5px 12px; border-radius: 6px;
+            font-size: 0.7rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: inherit; color: var(--text-muted);
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-mini:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
         .modal-custom {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(20,33,61,0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            z-index: 2000; align-items: flex-start; justify-content: center;
+            padding: 30px 20px; overflow-y: auto;
         }
         .modal-custom.activo { display: flex; }
         .modal-box {
-            background: #fff;
-            border-radius: var(--radius-lg);
-            padding: 28px;
-            max-width: 500px;
-            width: 100%;
+            background: #fff; border-radius: var(--radius-lg);
+            padding: 28px; max-width: 500px; width: 100%;
             box-shadow: var(--shadow-lg);
+            max-height: calc(100vh - 60px); overflow-y: auto;
         }
+        .modal-box.modal-ancho { max-width: 900px; }
         .modal-box h3 {
-            font-size: 1.15rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1.15rem; font-weight: 800;
+            margin-bottom: 8px; display: flex;
+            align-items: center; gap: 10px;
         }
         .modal-box .modal-sub {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            font-size: 0.85rem; color: var(--text-muted);
             margin-bottom: 18px;
         }
         .modal-box label {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 700;
-            margin-bottom: 6px;
+            display: block; font-size: 0.78rem;
+            font-weight: 700; margin-bottom: 6px;
             color: var(--text-dark);
         }
         .modal-box input,
-        .modal-box textarea {
-            width: 100%;
-            padding: 10px 14px;
+        .modal-box textarea,
+        .modal-box select {
+            width: 100%; padding: 10px 14px;
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
-            font-size: 0.85rem;
-            font-family: inherit;
-            margin-bottom: 16px;
-            background: var(--bg);
+            font-size: 0.85rem; font-family: inherit;
+            margin-bottom: 16px; background: var(--bg);
         }
         .modal-box input:focus,
-        .modal-box textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: #fff;
-        }
+        .modal-box textarea:focus,
+        .modal-box select:focus { outline: none; border-color: var(--primary); background: #fff; }
         .modal-acciones {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 8px;
+            display: flex; gap: 10px;
+            justify-content: flex-end; margin-top: 8px;
         }
         .modal-acciones button {
-            padding: 9px 22px;
-            border-radius: var(--radius-sm);
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: inherit;
-            border: none;
-            transition: all 0.2s ease;
+            padding: 9px 22px; border-radius: var(--radius-sm);
+            font-size: 0.8rem; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            border: none; transition: all 0.2s ease;
         }
-        .btn-cancelar {
-            background: var(--bg);
-            color: var(--text-muted);
-            border: 1.5px solid var(--border) !important;
-        }
+        .btn-cancelar { background: var(--bg); color: var(--text-muted); border: 1.5px solid var(--border) !important; }
         .btn-cancelar:hover { background: #E5E7EB; }
-        .btn-guardar {
-            background: var(--primary);
-            color: #fff;
-        }
+        .btn-guardar { background: var(--primary); color: #fff; }
         .btn-guardar:hover { background: var(--primary-dark); }
 
-        /* ===== TOAST ===== */
+        /* ============================================================
+           ⭐ RESUMEN DE CUPONES — COLORES NUEVOS
+        ============================================================ */
+        .resumen-tabla { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .resumen-tabla th {
+            background: var(--bg); padding: 10px 12px;
+            text-align: left; font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-muted); font-weight: 700;
+            border-bottom: 1px solid var(--border);
+        }
+        .resumen-tabla td {
+            padding: 12px 14px; border-bottom: 1px solid #F5F5F7;
+            vertical-align: top;
+        }
+        .resumen-tabla tr:hover { background: #FAFAFC; }
+
+        /* Fila alternada para mejor lectura */
+        .resumen-tabla tbody tr:nth-child(even) { background: #FBFBFD; }
+
+        /* Métricas del modal */
+        .resumen-metricas {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; margin-bottom: 18px;
+        }
+        .resumen-metrica {
+            background: var(--bg); border-radius: var(--radius-md);
+            padding: 16px 18px; text-align: center;
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .resumen-metrica:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(20,33,61,0.08);
+        }
+        .resumen-metrica .num {
+            font-size: 1.7rem; font-weight: 900;
+            display: block; letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+        .resumen-metrica .lbl {
+            font-size: 0.68rem; color: var(--text-muted);
+            font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.4px; margin-top: 6px;
+            display: block;
+        }
+
+        /* Colores por métrica */
+        .resumen-metrica.metrica-procesados {
+            border-top-color: var(--info);
+            background: linear-gradient(135deg, var(--info-light), #F4F9FE);
+        }
+        .resumen-metrica.metrica-procesados .num { color: var(--info); }
+
+        .resumen-metrica.metrica-generados {
+            border-top-color: var(--success);
+            background: linear-gradient(135deg, var(--success-light), #F3FBF6);
+        }
+        .resumen-metrica.metrica-generados .num { color: var(--success); }
+
+        .resumen-metrica.metrica-omitidos {
+            border-top-color: var(--warning);
+            background: linear-gradient(135deg, var(--warning-light), #FFFBF3);
+        }
+        .resumen-metrica.metrica-omitidos .num { color: var(--warning); }
+
+        /* ⭐ Celda de cupones generados: verde */
+        .cupones-generados-lista {
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .chip-generado {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: var(--success-light);
+            color: var(--success);
+            border-left: 3px solid var(--success);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem; font-weight: 700;
+            white-space: nowrap;
+            max-width: 100%;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .chip-generado i { font-size: 0.65rem; }
+
+        /* ⭐ Celda de cupones omitidos: naranja + motivo visible */
+        .cupones-omitidos-lista {
+            display: flex; flex-direction: column; gap: 5px;
+        }
+        .chip-omitido {
+            display: flex; flex-direction: column; gap: 2px;
+            background: var(--warning-light);
+            border-left: 3px solid var(--warning);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            max-width: 100%;
+        }
+        .chip-omitido .tipo {
+            font-weight: 800;
+            color: #8A4D00;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .chip-omitido .tipo i { font-size: 0.6rem; }
+        .chip-omitido .motivo {
+            color: #A15C00;
+            font-weight: 500;
+            font-size: 0.67rem;
+            line-height: 1.3;
+        }
+
+        .chip-vacio {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-style: italic;
+        }
+
         .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--success);
-            color: #fff;
-            padding: 14px 22px;
-            border-radius: var(--radius-md);
-            font-size: 0.85rem;
-            font-weight: 700;
-            box-shadow: var(--shadow-lg);
-            z-index: 3000;
-            opacity: 0;
-            transform: translateX(100%);
+            position: fixed; top: 20px; right: 20px;
+            background: var(--success); color: #fff;
+            padding: 14px 22px; border-radius: var(--radius-md);
+            font-size: 0.85rem; font-weight: 700;
+            box-shadow: var(--shadow-lg); z-index: 3000;
+            opacity: 0; transform: translateX(100%);
             transition: all 0.3s ease;
         }
-        .toast.activo {
-            opacity: 1;
-            transform: translateX(0);
-        }
+        .toast.activo { opacity: 1; transform: translateX(0); }
         .toast.error { background: var(--danger); }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .charts-grid { grid-template-columns: 1fr; }
+        .mini-loader {
+            display: inline-block; width: 12px; height: 12px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin .6s linear infinite;
+            vertical-align: middle; margin-right: 6px;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 992px) { .charts-grid { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             .sidebar { width: 70px; }
             .sidebar .logo, .sidebar .panel-title, .sidebar a span,
@@ -691,6 +560,7 @@
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .top-bar h1 { font-size: 1.3rem; }
             .table-header { flex-direction: column; align-items: stretch; }
+            .resumen-metricas { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr; }
@@ -702,7 +572,6 @@
 
 <div class="layout">
 
-    <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar">
         <div class="admin-profile">
             {% if session.get('foto') %}
@@ -754,7 +623,6 @@
         </div>
     </nav>
 
-    <!-- ===== MAIN ===== -->
     <main class="main">
 
         <div class="breadcrumb">
@@ -767,6 +635,12 @@
                 <div class="subtitulo">Programa de lealtad personalizado para tus mejores clientes.</div>
             </div>
             <div class="acciones">
+                <button class="btn-secondary-top" onclick="verUltimoResumen()" id="btnVerResumen" style="display:none;">
+                    <i class="fas fa-list"></i> Ver último resumen
+                </button>
+                <button class="btn-primary-top" id="btnAutoGenerar" onclick="generarAutomatico()">
+                    <i class="fas fa-magic"></i> Generar automático
+                </button>
                 <button class="btn-primary-top" onclick="abrirModalOtorgarPuntos()">
                     <i class="fas fa-star"></i> Otorgar puntos
                 </button>
@@ -776,31 +650,29 @@
             </div>
         </div>
 
-        <!-- ===== STATS ===== -->
         <div class="stats-grid">
             <div class="stat-card primary">
                 <div class="icon-circle"><i class="fas fa-users"></i></div>
-                <span class="num">{{ stats.total_clientes }}</span>
+                <span class="num" id="statTotalClientes">{{ stats.total_clientes }}</span>
                 <span class="label">Clientes en el programa</span>
             </div>
             <div class="stat-card warning">
                 <div class="icon-circle"><i class="fas fa-star"></i></div>
-                <span class="num">{{ stats.puntos_disponibles }}</span>
+                <span class="num" id="statPuntosDisponibles">{{ stats.puntos_disponibles }}</span>
                 <span class="label">Puntos disponibles</span>
             </div>
             <div class="stat-card success">
                 <div class="icon-circle"><i class="fas fa-trophy"></i></div>
-                <span class="num">{{ stats.puntos_historicos }}</span>
+                <span class="num" id="statPuntosHistoricos">{{ stats.puntos_historicos }}</span>
                 <span class="label">Puntos históricos</span>
             </div>
             <div class="stat-card info">
                 <div class="icon-circle"><i class="fas fa-dollar-sign"></i></div>
-                <span class="num">${{ "%.0f"|format(stats.gasto_total) }}</span>
+                <span class="num" id="statGastoTotal">${{ "%.0f"|format(stats.gasto_total) }}</span>
                 <span class="label">Gasto total acumulado</span>
             </div>
         </div>
 
-        <!-- ===== GRÁFICOS ===== -->
         <div class="charts-grid">
             <div class="chart-card">
                 <h5><i class="fas fa-chart-pie" style="color: var(--primary);"></i> Distribución por nivel</h5>
@@ -816,7 +688,6 @@
             </div>
         </div>
 
-        <!-- ===== ACCIONES MASIVAS ===== -->
         <div class="section-box">
             <div class="section-title">
                 <span class="section-icon icon-badge-primary"><i class="fas fa-bolt"></i></span>
@@ -834,7 +705,7 @@
                     </select>
                     <input type="number" id="inputPuntosMasivos" placeholder="Puntos a otorgar" min="1" value="100">
                     <input type="text" id="inputMotivoPuntos" placeholder="Motivo (ej: Campaña de bienvenida)" value="Campaña especial">
-                    <button class="btn-accion-primary" onclick="otorgarPuntosMasivos()">
+                    <button class="btn-accion-primary" id="btnOtorgarMasivo" onclick="otorgarPuntosMasivos()">
                         <i class="fas fa-paper-plane"></i> Otorgar puntos
                     </button>
                 </div>
@@ -849,19 +720,18 @@
                         <option value="Diamante">💎 Diamante</option>
                     </select>
                     <input type="number" id="inputMontoMinimoCupones" placeholder="Gasto mínimo (opcional)" min="0">
-                    <button class="btn-accion-info" onclick="generarCuponesMasivos()">
+                    <button class="btn-accion-info" id="btnGenerarCupones" onclick="generarCuponesMasivos()">
                         <i class="fas fa-magic"></i> Generar cupones
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- ===== TABLA DE CLIENTES ===== -->
         <div class="table-container">
             <div class="table-header">
                 <h5>
                     <span class="section-icon icon-badge-info"><i class="fas fa-list"></i></span>
-                    Clientes del programa ({{ clientes|length }})
+                    Clientes del programa (<span id="contadorClientes">{{ clientes|length }}</span>)
                 </h5>
                 <div class="filtros-tabla">
                     <select id="filtroNivel" onchange="filtrarClientes()">
@@ -872,6 +742,9 @@
                         <option value="Diamante">💎 Diamante</option>
                     </select>
                     <input type="text" id="buscarCliente" placeholder="Buscar cliente..." oninput="filtrarClientes()">
+                    <button class="btn-mini" onclick="cargarClientes(true)" title="Refrescar">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
             </div>
             <div style="overflow-x: auto;">
@@ -883,11 +756,11 @@
                             <th>Puntos</th>
                             <th>Gasto total</th>
                             <th>Compras</th>
-                            <th>Cupones</th>
+                            <th>Cupones activos</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tbodyClientes">
                         {% for c in clientes %}
                         <tr data-nivel="{{ c.nivel }}" data-nombre="{{ c.nombre_usuario }}">
                             <td>
@@ -906,11 +779,22 @@
                             <td class="gasto-cell">${{ "%.2f"|format(c.gasto_total) }}</td>
                             <td>{{ c.compras_realizadas }}</td>
                             <td>
-                                {{ c.cupones_personalizados|selectattr('usado', 'equalto', False)|list|length }}
-                                activos
+                                {% set activos = c.cupones_personalizados|selectattr('usado', 'equalto', False)|list %}
+                                {% if activos %}
+                                    {% for cupon in activos[:2] %}
+                                    <span class="badge-tipo {{ cupon.tipo_regla or 'nivel' }}" title="{{ cupon.titulo or cupon.id }}">
+                                        {{ cupon.tipo_regla or 'cupón' }}
+                                    </span>
+                                    {% endfor %}
+                                    {% if activos|length > 2 %}
+                                        <span class="badge-tipo nivel">+{{ activos|length - 2 }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color: var(--text-muted); font-size: 0.75rem;">—</span>
+                                {% endif %}
                             </td>
                             <td>
-                                <button class="btn-mini" onclick="abrirModalAjustar('{{ c.usuario_id }}', '{{ c.nombre_usuario }}', {{ c.puntos_disponibles }})">
+                                <button class="btn-mini" onclick="abrirModalAjustar('{{ c.usuario_id }}', '{{ c.nombre_usuario|e }}', {{ c.puntos_disponibles }})">
                                     <i class="fas fa-edit"></i> Ajustar
                                 </button>
                             </td>
@@ -932,89 +816,332 @@
     </main>
 </div>
 
-<!-- ===== MODAL: AJUSTAR PUNTOS ===== -->
+<!-- MODAL: AJUSTAR PUNTOS -->
 <div class="modal-custom" id="modalAjustar">
     <div class="modal-box">
         <h3><i class="fas fa-edit" style="color: var(--primary);"></i> Ajustar puntos</h3>
         <p class="modal-sub" id="modalAjustarSub">Cliente: —</p>
-
         <input type="hidden" id="ajustarUsuarioId">
-
         <label>Puntos (positivo para sumar, negativo para restar)</label>
         <input type="number" id="ajustarPuntos" placeholder="Ej: 100 o -50">
-
         <label>Motivo</label>
         <input type="text" id="ajustarMotivo" placeholder="Ej: Compensación por retraso" value="Ajuste manual">
-
         <div class="modal-acciones">
             <button class="btn-cancelar" onclick="cerrarModalAjustar()">Cancelar</button>
-            <button class="btn-guardar" onclick="guardarAjuste()">
+            <button class="btn-guardar" id="btnGuardarAjuste" onclick="guardarAjuste()">
                 <i class="fas fa-save"></i> Guardar
             </button>
         </div>
     </div>
 </div>
 
-<!-- ===== MODAL: OTORGAR PUNTOS MASIVOS ===== -->
+<!-- MODAL: OTORGAR PUNTOS MASIVOS -->
 <div class="modal-custom" id="modalOtorgar">
     <div class="modal-box">
         <h3><i class="fas fa-star" style="color: var(--warning);"></i> Otorgar puntos masivos</h3>
         <p class="modal-sub">Otorga puntos a todos los clientes de un nivel.</p>
-
         <label>Nivel objetivo</label>
-        <select id="otorgarNivel" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius: var(--radius-sm); font-size:0.85rem; font-family:inherit; margin-bottom:16px; background: var(--bg);">
+        <select id="otorgarNivel">
             <option value="todos">Todos los niveles</option>
             <option value="Bronce">🥉 Bronce</option>
             <option value="Plata">🥈 Plata</option>
             <option value="Oro">🥇 Oro</option>
             <option value="Diamante">💎 Diamante</option>
         </select>
-
         <label>Puntos a otorgar por cliente</label>
         <input type="number" id="otorgarPuntos" value="100" min="1">
-
         <label>Motivo</label>
         <input type="text" id="otorgarMotivo" value="Campaña especial" placeholder="Ej: Black Friday">
-
         <div class="modal-acciones">
             <button class="btn-cancelar" onclick="cerrarModalOtorgar()">Cancelar</button>
-            <button class="btn-guardar" onclick="confirmarOtorgar()">
+            <button class="btn-guardar" id="btnConfirmarOtorgar" onclick="confirmarOtorgar()">
                 <i class="fas fa-paper-plane"></i> Otorgar
             </button>
         </div>
     </div>
 </div>
 
-<!-- ===== TOAST ===== -->
+<!-- MODAL: RESUMEN DE CUPONES GENERADOS -->
+<div class="modal-custom" id="modalResumen">
+    <div class="modal-box modal-ancho">
+        <h3><i class="fas fa-list-check" style="color: var(--primary);"></i> Resumen de cupones generados</h3>
+        <p class="modal-sub" id="modalResumenSub">Detalle de qué cupón se generó y a quién.</p>
+
+        <div class="resumen-metricas" id="resumenMetricas"></div>
+
+        <div style="overflow-x: auto; max-height: 420px; border: 1px solid var(--border); border-radius: var(--radius-md);">
+            <table class="resumen-tabla" id="tablaResumen">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Nivel</th>
+                        <th>Cupones generados</th>
+                        <th>Cupones omitidos</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyResumen"></tbody>
+            </table>
+        </div>
+
+        <div class="modal-acciones" style="margin-top: 18px;">
+            <button class="btn-cancelar" onclick="cerrarModalResumen()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast">Acción completada</div>
 
 <script>
 // ============================================================
-// GRÁFICOS
+// ESTADO GLOBAL
 // ============================================================
 let chartNiveles = null;
 let chartTopClientes = null;
+let autoRefreshInterval = null;
+let clientesCache = [];
+let ultimoResumenCupones = null;
 
+// ============================================================
+// HELPERS
+// ============================================================
+function mostrarToast(mensaje, esError) {
+    const toast = document.getElementById('toast');
+    toast.textContent = mensaje;
+    toast.className = 'toast activo' + (esError ? ' error' : '');
+    setTimeout(function() { toast.classList.remove('activo'); }, 3200);
+}
+
+function setBotonCargando(btn, cargando, textoOriginal) {
+    if (!btn) return;
+    if (cargando) {
+        btn.disabled = true;
+        btn.dataset.original = btn.innerHTML;
+        btn.innerHTML = '<span class="mini-loader"></span>' + (textoOriginal || 'Procesando...');
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.original || textoOriginal || btn.innerHTML;
+    }
+}
+
+function badgeNivel(nivel) {
+    if (nivel === 'Bronce') return '🥉';
+    if (nivel === 'Plata') return '🥈';
+    if (nivel === 'Oro') return '🥇';
+    return '💎';
+}
+
+function labelTipoRegla(tipo) {
+    const map = {
+        bienvenida: 'Bienvenida',
+        nivel: 'Nivel',
+        reactivacion: 'Reactivación',
+        proximo_nivel: 'Próximo nivel',
+    };
+    return map[tipo] || tipo || 'Cupón';
+}
+
+function iconoTipoRegla(tipo) {
+    const map = {
+        bienvenida: 'fa-gift',
+        nivel: 'fa-crown',
+        reactivacion: 'fa-heart-broken',
+        proximo_nivel: 'fa-arrow-up',
+    };
+    return map[tipo] || 'fa-ticket-alt';
+}
+
+function _unirData(raw) {
+    if (!raw || typeof raw !== 'object') return {};
+    if (raw.data && typeof raw.data === 'object') {
+        return Object.assign({}, raw, raw.data);
+    }
+    return raw;
+}
+
+function _escapeHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function _hayModalAbierto() {
+    return document.querySelector('.modal-custom.activo') !== null;
+}
+
+// ============================================================
+// AUTO-CARGA
+// ============================================================
 document.addEventListener('DOMContentLoaded', function() {
+    cargarStats();
+    cargarClientes();
     renderChartNiveles();
     renderChartTopClientes();
+
+    autoRefreshInterval = setInterval(function() {
+        if (_hayModalAbierto()) return;
+        cargarStats(true);
+        cargarClientes(true);
+    }, 30000);
 });
 
-function renderChartNiveles() {
+// ============================================================
+// STATS
+// ============================================================
+async function cargarStats(silencioso) {
+    try {
+        const r = await fetch('/api/admin/lealtad/stats', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const raw = await r.json();
+        const data = _unirData(raw);
+        if (raw.success === false) throw new Error(data.error || 'Error stats');
+
+        const totalClientes = data.total_clientes ?? 0;
+        const puntosDisp = data.puntos_disponibles ?? 0;
+        const puntosHist = data.puntos_historicos ?? 0;
+        const gastoTotal = data.gasto_total ?? 0;
+
+        document.getElementById('statTotalClientes').textContent = totalClientes;
+        document.getElementById('statPuntosDisponibles').textContent = puntosDisp;
+        document.getElementById('statPuntosHistoricos').textContent = puntosHist;
+        document.getElementById('statGastoTotal').textContent =
+            '$' + Number(gastoTotal).toLocaleString('es-MX', { maximumFractionDigits: 0 });
+
+        const dist = data.distribucion_niveles || data.distribucion || { Bronce: 0, Plata: 0, Oro: 0, Diamante: 0 };
+        renderChartNiveles(dist);
+    } catch (e) {
+        console.warn('[stats] Error:', e.message);
+        if (!silencioso) mostrarToast('No se pudieron cargar las estadísticas', true);
+    }
+}
+
+// ============================================================
+// CLIENTES
+// ============================================================
+async function cargarClientes(silencioso) {
+    try {
+        const r = await fetch('/api/admin/lealtad/clientes', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const raw = await r.json();
+        const data = _unirData(raw);
+        if (raw.success === false) throw new Error(data.error || 'Error clientes');
+
+        clientesCache = data.clientes || [];
+        renderTablaClientes(clientesCache);
+        renderChartTopClientes();
+        document.getElementById('contadorClientes').textContent = clientesCache.length;
+    } catch (e) {
+        console.warn('[clientes] Error:', e.message);
+        if (!silencioso) mostrarToast('No se pudieron cargar los clientes', true);
+    }
+}
+
+function renderTablaClientes(lista) {
+    const tbody = document.getElementById('tbodyClientes');
+    if (!tbody) return;
+
+    if (!lista || lista.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align:center; padding: 40px; color: var(--text-muted);">
+                    <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 10px; color: var(--border);"></i>
+                    No hay clientes en el programa todavía.
+                </td>
+            </tr>`;
+        return;
+    }
+
+    tbody.innerHTML = lista.map(function(c) {
+        const nivel = c.nivel || 'Bronce';
+        const nombre = c.nombre || c.nombre_usuario || 'Cliente';
+        const iniciales = (nombre || 'NA').slice(0, 2).toUpperCase();
+        const puntos = c.puntos_disponibles ?? 0;
+        const gasto = Number(c.gasto_total ?? 0).toFixed(2);
+        const compras = c.compras_realizadas ?? 0;
+        const cupones = c.cupones_activos ?? 0;
+        const uid = c.usuario_id || c._id || '';
+
+        const nombreEsc = _escapeHtml(nombre);
+        const uidEsc = _escapeHtml(uid);
+
+        let cuponesHtml = '<span style="color: var(--text-muted); font-size: 0.75rem;">—</span>';
+        const cuponesArr = Array.isArray(c.cupones_personalizados) ? c.cupones_personalizados : [];
+        if (cuponesArr.length) {
+            const activos = cuponesArr.filter(function(x) { return x && !x.usado; });
+            if (activos.length) {
+                const chips = activos.slice(0, 2).map(function(x) {
+                    const tipo = x.tipo_regla || 'nivel';
+                    const titulo = _escapeHtml(x.titulo || x.id || '');
+                    return '<span class="badge-tipo ' + _escapeHtml(tipo) + '" title="' + titulo + '">' +
+                           _escapeHtml(labelTipoRegla(tipo)) + '</span>';
+                }).join('');
+                const extra = activos.length > 2 ? '<span class="badge-tipo nivel">+' + (activos.length - 2) + '</span>' : '';
+                cuponesHtml = chips + extra;
+            }
+        } else if (cupones > 0) {
+            cuponesHtml = '<span class="badge-tipo nivel">' + cupones + ' activos</span>';
+        }
+
+        return `
+            <tr data-nivel="${_escapeHtml(nivel)}" data-nombre="${nombreEsc}">
+                <td>
+                    <div class="cliente-cell">
+                        <span class="cliente-avatar">${_escapeHtml(iniciales)}</span>
+                        <span><strong>${nombreEsc}</strong></span>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge-nivel ${_escapeHtml(nivel)}">
+                        ${badgeNivel(nivel)} ${_escapeHtml(nivel)}
+                    </span>
+                </td>
+                <td class="puntos-cell">${puntos} pts</td>
+                <td class="gasto-cell">$${gasto}</td>
+                <td>${compras}</td>
+                <td>${cuponesHtml}</td>
+                <td>
+                    <button class="btn-mini" onclick="abrirModalAjustar('${uidEsc}', '${nombreEsc}', ${puntos})">
+                        <i class="fas fa-edit"></i> Ajustar
+                    </button>
+                </td>
+            </tr>`;
+    }).join('');
+
+    filtrarClientes();
+}
+
+function filtrarClientes() {
+    const nivel = document.getElementById('filtroNivel').value;
+    const busqueda = document.getElementById('buscarCliente').value.toLowerCase().trim();
+    document.querySelectorAll('#tbodyClientes tr').forEach(function(fila) {
+        const nivelFila = fila.dataset.nivel || '';
+        const nombreFila = (fila.dataset.nombre || '').toLowerCase();
+        const coincideNivel = !nivel || nivelFila === nivel;
+        const coincideBusqueda = !busqueda || nombreFila.includes(busqueda);
+        fila.style.display = (coincideNivel && coincideBusqueda) ? '' : 'none';
+    });
+}
+
+// ============================================================
+// GRÁFICOS
+// ============================================================
+function renderChartNiveles(dist) {
     const canvas = document.getElementById('chartNiveles');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (chartNiveles) chartNiveles.destroy();
 
-    const datos = {
-        'Bronce': {{ stats.distribucion_niveles.get('Bronce', 0) }},
-        'Plata': {{ stats.distribucion_niveles.get('Plata', 0) }},
-        'Oro': {{ stats.distribucion_niveles.get('Oro', 0) }},
-        'Diamante': {{ stats.distribucion_niveles.get('Diamante', 0) }}
-    };
-
+    const datos = dist || { Bronce: 0, Plata: 0, Oro: 0, Diamante: 0 };
     const labels = Object.keys(datos);
-    const valores = Object.values(datos);
+    const valores = Object.values(datos).map(Number);
     const total = valores.reduce((a, b) => a + b, 0);
     const colores = ['#CD7F32', '#A9AFBC', '#C99B2E', '#7A5FE0'];
 
@@ -1022,51 +1149,34 @@ function renderChartNiveles() {
         type: 'doughnut',
         data: {
             labels: labels,
-            datasets: [{
-                data: valores,
-                backgroundColor: colores,
-                borderWidth: 3,
-                borderColor: '#fff',
-                hoverOffset: 8
-            }]
+            datasets: [{ data: valores, backgroundColor: colores, borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
+            responsive: true, maintainAspectRatio: false, cutout: '65%',
             plugins: {
                 legend: {
                     position: 'right',
                     labels: {
-                        font: { size: 11, weight: '600' },
-                        boxWidth: 14,
-                        padding: 10,
-                        generateLabels: function(chart) {
+                        font: { size: 11, weight: '600' }, boxWidth: 14, padding: 10,
+                        generateLabels: function() {
                             return labels.map(function(label, i) {
                                 const value = valores[i];
                                 const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                                 return {
                                     text: label + ' · ' + value + ' (' + pct + '%)',
-                                    fillStyle: colores[i],
-                                    strokeStyle: '#fff',
-                                    lineWidth: 2,
-                                    index: i
+                                    fillStyle: colores[i], strokeStyle: '#fff', lineWidth: 2, index: i
                                 };
                             });
                         }
                     }
                 },
                 tooltip: {
-                    backgroundColor: '#14213D',
-                    padding: 12,
+                    backgroundColor: '#14213D', padding: 12,
                     callbacks: {
                         label: function(context) {
                             const value = context.parsed;
                             const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                            return [
-                                'Clientes: ' + value,
-                                'Porcentaje: ' + pct + '%'
-                            ];
+                            return ['Clientes: ' + value, 'Porcentaje: ' + pct + '%'];
                         }
                     }
                 }
@@ -1081,21 +1191,12 @@ function renderChartTopClientes() {
     const ctx = canvas.getContext('2d');
     if (chartTopClientes) chartTopClientes.destroy();
 
-    // Obtener top 10 clientes desde el HTML
-    const filas = document.querySelectorAll('#tablaClientes tbody tr');
-    const clientes = [];
-
-    filas.forEach(function(fila) {
-        const nombreEl = fila.querySelector('.cliente-cell strong');
-        const puntosEl = fila.querySelector('.puntos-cell');
-        if (nombreEl && puntosEl) {
-            const puntos = parseInt(puntosEl.textContent.replace(' pts', '')) || 0;
-            clientes.push({ nombre: nombreEl.textContent, puntos: puntos });
-        }
-    });
-
-    clientes.sort(function(a, b) { return b.puntos - a.puntos; });
-    const top10 = clientes.slice(0, 10);
+    const top10 = [...clientesCache]
+        .map(function(c) {
+            return { nombre: c.nombre || c.nombre_usuario || 'Cliente', puntos: Number(c.puntos_disponibles ?? 0) };
+        })
+        .sort(function(a, b) { return b.puntos - a.puntos; })
+        .slice(0, 10);
 
     chartTopClientes = new Chart(ctx, {
         type: 'bar',
@@ -1105,70 +1206,164 @@ function renderChartTopClientes() {
                 label: 'Puntos',
                 data: top10.map(function(c) { return c.puntos; }),
                 backgroundColor: 'rgba(230, 0, 126, 0.75)',
-                borderColor: '#E6007E',
-                borderWidth: 2,
-                borderRadius: 6
+                borderColor: '#E6007E', borderWidth: 2, borderRadius: 6
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false, indexAxis: 'y',
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: '#14213D',
-                    padding: 12,
-                    callbacks: {
-                        label: function(context) {
-                            return 'Puntos: ' + context.parsed.x;
-                        }
-                    }
+                    backgroundColor: '#14213D', padding: 12,
+                    callbacks: { label: function(context) { return 'Puntos: ' + context.parsed.x; } }
                 }
             },
             scales: {
-                x: {
-                    beginAtZero: true,
-                    grid: { color: '#F0F1F5' },
-                    title: { display: true, text: 'Puntos disponibles', font: { weight: '700', size: 11 } }
-                },
-                y: {
-                    grid: { display: false },
-                    ticks: { font: { size: 10 } }
-                }
+                x: { beginAtZero: true, grid: { color: '#F0F1F5' },
+                     title: { display: true, text: 'Puntos disponibles', font: { weight: '700', size: 11 } } },
+                y: { grid: { display: false }, ticks: { font: { size: 10 } } }
             }
         }
     });
 }
 
 // ============================================================
-// FILTROS TABLA
+// MODAL DE RESUMEN — ⭐ COLORES NUEVOS
 // ============================================================
-function filtrarClientes() {
-    const nivel = document.getElementById('filtroNivel').value;
-    const busqueda = document.getElementById('buscarCliente').value.toLowerCase().trim();
+function abrirModalResumen(rawData) {
+    const data = _unirData(rawData);
+    ultimoResumenCupones = data;
+    document.getElementById('btnVerResumen').style.display = 'inline-flex';
 
-    document.querySelectorAll('#tablaClientes tbody tr').forEach(function(fila) {
-        const nivelFila = fila.dataset.nivel || '';
-        const nombreFila = (fila.dataset.nombre || '').toLowerCase();
+    const metricas = document.getElementById('resumenMetricas');
+    const generados = data.cupones_generados ?? data.total_generados ?? 0;
+    const omitidos = data.cupones_omitidos ?? data.total_omitidos ?? 0;
+    const procesados = data.clientes_procesados ?? 0;
 
-        const coincideNivel = !nivel || nivelFila === nivel;
-        const coincideBusqueda = !busqueda || nombreFila.includes(busqueda);
+    // ⭐ Métricas con colores diferenciados
+    metricas.innerHTML = `
+        <div class="resumen-metrica metrica-procesados">
+            <span class="num">${procesados}</span>
+            <span class="lbl">Clientes procesados</span>
+        </div>
+        <div class="resumen-metrica metrica-generados">
+            <span class="num">${generados}</span>
+            <span class="lbl">Cupones generados</span>
+        </div>
+        <div class="resumen-metrica metrica-omitidos">
+            <span class="num">${omitidos}</span>
+            <span class="lbl">Cupones omitidos</span>
+        </div>
+    `;
 
-        fila.style.display = (coincideNivel && coincideBusqueda) ? '' : 'none';
-    });
+    const tbody = document.getElementById('tbodyResumen');
+    const detalle = Array.isArray(data.detalle) ? data.detalle : [];
+
+    if (!detalle.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align:center; padding: 30px; color: var(--text-muted);">
+                    <i class="fas fa-info-circle" style="font-size: 1.6rem; display: block; margin-bottom: 8px; color: var(--border);"></i>
+                    Ningún cliente cumplió las reglas para recibir un cupón nuevo.
+                </td>
+            </tr>`;
+    } else {
+        tbody.innerHTML = detalle.map(function(d) {
+            const nombre = _escapeHtml(d.nombre || 'Cliente');
+            const nivel = _escapeHtml(d.nivel || 'Bronce');
+            const generadosArr = Array.isArray(d.generados) ? d.generados : [];
+            const omitidosArr = Array.isArray(d.omitidos) ? d.omitidos : [];
+
+            // ⭐ Generados: chips verdes con ícono
+            let chipsGen = '<span class="chip-vacio">Sin cupones nuevos</span>';
+            if (generadosArr.length) {
+                chipsGen = '<div class="cupones-generados-lista">' +
+                    generadosArr.map(function(g) {
+                        const tipo = g.tipo_regla || 'nivel';
+                        const motivo = g.motivo || '';
+                        return '<span class="chip-generado" title="' + _escapeHtml(motivo) + '">' +
+                               '<i class="fas fa-check-circle"></i> ' +
+                               _escapeHtml(labelTipoRegla(tipo)) +
+                               '</span>';
+                    }).join('') +
+                '</div>';
+            }
+
+            // ⭐ Omitidos: chips naranjas con tipo + motivo completo
+            let chipsOmi = '<span class="chip-vacio">Sin omisiones</span>';
+            if (omitidosArr.length) {
+                chipsOmi = '<div class="cupones-omitidos-lista">' +
+                    omitidosArr.map(function(o) {
+                        const tipo = o.tipo_regla || 'nivel';
+                        const motivo = o.motivo || 'No aplica';
+                        return '<div class="chip-omitido">' +
+                               '<div class="tipo">' +
+                               '<i class="fas ' + iconoTipoRegla(tipo) + '"></i> ' +
+                               _escapeHtml(labelTipoRegla(tipo)) +
+                               '</div>' +
+                               '<div class="motivo">' + _escapeHtml(motivo) + '</div>' +
+                               '</div>';
+                    }).join('') +
+                '</div>';
+            }
+
+            return `
+                <tr>
+                    <td><strong>${nombre}</strong></td>
+                    <td><span class="badge-nivel ${nivel}">${badgeNivel(d.nivel || 'Bronce')} ${nivel}</span></td>
+                    <td>${chipsGen}</td>
+                    <td>${chipsOmi}</td>
+                </tr>`;
+        }).join('');
+    }
+
+    document.getElementById('modalResumen').classList.add('activo');
+}
+
+function cerrarModalResumen() {
+    document.getElementById('modalResumen').classList.remove('activo');
+}
+
+function verUltimoResumen() {
+    if (ultimoResumenCupones) {
+        abrirModalResumen(ultimoResumenCupones);
+    } else {
+        mostrarToast('Aún no has generado cupones en esta sesión', true);
+    }
 }
 
 // ============================================================
-// TOAST
+// GENERAR AUTOMÁTICO
 // ============================================================
-function mostrarToast(mensaje, esError) {
-    const toast = document.getElementById('toast');
-    toast.textContent = mensaje;
-    toast.className = 'toast activo' + (esError ? ' error' : '');
-    setTimeout(function() {
-        toast.classList.remove('activo');
-    }, 3000);
+async function generarAutomatico() {
+    const btn = document.getElementById('btnAutoGenerar');
+    setBotonCargando(btn, true, 'Generando...');
+
+    try {
+        const r = await fetch('/api/admin/lealtad/generar-cupones', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ nivel: null, monto_minimo: null })
+        });
+        const raw = await r.json();
+        const data = _unirData(raw);
+
+        if (raw.success === false) {
+            mostrarToast('Error: ' + (data.error || 'Desconocido'), true);
+            return;
+        }
+
+        const total = data.cupones_generados ?? data.total_generados ?? 0;
+        mostrarToast('Se generaron ' + total + ' cupones');
+        await cargarClientes(true);
+        await cargarStats(true);
+        abrirModalResumen(data);
+    } catch (e) {
+        mostrarToast('Error de red: ' + e.message, true);
+    } finally {
+        setBotonCargando(btn, false, 'Generar automático');
+    }
 }
 
 // ============================================================
@@ -1176,7 +1371,8 @@ function mostrarToast(mensaje, esError) {
 // ============================================================
 function abrirModalAjustar(usuarioId, nombre, puntosActuales) {
     document.getElementById('ajustarUsuarioId').value = usuarioId;
-    document.getElementById('modalAjustarSub').textContent = 'Cliente: ' + nombre + ' · ' + puntosActuales + ' pts actuales';
+    document.getElementById('modalAjustarSub').textContent =
+        'Cliente: ' + nombre + ' · ' + puntosActuales + ' pts actuales';
     document.getElementById('ajustarPuntos').value = '';
     document.getElementById('ajustarMotivo').value = 'Ajuste manual';
     document.getElementById('modalAjustar').classList.add('activo');
@@ -1186,7 +1382,8 @@ function cerrarModalAjustar() {
     document.getElementById('modalAjustar').classList.remove('activo');
 }
 
-function guardarAjuste() {
+async function guardarAjuste() {
+    const btn = document.getElementById('btnGuardarAjuste');
     const usuarioId = document.getElementById('ajustarUsuarioId').value;
     const puntos = parseInt(document.getElementById('ajustarPuntos').value);
     const motivo = document.getElementById('ajustarMotivo').value.trim();
@@ -1196,26 +1393,29 @@ function guardarAjuste() {
         return;
     }
 
-    fetch('/api/admin/lealtad/ajustar-puntos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            usuario_id: usuarioId,
-            puntos: puntos,
-            motivo: motivo
-        })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        if (data.success) {
+    setBotonCargando(btn, true, 'Guardando...');
+    try {
+        const r = await fetch('/api/admin/lealtad/ajustar-puntos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ usuario_id: usuarioId, puntos: puntos, motivo: motivo })
+        });
+        const raw = await r.json();
+        const data = _unirData(raw);
+        if (raw.success) {
             mostrarToast('Puntos ajustados correctamente');
             cerrarModalAjustar();
-            setTimeout(function() { window.location.reload(); }, 800);
+            await cargarClientes(true);
+            await cargarStats(true);
         } else {
             mostrarToast('Error: ' + (data.error || 'Desconocido'), true);
         }
-    })
-    .catch(function(err) { mostrarToast('Error de red: ' + err.message, true); });
+    } catch (e) {
+        mostrarToast('Error de red: ' + e.message, true);
+    } finally {
+        setBotonCargando(btn, false, 'Guardar');
+    }
 }
 
 // ============================================================
@@ -1229,7 +1429,8 @@ function cerrarModalOtorgar() {
     document.getElementById('modalOtorgar').classList.remove('activo');
 }
 
-function confirmarOtorgar() {
+async function confirmarOtorgar() {
+    const btn = document.getElementById('btnConfirmarOtorgar');
     const nivel = document.getElementById('otorgarNivel').value;
     const puntos = parseInt(document.getElementById('otorgarPuntos').value);
     const motivo = document.getElementById('otorgarMotivo').value.trim();
@@ -1239,32 +1440,36 @@ function confirmarOtorgar() {
         return;
     }
 
-    fetch('/api/admin/lealtad/otorgar-puntos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            nivel: nivel,
-            puntos: puntos,
-            motivo: motivo
-        })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        if (data.success) {
-            mostrarToast(data.clientes_afectados + ' clientes recibieron ' + puntos + ' pts');
+    setBotonCargando(btn, true, 'Otorgando...');
+    try {
+        const r = await fetch('/api/admin/lealtad/otorgar-puntos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ nivel: nivel, puntos: puntos, motivo: motivo })
+        });
+        const raw = await r.json();
+        const data = _unirData(raw);
+        if (raw.success) {
+            mostrarToast((data.clientes_afectados ?? 0) + ' clientes recibieron ' + puntos + ' pts');
             cerrarModalOtorgar();
-            setTimeout(function() { window.location.reload(); }, 1000);
+            await cargarClientes(true);
+            await cargarStats(true);
         } else {
             mostrarToast('Error: ' + (data.error || 'Desconocido'), true);
         }
-    })
-    .catch(function(err) { mostrarToast('Error de red: ' + err.message, true); });
+    } catch (e) {
+        mostrarToast('Error de red: ' + e.message, true);
+    } finally {
+        setBotonCargando(btn, false, 'Otorgar');
+    }
 }
 
 // ============================================================
-// ACCIONES MASIVAS (tarjetas)
+// ACCIONES MASIVAS
 // ============================================================
-function otorgarPuntosMasivos() {
+async function otorgarPuntosMasivos() {
+    const btn = document.getElementById('btnOtorgarMasivo');
     const nivel = document.getElementById('selectNivelPuntos').value;
     const puntos = parseInt(document.getElementById('inputPuntosMasivos').value);
     const motivo = document.getElementById('inputMotivoPuntos').value.trim();
@@ -1273,52 +1478,81 @@ function otorgarPuntosMasivos() {
         mostrarToast('Los puntos deben ser mayores a 0', true);
         return;
     }
-
     if (!confirm('¿Otorgar ' + puntos + ' puntos a los clientes de nivel "' + nivel + '"?')) return;
 
-    fetch('/api/admin/lealtad/otorgar-puntos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nivel: nivel, puntos: puntos, motivo: motivo })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        if (data.success) {
-            mostrarToast('✅ ' + data.clientes_afectados + ' clientes recibieron ' + puntos + ' pts');
-            setTimeout(function() { window.location.reload(); }, 1200);
+    setBotonCargando(btn, true, 'Otorgando...');
+    try {
+        const r = await fetch('/api/admin/lealtad/otorgar-puntos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ nivel: nivel, puntos: puntos, motivo: motivo })
+        });
+        const raw = await r.json();
+        const data = _unirData(raw);
+        if (raw.success) {
+            mostrarToast((data.clientes_afectados ?? 0) + ' clientes recibieron ' + puntos + ' pts');
+            await cargarClientes(true);
+            await cargarStats(true);
         } else {
             mostrarToast('Error: ' + (data.error || 'Desconocido'), true);
         }
-    })
-    .catch(function(err) { mostrarToast('Error de red: ' + err.message, true); });
+    } catch (e) {
+        mostrarToast('Error de red: ' + e.message, true);
+    } finally {
+        setBotonCargando(btn, false, 'Otorgar puntos');
+    }
 }
 
-function generarCuponesMasivos() {
+async function generarCuponesMasivos() {
+    const btn = document.getElementById('btnGenerarCupones');
     const nivel = document.getElementById('selectNivelCupones').value;
     const montoMinimo = parseFloat(document.getElementById('inputMontoMinimoCupones').value) || 0;
 
     if (!confirm('¿Generar cupones para ' + (nivel || 'todos los niveles') + '?')) return;
 
-    fetch('/api/admin/lealtad/generar-cupones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nivel: nivel || null, monto_minimo: montoMinimo || null })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        if (data.success) {
-            mostrarToast('✅ ' + data.cupones_generados + ' cupones generados');
-        } else {
+    setBotonCargando(btn, true, 'Generando...');
+    try {
+        const r = await fetch('/api/admin/lealtad/generar-cupones', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ nivel: nivel || null, monto_minimo: montoMinimo || null })
+        });
+        const raw = await r.json();
+        const data = _unirData(raw);
+
+        if (raw.success === false) {
             mostrarToast('Error: ' + (data.error || 'Desconocido'), true);
+            return;
         }
-    })
-    .catch(function(err) { mostrarToast('Error de red: ' + err.message, true); });
+
+        const total = data.cupones_generados ?? data.total_generados ?? 0;
+        mostrarToast(total + ' cupones generados');
+        await cargarClientes(true);
+        await cargarStats(true);
+        abrirModalResumen(data);
+    } catch (e) {
+        mostrarToast('Error de red: ' + e.message, true);
+    } finally {
+        setBotonCargando(btn, false, 'Generar cupones');
+    }
 }
 
-// Cerrar modales al hacer clic fuera
+// ============================================================
+// CERRAR MODALES
+// ============================================================
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('modal-custom')) {
         e.target.classList.remove('activo');
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-custom.activo').forEach(function(m) {
+            m.classList.remove('activo');
+        });
     }
 });
 </script>

@@ -3,13 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ vendedor.nombre_tienda }} | Marketplace ORION</title>
+    <title>{{ vendedor.nombre_tienda|default('Tienda') }} | ORION</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
+    {# ⭐ TEMA DINÁMICO DEL HERO (gradiente) — 16 temas #}
+    {% set tema = vendedor.tema_hero|default('azul') %}
+    {% set gradientes = {
+        'azul':       'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+        'morado':     'linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)',
+        'rosa':       'linear-gradient(135deg, #e10098 0%, #c00080 100%)',
+        'verde':      'linear-gradient(135deg, #059669 0%, #047857 100%)',
+        'naranja':    'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
+        'rojo':       'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+        'turquesa':   'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
+        'negro':      'linear-gradient(135deg, #1a1a2e 0%, #0f172a 100%)',
+        'lavanda':    'linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%)',
+        'menta':      'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
+        'cielo':      'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
+        'durazno':    'linear-gradient(135deg, #fdba74 0%, #f97316 100%)',
+        'rosa-suave': 'linear-gradient(135deg, #f9a8d4 0%, #ec4899 100%)',
+        'coral':      'linear-gradient(135deg, #fda4af 0%, #f43f5e 100%)',
+        'oliva':      'linear-gradient(135deg, #a3e635 0%, #65a30d 100%)',
+        'jade':       'linear-gradient(135deg, #5eead4 0%, #14b8a6 100%)',
+    } %}
+    {% set gradiente_actual = gradientes.get(tema, gradientes['azul']) %}
+
+    {# ⭐ COLOR DE ACENTO (para botones, chips, iconos) — 16 temas #}
+    {% set acentos = {
+        'azul':       '#0284c7',
+        'morado':     '#7c3aed',
+        'rosa':       '#e10098',
+        'verde':      '#059669',
+        'naranja':    '#ea580c',
+        'rojo':       '#dc2626',
+        'turquesa':   '#0891b2',
+        'negro':      '#1a1a2e',
+        'lavanda':    '#8b5cf6',
+        'menta':      '#10b981',
+        'cielo':      '#3b82f6',
+        'durazno':    '#f97316',
+        'rosa-suave': '#ec4899',
+        'coral':      '#f43f5e',
+        'oliva':      '#65a30d',
+        'jade':       '#14b8a6',
+    } %}
+    {# Si hay imagen de fondo, usar un acento neutro predefinido (no depende del tema) #}
+    {% if vendedor.hero_imagen %}
+        {% set acento_actual = '#1a1a2e' %}
+    {% else %}
+        {% set acento_actual = acentos.get(tema, acentos['azul']) %}
+    {% endif %}
+
     <style>
-        :root { --orion-primary: #e10098; --orion-primary-dark: #c00080; --orion-ink: #1a1a1a; --mkt-blue: #0284c7; }
+        :root {
+            --orion-primary: #e10098;
+            --orion-primary-dark: #c00080;
+            --orion-ink: #1a1a1a;
+            --mkt-blue: {{ acento_actual }};
+        }
         body { font-family: 'Plus Jakarta Sans', sans-serif; color: #2b2b2b; background: #f8f9fa; }
         @media (min-width: 1400px) { .container { max-width: 2000px; } }
 
@@ -17,9 +70,17 @@
         .main-navbar { background: #fff; border-bottom: 2px solid #f0f0f0; padding: 10px 0 !important; }
         .brand-logo { font-weight: 900; font-size: 2.3rem; color: var(--orion-primary) !important; letter-spacing: -1.5px; text-decoration: none; }
 
-        /* HERO DEL VENDEDOR */
+        /* HERO DEL VENDEDOR — DINÁMICO */
         .vendedor-hero {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            {% if vendedor.hero_imagen %}
+                background: linear-gradient(135deg, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.30) 100%),
+                            url('{{ url_for("static", filename="uploads/vendedores/" + vendedor.hero_imagen) }}');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            {% else %}
+                background: {{ gradiente_actual }};
+            {% endif %}
             color: #fff;
             padding: 48px 0 60px;
             position: relative;
@@ -34,6 +95,7 @@
             height: 320px;
             background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
             border-radius: 50%;
+            pointer-events: none;
         }
         .vendedor-hero::before {
             content: '';
@@ -44,6 +106,7 @@
             height: 240px;
             background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%);
             border-radius: 50%;
+            pointer-events: none;
         }
         .vendedor-hero-content { position: relative; z-index: 2; }
         .vendedor-logo {
@@ -125,6 +188,7 @@
             display: block;
         }
 
+        /* BOTONES DEL HERO — el texto usa el color de acento dinámico */
         .btn-hero {
             background: #fff;
             color: var(--mkt-blue);
@@ -137,6 +201,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
         }
         .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.2); color: var(--mkt-blue); }
         .btn-hero-outline {
@@ -151,10 +216,11 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
         }
         .btn-hero-outline:hover { background: rgba(255,255,255,0.12); border-color: #fff; color: #fff; }
 
-        /* FILTROS */
+        /* FILTROS — usan el acento dinámico */
         .filtros-categorias {
             display: flex;
             gap: 10px;
@@ -178,7 +244,7 @@
             background: var(--mkt-blue);
             border-color: var(--mkt-blue);
             color: #fff;
-            box-shadow: 0 6px 16px rgba(2,132,199,0.28);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
 
         /* GRID DE PRODUCTOS */
@@ -288,7 +354,7 @@
         .empty-state h4 { font-weight: 800; color: #475569; }
         .empty-state p { color: #94a3b8; }
 
-        /* SECCIÓN INFO VENDEDOR */
+        /* SECCIÓN INFO VENDEDOR — iconos usan el acento dinámico */
         .info-vendedor-card {
             background: #fff;
             border-radius: 20px;
@@ -327,7 +393,7 @@
         .breadcrumb-orion .breadcrumb-item.active { color: #999; }
         .breadcrumb-orion .breadcrumb-item + .breadcrumb-item::before { color: #ccc; }
 
-        /* FOOTER CHIP */
+        /* FOOTER CTA — botón sigue siendo rosa ORION (identidad de marca) */
         .footer-cta {
             background: linear-gradient(135deg, #fdf2f8 0%, #fef6fb 100%);
             border-radius: 20px;
@@ -346,6 +412,8 @@
             border-radius: 50px;
             padding: 12px 28px;
             transition: 0.25s;
+            text-decoration: none;
+            display: inline-block;
         }
         .btn-orion:hover { background: var(--orion-primary-dark); color: #fff; transform: translateY(-1px); }
 
@@ -364,7 +432,7 @@
 <!-- NAVBAR -->
 <nav class="navbar navbar-light main-navbar shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand brand-logo" href="/">ORION</a>
+        <a class="navbar-brand brand-logo" href="{{ url_for('web.raiz_tienda') }}">ORION</a>
         <form class="d-flex flex-grow-1 mx-4" action="{{ url_for('web.catalogo') }}" method="GET">
             <div class="input-group rounded-pill overflow-hidden bg-light" style="border:2px solid #eee;">
                 <input class="form-control border-0 bg-light ps-4" type="search" name="q" placeholder="Buscar productos...">
@@ -372,13 +440,15 @@
             </div>
         </form>
         <div class="d-flex align-items-center gap-3">
-            {% if session.get('nombre') %}
+             {% if session.get('nombre') %}
                 <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
                     {% if session.get('foto') %}<img src="{{ url_for('static', filename='uploads/' + session['foto']) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;">{% endif %}
                     Hola, {{ session['nombre'] }}
                 </a>
             {% else %}
-                <a href="/login" class="text-dark fw-bold small text-uppercase text-decoration-none"><i class="bi bi-person fs-5 me-1"></i> Iniciar sesión</a>
+                <a href="{{ url_for('web.login') }}" class="text-dark fw-bold small text-uppercase text-decoration-none">
+                    <i class="bi bi-person fs-5 me-1"></i> Iniciar sesión
+                </a>
             {% endif %}
             <a href="{{ url_for('web.ver_carrito') }}" class="text-dark"><i class="bi bi-bag fs-4"></i></a>
         </div>
@@ -390,9 +460,9 @@
     <div class="container vendedor-hero-content">
         <nav aria-label="breadcrumb" class="breadcrumb-orion mb-3" style="--bs-breadcrumb-divider-color: rgba(255,255,255,0.5);">
             <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="/" style="color:rgba(255,255,255,0.8);">Inicio</a></li>
-                <li class="breadcrumb-item"><a href="{{ url_for('web.marketplace') }}" style="color:rgba(255,255,255,0.8);">Marketplace</a></li>
-                <li class="breadcrumb-item active" aria-current="page" style="color:rgba(255,255,255,0.65);">{{ vendedor.nombre_tienda }}</li>
+                <li class="breadcrumb-item"><a href="{{ url_for('web.raiz_tienda') }}" style="color:rgba(255,255,255,0.8);">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('web.catalogo') }}" style="color:rgba(255,255,255,0.8);">Catálogo</a></li>
+                <li class="breadcrumb-item active" aria-current="page" style="color:rgba(255,255,255,0.65);">{{ vendedor.nombre_tienda|default('Tienda') }}</li>
             </ol>
         </nav>
 
@@ -400,14 +470,14 @@
             <div class="col-auto">
                 <div class="vendedor-logo">
                     {% if vendedor.logo %}
-                        <img src="{{ url_for('static', filename='uploads/vendedores/' + vendedor.logo) }}" alt="{{ vendedor.nombre_tienda }}">
+                        <img src="{{ url_for('static', filename='uploads/vendedores/' + vendedor.logo) }}" alt="{{ vendedor.nombre_tienda|default('Tienda') }}">
                     {% else %}
-                        {{ vendedor.nombre_tienda[0]|upper }}
+                        {{ (vendedor.nombre_tienda|default('T'))[0]|upper }}
                     {% endif %}
                 </div>
             </div>
             <div class="col">
-                <h1 class="vendedor-nombre">{{ vendedor.nombre_tienda }}</h1>
+                <h1 class="vendedor-nombre">{{ vendedor.nombre_tienda|default('Tienda') }}</h1>
                 {% if vendedor.descripcion %}
                     <p class="vendedor-descripcion">{{ vendedor.descripcion }}</p>
                 {% endif %}
@@ -422,10 +492,9 @@
                             {{ "%.1f"|format(vendedor.rating) }} ({{ vendedor.total_resenas or 0 }})
                         </span>
                     {% endif %}
-                    {% if vendedor.ubicacion or (vendedor.direccion and vendedor.direccion.ciudad) %}
+                    {% if vendedor.ubicacion %}
                         <span class="vendedor-badge-chip">
-                            <i class="bi bi-geo-alt-fill"></i>
-                            {{ vendedor.ubicacion or vendedor.direccion.ciudad }}
+                            <i class="bi bi-geo-alt-fill"></i> {{ vendedor.ubicacion }}
                         </span>
                     {% endif %}
                     <span class="vendedor-badge-chip">
@@ -436,8 +505,8 @@
             </div>
             <div class="col-auto d-none d-lg-block">
                 <div class="d-flex flex-column gap-2">
-                    <a href="{{ url_for('web.marketplace') }}" class="btn-hero">
-                        <i class="bi bi-shop"></i> Ver más vendedores
+                    <a href="{{ url_for('web.catalogo') }}" class="btn-hero">
+                        <i class="bi bi-shop"></i> Ver catálogo
                     </a>
                     {% if vendedor.whatsapp %}
                         <a href="https://wa.me/{{ vendedor.whatsapp }}" target="_blank" rel="noopener" class="btn-hero-outline">
@@ -450,7 +519,13 @@
 
         <div class="vendedor-stats">
             <div class="vendedor-stat">
-                <span class="valor">{{ vendedor.metricas.ventas or 0 }}</span>
+                <span class="valor">
+                    {% if vendedor.metricas and vendedor.metricas.ventas %}
+                        {{ vendedor.metricas.ventas }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </span>
                 <span class="label">Ventas</span>
             </div>
             <div class="vendedor-stat">
@@ -461,12 +536,6 @@
                 <span class="valor">{{ categorias|length }}</span>
                 <span class="label">Categorías</span>
             </div>
-            {% if vendedor.created_at %}
-            <div class="vendedor-stat">
-                <span class="valor">{{ vendedor.created_at.year }}</span>
-                <span class="label">Desde</span>
-            </div>
-            {% endif %}
         </div>
     </div>
 </section>
@@ -482,7 +551,7 @@
             <i class="bi bi-grid"></i> Todas
         </a>
         {% for cat in categorias %}
-            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}?cat={{ cat._id }}"
+            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}?cat={{ cat._id|string }}"
                class="filtro-chip {% if request.args.get('cat') == cat._id|string %}active{% endif %}">
                 {{ cat.nombre }}
             </a>
@@ -505,28 +574,19 @@
                 <div class="row g-3">
                     {% for p in productos %}
                     <div class="col-6 col-md-4 col-xl-3">
-                        <a href="{{ url_for('web.ver_detalle_producto', id=p._id) }}" class="producto-card">
+                        <div class="producto-card">
                             <div class="producto-card-img-wrap">
                                 {% if p.foto_principal %}
                                     <img src="{{ url_for('static', filename='uploads/productos/' + p.foto_principal) }}"
-                                         alt="{{ p.nombre }}" loading="lazy">
+                                         alt="{{ p.nombre|default('Producto') }}" loading="lazy">
                                 {% else %}
                                     <div class="producto-card-noimg"><i class="bi bi-image"></i></div>
                                 {% endif %}
-                                {% if not p.activo or (p.stock is defined and p.stock == 0) %}
-                                    <span class="producto-card-badge-agotado">Agotado</span>
-                                {% endif %}
                             </div>
                             <div class="producto-card-body">
-                                {% if p.marca_nombre %}
-                                    <span class="producto-card-marca">{{ p.marca_nombre }}</span>
-                                {% endif %}
-                                <span class="producto-card-nombre">{{ p.nombre }}</span>
+                                <span class="producto-card-nombre">{{ p.nombre|default('Producto') }}</span>
                                 <span class="producto-card-precio">
-                                    {% if p.variantes_para_template and p.variantes_para_template|length > 0 %}
-                                        <span class="desde">Desde</span>
-                                    {% endif %}
-                                    ${{ "%.2f"|format(p.precio_mostrado or 0) }}
+                                    ${{ "%.2f"|format(p.precio_mostrado|default(0)) }}
                                     {% if (p.precio_mostrado or 0) >= 300 %}
                                         <span class="msi-mini">
                                             <i class="bi bi-credit-card"></i> Hasta 12 MSI
@@ -534,14 +594,14 @@
                                     {% endif %}
                                 </span>
                             </div>
-                        </a>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
 
                 <div class="footer-cta">
                     <h4>¿Te gustó algo?</h4>
-                    <p>Agrega los productos de <strong>{{ vendedor.nombre_tienda }}</strong> a tu bolsa y aprovecha envío a todo México.</p>
+                    <p>Agrega los productos de <strong>{{ vendedor.nombre_tienda|default('esta tienda') }}</strong> a tu bolsa.</p>
                     <a href="{{ url_for('web.catalogo') }}" class="btn-orion">
                         <i class="bi bi-bag-plus"></i> Seguir explorando
                     </a>
@@ -550,9 +610,9 @@
                 <div class="empty-state">
                     <i class="bi bi-inbox"></i>
                     <h4>Esta tienda aún no tiene productos</h4>
-                    <p>Vuelve pronto — <strong>{{ vendedor.nombre_tienda }}</strong> está preparando novedades.</p>
-                    <a href="{{ url_for('web.marketplace') }}" class="btn-orion mt-3 d-inline-block">
-                        <i class="bi bi-arrow-left"></i> Volver al Marketplace
+                    <p>Vuelve pronto — <strong>{{ vendedor.nombre_tienda|default('la tienda') }}</strong> está preparando novedades.</p>
+                    <a href="{{ url_for('web.catalogo') }}" class="btn-orion mt-3 d-inline-block">
+                        <i class="bi bi-arrow-left"></i> Explorar catálogo
                     </a>
                 </div>
             {% endif %}
@@ -577,35 +637,12 @@
                 </div>
                 {% endif %}
 
-                {% if vendedor.rfc %}
-                <div class="info-row">
-                    <i class="bi bi-file-earmark-text"></i>
-                    <div>
-                        <span class="label">RFC</span>
-                        <span class="valor">{{ vendedor.rfc }}</span>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if vendedor.direccion and (vendedor.direccion.ciudad or vendedor.direccion.estado) %}
+                {% if vendedor.ubicacion %}
                 <div class="info-row">
                     <i class="bi bi-geo-alt"></i>
                     <div>
                         <span class="label">Ubicación</span>
-                        <span class="valor">
-                            {% if vendedor.direccion.ciudad %}{{ vendedor.direccion.ciudad }}{% endif %}
-                            {% if vendedor.direccion.estado %}, {{ vendedor.direccion.estado }}{% endif %}
-                        </span>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if vendedor.created_at %}
-                <div class="info-row">
-                    <i class="bi bi-calendar-check"></i>
-                    <div>
-                        <span class="label">En ORION desde</span>
-                        <span class="valor">{{ vendedor.created_at.strftime('%B %Y') }}</span>
+                        <span class="valor">{{ vendedor.ubicacion }}</span>
                     </div>
                 </div>
                 {% endif %}
@@ -649,8 +686,8 @@
 <!-- FOOTER -->
 <footer class="text-center py-5 mt-4" style="background:#fff; border-top:1px solid #f0f0f0;">
     <div class="container">
-        <a href="/" class="brand-logo d-inline-block mb-2">ORION</a>
-        <p class="text-muted small mb-0">© {{ now_year or 2026 }} ORION · Todos los derechos reservados</p>
+        <a href="{{ url_for('web.raiz_tienda') }}" class="brand-logo d-inline-block mb-2">ORION</a>
+        <p class="text-muted small mb-0">© 2026 ORION · Todos los derechos reservados</p>
     </div>
 </footer>
 

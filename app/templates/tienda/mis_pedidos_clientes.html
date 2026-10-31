@@ -1075,7 +1075,7 @@
             <div class="container d-flex justify-content-end gap-4">
                 <a href="#"><i class="bi bi-geo-alt"></i> Encuentra tu tienda</a>
                 <a href="/servicios"><i class="bi bi-truck"></i> Servicios</a>
-                <a href="#"><i class="bi bi-question-circle"></i> Ayuda</a>
+                <a href="{{ url_for('web.ayuda') }}" class="text-secondary text-decoration-none">Ayuda</a>
             </div>
         </div>
 
@@ -1126,16 +1126,15 @@
                     </form>
 
                     <!-- Usuario y Carrito -->
-                    <div class="ms-3 d-flex align-items-center gap-3">
+                                        <div class="ms-3 d-flex align-items-center gap-3">
                         {% if session.get('nombre') %}
-                            <a href="{{ url_for('web.perfil') }}" class="user-link">
-                                {% if session.get('foto') %}
-                                    <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}"
-                                         class="user-avatar" alt="Perfil">
+                            <a href="/perfil" class="text-dark text-decoration-none fw-bold small text-uppercase d-flex align-items-center">
+                                {% if current_user_foto %}
+                                    <img src="{{ foto_src(current_user_foto) }}" class="rounded-circle me-2 border" width="30" height="30" style="object-fit:cover;">
                                 {% else %}
-                                    <i class="bi bi-person-circle fs-3"></i>
+                                    <i class="bi bi-person fs-5 me-1"></i>
                                 {% endif %}
-                                <span>HOLA, {{ session['nombre'] }}</span>
+                                Hola, {{ session['nombre'] }}
                             </a>
                         {% else %}
                             <a href="/login" class="user-link">

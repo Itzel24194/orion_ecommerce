@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reseñas | ORION Marketplace</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .sidebar .vendedor-profile {
+            padding: 25px 20px 20px; text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            margin-bottom: 10px; flex-shrink: 0;
+        }
+        .sidebar .vendedor-profile .avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .vendedor-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .vendedor-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .vendedor-profile .rol {
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f0f9ff; color: #0284c7; border-left-color: #0284c7; }
+        .sidebar a:hover i, .sidebar a.active i { color: #0284c7; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ============ MAIN ============ */
+        .main {
+            margin-left: 280px; padding: 30px 35px 20px;
+            width: 100%; min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 20px; border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px; flex-shrink: 0;
+        }
+        .top-bar h1 {
+            font-size: 1.6rem; font-weight: 800; color: #1a1a2e;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .top-bar h1 i { color: #0284c7; }
+        .top-bar .tag {
+            background: #0284c7; color: #fff; padding: 5px 18px;
+            border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; display: flex; align-items: center; gap: 6px;
+        }
+
+        /* ============ HERO ============ */
+        .hero {
+            background: linear-gradient(135deg, #fff, #f0f9ff);
+            padding: 25px 30px; border-radius: 16px; border: 1px solid #e8e8e8;
+            margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); flex-shrink: 0;
+        }
+        .hero h2 { color: #1a1a2e; margin-bottom: 8px; font-weight: 800; font-size: 1.3rem; }
+        .hero h2 i { color: #0284c7; }
+        .hero p { color: #666; margin: 0; font-size: 0.95rem; line-height: 1.6; }
+        .hero strong { color: #0284c7; }
+
+        /* ============ STATS ============ */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px; margin-bottom: 25px; flex-shrink: 0;
+        }
+        .stat-card {
+            background: #ffffff; padding: 20px 25px; border-radius: 16px;
+            border: 1px solid #e8e8e8; transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 3px; background: linear-gradient(90deg, #0284c7, #00d4ff);
+        }
+        .stat-card:hover { border-color: #0284c7; transform: translateY(-5px); box-shadow: 0 8px 30px rgba(2,132,199,.1); }
+        .stat-card .number { font-size: 2.2rem; font-weight: 900; color: #1a1a2e; display: block; }
+        .stat-card .number span { color: #0284c7; }
+        .stat-card .label {
+            color: #888; font-size: 0.8rem; text-transform: uppercase;
+            font-weight: 600; letter-spacing: 0.5px; margin-top: 3px; display: block;
+        }
+        .stat-card .icon { font-size: 1.8rem; color: #0284c7; opacity: 0.3; float: right; margin-top: -5px; }
+        .stat-card.star::before  { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+        .stat-card.star .icon    { color: #f59e0b; }
+        .stat-card.good::before  { background: linear-gradient(90deg, #22c55e, #16a34a); }
+        .stat-card.good .icon    { color: #16a34a; }
+        .stat-card.alert::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .stat-card.alert .icon   { color: #dc2626; }
+
+        /* ============ SECTION BOX ============ */
+        .section-box {
+            background: #ffffff; border-radius: 16px; padding: 25px;
+            border: 1px solid #e8e8e8; margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0;
+        }
+        .section-box h2 {
+            font-size: 1.1rem; font-weight: 800; margin-bottom: 20px;
+            color: #1a1a2e; display: flex; align-items: center; gap: 10px;
+        }
+        .section-box h2 i { color: #0284c7; }
+        .section-box h2 .badge-count {
+            margin-left: auto;
+            background: #f0f9ff; color: #0284c7;
+            font-size: .72rem; font-weight: 800;
+            padding: 4px 14px; border-radius: 50px;
+        }
+
+        /* ============ BARRAS ============ */
+        .barra { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .barra-label {
+            width: 60px; font-weight: 700; font-size: 0.85rem;
+            color: #1a1a2e; text-align: right;
+        }
+        .barra-label .star-icon { color: #fbbf24; }
+        .barra-progress {
+            flex: 1; height: 10px; background: #f1f5f9;
+            border-radius: 50px; overflow: hidden;
+        }
+        .barra-fill {
+            height: 100%; border-radius: 50px;
+            background: linear-gradient(90deg, #0284c7, #0369a1);
+            transition: width .6s ease;
+        }
+        .barra-num {
+            width: 50px; text-align: right;
+            font-weight: 700; font-size: 0.85rem; color: #0284c7;
+        }
+
+        /* ============ RESEÑA ITEM ============ */
+        .resena-item {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 20px 0;
+        }
+        .resena-item:first-of-type { padding-top: 0; }
+        .resena-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .resena-header {
+            display: flex; justify-content: space-between;
+            align-items: flex-start; flex-wrap: wrap; gap: 10px;
+            margin-bottom: 8px;
+        }
+        .resena-usuario { font-weight: 700; color: #1e293b; font-size: .95rem; }
+        .resena-fecha { font-size: 0.75rem; color: #94a3b8; }
+        .resena-producto {
+            font-size: 0.75rem; color: #0284c7; font-weight: 700;
+            background: #f0f9ff; padding: 3px 10px; border-radius: 50px;
+            display: inline-flex; align-items: center; gap: 5px;
+            margin-bottom: 4px;
+        }
+        .resena-titulo { font-weight: 800; margin: 8px 0 4px; color: #1a1a2e; font-size: .95rem; }
+        .resena-comentario { color: #475569; font-size: 0.9rem; margin: 4px 0; line-height: 1.6; }
+
+        .stars-display { font-size: 0.9rem; letter-spacing: 1px; }
+        .stars-display .on  { color: #fbbf24; }
+        .stars-display .off { color: #e2e8f0; }
+
+        /* ============ RESPUESTA VENDEDOR ============ */
+        .respuesta-vendedor {
+            background: #f0f9ff; border-left: 4px solid #0284c7;
+            padding: 12px 16px; border-radius: 10px; margin-top: 12px;
+        }
+        .respuesta-vendedor .label {
+            font-size: 0.7rem; font-weight: 800; color: #0284c7;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .respuesta-vendedor .texto { color: #0c4a6e; font-size: 0.88rem; line-height: 1.5; }
+
+        /* ============ FORM RESPUESTA ============ */
+        .form-respuesta { margin-top: 12px; }
+        .form-respuesta .input-group-custom {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        .form-respuesta input {
+            flex: 1; min-width: 200px;
+            border: 2px solid #e8e8e8; border-radius: 50px;
+            padding: 10px 18px; font-size: 0.9rem;
+            transition: all .2s ease; background: #fafbfc; font-family: inherit;
+        }
+        .form-respuesta input:focus {
+            border-color: #0284c7; background: #fff;
+            box-shadow: 0 0 0 4px rgba(2,132,199,.1); outline: none;
+        }
+
+        /* ============ BOTONES ============ */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff; padding: 10px 22px; border-radius: 50px;
+            text-decoration: none; font-weight: 700; font-size: 0.82rem;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: all 0.3s ease; border: none; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2,132,199,.25);
+            white-space: nowrap;
+        }
+        .btn-primary-custom:hover {
+            transform: translateY(-2px); box-shadow: 0 6px 20px rgba(2,132,199,.4);
+            color: #fff;
+        }
+
+        /* ============ EMPTY ============ */
+        .empty-inline { text-align: center; padding: 40px 20px; color: #94a3b8; }
+        .empty-inline i { font-size: 3rem; color: #ddd; display: block; margin-bottom: 12px; }
+        .empty-inline p { font-size: .9rem; margin: 0; }
+
+        /* ============ FOOTER ============ */
+        .footer-info {
+            background: #ffffff; padding: 15px 25px; border-radius: 16px;
+            border: 1px solid #e8e8e8; text-align: center;
+            margin-top: auto; flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+        }
+        .footer-info p {
+            color: #888; font-size: 0.75rem; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; flex-wrap: wrap;
+        }
+        .footer-info i { color: #0284c7; }
+        .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; display: inline-block; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .vendedor-profile .name, .sidebar .vendedor-profile .email,
+            .sidebar .vendedor-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .vendedor-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .vendedor-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 15px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .section-box { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR VENDEDOR (marketplace) ===== -->
+    <nav class="sidebar">
+        <div class="vendedor-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Vendedor">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ ((usuario.nombre if usuario else 'V') or 'V')|urlencode }}&background=0284c7&color=fff&size=80&bold=true" class="avatar" alt="Vendedor">
+            {% endif %}
+            <div class="name">
+                {% if vendedor and vendedor.nombre_tienda %}
+                    {{ vendedor.nombre_tienda }}
+                {% elif usuario and usuario.nombre %}
+                    {{ usuario.nombre }} {{ usuario.apellido_paterno or '' }}
+                {% else %}
+                    {{ session.get('nombre', 'Mi Tienda') }}
+                {% endif %}
+            </div>
+            <div class="email">{{ session.get('email', '') }}</div>
+            <div class="rol"><i class="fas fa-shop"></i> Vendedor</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+            <div class="panel-title">MI TIENDA</div>
+            <a href="{{ url_for('web.marketplace_dashboard') }}" class="{% if request.endpoint == 'web.marketplace_dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_productos') }}" class="{% if request.endpoint == 'web.marketplace_mis_productos' %}active{% endif %}">
+                <i class="fas fa-box"></i> <span>Mis productos</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_pedidos') }}" class="{% if request.endpoint == 'web.marketplace_mis_pedidos' %}active{% endif %}">
+                <i class="fas fa-shopping-cart"></i> <span>Mis pedidos</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_ventas') }}" class="{% if request.endpoint == 'web.marketplace_mis_ventas' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> <span>Mis ventas</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_mis_clientes') }}" class="{% if request.endpoint == 'web.marketplace_mis_clientes' %}active{% endif %}">
+                <i class="fas fa-users"></i> <span>Mis clientes</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_resenas') }}" class="{% if request.endpoint == 'web.marketplace_resenas' %}active{% endif %}">
+                <i class="fas fa-star"></i> <span>Reseñas</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">LOGÍSTICA</div>
+            <a href="{{ url_for('web.marketplace_envios') }}" class="{% if request.endpoint == 'web.marketplace_envios' %}active{% endif %}">
+                <i class="fas fa-truck"></i> <span>Envíos</span>
+            </a>
+
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.marketplace_mi_tienda') }}" class="{% if request.endpoint == 'web.marketplace_mi_tienda' %}active{% endif %}">
+                <i class="fas fa-cog"></i> <span>Mi tienda</span>
+            </a>
+
+            {# --- TIENDA PÚBLICA (solo si hay slug) --- #}
+            {% if vendedor and vendedor.slug %}
+            <div class="divider"></div>
+            <div class="panel-title">TIENDA PÚBLICA</div>
+            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank">
+                <i class="fas fa-eye"></i> <span>Ver mi tienda pública</span>
+            </a>
+            {% endif %}
+
+            <div class="divider"></div>
+            <div class="panel-title">CUENTA</div>
+            <a href="{{ url_for('web.raiz_tienda') }}">
+                <i class="fas fa-home"></i> <span>Ir a tienda ORION</span>
+            </a>
+            <a href="{{ url_for('web.marketplace_perfil') }}" class="{% if request.endpoint == 'web.marketplace_perfil' %}active{% endif %}">
+                <i class="fas fa-user"></i> <span>Mi perfil</span>
+            </a>
+
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-star"></i> Reseñas de mis productos</h1>
+            <div class="tag"><i class="fas fa-shop"></i>
+                {% if vendedor and vendedor.nombre_tienda %}
+                    {{ vendedor.nombre_tienda }}
+                {% else %}
+                    Mi Tienda
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- HERO -->
+        <section class="hero">
+            <h2><i class="fas fa-comments"></i> Opiniones de tus clientes</h2>
+            <p>
+                Revisa las <strong>calificaciones</strong> de tus productos y responde a tus clientes.
+                Las respuestas oportunas mejoran tu <strong>reputación</strong> y aumentan las ventas.
+            </p>
+        </section>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card star">
+                <div class="icon"><i class="fas fa-star"></i></div>
+                <div class="number">
+                    <span>{{ "%.1f"|format((stats.promedio if stats else 0) or 0) }}</span>
+                    <small style="font-size:.9rem; color:#94a3b8; font-weight:700;">/5</small>
+                </div>
+                <div class="label">Promedio</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-comments"></i></div>
+                <div class="number"><span>{{ (stats.total if stats else (resenas|length)) or 0 }}</span></div>
+                <div class="label">Total reseñas</div>
+            </div>
+            <div class="stat-card good">
+                <div class="icon"><i class="fas fa-thumbs-up"></i></div>
+                <div class="number"><span>
+                    {% set dist = (stats.distribucion if stats else {1:0,2:0,3:0,4:0,5:0}) or {1:0,2:0,3:0,4:0,5:0} %}
+                    {{ (dist.get(5, 0) or 0) + (dist.get(4, 0) or 0) }}
+                </span></div>
+                <div class="label">Positivas (4-5★)</div>
+            </div>
+            <div class="stat-card alert">
+                <div class="icon"><i class="fas fa-reply"></i></div>
+                <div class="number"><span>{{ (stats.sin_responder if stats else 0) or 0 }}</span></div>
+                <div class="label">Sin responder</div>
+            </div>
+        </div>
+
+        <!-- DISTRIBUCIÓN -->
+        <div class="section-box">
+            <h2><i class="fas fa-chart-bar"></i> Distribución de calificaciones</h2>
+
+            {% set dist = (stats.distribucion if stats else {1:0,2:0,3:0,4:0,5:0}) or {1:0,2:0,3:0,4:0,5:0} %}
+            {% set total_r = (stats.total if stats else 0) or 0 %}
+
+            {% for est in [5,4,3,2,1] %}
+            {% set cantidad = dist.get(est, 0) or 0 %}
+            {% set pct = (cantidad / total_r * 100) if total_r else 0 %}
+            <div class="barra">
+                <span class="barra-label">{{ est }} <span class="star-icon">★</span></span>
+                <div class="barra-progress">
+                    <div class="barra-fill" style="width: {{ '%.2f'|format(pct) }}%;"></div>
+                </div>
+                <span class="barra-num">{{ cantidad }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- LISTA DE RESEÑAS -->
+        <div class="section-box">
+            <h2>
+                <i class="fas fa-comments"></i> Todas las reseñas
+                <span class="badge-count">{{ resenas|length }} total</span>
+            </h2>
+
+            {% if resenas %}
+                {% for r in resenas %}
+                <div class="resena-item">
+
+                    <div class="resena-header">
+                        <div>
+                            <span class="resena-producto">
+                                <i class="fas fa-box"></i> {{ r.producto_nombre }}
+                            </span>
+                            <div class="resena-usuario">
+                                <i class="fas fa-user-circle" style="color:#0284c7;"></i>
+                                {{ r.usuario_nombre }}
+                            </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="stars-display">
+                                {% for i in range(1,6) %}
+                                    <i class="fas fa-star {{ 'on' if i <= r.calificacion else 'off' }}"></i>
+                                {% endfor %}
+                            </div>
+                            <div class="resena-fecha">
+                                <i class="fas fa-clock" style="font-size:.7rem;"></i>
+                                {{ r.fecha or '—' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if r.titulo %}
+                        <div class="resena-titulo">{{ r.titulo }}</div>
+                    {% endif %}
+
+                    {% if r.comentario %}
+                        <p class="resena-comentario">{{ r.comentario }}</p>
+                    {% endif %}
+
+                    {% if r.respuesta_vendedor %}
+                        <div class="respuesta-vendedor">
+                            <div class="label">
+                                <i class="fas fa-reply"></i> Tu respuesta
+                            </div>
+                            <div class="texto">{{ r.respuesta_vendedor }}</div>
+                        </div>
+                    {% else %}
+                        <form method="POST"
+                              action="{{ url_for('web.marketplace_responder_resena', resena_id=r._id) }}"
+                              class="form-respuesta">
+                            <div class="input-group-custom">
+                                <input type="text" name="respuesta"
+                                       placeholder="Escribe una respuesta a {{ r.usuario_nombre }}..."
+                                       required maxlength="500">
+                                <button type="submit" class="btn-primary-custom">
+                                    <i class="fas fa-reply"></i> Responder
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
+
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-inline">
+                    <i class="fas fa-star"></i>
+                    <p>Aún no tienes reseñas en tus productos.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer-info">
+            <p>
+                <i class="fas fa-clock"></i>
+                {% if datetime is defined %}
+                    {{ datetime.now().strftime('%d/%m/%Y %H:%M') }}
+                {% else %}
+                    Ahora
+                {% endif %}
+                <span>|</span>
+                <i class="fas fa-shield-alt"></i> ORION System
+                <span>|</span>
+                <span class="heart"><i class="fas fa-heart"></i></span>
+            </p>
+        </div>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

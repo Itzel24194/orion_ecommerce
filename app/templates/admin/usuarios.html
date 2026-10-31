@@ -391,10 +391,11 @@
                     </div>
                     <div class="form-row">
                         <div>
-                            <label class="form-label-custom">Género</label>
-                            <select name="genero" class="form-select-custom">
-                                <option value="Mujer">👩 Mujer</option>
-                                <option value="Hombre">👨 Hombre</option>
+                            <!-- ⭐ CAMBIO: name="sexo" y valores normalizados -->
+                            <label class="form-label-custom">Sexo</label>
+                            <select name="sexo" class="form-select-custom">
+                                <option value="Femenino">👩 Mujer</option>
+                                <option value="Masculino">👨 Hombre</option>
                                 <option value="Indefinido">⚧ Indefinido</option>
                             </select>
                         </div>
@@ -477,7 +478,8 @@
                             <span class="badge-role">
                                 <i class="fas fa-user-tag"></i> {{ u.rol or 'cliente' }}
                             </span>
-                            <span class="badge-id">{{ u._id|string|truncate(6, True, '') }}</span>
+                            <!-- ⭐ CAMBIO: guardar el ID completo en un data-attribute para el JS -->
+                            <span class="badge-id" data-user-id="{{ u._id }}">{{ u._id|string|truncate(6, True, '') }}</span>
                         </div>
 
                         <button type="button" class="btn-expand" id="btn-expand-{{ u._id }}" onclick="event.stopPropagation(); toggleUser('{{ u._id }}')">
@@ -538,11 +540,12 @@
                                 </div>
                                 <div class="form-row">
                                     <div>
-                                        <label class="form-label-custom">Género</label>
-                                        <select name="genero" class="form-select-custom">
-                                            <option value="Mujer" {% if u.genero=='Mujer' %}selected{% endif %}>Mujer</option>
-                                            <option value="Hombre" {% if u.genero=='Hombre' %}selected{% endif %}>Hombre</option>
-                                            <option value="Indefinido" {% if u.genero=='Indefinido' %}selected{% endif %}>Indefinido</option>
+                                        <!-- ⭐ CAMBIO: name="sexo" y comparación contra valores normalizados -->
+                                        <label class="form-label-custom">Sexo</label>
+                                        <select name="sexo" class="form-select-custom">
+                                            <option value="Femenino" {% if u.sexo=='Femenino' %}selected{% endif %}>Mujer</option>
+                                            <option value="Masculino" {% if u.sexo=='Masculino' %}selected{% endif %}>Hombre</option>
+                                            <option value="Indefinido" {% if u.sexo=='Indefinido' or not u.sexo %}selected{% endif %}>Indefinido</option>
                                         </select>
                                     </div>
                                     <div>
@@ -1095,7 +1098,6 @@
 
         const isOpen = body.classList.contains('open');
 
-        // Cerrar todos los demás
         document.querySelectorAll('.user-card-body.open').forEach(el => {
             if (el.id !== 'body-' + usuarioId) {
                 el.classList.remove('open');
@@ -1179,7 +1181,6 @@
         const allCards = Array.from(document.querySelectorAll('#usuariosList .user-card'));
         const emptyState = document.getElementById('emptyState');
 
-        // Ocultar todas
         allCards.forEach(c => c.style.display = 'none');
 
         if (filteredCards.length === 0 && allCards.length > 0) {
@@ -1204,13 +1205,11 @@
 
         filteredCards.slice(start, end).forEach(c => c.style.display = 'block');
 
-        // Info
         const info = document.getElementById('paginationInfo');
         const from = filteredCards.length === 0 ? 0 : start + 1;
         const to = Math.min(end, filteredCards.length);
         info.textContent = `Mostrando ${from} - ${to} de ${filteredCards.length} usuarios`;
 
-        // Botones
         const list = document.getElementById('paginationList');
         list.innerHTML = '';
 
@@ -1251,24 +1250,26 @@
     function exportarCSV() {
         const rows = [];
         rows.push(['ID', 'Nombre', 'Apellido Paterno', 'Apellido Materno', 'Email', 'Teléfono',
-                   'Rol', 'Activo', 'Género', 'Fecha Nacimiento',
+                   'Rol', 'Activo', 'Sexo', 'Fecha Nacimiento',
                    'Direcciones', 'Complexión', 'Intereses']);
 
         document.querySelectorAll('#usuariosList .user-card').forEach(card => {
-            const search = card.getAttribute('data-search') || '';
-            // Extraer datos del DOM
             const nombre = card.querySelector('.user-info .name')?.textContent?.trim() || '';
             const email = card.querySelector('.contact span:first-child')?.textContent?.replace(/^\s+/, '').trim() || '';
             const tel = card.querySelector('.contact span:last-child')?.textContent?.replace(/^\s+/, '').trim() || '';
             const rol = card.querySelector('.badge-role')?.textContent?.trim() || '';
             const estado = card.querySelector('.badge-status')?.textContent?.trim() || '';
-            const idBadge = card.querySelector('.badge-id')?.textContent?.trim() || '';
+
+            // ⭐ CAMBIO: leer el ID COMPLETO del data-attribute
+            const idBadge = card.querySelector('.badge-id');
+            const userId = idBadge?.getAttribute('data-user-id') || idBadge?.textContent?.trim() || '';
 
             const dirCount = card.querySelectorAll('.direccion-card').length;
-            const tieneComplexion = card.querySelector('#panel-complexion-' + idBadge) ? 'Sí' : 'No';
+            // ⭐ CAMBIO: usar el ID completo para buscar el panel
+            const tieneComplexion = card.querySelector('#panel-complexion-' + userId) ? 'Sí' : 'No';
 
             rows.push([
-                idBadge,
+                userId,
                 nombre,
                 '',
                 '',
@@ -1284,13 +1285,11 @@
             ]);
         });
 
-        // Convertir a CSV
         const csv = rows.map(r => r.map(v => {
             const s = String(v ?? '').replace(/"/g, '""');
             return /[",\n]/.test(s) ? `"${s}"` : s;
         }).join(',')).join('\n');
 
-        // Descargar
         const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -1340,7 +1339,6 @@
     // INICIALIZACIÓN
     // ================================================================
     document.addEventListener('DOMContentLoaded', function () {
-        // Fecha
         const ahora = new Date();
         const fechaStr = ahora.toLocaleString('es-MX', {
             day: '2-digit', month: '2-digit', year: 'numeric',
@@ -1349,11 +1347,9 @@
         const fechaEl = document.getElementById('fecha-actual');
         if (fechaEl) fechaEl.textContent = fechaStr;
 
-        // Inicializar paginación
         filteredCards = Array.from(document.querySelectorAll('#usuariosList .user-card'));
         renderPagination();
 
-        // Confirmar eliminación de direcciones
         document.querySelectorAll('.btn-eliminar-dir').forEach(btn => {
             btn.addEventListener('click', function (e) {
                 if (!confirm('¿Estás seguro de eliminar esta dirección?')) {

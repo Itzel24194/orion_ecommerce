@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | ORION</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; background: #f5f6f8; color: #1a1a2e; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            width: 280px; background: #ffffff; border-right: 2px solid #e8e8e8;
+            height: 100vh; position: fixed; left: 0; top: 0;
+            overflow-y: auto; z-index: 1000; transition: all 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .sidebar .vendedor-profile {
+            padding: 25px 20px 20px; text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            margin-bottom: 10px; flex-shrink: 0;
+        }
+        .sidebar .vendedor-profile .avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .sidebar .vendedor-profile .name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-top: 10px; }
+        .sidebar .vendedor-profile .email { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .sidebar .vendedor-profile .rol {
+            font-size: 0.65rem; color: #fff; text-transform: uppercase; font-weight: 700;
+            background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 20px;
+            display: inline-block; margin-top: 5px;
+        }
+        .sidebar .logo {
+            font-size: 1.8rem; font-weight: 900; color: #e10098;
+            text-align: center; padding: 15px 0 5px; letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+        .sidebar .logo span { color: #1a1a2e; }
+        .sidebar .menu-scroll { flex: 1; overflow-y: auto; padding-bottom: 10px; }
+        .sidebar .panel-title {
+            font-size: 0.65rem; text-transform: uppercase; color: #888;
+            padding: 10px 25px 5px; letter-spacing: 2px; font-weight: 700;
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #555; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+        }
+        .sidebar a i { width: 20px; font-size: 1rem; color: #888; }
+        .sidebar a:hover, .sidebar a.active { background: #f0f9ff; color: #0284c7; border-left-color: #0284c7; }
+        .sidebar a:hover i, .sidebar a.active i { color: #0284c7; }
+        .sidebar .divider { height: 1px; background: #e8e8e8; margin: 10px 25px; }
+        .sidebar .logout-btn {
+            display: flex; align-items: center; gap: 12px; padding: 11px 25px;
+            color: #dc3545; text-decoration: none; transition: all 0.3s ease;
+            border-left: 3px solid transparent; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; background: transparent; border: none; width: 100%; text-align: left;
+        }
+        .sidebar .logout-btn i { width: 20px; font-size: 1rem; color: #dc3545; }
+        .sidebar .logout-btn:hover { background: #fdf0f0; border-left-color: #dc3545; }
+
+        /* ============ MAIN ============ */
+        .main { margin-left: 280px; padding: 30px 35px 20px; width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 20px; border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 25px; flex-wrap: wrap; gap: 15px;
+        }
+        .top-bar h1 { font-size: 1.6rem; font-weight: 800; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .top-bar h1 i { color: #0284c7; }
+        .top-bar .tag {
+            background: #0284c7; color: #fff; padding: 5px 18px;
+            border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; display: flex; align-items: center; gap: 6px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #fff, #f0f9ff);
+            padding: 25px 30px; border-radius: 16px; border: 1px solid #e8e8e8;
+            margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .hero h2 { color: #1a1a2e; margin-bottom: 8px; font-weight: 800; font-size: 1.3rem; }
+        .hero h2 i { color: #0284c7; }
+        .hero p { color: #666; margin: 0; font-size: 0.95rem; line-height: 1.6; }
+        .hero strong { color: #0284c7; }
+
+        /* ============ GRID ============ */
+        .perfil-grid { display: grid; grid-template-columns: 340px 1fr; gap: 25px; align-items: start; margin-bottom: 25px; }
+
+        /* ============ TARJETA PERFIL ============ */
+        .perfil-card {
+            background: #fff; border-radius: 16px; border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden;
+            position: sticky; top: 20px;
+        }
+        .perfil-card .cover { height: 100px; background: linear-gradient(135deg, #0284c7, #0369a1); }
+        .perfil-card .avatar-wrap { text-align: center; margin-top: -55px; position: relative; z-index: 2; }
+        .perfil-card .avatar-img {
+            width: 110px; height: 110px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 15px rgba(2,132,199,0.25);
+            background: #f1f5f9;
+        }
+        .perfil-card .nombre { text-align: center; font-weight: 800; font-size: 1.15rem; color: #1a1a2e; margin-top: 12px; }
+        .perfil-card .sub { text-align: center; font-size: .8rem; color: #888; margin-bottom: 4px; }
+        .perfil-card .badges { text-align: center; margin: 10px 0 4px; }
+        .perfil-card .badges .badge {
+            font-size: .65rem; font-weight: 700; text-transform: uppercase;
+            padding: 5px 12px; border-radius: 50px; margin: 2px; letter-spacing: .5px;
+        }
+        .perfil-card .info-list { list-style: none; padding: 20px 22px; border-top: 1px solid #f0f0f0; margin-top: 15px; }
+        .perfil-card .info-list li {
+            display: flex; align-items: flex-start; gap: 12px;
+            font-size: .85rem; color: #4a4a5e; padding: 9px 0;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+        .perfil-card .info-list li:last-child { border-bottom: none; }
+        .perfil-card .info-list i { color: #0284c7; font-size: 1rem; margin-top: 2px; width: 20px; text-align: center; flex-shrink: 0; }
+        .perfil-card .info-list .label { font-size: .7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: .5px; display: block; }
+        .perfil-card .info-list .value { font-weight: 600; color: #1a1a2e; word-break: break-word; }
+
+        /* ============ TABS ============ */
+        .tabs-wrap {
+            background: #fff; border-radius: 16px; border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden;
+        }
+        .edit-tabs {
+            display: flex; gap: 4px; border-bottom: 2px solid #f0f0f0;
+            padding: 8px 20px 0; flex-wrap: wrap; background: #fafbfc;
+        }
+        .edit-tab {
+            padding: 12px 20px; font-size: 0.85rem; font-weight: 700; color: #888;
+            cursor: pointer; border: none; background: transparent;
+            border-bottom: 3px solid transparent; margin-bottom: -2px;
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 8px;
+        }
+        .edit-tab:hover { color: #0284c7; }
+        .edit-tab.active { color: #0284c7; border-bottom-color: #0284c7; background: #fff; }
+        .edit-tab i { font-size: 0.95rem; }
+
+        .edit-panel { display: none; padding: 28px 30px; }
+        .edit-panel.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .edit-panel h3 {
+            font-size: 1.05rem; font-weight: 800; margin-bottom: 22px;
+            color: #1a1a2e; display: flex; align-items: center; gap: 10px;
+            padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;
+        }
+        .edit-panel h3 i { color: #0284c7; }
+
+        /* ============ FORM ============ */
+        .form-label {
+            font-weight: 700; font-size: .78rem; color: #4a4a5e;
+            text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; display: block;
+        }
+        .form-label .req { color: #dc3545; }
+
+        .form-control, .form-select {
+            border: 2px solid #e8e8e8; border-radius: 10px;
+            padding: 11px 15px; font-size: .9rem;
+            transition: all .2s ease; background: #fafbfc; font-family: inherit;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #0284c7; box-shadow: 0 0 0 4px rgba(2,132,199,.1); background: #fff;
+        }
+        .form-control::placeholder { color: #b0b8c4; }
+
+        .input-icon-group { position: relative; }
+        .input-icon-group .input-icon {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            color: #94a3b8; font-size: .95rem; pointer-events: none; z-index: 2;
+        }
+        .input-icon-group .form-control { padding-left: 42px; }
+
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px; }
+
+        /* ============ BOTONES ============ */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff; padding: 11px 26px; border-radius: 50px;
+            text-decoration: none; font-weight: 700; font-size: 0.85rem;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.3s ease; border: none; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2,132,199,.25);
+        }
+        .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(2,132,199,.4); color: #fff; }
+
+        .btn-warning-custom {
+            background: linear-gradient(135deg, #f9a825, #f59f00);
+            color: #fff; padding: 11px 26px; border-radius: 50px;
+            font-weight: 700; font-size: 0.85rem;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.3s ease; border: none; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(249,168,37,.25);
+        }
+        .btn-warning-custom:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(249,168,37,.4); color: #fff; }
+
+        .btn-ghost {
+            background: #fff; color: #4a4a5e; padding: 11px 26px; border-radius: 50px;
+            font-weight: 700; font-size: 0.85rem;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.3s ease; border: 2px solid #e8e8e8; cursor: pointer;
+        }
+        .btn-ghost:hover { border-color: #0284c7; color: #0284c7; background: #f0f9ff; }
+
+        .btn-mini {
+            padding: 6px 12px; font-size: 0.72rem; border-radius: 8px;
+            font-weight: 700; border: none; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 5px;
+            transition: all 0.2s ease; color: #fff;
+        }
+        .btn-mini:hover { transform: translateY(-2px); }
+        .btn-mini.primary { background: #0284c7; }
+        .btn-mini.success { background: #28a745; }
+        .btn-mini.warn    { background: #f59f00; color: #fff; }
+        .btn-mini.danger  { background: #dc3545; }
+
+        /* ============ AVATAR ============ */
+        .avatar-preview-box {
+            display: flex; align-items: center; gap: 20px;
+            padding: 18px; background: #f0f9ff;
+            border-radius: 12px; border: 2px dashed #bae6fd;
+            margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .avatar-preview-box .preview {
+            width: 90px; height: 90px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #fff; box-shadow: 0 4px 12px rgba(2,132,199,.2);
+            flex-shrink: 0; background: #e0f2fe;
+        }
+        .avatar-preview-box .info { flex: 1; min-width: 180px; }
+        .avatar-preview-box .info h6 { font-weight: 800; margin-bottom: 4px; color: #0369a1; font-size: .9rem; }
+        .avatar-preview-box .info p { font-size: .78rem; color: #64748b; margin: 0 0 8px; }
+
+        .file-input-hidden { display: none; }
+
+        /* ============ ALERTAS ============ */
+        .alert {
+            border-radius: 12px; border: none; padding: 14px 20px;
+            font-size: .88rem; font-weight: 600;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .alert i { font-size: 1.1rem; }
+        .alert-success { background: #dcfce7; color: #166534; }
+        .alert-danger  { background: #fee2e2; color: #991b1b; }
+        .alert-warning { background: #fef3c7; color: #92400e; }
+        .alert-info    { background: #dbeafe; color: #1e40af; }
+        .alert .btn-close { margin-left: auto; }
+
+        /* ============ DIRECCIONES ============ */
+        .direccion-card {
+            background: #fafbfc; border-radius: 12px; padding: 16px 18px;
+            border-left: 4px solid #dee2e6; transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+        .direccion-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+        .direccion-card.predeterminada { border-left-color: #28a745; background: linear-gradient(135deg, #f0fff4, #e8f5e9); }
+        .direccion-card .dir-titulo { font-weight: 700; font-size: 0.9rem; color: #1a1a2e; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .direccion-card .badge-predeterminada { background: #28a745; color: white; font-size: 0.6rem; padding: 3px 10px; border-radius: 50px; font-weight: 700; }
+        .direccion-card .dir-detalle { font-size: 0.82rem; color: #636e72; margin-top: 6px; line-height: 1.7; }
+        .direccion-card .dir-detalle i { width: 16px; color: #0284c7; }
+        .edit-dir-form { background: #f8f9fa; border-radius: 10px; padding: 16px; margin-top: 12px; border: 2px dashed #dee2e6; }
+
+        /* ============ CHIPS ============ */
+        .cx-chip {
+            padding: 8px 16px; border: 2px solid #ececf2; border-radius: 50px;
+            font-size: 0.78rem; font-weight: 600; color: #555; cursor: pointer;
+            transition: all 0.2s ease; user-select: none; background: #fff; display: inline-block;
+        }
+        .cx-chip:hover { border-color: #0284c7; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(2,132,199,.08); }
+        .cx-chip.active { background: linear-gradient(135deg, #f0f9ff, #fff); border-color: #0284c7; color: #0284c7; font-weight: 700; }
+
+        .cx-color-chip {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 8px; border: 2px solid transparent; border-radius: 10px;
+            min-width: 68px; cursor: pointer; transition: all 0.2s ease;
+            user-select: none; background: #fff;
+        }
+        .cx-color-chip:hover { background: #f0f9ff; }
+        .cx-color-chip.active { border-color: #0284c7; background: #f0f9ff; }
+        .cx-color-chip .circle { width: 30px; height: 30px; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: transform 0.2s; }
+        .cx-color-chip.active .circle { transform: scale(1.15); box-shadow: 0 4px 10px rgba(2,132,199,.3); }
+        .cx-color-chip .label { font-size: 0.68rem; color: #666; font-weight: 600; text-transform: capitalize; }
+        .cx-color-chip.active .label { color: #0284c7; font-weight: 800; }
+
+        /* ============ SEGURIDAD ============ */
+        .strength-bar { height: 6px; border-radius: 50px; background: #e8e8e8; margin-top: 8px; overflow: hidden; }
+        .strength-bar .fill { height: 100%; width: 0%; transition: all .3s ease; border-radius: 50px; }
+        .strength-text { font-size: .72rem; margin-top: 4px; font-weight: 700; }
+
+        /* ============ FOOTER ============ */
+        .footer-info {
+            background: #fff; padding: 15px 25px; border-radius: 16px;
+            border: 1px solid #e8e8e8; text-align: center;
+            margin-top: auto; box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+        }
+        .footer-info p {
+            color: #888; font-size: 0.75rem; margin: 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; flex-wrap: wrap;
+        }
+        .footer-info i { color: #0284c7; }
+        .footer-info .heart { color: #e10098; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1100px) {
+            .perfil-grid { grid-template-columns: 1fr; }
+            .perfil-card { position: static; }
+        }
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo, .sidebar .panel-title, .sidebar a span,
+            .sidebar .vendedor-profile .name, .sidebar .vendedor-profile .email,
+            .sidebar .vendedor-profile .rol, .sidebar .logout-btn span { display: none; }
+            .sidebar a { padding: 15px; justify-content: center; }
+            .sidebar a i { font-size: 1.3rem; margin: 0; }
+            .sidebar .vendedor-profile .avatar { width: 40px; height: 40px; }
+            .sidebar .vendedor-profile { padding: 10px; }
+            .sidebar .logout-btn { padding: 15px; justify-content: center; }
+            .main { margin-left: 70px; padding: 20px; }
+        }
+        @media (max-width: 768px) {
+            .top-bar { flex-direction: column; align-items: flex-start; }
+            .main { padding: 15px; }
+            .edit-tab { padding: 10px 14px; font-size: .78rem; }
+            .edit-tabs { padding: 6px 10px 0; overflow-x: auto; flex-wrap: nowrap; }
+            .edit-tab { white-space: nowrap; }
+            .edit-panel { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="vendedor-profile">
+            {% if session.get('foto') %}
+                <img src="{{ url_for('static', filename='uploads/' + session.get('foto')) }}" class="avatar" alt="Vendedor">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ ((usuario.nombre if usuario else 'User') or 'User')|urlencode }}&background=0284c7&color=fff&size=80&bold=true" class="avatar" alt="Vendedor">
+            {% endif %}
+            <div class="name">
+                {% if usuario and usuario.nombre %}
+                    {{ usuario.nombre }} {{ usuario.apellido_paterno or usuario.apellido or '' }}
+                {% else %}
+                    {{ vendedor.nombre_tienda|default('Mi Tienda') }}
+                {% endif %}
+            </div>
+            <div class="email">{{ session.get('email', '') }}</div>
+            <div class="rol"><i class="fas fa-user"></i> Mi perfil</div>
+        </div>
+
+        <div class="logo">ORION<span>.</span></div>
+
+        <div class="menu-scroll">
+            <div class="panel-title">MI TIENDA</div>
+            <a href="{{ url_for('web.marketplace_dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('web.marketplace_mis_productos') }}"><i class="fas fa-box"></i> <span>Mis productos</span></a>
+            <a href="{{ url_for('web.marketplace_mis_pedidos') }}"><i class="fas fa-shopping-cart"></i> <span>Mis pedidos</span></a>
+            <a href="{{ url_for('web.marketplace_mis_ventas') }}"><i class="fas fa-chart-line"></i> <span>Mis ventas</span></a>
+            <a href="{{ url_for('web.marketplace_mis_clientes') }}"><i class="fas fa-users"></i> <span>Mis clientes</span></a>
+            <a href="{{ url_for('web.marketplace_resenas') }}"><i class="fas fa-star"></i> <span>Reseñas</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">LOGÍSTICA</div>
+            <a href="{{ url_for('web.marketplace_envios') }}"><i class="fas fa-truck"></i> <span>Envíos</span></a>
+
+            <div class="divider"></div>
+            <div class="panel-title">CONFIGURACIÓN</div>
+            <a href="{{ url_for('web.marketplace_mi_tienda') }}"><i class="fas fa-cog"></i> <span>Mi tienda</span></a>
+            {# --- TIENDA PÚBLICA (solo si hay slug) --- #}
+            {% if vendedor and vendedor.slug %}
+            <div class="divider"></div>
+            <div class="panel-title">TIENDA PÚBLICA</div>
+            <a href="{{ url_for('web.marketplace_ver_tienda', slug=vendedor.slug) }}" target="_blank">
+                <i class="fas fa-eye"></i> <span>Ver mi tienda pública</span>
+            </a>
+            {% endif %}
+
+            <div class="divider"></div>
+            <div class="panel-title">CUENTA</div>
+            <a href="{{ url_for('web.raiz_tienda') }}"><i class="fas fa-home"></i> <span>Ir a tienda ORION</span></a>
+            <a href="{{ url_for('web.marketplace_perfil') }}" class="active"><i class="fas fa-user"></i> <span>Mi perfil</span></a>
+
+            <div class="divider"></div>
+            <form action="{{ url_for('web.logout') }}" method="GET" style="margin: 0;">
+                <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+
+        <header class="top-bar">
+            <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+            <div class="tag"><i class="fas fa-shield-alt"></i> Cuenta personal</div>
+        </header>
+
+        <section class="hero">
+            <h2><i class="fas fa-id-card"></i> Administra tu cuenta</h2>
+            <p>
+                Completa tus <strong>datos personales</strong>, <strong>complexión</strong> e <strong>intereses</strong>
+                para recibir recomendaciones personalizadas. Gestiona tus <strong>direcciones</strong> y mantén
+                segura tu cuenta.
+            </p>
+        </section>
+
+        {# ---------- FLASH ---------- #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    {% set cls = 'danger' if category in ('error', 'danger') else category %}
+                    {% set icon = 'fa-check-circle' if cls == 'success' else ('fa-info-circle' if cls == 'info' else 'fa-exclamation-circle') %}
+                    <div class="alert alert-{{ cls }} alert-dismissible fade show" role="alert">
+                        <i class="fas {{ icon }}"></i>
+                        <span>{{ msg }}</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="perfil-grid">
+
+            {# ============ TARJETA PERFIL ============ #}
+            <aside class="perfil-card">
+                <div class="cover"></div>
+                <div class="avatar-wrap">
+                    {% if usuario and usuario.foto %}
+                        <img id="previewAvatar" src="{{ url_for('static', filename='uploads/' ~ usuario.foto) }}" class="avatar-img" alt="Avatar">
+                    {% else %}
+                        <img id="previewAvatar"
+                             src="https://ui-avatars.com/api/?name={{ ((usuario.nombre if usuario else 'User') or 'User')|urlencode }}&background=0284c7&color=fff&size=200&bold=true"
+                             class="avatar-img" alt="Avatar">
+                    {% endif %}
+                </div>
+
+                <div class="nombre">
+                    {{ (usuario.nombre if usuario else '') or '' }}
+                    {{ (usuario.apellido_paterno if usuario else '') or (usuario.apellido if usuario else '') or '' }}
+                    {{ (usuario.apellido_materno if usuario else '') or '' }}
+                </div>
+                <div class="sub">{{ (usuario.email if usuario else '') or '—' }}</div>
+
+                <div class="badges">
+                    {% if usuario and usuario.rol %}
+                        <span class="badge bg-secondary">{{ usuario.rol|capitalize }}</span>
+                    {% endif %}
+                    {% if vendedor %}
+                        {% if vendedor.activo %}
+                            <span class="badge bg-success">Tienda activa</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Tienda inactiva</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <ul class="info-list">
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <span class="label">Email</span>
+                            <span class="value">{{ (usuario.email if usuario else '') or '—' }}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <span class="label">Teléfono</span>
+                            <span class="value">{{ (usuario.telefono if usuario else '') or '—' }}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-venus-mars"></i>
+                        <div>
+                            <span class="label">Género</span>
+                            <span class="value">{{ (usuario.genero if usuario else '') or '—' }}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-birthday-cake"></i>
+                        <div>
+                            <span class="label">Fecha de nacimiento</span>
+                            <span class="value">
+                                {% if usuario and usuario.fecha_nacimiento %}
+                                    {% if usuario.fecha_nacimiento is string %}
+                                        {{ usuario.fecha_nacimiento }}
+                                    {% else %}
+                                        {{ usuario.fecha_nacimiento.strftime('%d/%m/%Y') }}
+                                    {% endif %}
+                                {% else %}—{% endif %}
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <span class="label">Direcciones</span>
+                            <span class="value">{{ (usuario.direcciones if usuario else [])|length }}</span>
+                        </div>
+                    </li>
+                    {% if vendedor %}
+                    <li>
+                        <i class="fas fa-store"></i>
+                        <div>
+                            <span class="label">Mi tienda</span>
+                            <span class="value">{{ vendedor.nombre_tienda or '—' }}</span>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+            </aside>
+
+            {# ============ TABS ============ #}
+            <div class="tabs-wrap">
+                <div class="edit-tabs">
+                    <button type="button" class="edit-tab active" data-tab="personal" onclick="switchTab('personal')">
+                        <i class="fas fa-user"></i> Datos personales
+                    </button>
+                    <button type="button" class="edit-tab" data-tab="direcciones" onclick="switchTab('direcciones')">
+                        <i class="fas fa-map-marker-alt"></i> Direcciones ({{ (usuario.direcciones if usuario else [])|length }})
+                    </button>
+                    <button type="button" class="edit-tab" data-tab="complexion" onclick="switchTab('complexion')">
+                        <i class="fas fa-ruler-combined"></i> Complexión
+                    </button>
+                    <button type="button" class="edit-tab" data-tab="intereses" onclick="switchTab('intereses')">
+                        <i class="fas fa-heart"></i> Intereses
+                    </button>
+                    <button type="button" class="edit-tab" data-tab="seguridad" onclick="switchTab('seguridad')">
+                        <i class="fas fa-shield-lock"></i> Seguridad
+                    </button>
+                </div>
+
+                {# ============================================================ #}
+                {# PANEL 1: DATOS PERSONALES                                     #}
+                {# ============================================================ #}
+                <div class="edit-panel active" id="panel-personal">
+                    <h3><i class="fas fa-user-edit"></i> Datos personales</h3>
+
+                    <form method="POST" action="{{ url_for('web.marketplace_perfil') }}" enctype="multipart/form-data" novalidate>
+                        <input type="hidden" name="accion" value="datos">
+
+                        <div class="avatar-preview-box">
+                            {% if usuario and usuario.foto %}
+                                <img id="avatarBoxPreview" src="{{ url_for('static', filename='uploads/' ~ usuario.foto) }}" class="preview" alt="Preview">
+                            {% else %}
+                                <img id="avatarBoxPreview"
+                                     src="https://ui-avatars.com/api/?name={{ ((usuario.nombre if usuario else 'User') or 'User')|urlencode }}&background=0284c7&color=fff&size=120&bold=true"
+                                     class="preview" alt="Preview">
+                            {% endif %}
+                            <div class="info">
+                                <h6><i class="fas fa-camera"></i> Foto de perfil</h6>
+                                <p>JPG, PNG o WEBP · máx. 2 MB</p>
+                                <label for="inputFoto" class="btn-ghost" style="padding: 8px 18px; font-size: .78rem;">
+                                    <i class="fas fa-upload"></i> Elegir imagen
+                                </label>
+                                <input type="file" id="inputFoto" name="foto" class="file-input-hidden" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">Nombre <span class="req">*</span></label>
+                                <div class="input-icon-group">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <input type="text" name="nombre" class="form-control"
+                                           value="{{ (usuario.nombre if usuario else '') or '' }}" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">Apellido Paterno</label>
+                                <div class="input-icon-group">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <input type="text" name="apellido_paterno" class="form-control"
+                                           value="{{ (usuario.apellido_paterno if usuario else '') or (usuario.apellido if usuario else '') or '' }}">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">Apellido Materno</label>
+                                <div class="input-icon-group">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <input type="text" name="apellido_materno" class="form-control"
+                                           value="{{ (usuario.apellido_materno if usuario else '') or '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">Email <span class="req">*</span></label>
+                                <div class="input-icon-group">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <input type="email" name="email" class="form-control"
+                                           value="{{ (usuario.email if usuario else '') or '' }}" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">Teléfono</label>
+                                <div class="input-icon-group">
+                                    <i class="fas fa-phone input-icon"></i>
+                                    <input type="tel" name="telefono" class="form-control"
+                                           value="{{ (usuario.telefono if usuario else '') or '' }}">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">Fecha de nacimiento</label>
+                                <input type="date" name="fecha_nacimiento" class="form-control"
+                                       value="{% if usuario and usuario.fecha_nacimiento %}{% if usuario.fecha_nacimiento is string %}{{ usuario.fecha_nacimiento }}{% else %}{{ usuario.fecha_nacimiento.strftime('%Y-%m-%d') }}{% endif %}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">Género</label>
+                                <select name="genero" class="form-select">
+                                    <option value="">— Sin especificar —</option>
+                                    <option value="Mujer" {% if usuario and usuario.genero=='Mujer' %}selected{% endif %}>👩 Mujer</option>
+                                    <option value="Hombre" {% if usuario and usuario.genero=='Hombre' %}selected{% endif %}>👨 Hombre</option>
+                                    <option value="Indefinido" {% if usuario and usuario.genero=='Indefinido' %}selected{% endif %}>⚧ Indefinido</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3" style="border-top: 2px solid #f0f0f0;">
+                            <button type="reset" class="btn-ghost"><i class="fas fa-undo"></i> Restablecer</button>
+                            <button type="submit" class="btn-primary-custom"><i class="fas fa-save"></i> Guardar cambios</button>
+                        </div>
+                    </form>
+                </div>
+
+                {# ============================================================ #}
+                {# PANEL 2: DIRECCIONES                                          #}
+                {# ============================================================ #}
+                <div class="edit-panel" id="panel-direcciones">
+                    <h3><i class="fas fa-map-marker-alt"></i> Mis direcciones</h3>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                        <span style="font-size:.85rem; color:#666;">
+                            <i class="fas fa-info-circle" style="color:#0284c7;"></i>
+                            {{ (usuario.direcciones if usuario else [])|length }} dirección(es) registrada(s)
+                        </span>
+                        <button type="button" class="btn-primary-custom" style="padding:9px 20px; font-size:.8rem;" onclick="toggleNuevaDir()">
+                            <i class="fas fa-plus-circle"></i> Agregar dirección
+                        </button>
+                    </div>
+
+                    {# --- Nueva dirección --- #}
+                    <div id="nuevaDirForm" class="edit-dir-form" style="display:none;">
+                        <h4 style="font-size:.9rem; font-weight:800; color:#0284c7; margin-bottom:14px;">
+                            <i class="fas fa-plus-circle"></i> Nueva dirección
+                        </h4>
+                        <form method="POST" action="{{ url_for('web.marketplace_perfil') }}">
+                            <input type="hidden" name="accion" value="dir_agregar">
+                            <div class="form-row">
+                                <div><label class="form-label">Nombre (ej: Casa)</label>
+                                    <input name="dir_nombre" class="form-control" placeholder="Casa, Oficina..."></div>
+                                <div><label class="form-label">Calle *</label>
+                                    <input name="dir_calle" class="form-control" required></div>
+                                <div><label class="form-label">Número *</label>
+                                    <input name="dir_numero" class="form-control" required></div>
+                                <div><label class="form-label">CP *</label>
+                                    <input name="dir_cp" class="form-control" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div><label class="form-label">Colonia *</label>
+                                    <input name="dir_colonia" class="form-control" required></div>
+                                <div><label class="form-label">Ciudad</label>
+                                    <input name="dir_ciudad" class="form-control"></div>
+                                <div><label class="form-label">Estado</label>
+                                    <input name="dir_estado" class="form-control"></div>
+                            </div>
+                            <div class="form-row">
+                                <div style="grid-column: 1 / -1;">
+                                    <label class="form-label">Referencias</label>
+                                    <input name="dir_referencias" class="form-control" placeholder="Entre calles, piso, color de fachada...">
+                                </div>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="dir_predeterminada" value="1" id="chkNuevaDir">
+                                <label class="form-check-label" for="chkNuevaDir" style="font-size:.85rem; font-weight:600;">
+                                    <i class="fas fa-star" style="color:#f59f00;"></i> Establecer como predeterminada
+                                </label>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn-primary-custom" style="padding:9px 20px; font-size:.8rem;">
+                                    <i class="fas fa-save"></i> Guardar
+                                </button>
+                                <button type="button" class="btn-ghost" style="padding:9px 20px; font-size:.8rem;" onclick="toggleNuevaDir()">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {# --- Lista de direcciones --- #}
+                    <div style="margin-top:18px;">
+                        {% set dirs = usuario.direcciones if usuario and usuario.direcciones else [] %}
+                        {% if dirs %}
+                            {% for dir in dirs %}
+                            <div class="direccion-card {% if dir.get('predeterminada') %}predeterminada{% endif %}">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+                                    <div style="flex:1; min-width:220px;">
+                                        <div class="dir-titulo">
+                                            <i class="fas fa-tag" style="color:#0284c7;"></i>
+                                            {{ dir.get('nombre') or ('Dirección ' ~ loop.index) }}
+                                            {% if dir.get('predeterminada') %}
+                                                <span class="badge-predeterminada"><i class="fas fa-check-circle"></i> Predeterminada</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="dir-detalle">
+                                            <div><i class="fas fa-road"></i> {{ dir.get('calle','') }} #{{ dir.get('numero','') }}</div>
+                                            <div><i class="fas fa-map-pin"></i> {{ dir.get('colonia','') }}, CP {{ dir.get('cp','') }}</div>
+                                            {% if dir.get('ciudad') or dir.get('estado') %}
+                                                <div><i class="fas fa-city"></i> {{ dir.get('ciudad','') }} {{ dir.get('estado','') }}</div>
+                                            {% endif %}
+                                            {% if dir.get('referencias') %}
+                                                <div><i class="fas fa-info-circle"></i> {{ dir.get('referencias') }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                                        {% if not dir.get('predeterminada') %}
+                                        <form method="POST" action="{{ url_for('web.marketplace_perfil') }}" style="display:inline;">
+                                            <input type="hidden" name="accion" value="dir_predeterminada">
+                                            <input type="hidden" name="dir_index" value="{{ loop.index0 }}">
+                                            <button type="submit" class="btn-mini success" title="Predeterminar"><i class="fas fa-star"></i></button>
+                                        </form>
+                                        {% endif %}
+                                        <button type="button" class="btn-mini warn" onclick="toggleEditarDir({{ loop.index0 }})" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <form method="POST" action="{{ url_for('web.marketplace_perfil') }}" style="display:inline;" onsubmit="return confirm('¿Eliminar esta dirección?')">
+                                            <input type="hidden" name="accion" value="dir_eliminar">
+                                            <input type="hidden" name="dir_index" value="{{ loop.index0 }}">
+                                            <button type="submit" class="btn-mini danger" title="Eliminar"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                {# Editar inline #}
+                                <div id="editDir-{{ loop.index0 }}" class="edit-dir-form" style="display:none;">
+                                    <form method="POST" action="{{ url_for('web.marketplace_perfil') }}">
+                                        <input type="hidden" name="accion" value="dir_editar">
+                                        <input type="hidden" name="dir_index" value="{{ loop.index0 }}">
+                                        <div class="form-row">
+                                            <div><label class="form-label">Nombre</label>
+                                                <input name="dir_nombre" class="form-control" value="{{ dir.get('nombre','') }}"></div>
+                                            <div><label class="form-label">Calle *</label>
+                                                <input name="dir_calle" class="form-control" value="{{ dir.get('calle','') }}" required></div>
+                                            <div><label class="form-label">Número *</label>
+                                                <input name="dir_numero" class="form-control" value="{{ dir.get('numero','') }}" required></div>
+                                            <div><label class="form-label">CP *</label>
+                                                <input name="dir_cp" class="form-control" value="{{ dir.get('cp','') }}" required></div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div><label class="form-label">Colonia *</label>
+                                                <input name="dir_colonia" class="form-control" value="{{ dir.get('colonia','') }}" required></div>
+                                            <div><label class="form-label">Ciudad</label>
+                                                <input name="dir_ciudad" class="form-control" value="{{ dir.get('ciudad','') }}"></div>
+                                            <div><label class="form-label">Estado</label>
+                                                <input name="dir_estado" class="form-control" value="{{ dir.get('estado','') }}"></div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div style="grid-column: 1 / -1;">
+                                                <label class="form-label">Referencias</label>
+                                                <input name="dir_referencias" class="form-control" value="{{ dir.get('referencias','') }}">
+                                            </div>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="dir_predeterminada" value="1" id="chkEditDir{{ loop.index0 }}" {% if dir.get('predeterminada') %}checked{% endif %}>
+                                            <label class="form-check-label" for="chkEditDir{{ loop.index0 }}" style="font-size:.85rem; font-weight:600;">
+                                                <i class="fas fa-star" style="color:#f59f00;"></i> Predeterminada
+                                            </label>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="btn-primary-custom" style="padding:9px 20px; font-size:.8rem;">
+                                                <i class="fas fa-save"></i> Guardar
+                                            </button>
+                                            <button type="button" class="btn-ghost" style="padding:9px 20px; font-size:.8rem;" onclick="toggleEditarDir({{ loop.index0 }})">
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="text-align:center; padding: 40px 20px; color:#94a3b8;">
+                                <i class="fas fa-map-marked-alt" style="font-size:3rem; opacity:.3;"></i>
+                                <p style="margin-top:12px;">No tienes direcciones registradas</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# ============================================================ #}
+                {# PANEL 3: COMPLEXIÓN                                          #}
+                {# ============================================================ #}
+                {% set cx = (usuario.complexion if usuario and usuario.complexion else {}) %}
+                {% set medidas = cx.get('medidas') or {} %}
+                <div class="edit-panel" id="panel-complexion">
+                    <h3><i class="fas fa-ruler-combined"></i> Complexión y tallas</h3>
+
+                    <form method="POST" action="{{ url_for('web.marketplace_perfil') }}">
+                        <input type="hidden" name="accion" value="complexion">
+
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">Altura (cm)</label>
+                                <input type="number" name="altura_cm" class="form-control" min="100" max="250"
+                                       value="{{ cx.get('altura_cm') or '' }}" placeholder="Ej: 170">
+                            </div>
+                            <div>
+                                <label class="form-label">Peso (kg)</label>
+                                <input type="number" name="peso_kg" class="form-control" min="30" max="300" step="0.1"
+                                       value="{{ cx.get('peso_kg') or '' }}" placeholder="Ej: 70">
+                            </div>
+                            <div>
+                                <label class="form-label">Complexión</label>
+                                <select name="complexion" class="form-select">
+                                    <option value="">— Sin especificar —</option>
+                                    {% for opt in ['delgada','media','robusta','extra'] %}
+                                        <option value="{{ opt }}" {% if cx.get('complexion')==opt %}selected{% endif %}>{{ opt|capitalize }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">Talla Camisa</label>
+                                <select name="talla_camisa" class="form-select">
+                                    <option value="">—</option>
+                                    {% for t in ['XS','S','M','L','XL','XXL','3XL'] %}
+                                        <option value="{{ t }}" {% if cx.get('talla_camisa')==t %}selected{% endif %}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Talla Pantalón</label>
+                                <select name="talla_pantalon" class="form-select">
+                                    <option value="">—</option>
+                                    {% for t in ['26','28','30','32','34','36','38','40','42','44'] %}
+                                        <option value="{{ t }}" {% if cx.get('talla_pantalon')==t %}selected{% endif %}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Talla Calzado</label>
+                                <select name="talla_calzado" class="form-select">
+                                    <option value="">—</option>
+                                    {% for n in range(22, 34) %}
+                                        {% set t = n|string %}
+                                        <option value="{{ t }}" {% if cx.get('talla_calzado')==t %}selected{% endif %}>{{ t }} cm</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Talla Sujetador</label>
+                                <select name="talla_sujetador" class="form-select">
+                                    <option value="">—</option>
+                                    {% for t in ['32A','32B','32C','34A','34B','34C','34D','36A','36B','36C','36D','38B','38C','38D'] %}
+                                        <option value="{{ t }}" {% if cx.get('talla_sujetador')==t %}selected{% endif %}>{{ t }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">Pecho (cm)</label>
+                                <input type="number" name="pecho_cm" class="form-control" min="40" max="200"
+                                       value="{{ medidas.get('pecho_cm') or '' }}" placeholder="Ej: 95">
+                            </div>
+                            <div>
+                                <label class="form-label">Cintura (cm)</label>
+                                <input type="number" name="cintura_cm" class="form-control" min="40" max="200"
+                                       value="{{ medidas.get('cintura_cm') or '' }}" placeholder="Ej: 80">
+                            </div>
+                            <div>
+                                <label class="form-label">Cadera (cm)</label>
+                                <input type="number" name="cadera_cm" class="form-control" min="40" max="200"
+                                       value="{{ medidas.get('cadera_cm') or '' }}" placeholder="Ej: 95">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <label class="form-label">Estilos preferidos</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                {% set estilos_actuales = cx.get('estilos_preferidos') or [] %}
+                                {% for est in [
+                                    {'v':'casual','t':'Casual'},
+                                    {'v':'formal','t':'Formal'},
+                                    {'v':'deportivo','t':'Deportivo'},
+                                    {'v':'elegante','t':'Elegante'},
+                                    {'v':'bohemio','t':'Bohemio'},
+                                    {'v':'minimalista','t':'Minimalista'},
+                                    {'v':'streetwear','t':'Streetwear'},
+                                    {'v':'vintage','t':'Vintage'}
+                                ] %}
+                                <label class="cx-chip {% if est.v in estilos_actuales %}active{% endif %}">
+                                    <input type="checkbox" name="estilos_preferidos" value="{{ est.v }}"
+                                           {% if est.v in estilos_actuales %}checked{% endif %} style="display:none;">
+                                    {{ est.t }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <label class="form-label">Colores favoritos</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                {% set colores_actuales = cx.get('colores_favoritos') or [] %}
+                                {% set mapa_colores = {
+                                    'negro':'#000','blanco':'#fff','gris':'#888','azul':'#0d6efd',
+                                    'rojo':'#dc3545','verde':'#198754','amarillo':'#ffc107',
+                                    'rosa':'#e10098','morado':'#6c5ce7','naranja':'#fd7e14',
+                                    'beige':'#f5deb3','café':'#8b4513','dorado':'#d4af37','plateado':'#c0c0c0'
+                                } %}
+                                {% for color in ['negro','blanco','gris','azul','rojo','verde','amarillo','rosa','morado','naranja','beige','café','dorado','plateado'] %}
+                                <label class="cx-color-chip {% if color in colores_actuales %}active{% endif %}">
+                                    <input type="checkbox" name="colores_favoritos" value="{{ color }}"
+                                           {% if color in colores_actuales %}checked{% endif %} style="display:none;">
+                                    <span class="circle" style="background: {{ mapa_colores.get(color, '#ccc') }}; {% if color == 'blanco' %}border:2px solid #ccc;{% endif %}"></span>
+                                    <span class="label">{{ color }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 pt-3" style="border-top: 2px solid #f0f0f0;">
+                            <button type="submit" class="btn-primary-custom"><i class="fas fa-save"></i> Guardar complexión</button>
+                        </div>
+                    </form>
+                </div>
+
+                {# ============================================================ #}
+                {# PANEL 4: INTERESES                                            #}
+                {# ============================================================ #}
+                {% set inx = (usuario.intereses if usuario and usuario.intereses else {}) %}
+                <div class="edit-panel" id="panel-intereses">
+                    <h3><i class="fas fa-heart"></i> Mis intereses</h3>
+
+                    <form method="POST" action="{{ url_for('web.marketplace_perfil') }}">
+                        <input type="hidden" name="accion" value="intereses">
+
+                        <div style="margin-bottom:22px;">
+                            <label class="form-label">Categorías que me interesan</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                {% set cats_actuales = inx.get('categorias') or [] %}
+                                {% for cat in [
+                                    {'v':'moda','t':'Moda'},{'v':'electronica','t':'Electrónica'},
+                                    {'v':'hogar','t':'Hogar'},{'v':'belleza','t':'Belleza'},
+                                    {'v':'deportes','t':'Deportes'},{'v':'juguetes','t':'Juguetes'},
+                                    {'v':'libros','t':'Libros'},{'v':'musica','t':'Música'},
+                                    {'v':'mascotas','t':'Mascotas'},{'v':'automotriz','t':'Automotriz'},
+                                    {'v':'herramientas','t':'Herramientas'},{'v':'videojuegos','t':'Videojuegos'}
+                                ] %}
+                                <label class="cx-chip {% if cat.v in cats_actuales %}active{% endif %}">
+                                    <input type="checkbox" name="categorias" value="{{ cat.v }}"
+                                           {% if cat.v in cats_actuales %}checked{% endif %} style="display:none;">
+                                    {{ cat.t }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:22px;">
+                            <label class="form-label">Marcas favoritas</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                {% set marcas_actuales = inx.get('marcas') or [] %}
+                                {% for marca in ['Nike','Adidas','Apple','Samsung','Sony',"Levi's",'Zara',"L'Oréal",'Xiaomi','Logitech'] %}
+                                <label class="cx-chip {% if marca in marcas_actuales %}active{% endif %}">
+                                    <input type="checkbox" name="marcas" value="{{ marca }}"
+                                           {% if marca in marcas_actuales %}checked{% endif %} style="display:none;">
+                                    {{ marca }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:22px;">
+                            <label class="form-label">Actividades</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                {% set acts_actuales = inx.get('actividades') or [] %}
+                                {% for act in [
+                                    {'v':'trabajo','t':'Trabajo / Oficina'},{'v':'gym','t':'Gym / Fitness'},
+                                    {'v':'viajes','t':'Viajes'},{'v':'gaming','t':'Gaming'},
+                                    {'v':'lectura','t':'Lectura'},{'v':'cocina','t':'Cocina'},
+                                    {'v':'fotografia','t':'Fotografía'},{'v':'running','t':'Running'}
+                                ] %}
+                                <label class="cx-chip {% if act.v in acts_actuales %}active{% endif %}">
+                                    <input type="checkbox" name="actividades" value="{{ act.v }}"
+                                           {% if act.v in acts_actuales %}checked{% endif %} style="display:none;">
+                                    {{ act.t }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:22px;">
+                            <label class="form-label">Ocasiones de compra</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                {% set ocs_actuales = inx.get('ocasiones') or [] %}
+                                {% for oc in [
+                                    {'v':'mi','t':'Para mí'},{'v':'regalo','t':'Regalos'},
+                                    {'v':'familia','t':'Familia'},{'v':'pareja','t':'Pareja'},
+                                    {'v':'hijos','t':'Hijos'},{'v':'amigos','t':'Amigos'},
+                                    {'v':'trabajo','t':'Compañeros de trabajo'},{'v':'eventos','t':'Eventos especiales'}
+                                ] %}
+                                <label class="cx-chip {% if oc.v in ocs_actuales %}active{% endif %}">
+                                    <input type="checkbox" name="ocasiones" value="{{ oc.v }}"
+                                           {% if oc.v in ocs_actuales %}checked{% endif %} style="display:none;">
+                                    {{ oc.t }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:22px; max-width:400px;">
+                            <label class="form-label">Frecuencia de compra</label>
+                            <select name="frecuencia" class="form-select">
+                                <option value="">— Sin especificar —</option>
+                                {% set frec_actual = inx.get('frecuencia') %}
+                                {% for opt in [
+                                    ('semanal','Semanal'),('quincenal','Quincenal'),
+                                    ('mensual','Mensual'),('bimestral','Cada 2 meses'),
+                                    ('trimestral','Trimestral'),('ocasional','Ocasional')
+                                ] %}
+                                    <option value="{{ opt[0] }}" {% if frec_actual==opt[0] %}selected{% endif %}>{{ opt[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 pt-3" style="border-top: 2px solid #f0f0f0;">
+                            <button type="submit" class="btn-primary-custom"><i class="fas fa-save"></i> Guardar intereses</button>
+                        </div>
+                    </form>
+                </div>
+
+                {# ============================================================ #}
+                {# PANEL 5: SEGURIDAD                                            #}
+                {# ============================================================ #}
+                <div class="edit-panel" id="panel-seguridad">
+                    <h3 style="color:#92400e;"><i class="fas fa-shield-lock" style="color:#f59f00;"></i> Seguridad · Cambiar contraseña</h3>
+
+                    <div class="alert alert-info" style="margin-bottom: 22px;">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Usa una contraseña con <strong>8+ caracteres</strong>, mayúsculas, números y símbolos.</span>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('web.marketplace_perfil') }}" novalidate>
+                        <input type="hidden" name="accion" value="password">
+
+                        <div style="margin-bottom:16px; max-width:480px;">
+                            <label class="form-label">Contraseña actual <span class="req">*</span></label>
+                            <div class="input-icon-group">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" name="password_actual" class="form-control"
+                                       placeholder="Tu contraseña actual" autocomplete="current-password" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div>
+                                <label class="form-label">Nueva contraseña <span class="req">*</span></label>
+                                <div class="input-icon-group">
+                                    <i class="fas fa-key input-icon"></i>
+                                    <input type="password" name="password_nueva" id="pwNueva" class="form-control"
+                                           placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required>
+                                </div>
+                                <div class="strength-bar"><div class="fill" id="strengthFill"></div></div>
+                                <div class="strength-text" id="strengthText" style="color:#94a3b8;"></div>
+                            </div>
+                            <div>
+                                <label class="form-label">Confirmar contraseña <span class="req">*</span></label>
+                                <div class="input-icon-group">
+                                    <i class="fas fa-key input-icon"></i>
+                                    <input type="password" name="password_confirmar" id="pwConfirm" class="form-control"
+                                           placeholder="Repite la contraseña" autocomplete="new-password" minlength="6" required>
+                                </div>
+                                <div class="strength-text" id="matchText"></div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 pt-3" style="border-top: 2px solid #f0f0f0;">
+                            <button type="submit" class="btn-warning-custom"><i class="fas fa-shield-alt"></i> Actualizar contraseña</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <p>
+                <i class="fas fa-shield-alt"></i> ORION
+                <span>|</span>
+                <i class="fas fa-user-circle"></i> {{ (usuario.nombre if usuario else 'Mi perfil') or 'Mi perfil' }}
+                <span>|</span>
+                <span class="heart"><i class="fas fa-heart"></i></span>
+            </p>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function() {
+    // ============ TABS ============
+    window.switchTab = function(tabName) {
+        document.querySelectorAll('.edit-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.edit-panel').forEach(p => p.classList.remove('active'));
+
+        const tab = document.querySelector(`.edit-tab[data-tab="${tabName}"]`);
+        if (tab) tab.classList.add('active');
+        const panel = document.getElementById('panel-' + tabName);
+        if (panel) panel.classList.add('active');
+
+        // Actualizar hash sin recargar
+        history.replaceState(null, '', '#' + tabName);
+    };
+
+    // Activar tab desde el hash al cargar
+    const hash = (location.hash || '').replace('#','');
+    if (hash && document.querySelector(`.edit-tab[data-tab="${hash}"]`)) {
+        window.switchTab(hash);
+    }
+
+    // ============ DIRECCIONES: toggles ============
+    window.toggleNuevaDir = function() {
+        const d = document.getElementById('nuevaDirForm');
+        if (d) d.style.display = (d.style.display === 'none' || !d.style.display) ? 'block' : 'none';
+    };
+    window.toggleEditarDir = function(i) {
+        const d = document.getElementById('editDir-' + i);
+        if (d) d.style.display = (d.style.display === 'none' || !d.style.display) ? 'block' : 'none';
+    };
+
+    // ============ CHIPS toggle (checkbox oculto + label) ============
+    document.querySelectorAll('.cx-chip, .cx-color-chip').forEach(chip => {
+        chip.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.classList.toggle('active');
+            const cb = this.querySelector('input[type="checkbox"]');
+            if (cb) cb.checked = this.classList.contains('active');
+        });
+    });
+
+    // ============ PREVIEW AVATAR ============
+    const inputFoto = document.getElementById('inputFoto');
+    const previews = [
+        document.getElementById('previewAvatar'),
+        document.getElementById('avatarBoxPreview')
+    ];
+    if (inputFoto) {
+        inputFoto.addEventListener('change', function(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                alert('La imagen supera 2 MB.');
+                inputFoto.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = ev => previews.forEach(img => { if (img) img.src = ev.target.result; });
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // ============ STRENGTH ============
+    const pwNueva = document.getElementById('pwNueva');
+    const fill = document.getElementById('strengthFill');
+    const text = document.getElementById('strengthText');
+    function calcStrength(pw) {
+        let s = 0;
+        if (!pw) return { w: '0%', label: '', color: '#e8e8e8' };
+        if (pw.length >= 6) s++;
+        if (pw.length >= 10) s++;
+        if (/[A-Z]/.test(pw)) s++;
+        if (/[0-9]/.test(pw)) s++;
+        if (/[^A-Za-z0-9]/.test(pw)) s++;
+        const map = [
+            { w: '0%',   label: '',            color: '#e8e8e8' },
+            { w: '20%',  label: 'Muy débil',   color: '#dc3545' },
+            { w: '40%',  label: 'Débil',       color: '#f97316' },
+            { w: '60%',  label: 'Aceptable',   color: '#f59f00' },
+            { w: '80%',  label: 'Fuerte',      color: '#0284c7' },
+            { w: '100%', label: '¡Excelente!', color: '#16a34a' }
+        ];
+        return { w: map[s].w, label: map[s].label, color: map[s].color };
+    }
+    if (pwNueva && fill && text) {
+        pwNueva.addEventListener('input', function() {
+            const r = calcStrength(pwNueva.value);
+            fill.style.width = r.w;
+            fill.style.background = r.color;
+            text.textContent = r.label;
+            text.style.color = r.color;
+        });
+    }
+
+    // ============ MATCH ============
+    const pwConfirm = document.getElementById('pwConfirm');
+    const matchText = document.getElementById('matchText');
+    function checkMatch() {
+        if (!pwNueva || !pwConfirm || !matchText) return;
+        if (!pwConfirm.value) { matchText.textContent = ''; return; }
+        if (pwNueva.value === pwConfirm.value) {
+            matchText.textContent = '✓ Coinciden';
+            matchText.style.color = '#16a34a';
+        } else {
+            matchText.textContent = '✗ No coinciden';
+            matchText.style.color = '#dc3545';
+        }
+    }
+    if (pwNueva) pwNueva.addEventListener('input', checkMatch);
+    if (pwConfirm) pwConfirm.addEventListener('input', checkMatch);
+})();
+</script>
+</body>
+</html>
