@@ -214,8 +214,15 @@ class MesaRegalos:
         mesa['event_date_formatted'] = fecha_fmt
         mesa['emoji'] = info['emoji']
         mesa['tipo_nombre'] = info['nombre']
-        mesa['bonificacion_estimada'] = round(
-            (sum(g.get('precio', 0) for g in mesa.get('gifts', [])) +
-             mesa.get('fund_raised', 0)) * 0.10, 2
-        )
+
+        # ⭐ CORREGIDO: La bonificación se calcula SOLO sobre el fondo (fund_goal)
+        # NO se suman los regalos, porque todavía no se han pagado.
+        fondo_meta = float(mesa.get('fund_goal', 0) or 0)
+        mesa['bonificacion_estimada'] = round(fondo_meta * 0.10, 2)
+        
+        # (Opcional) Si quieres calcular sobre lo recaudado en lugar de la meta,
+        # cambia la línea de arriba por:
+        # fondo_recaudado = float(mesa.get('fund_raised', 0) or 0)
+        # mesa['bonificacion_estimada'] = round(fondo_recaudado * 0.10, 2)
+
         return mesa

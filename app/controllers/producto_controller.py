@@ -1,5 +1,5 @@
 # ================================================================
-# app/controllers/producto_controller.py - CONTROLADOR COMPLETO CON TEMPORADAS Y VIDEOS
+# app/controllers/producto_controller.py - CONTROLADOR COMPLETO
 # ================================================================
 
 import os
@@ -28,7 +28,7 @@ except ImportError:
     OPENPYXL_OK = False
     print("⚠️ openpyxl no instalado. Ejecuta: python -m pip install openpyxl")
 
-# ⭐ IMPORT MARKETPLACE (opcional, con try/except para no romper si no está)
+# ⭐ IMPORT MARKETPLACE (opcional)
 try:
     from app.models.marketplace_model import Vendedor
     MARKETPLACE_OK = True
@@ -40,21 +40,18 @@ except ImportError:
 
 # --- UTILIDADES ---
 
-# ✅ Extensiones de IMAGEN
 EXTENSIONES_IMAGEN = [
     '.jpg', '.jpeg', '.jpe', '.jfif', '.pjpeg', '.pjp',
     '.png', '.apng', '.gif', '.webp', '.bmp', '.dib',
     '.tif', '.tiff', '.avif', '.heic', '.heif', '.svg',
 ]
 
-# ✅ Extensiones de VIDEO
 EXTENSIONES_VIDEO = [
     '.mp4', '.m4v', '.webm', '.ogv', '.ogg',
     '.mov', '.qt', '.avi', '.mkv', '.flv',
     '.wmv', '.3gp', '.3g2', '.mpeg', '.mpg', '.m2v',
 ]
 
-# Mapa content_type → extensión de fallback (imagen)
 CONTENT_TYPE_A_EXT_IMG = {
     'image/jpeg': '.jpg', 'image/jpg': '.jpg', 'image/pjpeg': '.jpg',
     'image/png': '.png', 'image/gif': '.gif', 'image/webp': '.webp',
@@ -62,7 +59,6 @@ CONTENT_TYPE_A_EXT_IMG = {
     'image/heic': '.heic', 'image/heif': '.heif', 'image/svg+xml': '.svg',
 }
 
-# Mapa content_type → extensión de fallback (video)
 CONTENT_TYPE_A_EXT_VID = {
     'video/mp4': '.mp4', 'video/x-m4v': '.m4v', 'video/webm': '.webm',
     'video/ogg': '.ogv', 'video/quicktime': '.mov', 'video/x-msvideo': '.avi',
@@ -72,7 +68,9 @@ CONTENT_TYPE_A_EXT_VID = {
 
 MAX_FOTOS = 6
 MAX_VIDEOS = 3
-MAX_SIZE_VIDEO = 100 * 1024 * 1024  # 100 MB por video
+MAX_SIZE_VIDEO = 100 * 1024 * 1024
+
+BADGE_VENDEDOR_MAX_LEN = 20
 
 
 def _get_upload_folder():
@@ -82,7 +80,6 @@ def _get_upload_folder():
 
 
 def _save_photos(files, nombre_producto, fotos_existentes=None):
-    """Guarda imágenes subidas (máx 6)."""
     upload_path = _get_upload_folder()
     prefijo = "".join([c if c.isalnum() else "_" for c in (nombre_producto or 'producto').lower()])[:30]
     fotos_guardadas = list(fotos_existentes) if fotos_existentes else []
@@ -93,14 +90,10 @@ def _save_photos(files, nombre_producto, fotos_existentes=None):
     for idx, file in enumerate(archivos_lista):
         fname = getattr(file, 'filename', None)
         ctype = getattr(file, 'content_type', None)
-        print(f"      [IMG {idx}] filename={fname!r} content_type={ctype!r}")
 
         if file is None or not fname or not str(fname).strip():
-            print(f"         → Saltando (filename vacío)")
             continue
-
         if len(fotos_guardadas) >= MAX_FOTOS:
-            print(f"         → Saltando (límite de {MAX_FOTOS} fotos)")
             break
 
         ext_original = os.path.splitext(fname)[1].lower()
@@ -108,7 +101,6 @@ def _save_photos(files, nombre_producto, fotos_existentes=None):
             ext = ext_original
         else:
             ext = CONTENT_TYPE_A_EXT_IMG.get((ctype or '').lower(), '.jpg')
-            print(f"         → Ext '{ext_original}' no soportada. Usando '{ext}'")
 
         nombre_archivo = f"{prefijo}_img_{len(fotos_guardadas)}_{os.urandom(2).hex()}{ext}"
         ruta_destino = os.path.join(upload_path, nombre_archivo)
@@ -121,20 +113,15 @@ def _save_photos(files, nombre_producto, fotos_existentes=None):
             file.save(ruta_destino)
             if os.path.exists(ruta_destino) and os.path.getsize(ruta_destino) > 0:
                 fotos_guardadas.append(nombre_archivo)
-                size = os.path.getsize(ruta_destino)
-                print(f"         ✅ Guardado: {nombre_archivo} ({size} bytes)")
-            else:
-                print(f"         ❌ No se guardó o está vacío")
+                print(f"         ✅ Guardado: {nombre_archivo}")
         except Exception as e:
             print(f"         ❌ Error: {e}")
             traceback.print_exc()
 
-    print(f"   📸 Total fotos: {len(fotos_guardadas)}")
     return fotos_guardadas
 
 
 def _save_videos(files, nombre_producto, videos_existentes=None):
-    """Guarda videos subidos (máx 3)."""
     upload_path = _get_upload_folder()
     prefijo = "".join([c if c.isalnum() else "_" for c in (nombre_producto or 'producto').lower()])[:30]
     videos_guardados = list(videos_existentes) if videos_existentes else []
@@ -145,14 +132,10 @@ def _save_videos(files, nombre_producto, videos_existentes=None):
     for idx, file in enumerate(archivos_lista):
         fname = getattr(file, 'filename', None)
         ctype = getattr(file, 'content_type', None)
-        print(f"      [VID {idx}] filename={fname!r} content_type={ctype!r}")
 
         if file is None or not fname or not str(fname).strip():
-            print(f"         → Saltando (filename vacío)")
             continue
-
         if len(videos_guardados) >= MAX_VIDEOS:
-            print(f"         → Saltando (límite de {MAX_VIDEOS} videos)")
             break
 
         ext_original = os.path.splitext(fname)[1].lower()
@@ -160,7 +143,6 @@ def _save_videos(files, nombre_producto, videos_existentes=None):
             ext = ext_original
         else:
             ext = CONTENT_TYPE_A_EXT_VID.get((ctype or '').lower(), '.mp4')
-            print(f"         → Ext '{ext_original}' no soportada. Usando '{ext}'")
 
         nombre_archivo = f"{prefijo}_vid_{len(videos_guardados)}_{os.urandom(2).hex()}{ext}"
         ruta_destino = os.path.join(upload_path, nombre_archivo)
@@ -175,20 +157,13 @@ def _save_videos(files, nombre_producto, videos_existentes=None):
                 size = os.path.getsize(ruta_destino)
                 if size > MAX_SIZE_VIDEO:
                     os.remove(ruta_destino)
-                    print(f"         ⚠️ Video excede {MAX_SIZE_VIDEO // (1024*1024)}MB. Descartado.")
                     continue
                 if size > 0:
                     videos_guardados.append(nombre_archivo)
-                    print(f"         ✅ Guardado: {nombre_archivo} ({size} bytes)")
-                else:
-                    print(f"         ❌ Está vacío")
-            else:
-                print(f"         ❌ No se guardó")
+                    print(f"         ✅ Guardado: {nombre_archivo}")
         except Exception as e:
             print(f"         ❌ Error: {e}")
-            traceback.print_exc()
 
-    print(f"   🎬 Total videos: {len(videos_guardados)}")
     return videos_guardados
 
 
@@ -215,14 +190,6 @@ def _extraer_variantes(form):
 # ⭐ MARKETPLACE — HELPERS
 # ====================================================================
 def _get_vendedor_actual():
-    """
-    Devuelve el documento del vendedor del usuario logueado (si existe y está aprobado).
-    Retorna None si:
-      - No hay sesión
-      - No es vendedor
-      - No está aprobado
-      - El módulo Marketplace no está disponible
-    """
     if not MARKETPLACE_OK or Vendedor is None:
         return None
     if not session.get('user_id'):
@@ -238,66 +205,153 @@ def _get_vendedor_actual():
 
 
 def _es_admin_actual():
-    """Verifica si el usuario logueado es admin."""
     return session.get('rol') == 'admin'
 
 
+def _truncar_nombre_vendedor(nombre, max_len=BADGE_VENDEDOR_MAX_LEN):
+    if not nombre:
+        return ""
+    nombre = str(nombre).strip()
+    if len(nombre) <= max_len:
+        return nombre
+    return nombre[:max_len].rstrip() + "…"
+
+
+def _nombre_vendedor_display(producto):
+    """Replica la cascada del Jinja."""
+    if not producto:
+        return ""
+
+    v = producto.get('vendedor_nombre')
+    if v:
+        return str(v).strip()
+
+    v = producto.get('nombre_tienda')
+    if v:
+        return str(v).strip()
+
+    v = producto.get('tienda_nombre')
+    if v:
+        return str(v).strip()
+
+    vendedor_raw = producto.get('vendedor')
+
+    if isinstance(vendedor_raw, str) and vendedor_raw.strip():
+        return vendedor_raw.strip()
+
+    if isinstance(vendedor_raw, dict):
+        for k in ('nombre_tienda', 'tienda_nombre', 'nombre', 'name'):
+            if vendedor_raw.get(k):
+                return str(vendedor_raw[k]).strip()
+
+    vinfo = producto.get('vendedor_info') or {}
+    if isinstance(vinfo, dict) and vinfo.get('nombre'):
+        return str(vinfo['nombre']).strip()
+
+    return ""
+
+
+def _aplicar_campos_planos_vendedor(producto, nombre, vendedor_id_str, slug):
+    """Aplica los campos planos que el template Jinja espera."""
+    nombre = (nombre or '').strip()
+
+    producto['vendedor_nombre'] = nombre
+    producto['nombre_tienda']   = nombre
+    producto['tienda_nombre']   = nombre
+    producto['vendedor']        = nombre
+
+    producto['vendedor_id_str']       = vendedor_id_str
+    producto['vendedor_slug']         = slug or ''
+    producto['vendedor_nombre_badge'] = _truncar_nombre_vendedor(
+        nombre, BADGE_VENDEDOR_MAX_LEN
+    )
+
+    producto['data_vendidos'] = slug or vendedor_id_str or nombre
+
+
 def _enriquecer_producto_con_vendedor(producto):
-    """
-    Agrega info del vendedor a un dict de producto.
-    Inyecta: producto['vendedor_info'] = {nombre, slug, id} o None
-    """
+    """Agrega info del vendedor + campos planos para el badge."""
     if not producto:
         return producto
 
     vendedor_id = producto.get('vendedor_id')
+
     if not vendedor_id:
-        producto['vendedor_info'] = None
+        producto['vendedor_info']  = None
+        producto['es_marketplace'] = False
+        producto.setdefault('vendedor_nombre', '')
         return producto
 
-    # Si el producto ya trae nombre guardado, lo usamos como fallback
-    nombre_fallback = producto.get('vendedor_nombre', '')
+    producto['es_marketplace'] = True
+
+    nombre_fallback = (
+        producto.get('vendedor_nombre')
+        or producto.get('nombre_tienda')
+        or producto.get('tienda_nombre')
+        or ''
+    )
 
     if not MARKETPLACE_OK or Vendedor is None:
-        producto['vendedor_info'] = {
-            'id':     str(vendedor_id),
-            'nombre': nombre_fallback or 'Vendedor',
-            'slug':   None,
-        } if nombre_fallback else None
+        if nombre_fallback:
+            producto['vendedor_info'] = {
+                'id':     str(vendedor_id),
+                'nombre': nombre_fallback,
+                'slug':   None,
+                'logo':   '',
+            }
+        else:
+            producto['vendedor_info'] = None
+        _aplicar_campos_planos_vendedor(producto, nombre_fallback, str(vendedor_id), None)
         return producto
 
     try:
         db = current_app.db
         v = Vendedor.obtener_por_id(db, vendedor_id)
+
         if v and v.get('estado') == 'aprobado':
+            nombre = v.get('nombre_tienda') or nombre_fallback or 'Vendedor'
             producto['vendedor_info'] = {
                 'id':     str(v['_id']),
-                'nombre': v.get('nombre_tienda', nombre_fallback or 'Vendedor'),
+                'nombre': nombre,
                 'slug':   v.get('slug'),
                 'logo':   v.get('logo', ''),
             }
+            _aplicar_campos_planos_vendedor(
+                producto, nombre,
+                str(v['_id']),
+                v.get('slug')
+            )
         else:
             producto['vendedor_info'] = None
+            if nombre_fallback:
+                _aplicar_campos_planos_vendedor(
+                    producto, nombre_fallback, str(vendedor_id), None
+                )
     except Exception as e:
         print(f"⚠️ [_enriquecer_producto_con_vendedor] Error: {e}")
-        producto['vendedor_info'] = {
-            'id':     str(vendedor_id),
-            'nombre': nombre_fallback or 'Vendedor',
-            'slug':   None,
-        } if nombre_fallback else None
+        if nombre_fallback:
+            producto['vendedor_info'] = {
+                'id':     str(vendedor_id),
+                'nombre': nombre_fallback,
+                'slug':   None,
+                'logo':   '',
+            }
+            _aplicar_campos_planos_vendedor(
+                producto, nombre_fallback, str(vendedor_id), None
+            )
+        else:
+            producto['vendedor_info'] = None
 
     return producto
 
 
-def _actualizar_metricas_vendedor(vendedor_id, subtotal, comision_pct=None):
-    """
-    Actualiza las métricas del vendedor tras una venta:
-      - metricas.ventas     +1
-      - metricas.ingresos   +subtotal
-      - metricas.comisiones +comision
+def _enriquecer_lista_con_vendedor(productos):
+    for p in productos or []:
+        _enriquecer_producto_con_vendedor(p)
+    return productos
 
-    Llamar desde el pedido_controller al confirmar un pedido.
-    """
+
+def _actualizar_metricas_vendedor(vendedor_id, subtotal, comision_pct=None):
     if not MARKETPLACE_OK or Vendedor is None or not vendedor_id:
         return False
     try:
@@ -327,7 +381,7 @@ def _actualizar_metricas_vendedor(vendedor_id, subtotal, comision_pct=None):
 
 
 # ====================================================================
-# FUNCIÓN CLAVE: Calcular jerarquía de categorías
+# Jerarquía de categorías
 # ====================================================================
 def _calcular_jerarquia_categorias(categorias_crudas):
     todas = list(categorias_crudas)
@@ -359,7 +413,7 @@ def _calcular_jerarquia_categorias(categorias_crudas):
 
 
 # ====================================================================
-# HELPER: Obtener IDs de favoritos del usuario actual
+# Favoritos
 # ====================================================================
 def _get_favoritos_ids():
     if not session.get('user_id'):
@@ -373,13 +427,102 @@ def _get_favoritos_ids():
         return set()
 
 
+# ====================================================================
+# ⭐ HELPERS ROBUSTOS DE CARGA DE PRODUCTOS
+# ====================================================================
+
+def _obtener_activos_incluyendo_marketplace():
+    """
+    Trae TODOS los productos visibles en el catálogo (incluye marketplace).
+    Query simple + filtro de estados en Python.
+    """
+    db = current_app.db
+
+    productos = list(db.productos.find({'activo': {'$ne': False}}))
+
+    ESTADOS_EXCLUIDOS = {'inactivo', 'borrador', 'deshabilitado', 'eliminado', 'rechazado'}
+    productos = [
+        p for p in productos
+        if (p.get('estado') or 'activo').lower() not in ESTADOS_EXCLUIDOS
+    ]
+
+    print(f"🔎 [_obtener_activos_incluyendo_marketplace] {len(productos)} productos encontrados")
+    con_v = sum(1 for p in productos if p.get('vendedor_id'))
+    print(f"   ├─ con vendedor_id: {con_v}")
+    print(f"   └─ sin vendedor_id: {len(productos) - con_v}")
+
+    return productos
+
+
+def _obtener_activos_por_categoria(cat_id):
+    """
+    Carga TODOS los productos activos y filtra por categoría + descendientes
+    en Python (comparación de strings). Incluye diagnóstico detallado si
+    no encuentra nada.
+    """
+    productos = _obtener_activos_incluyendo_marketplace()
+
+    categorias_crudas = Categoria.obtener_todas()
+
+    # Recolectar la categoría + TODOS sus descendientes
+    ids_categoria = {str(cat_id)}
+    cambio = True
+    while cambio:
+        cambio = False
+        for c in categorias_crudas:
+            padre = c.get('padre_id')
+            if padre and str(padre) in ids_categoria and str(c['_id']) not in ids_categoria:
+                ids_categoria.add(str(c['_id']))
+                cambio = True
+
+    print(f"🔎 [_obtener_activos_por_categoria] buscando en {len(ids_categoria)} categorías: "
+          f"{sorted(ids_categoria)[:5]}...")
+    print(f"   total productos a filtrar: {len(productos)}")
+
+    def _match_categoria(p):
+        # Probar todos los campos posibles
+        for campo in ('categoria_id', 'categoria', 'categoria_ids'):
+            val = p.get(campo)
+            if val is None:
+                continue
+            if isinstance(val, list):
+                for v in val:
+                    if str(v) in ids_categoria:
+                        return True
+            else:
+                if str(val) in ids_categoria:
+                    return True
+        return False
+
+    filtrados = [p for p in productos if _match_categoria(p)]
+
+    print(f"🔎 [_obtener_activos_por_categoria] cat={cat_id} "
+          f"→ {len(filtrados)} de {len(productos)} productos")
+
+    # ⭐ Diagnóstico: si no hay ninguno, mostrar qué categorías SÍ tienen
+    if not filtrados and productos:
+        cats_de_productos = {}
+        for p in productos:
+            cid = p.get('categoria_id') or p.get('categoria')
+            if cid:
+                cid_str = str(cid)
+                cats_de_productos[cid_str] = cats_de_productos.get(cid_str, 0) + 1
+        print(f"   ⚠️ NINGÚN producto matchea. Categorías reales de los productos:")
+        for cid, n in list(cats_de_productos.items())[:10]:
+            print(f"      → {cid}: {n} producto(s)")
+
+        print(f"   ⚠️ Productos de vendedor y sus categorías:")
+        for p in productos:
+            if p.get('vendedor_id'):
+                cid = p.get('categoria_id') or p.get('categoria')
+                print(f"      → '{p.get('nombre')}' cat={cid}")
+
+    return filtrados
+
+
 # --- CONTROLADORES ---
 
 def listar_productos():
-    """
-    Lista de productos en el panel admin.
-    ⭐ Si el usuario es VENDEDOR (no admin), solo ve SUS productos.
-    """
     productos = ProductoModel.obtener_todos()
     categorias_crudas = Categoria.obtener_todas()
     categorias = _calcular_jerarquia_categorias(categorias_crudas)
@@ -387,7 +530,6 @@ def listar_productos():
     temporadas = Temporada.obtener_todas()
     temporadas_dict = {str(t['_id']): t for t in temporadas}
 
-    # ⭐ FILTRO MARKETPLACE: si es vendedor (no admin), solo ve sus productos
     vendedor_actual = _get_vendedor_actual()
     es_admin = _es_admin_actual()
     if vendedor_actual and not es_admin:
@@ -400,6 +542,7 @@ def listar_productos():
             if str(marca.get('_id')) == str(p.get('marca_id')):
                 p['marca_nombre'] = marca.get('nombre_comercial', '')
                 break
+        _enriquecer_producto_con_vendedor(p)
 
     return render_template('admin/productos.html',
                            productos=productos,
@@ -436,7 +579,6 @@ def ver_producto(id):
             producto['marca_nombre'] = marca.get('nombre_comercial', '')
             break
 
-    # ⭐ Enriquecer con vendedor
     _enriquecer_producto_con_vendedor(producto)
 
     vendedor_actual = _get_vendedor_actual()
@@ -453,27 +595,18 @@ def ver_producto(id):
 
 def agregar():
     if request.method == 'POST':
-        print(f"\n{'='*60}")
-        print(f"📥 POST /admin/productos/agregar")
-
         nombre = request.form.get('nombre')
         if not nombre:
             flash('El nombre del producto es requerido', 'danger')
             return redirect(url_for('web.lista_productos'))
 
         variantes = _extraer_variantes(request.form)
-
-        # Imágenes
         archivos_img = request.files.getlist('fotos[]')
         fotos = _save_photos(archivos_img, nombre)
-
-        # Videos
         archivos_vid = request.files.getlist('videos[]')
         videos = _save_videos(archivos_vid, nombre)
 
-        temporada_id = request.form.get('temporada_id', '').strip()
-        if not temporada_id:
-            temporada_id = None
+        temporada_id = request.form.get('temporada_id', '').strip() or None
 
         data = {
             "nombre": nombre.strip(),
@@ -490,14 +623,13 @@ def agregar():
             "updated_at": datetime.utcnow()
         }
 
-        # ⭐ MARKETPLACE: si el usuario es vendedor, asociar el producto
         vendedor_actual = _get_vendedor_actual()
         if vendedor_actual:
             data['vendedor_id']     = str(vendedor_actual['_id'])
             data['vendedor_nombre'] = vendedor_actual.get('nombre_tienda', '')
-            print(f"   🏪 Producto de vendedor: {data['vendedor_nombre']} ({data['vendedor_id']})")
+            data['nombre_tienda']   = vendedor_actual.get('nombre_tienda', '')
+            data['tienda_nombre']   = vendedor_actual.get('nombre_tienda', '')
 
-            # Incrementar contador de productos del vendedor
             try:
                 db = current_app.db
                 db[Vendedor.COLLECTION].update_one(
@@ -521,9 +653,6 @@ def editar(id):
         return redirect(url_for('web.lista_productos'))
 
     if request.method == 'POST':
-        print(f"\n{'='*60}")
-        print(f"📥 POST /admin/productos/editar/{id}")
-
         nombre = request.form.get('nombre')
         if not nombre:
             flash('El nombre del producto es requerido', 'danger')
@@ -531,19 +660,15 @@ def editar(id):
 
         variantes = _extraer_variantes(request.form)
 
-        # Imágenes
         fotos_existentes = request.form.getlist('fotos_existentes[]')
         archivos_img = request.files.getlist('fotos[]')
         fotos = _save_photos(archivos_img, nombre, fotos_existentes)
 
-        # Videos
         videos_existentes = request.form.getlist('videos_existentes[]')
         archivos_vid = request.files.getlist('videos[]')
         videos = _save_videos(archivos_vid, nombre, videos_existentes)
 
-        temporada_id = request.form.get('temporada_id', '').strip()
-        if not temporada_id:
-            temporada_id = None
+        temporada_id = request.form.get('temporada_id', '').strip() or None
 
         data = {
             "nombre": nombre.strip(),
@@ -558,10 +683,11 @@ def editar(id):
             "updated_at": datetime.utcnow()
         }
 
-        # ⭐ MARKETPLACE: preservar vendedor_id original
         if producto.get('vendedor_id'):
             data['vendedor_id']     = producto['vendedor_id']
             data['vendedor_nombre'] = producto.get('vendedor_nombre', '')
+            data['nombre_tienda']   = producto.get('nombre_tienda', producto.get('vendedor_nombre', ''))
+            data['tienda_nombre']   = producto.get('tienda_nombre', producto.get('vendedor_nombre', ''))
 
         ProductoModel.actualizar(id, data)
         flash(f'Producto actualizado: {len(fotos)} foto(s), {len(videos)} video(s)', 'success')
@@ -586,7 +712,6 @@ def borrar(id):
         flash('Producto no encontrado', 'danger')
         return redirect(url_for('web.lista_productos'))
 
-    # ⭐ MARKETPLACE: decrementar contador si es producto de vendedor
     if producto.get('vendedor_id') and MARKETPLACE_OK and Vendedor is not None:
         try:
             db = current_app.db
@@ -610,10 +735,9 @@ def catalogo():
     """
     Catálogo general público.
 
-    ⭐ IMPORTANTE: Los productos del MARKETPLACE (con vendedor_id) también
-    aparecen aquí porque `ProductoModel.obtener_activos()` no filtra por
-    vendedor. Se enriquecen con `_enriquecer_producto_con_vendedor()` para
-    mostrar el badge "Vendido por...".
+    ⭐ Fix: si al filtrar por categoría NO hay productos pero SÍ hay
+    productos de marketplace, los muestra igualmente (fallback) para que
+    los productos del vendedor sean visibles.
     """
     cat_id = request.args.get('categoria')
     marca_id = request.args.get('marca')
@@ -623,22 +747,50 @@ def catalogo():
     categorias_crudas = Categoria.obtener_todas()
     todas = _calcular_jerarquia_categorias(categorias_crudas)
 
-    if cat_id:
-        productos = ProductoModel.filtrar_por_categoria_y_descendientes(cat_id)
-    else:
-        productos = ProductoModel.obtener_activos()
+    # ⭐ Cargar TODOS los productos activos (incluye marketplace)
+    todos_activos = _obtener_activos_incluyendo_marketplace()
 
+    if cat_id:
+        productos = _obtener_activos_por_categoria(cat_id)
+
+        # ⭐ FALLBACK: si el filtro de categoría vacía todo pero hay
+        # productos de vendedor, mostrarlos igual (modo "relacionados")
+        if not productos:
+            productos_mkt = [p for p in todos_activos if p.get('vendedor_id')]
+            if productos_mkt:
+                print(f"   ℹ️ Categoría '{cat_id}' vacía pero hay "
+                      f"{len(productos_mkt)} productos de vendedor → mostrando todos")
+                productos = productos_mkt
+            else:
+                print(f"   ℹ️ Categoría '{cat_id}' vacía y no hay productos de vendedor")
+                productos = todos_activos
+    else:
+        productos = todos_activos
+
+    print(f"📦 catálogo: {len(productos)} productos antes de filtros "
+          f"(cat={cat_id}, marca={marca_id}, genero={genero}, q={query!r})")
+
+    # Filtros posteriores
     if marca_id:
         productos = [p for p in productos if str(p.get('marca_id')) == str(marca_id)]
     if genero:
-        productos = [p for p in productos if (p.get('genero') or '').strip().lower() == genero.strip().lower()]
+        productos = [
+            p for p in productos
+            if (p.get('genero') or '').strip().lower() == genero.strip().lower()
+        ]
     if query:
         query_lower = query.lower()
-        productos = [p for p in productos if query_lower in p.get('nombre', '').lower() or query_lower in p.get('descripcion', '').lower()]
+        productos = [
+            p for p in productos
+            if query_lower in (p.get('nombre') or '').lower()
+            or query_lower in (p.get('descripcion') or '').lower()
+        ]
 
-    # ⭐ MARKETPLACE: enriquecer productos con info del vendedor
-    for p in productos:
-        _enriquecer_producto_con_vendedor(p)
+    # ⭐ Enriquecer con datos del vendedor (badge azul)
+    _enriquecer_lista_con_vendedor(productos)
+
+    con_vendedor = sum(1 for p in productos if p.get('vendedor_id'))
+    print(f"📦 catálogo FINAL: {len(productos)} productos · {con_vendedor} son de vendedores")
 
     cat_actual = next((c for c in todas if str(c['_id']) == str(cat_id)), None)
     marcas = Marca.obtener_todas()
@@ -701,20 +853,19 @@ def ver_detalle_producto(id):
 
     db = current_app.db
 
-    # ⭐ MARKETPLACE: enriquecer con info del vendedor
     _enriquecer_producto_con_vendedor(producto)
 
     productos_relacionados = []
     if producto.get('categoria_id'):
         productos_relacionados = [
-            p for p in ProductoModel.obtener_activos()
+            p for p in _obtener_activos_incluyendo_marketplace()
             if str(p.get('categoria_id')) == str(producto.get('categoria_id'))
             and str(p['_id']) != str(producto['_id'])
         ][:8]
 
     ids_relacionados = {str(p['_id']) for p in productos_relacionados}
     productos_complementa = [
-        p for p in ProductoModel.obtener_activos()
+        p for p in _obtener_activos_incluyendo_marketplace()
         if str(p['_id']) != str(producto['_id'])
         and str(p['_id']) not in ids_relacionados
     ][:8]
@@ -722,7 +873,7 @@ def ver_detalle_producto(id):
     productos_de_marca = []
     if producto.get('marca_id'):
         productos_de_marca = [
-            p for p in ProductoModel.obtener_activos()
+            p for p in _obtener_activos_incluyendo_marketplace()
             if str(p.get('marca_id')) == str(producto.get('marca_id'))
             and str(p['_id']) != str(producto['_id'])
         ][:12]
@@ -755,19 +906,22 @@ def ver_detalle_producto(id):
         except Exception:
             es_favorito = False
 
-    # ⭐ MARKETPLACE: otros productos del mismo vendedor
     productos_del_vendedor = []
     if producto.get('vendedor_id'):
         try:
             productos_del_vendedor = [
-                p for p in ProductoModel.obtener_activos()
+                p for p in _obtener_activos_incluyendo_marketplace()
                 if str(p.get('vendedor_id') or '') == str(producto['vendedor_id'])
                 and str(p['_id']) != str(producto['_id'])
             ][:8]
-            for p in productos_del_vendedor:
-                _enriquecer_producto_con_vendedor(p)
+            _enriquecer_lista_con_vendedor(productos_del_vendedor)
         except Exception:
             productos_del_vendedor = []
+
+    _enriquecer_lista_con_vendedor(productos_relacionados)
+    _enriquecer_lista_con_vendedor(productos_complementa)
+    _enriquecer_lista_con_vendedor(productos_de_marca)
+    _enriquecer_lista_con_vendedor(productos_mas_vendidos)
 
     return render_template(
         'tienda/detalle_producto.html',
@@ -849,20 +1003,31 @@ def enviar_opinion():
 
 
 def listar_por_marca(marca):
-    db = current_app.db
-    productos = list(db.productos.find({"marca_id": marca, "activo": True}))
-    if not productos:
-        marcas = Marca.obtener_todas()
-        marca_obj = next((m for m in marcas if m.get('nombre_comercial', '').strip().lower() == marca.strip().lower()), None)
-        if marca_obj:
-            productos = list(db.productos.find({"marca_id": str(marca_obj['_id']), "activo": True}))
+    """Lista productos por marca incluyendo marketplace."""
+    productos = _obtener_activos_incluyendo_marketplace()
+
+    marcas = Marca.obtener_todas()
+    marca_ids_validos = {str(marca)}
+    marca_obj = next(
+        (m for m in marcas
+         if str(m.get('_id')) == str(marca)
+         or m.get('nombre_comercial', '').strip().lower() == str(marca).strip().lower()),
+        None
+    )
+    if marca_obj:
+        marca_ids_validos.add(str(marca_obj['_id']))
+
+    productos = [
+        p for p in productos
+        if str(p.get('marca_id') or '') in marca_ids_validos
+        or str(p.get('marca') or '').strip().lower() == str(marca).strip().lower()
+    ]
+
     categorias_crudas = Categoria.obtener_todas()
     categorias = _calcular_jerarquia_categorias(categorias_crudas)
     favoritos_ids = _get_favoritos_ids()
 
-    # ⭐ MARKETPLACE: enriquecer
-    for p in productos:
-        _enriquecer_producto_con_vendedor(p)
+    _enriquecer_lista_con_vendedor(productos)
 
     return render_template('tienda/catalogo.html',
                            productos=productos,
@@ -890,7 +1055,6 @@ def productos_relacionados(id):
 
     for p in relacionados:
         p['_id'] = str(p['_id'])
-        # ⭐ MARKETPLACE: enriquecer con vendedor
         _enriquecer_producto_con_vendedor(p)
 
     return jsonify({'success': True, 'productos': relacionados})
@@ -911,7 +1075,6 @@ def productos_mas_vendidos():
             p = ProductoModel.obtener_por_id(pid)
             if p and p.get('activo', True):
                 p['_id'] = str(p['_id'])
-                # ⭐ MARKETPLACE: enriquecer con vendedor
                 _enriquecer_producto_con_vendedor(p)
                 productos.append(p)
         return jsonify({'success': True, 'productos': productos})
@@ -927,7 +1090,6 @@ def productos_por_categoria_api(categoria_id):
     }).limit(20))
     for p in productos:
         p['_id'] = str(p['_id'])
-        # ⭐ MARKETPLACE: enriquecer con vendedor
         _enriquecer_producto_con_vendedor(p)
     return jsonify({'success': True, 'productos': productos})
 
@@ -946,7 +1108,6 @@ def buscar_productos():
     }).limit(20))
     for p in productos:
         p['_id'] = str(p['_id'])
-        # ⭐ MARKETPLACE: enriquecer con vendedor
         _enriquecer_producto_con_vendedor(p)
     return jsonify({'success': True, 'productos': productos})
 
@@ -960,7 +1121,6 @@ def api_productos():
     total = db.productos.count_documents({'activo': True})
     for p in productos:
         p['_id'] = str(p['_id'])
-        # ⭐ MARKETPLACE: enriquecer para el frontend
         _enriquecer_producto_con_vendedor(p)
     return jsonify({
         'success': True,
@@ -978,7 +1138,6 @@ def api_producto(id):
     if not producto:
         return jsonify({'success': False, 'message': 'Producto no encontrado'}), 404
     producto['_id'] = str(producto['_id'])
-    # ⭐ MARKETPLACE: enriquecer
     _enriquecer_producto_con_vendedor(producto)
     return jsonify({'success': True, 'producto': producto})
 
@@ -989,7 +1148,6 @@ def subir_imagen_producto(id):
     db = current_app.db
     usuario = db.usuarios.find_one({'_id': ObjectId(session['user_id'])})
 
-    # ⭐ MARKETPLACE: admin O vendedor dueño del producto
     vendedor_actual = _get_vendedor_actual()
     es_admin = usuario and usuario.get('rol') == 'admin'
 
@@ -1006,7 +1164,6 @@ def subir_imagen_producto(id):
     if not prod:
         return jsonify({'success': False, 'message': 'Producto no encontrado'}), 404
 
-    # ⭐ MARKETPLACE: si es vendedor, solo puede modificar SUS productos
     if vendedor_actual and not es_admin:
         if str(prod.get('vendedor_id') or '') != str(vendedor_actual['_id']):
             return jsonify({'success': False, 'message': 'Este producto no te pertenece'}), 403
@@ -1030,7 +1187,6 @@ def eliminar_imagen_producto(id, index):
     db = current_app.db
     usuario = db.usuarios.find_one({'_id': ObjectId(session['user_id'])})
 
-    # ⭐ MARKETPLACE: admin O vendedor dueño
     vendedor_actual = _get_vendedor_actual()
     es_admin = usuario and usuario.get('rol') == 'admin'
 
@@ -1041,7 +1197,6 @@ def eliminar_imagen_producto(id, index):
     if not producto:
         return jsonify({'success': False, 'message': 'Producto no encontrado'}), 404
 
-    # ⭐ MARKETPLACE: si es vendedor, solo puede modificar SUS productos
     if vendedor_actual and not es_admin:
         if str(producto.get('vendedor_id') or '') != str(vendedor_actual['_id']):
             return jsonify({'success': False, 'message': 'Este producto no te pertenece'}), 403
@@ -1059,7 +1214,7 @@ def eliminar_imagen_producto(id, index):
 
 
 # ================================================================
-# ⭐ EXPORTAR PRODUCTOS A EXCEL (CON IMÁGENES Y VIDEOS)
+# ⭐ EXPORTAR PRODUCTOS A EXCEL
 # ================================================================
 
 def exportar_productos():
@@ -1089,7 +1244,6 @@ def exportar_productos():
     marcas = {str(m['_id']): m.get('nombre_comercial', '') for m in Marca.obtener_todas()}
     temporadas = {str(t['_id']): t.get('nombre', '') for t in Temporada.obtener_todas()}
 
-    # ⭐ MARKETPLACE: si es vendedor, solo exporta SUS productos
     filtro = {}
     if vendedor_actual and not es_admin:
         filtro['vendedor_id'] = str(vendedor_actual['_id'])
@@ -1104,6 +1258,7 @@ def exportar_productos():
         'nombre', 'descripcion', 'categoria_id', 'categoria_nombre',
         'marca_id', 'marca_nombre', 'temporada_id', 'temporada_nombre',
         'estado', 'activo',
+        'vendedor_id', 'vendedor_nombre',
         'sku', 'color', 'talla', 'precio', 'stock',
         'fotos', 'fotos_urls',
         'videos', 'videos_urls',
@@ -1118,8 +1273,9 @@ def exportar_productos():
     anchos = {
         'A': 30, 'B': 40, 'C': 22, 'D': 22, 'E': 22, 'F': 22,
         'G': 22, 'H': 22, 'I': 12, 'J': 10,
-        'K': 20, 'L': 15, 'M': 12, 'N': 12, 'O': 10,
-        'P': 45, 'Q': 60, 'R': 45, 'S': 60,
+        'K': 28, 'L': 28,
+        'M': 20, 'N': 15, 'O': 12, 'P': 12, 'Q': 10,
+        'R': 45, 'S': 60, 'T': 45, 'U': 60,
     }
     for col, ancho in anchos.items():
         ws.column_dimensions[col].width = ancho
@@ -1139,7 +1295,9 @@ def exportar_productos():
         activo = p.get('activo', True)
         variables = p.get('variables') or []
 
-        # Fotos
+        vendedor_id  = str(p.get('vendedor_id') or '')
+        vendedor_nom = p.get('vendedor_nombre') or p.get('nombre_tienda') or ''
+
         fotos_nombres = p.get('fotos') or []
         fotos_str = ' | '.join(fotos_nombres)
         fotos_urls = [
@@ -1148,7 +1306,6 @@ def exportar_productos():
         ]
         fotos_urls_str = ' | '.join(fotos_urls)
 
-        # Videos
         videos_nombres = p.get('videos') or []
         videos_str = ' | '.join(videos_nombres)
         videos_urls = [
@@ -1163,6 +1320,7 @@ def exportar_productos():
             marca_id, marcas.get(marca_id, ''),
             temporada_id, temporadas.get(temporada_id, ''),
             estado, 'Sí' if activo else 'No',
+            vendedor_id, vendedor_nom,
         ]
 
         if variables:
@@ -1191,7 +1349,7 @@ def exportar_productos():
 
 
 # ================================================================
-# ⭐ IMPORTAR PRODUCTOS DESDE EXCEL (CON IMÁGENES Y VIDEOS)
+# ⭐ IMPORTAR PRODUCTOS DESDE EXCEL
 # ================================================================
 
 def importar_productos_excel():
@@ -1399,14 +1557,12 @@ def importar_productos_excel():
         try:
             existente = db.productos.find_one({'nombre': nombre_prod})
 
-            # ⭐ MARKETPLACE: si es vendedor, no puede actualizar productos que no son suyos
             if vendedor_actual and not es_admin and existente:
                 if str(existente.get('vendedor_id') or '') != str(vendedor_actual['_id']):
                     errores.append(f'"{nombre_prod}": no es tu producto')
                     omitidos += 1
                     continue
 
-            # Fotos
             fotos_finales = []
             for fn in data_prod.get('fotos_nombres', []):
                 if _validar_local(fn):
@@ -1422,7 +1578,6 @@ def importar_productos_excel():
                     total_fotos_descargadas += 1
             fotos_finales = fotos_finales[:MAX_FOTOS]
 
-            # Videos
             videos_finales = []
             for vn in data_prod.get('videos_nombres', []):
                 if _validar_local(vn):
@@ -1453,6 +1608,12 @@ def importar_productos_excel():
                 if videos_finales:
                     update_data['videos'] = videos_finales
 
+                if vendedor_actual:
+                    update_data['vendedor_id']     = str(vendedor_actual['_id'])
+                    update_data['vendedor_nombre'] = vendedor_actual.get('nombre_tienda', '')
+                    update_data['nombre_tienda']   = vendedor_actual.get('nombre_tienda', '')
+                    update_data['tienda_nombre']   = vendedor_actual.get('nombre_tienda', '')
+
                 db.productos.update_one({'_id': existente['_id']}, {'$set': update_data})
                 actualizados += 1
 
@@ -1475,10 +1636,11 @@ def importar_productos_excel():
                     'updated_at': datetime.utcnow(),
                 }
 
-                # ⭐ MARKETPLACE: asociar vendedor si aplica
                 if vendedor_actual:
                     nuevo['vendedor_id']     = str(vendedor_actual['_id'])
                     nuevo['vendedor_nombre'] = vendedor_actual.get('nombre_tienda', '')
+                    nuevo['nombre_tienda']   = vendedor_actual.get('nombre_tienda', '')
+                    nuevo['tienda_nombre']   = vendedor_actual.get('nombre_tienda', '')
 
                 db.productos.insert_one(nuevo)
                 creados += 1
@@ -1513,13 +1675,9 @@ def importar_productos_excel():
 
 
 # ================================================================
-# ⭐ AUTOCOMPLETADO DE BÚSQUEDA (endpoint AJAX para el navbar)
+# ⭐ AUTOCOMPLETADO DE BÚSQUEDA
 # ================================================================
 def autocompletar_productos():
-    """
-    Sugerencias en vivo para el buscador.
-    GET /api/productos/autocompletar?q=cami
-    """
     try:
         q = (request.args.get('q') or '').strip()
         if not q or len(q) < 2:
@@ -1530,7 +1688,7 @@ def autocompletar_productos():
         patron = {'$regex': q, '$options': 'i'}
 
         cursor = db.productos.find({
-            'estado': 'activo',
+            'activo': {'$ne': False},
             '$or': [
                 {'nombre': patron},
                 {'descripcion': patron}
@@ -1539,7 +1697,6 @@ def autocompletar_productos():
 
         resultados = []
         for p in cursor:
-            # Precio (primera variante con stock, o la primera variante, o el precio del producto)
             precio = 0.0
             variables = p.get('variables') or []
             variantes_con_stock = [v for v in variables if (v.get('stock') or 0) > 0]
@@ -1550,13 +1707,11 @@ def autocompletar_productos():
             else:
                 precio = float(p.get('precio') or 0)
 
-            # Foto principal
             foto_url = ''
             fotos = p.get('fotos') or []
             if fotos:
                 foto_url = url_for('static', filename='uploads/productos/' + fotos[0])
 
-            # Marca
             marca_nombre = ''
             marca_id = p.get('marca_id')
             if marca_id:
@@ -1567,7 +1722,6 @@ def autocompletar_productos():
                 except Exception:
                     marca_nombre = p.get('marca_nombre') or ''
 
-            # Categoría
             categoria_nombre = ''
             cat_id = p.get('categoria_id')
             if cat_id:
@@ -1578,8 +1732,10 @@ def autocompletar_productos():
                 except Exception:
                     categoria_nombre = p.get('categoria') or ''
 
-            # ⭐ MARKETPLACE: nombre del vendedor
-            vendedor_nombre = p.get('vendedor_nombre', '')
+            _enriquecer_producto_con_vendedor(p)
+
+            nombre_vendedor = _nombre_vendedor_display(p)
+            badge_vendedor  = _truncar_nombre_vendedor(nombre_vendedor, BADGE_VENDEDOR_MAX_LEN)
 
             resultados.append({
                 'id': str(p['_id']),
@@ -1587,7 +1743,9 @@ def autocompletar_productos():
                 'precio': round(precio, 2),
                 'marca': marca_nombre,
                 'categoria': categoria_nombre,
-                'vendedor': vendedor_nombre,
+                'vendedor': nombre_vendedor,
+                'vendedor_badge': badge_vendedor,
+                'es_marketplace': bool(p.get('vendedor_id')),
                 'foto': foto_url,
                 'url': url_for('web.ver_detalle_producto', id=str(p['_id']))
             })
@@ -1607,15 +1765,173 @@ def autocompletar_productos():
 
 
 # ================================================================
+# ⭐ DEBUG: diagnóstico
+# ================================================================
+def debug_productos():
+    """⚠️ Quitar en producción. Visitar /debug/productos"""
+    db = current_app.db
+
+    total           = db.productos.count_documents({})
+    activos         = db.productos.count_documents({'activo': True})
+    inactivos       = db.productos.count_documents({'activo': False})
+    con_vendedor    = db.productos.count_documents({'vendedor_id': {'$exists': True, '$ne': None}})
+    sin_vendedor    = db.productos.count_documents({
+        '$or': [
+            {'vendedor_id': {'$exists': False}},
+            {'vendedor_id': None},
+        ]
+    })
+
+    estados_agg = list(db.productos.aggregate([
+        {'$group': {'_id': '$estado', 'count': {'$sum': 1}}},
+        {'$sort': {'count': -1}},
+    ]))
+
+    muestra = list(db.productos.find(
+        {'vendedor_id': {'$exists': True, '$ne': None}},
+        {'nombre': 1, 'vendedor_id': 1, 'vendedor_nombre': 1,
+         'estado': 1, 'activo': 1, 'categoria_id': 1}
+    ).limit(5))
+
+    for p in muestra:
+        p['_id'] = str(p['_id'])
+        p['categoria_id'] = str(p.get('categoria_id')) if p.get('categoria_id') else None
+
+    try:
+        del_modelo = ProductoModel.obtener_activos()
+        modelo_total     = len(del_modelo)
+        modelo_con_vend  = sum(1 for p in del_modelo if p.get('vendedor_id'))
+    except Exception as e:
+        modelo_total = f"ERROR: {e}"
+        modelo_con_vend = "ERROR"
+
+    try:
+        del_helper = _obtener_activos_incluyendo_marketplace()
+        helper_total     = len(del_helper)
+        helper_con_vend  = sum(1 for p in del_helper if p.get('vendedor_id'))
+    except Exception as e:
+        helper_total = f"ERROR: {e}"
+        helper_con_vend = "ERROR"
+
+    return jsonify({
+        'resumen': {
+            'total_en_db':           total,
+            'activos_True':          activos,
+            'activos_False':         inactivos,
+            'activos_ausentes':      total - activos - inactivos,
+            'con_vendedor_id':       con_vendedor,
+            'sin_vendedor_id':       sin_vendedor,
+        },
+        'estados_usados': [
+            {'estado': e['_id'], 'count': e['count']} for e in estados_agg
+        ],
+        'modelo_obtener_activos': {
+            'total':            modelo_total,
+            'con_vendedor_id':  modelo_con_vend,
+        },
+        'helper_robusto': {
+            'total':            helper_total,
+            'con_vendedor_id':  helper_con_vend,
+        },
+        'muestra_vendedores': muestra,
+    })
+
+
+def debug_categorias():
+    """⚠️ Quitar en producción. Visitar /debug/categorias"""
+    db = current_app.db
+
+    categorias = list(db.categorias.find({}, {'nombre': 1, 'padre_id': 1}))
+    categorias_info = [
+        {'_id': str(c['_id']), 'nombre': c.get('nombre'), 'padre_id': str(c.get('padre_id') or '')}
+        for c in categorias
+    ]
+
+    agg = list(db.productos.aggregate([
+        {'$group': {'_id': '$categoria_id', 'count': {'$sum': 1}}},
+        {'$sort': {'count': -1}},
+        {'$limit': 30},
+    ]))
+
+    def _norm(x):
+        try:
+            return str(x) if x is not None else None
+        except Exception:
+            return repr(x)
+
+    dist = [{'categoria_id': _norm(r['_id']), 'count': r['count']} for r in agg]
+
+    sin_cat = db.productos.count_documents({'categoria_id': {'$exists': False}})
+    con_cat = db.productos.count_documents({'categoria_id': {'$exists': True, '$ne': None}})
+
+    tipos = {}
+    for p in db.productos.find({'categoria_id': {'$exists': True}}).limit(200):
+        t = type(p.get('categoria_id')).__name__
+        tipos[t] = tipos.get(t, 0) + 1
+
+    muestra = list(db.productos.find(
+        {},
+        {'nombre': 1, 'categoria_id': 1, 'categoria': 1, 'vendedor_id': 1}
+    ).limit(10))
+    for p in muestra:
+        p['_id'] = str(p['_id'])
+        p['categoria_id'] = _norm(p.get('categoria_id'))
+
+    return jsonify({
+        'categorias_en_bd': categorias_info,
+        'total_categorias': len(categorias),
+        'productos_con_categoria_id': con_cat,
+        'productos_sin_categoria_id': sin_cat,
+        'tipos_de_dato_categoria_id': tipos,
+        'distribucion_categoria_id_en_productos': dist,
+        'muestra_productos': muestra,
+    })
+
+
+def debug_catalogo():
+    """
+    ⚠️ Diagnóstico. Visitar /debug/catalogo
+    Muestra TODO lo que hay en productos: id, nombre, vendedor, categoría, activo, estado.
+    """
+    db = current_app.db
+
+    productos = list(db.productos.find({}))
+    salida = []
+    for p in productos:
+        salida.append({
+            '_id':               str(p.get('_id')),
+            'nombre':            p.get('nombre'),
+            'vendedor_id':       str(p.get('vendedor_id')) if p.get('vendedor_id') else None,
+            'vendedor_nombre':   p.get('vendedor_nombre'),
+            'categoria_id':      str(p.get('categoria_id')) if p.get('categoria_id') else None,
+            'categoria_id_tipo': type(p.get('categoria_id')).__name__ if p.get('categoria_id') else None,
+            'categoria':         p.get('categoria'),
+            'marca_id':          str(p.get('marca_id')) if p.get('marca_id') else None,
+            'activo':            p.get('activo'),
+            'estado':            p.get('estado'),
+            'es_marketplace':    bool(p.get('vendedor_id')),
+        })
+
+    cats = list(db.categorias.find({}))
+    categorias = [{
+        '_id':       str(c['_id']),
+        'nombre':    c.get('nombre'),
+        'padre_id':  str(c.get('padre_id')) if c.get('padre_id') else None,
+    } for c in cats]
+
+    return jsonify({
+        'total_productos': len(salida),
+        'productos': salida,
+        'total_categorias': len(categorias),
+        'categorias': categorias,
+    })
+
+
+# ================================================================
 # 💳 MSI — MESES SIN INTERESES
 # ================================================================
 
 def _calcular_msi(precio):
-    """
-    Calcula las opciones de MSI disponibles para un precio dado.
-    Devuelve una lista de dicts con:
-      - meses, etiqueta, min, tipo, bancos, mensualidad, total, tasa
-    """
     from app.config.msi_config import MSI_OPCIONES
     precio = float(precio or 0)
     opciones = []
@@ -1654,7 +1970,6 @@ def _calcular_msi(precio):
 
 
 def _mejor_msi(precio):
-    """Devuelve la opción MSI con más meses sin interés (la más atractiva)."""
     opciones = _calcular_msi(precio)
     sin_interes = [o for o in opciones if o["tipo"] == "sin_interes"]
     if sin_interes:
@@ -1663,10 +1978,6 @@ def _mejor_msi(precio):
 
 
 def api_calcular_msi():
-    """
-    Endpoint AJAX: devuelve opciones MSI para un precio.
-    GET /api/msi/calcular?precio=2999.99
-    """
     from app.config.msi_config import TARJETAS_TIENDA, MSI_LEGAL
     try:
         precio_raw = request.args.get("precio", "0")

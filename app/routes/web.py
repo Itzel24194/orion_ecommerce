@@ -259,32 +259,36 @@ def actualizar():
 def cambiar_password():
     return ac.cambiar_password()
 
-
 # ---- OPINIONES ----
 @web.route('/opinion/agregar', methods=['POST'])
 @cliente_required
 def agregar_opinion():
-    return pc.enviar_opinion()
+    from app.controllers import resenas_controller
+    return resenas_controller.agregar_opinion()
 
 @web.route('/opinion/editar', methods=['POST'])
 @cliente_required
 def editar_opinion():
-    return uc.editar_opinion()
+    from app.controllers import resenas_controller
+    return resenas_controller.editar_opinion()
 
 @web.route('/opinion/eliminar', methods=['POST'])
 @cliente_required
 def eliminar_opinion():
-    return uc.eliminar_opinion()
+    from app.controllers import resenas_controller
+    return resenas_controller.eliminar_opinion()
 
 @web.route('/opinion/util', methods=['POST'])
 @cliente_required
 def marcar_util():
-    return uc.marcar_util()
+    from app.controllers import resenas_controller
+    return resenas_controller.marcar_util()
 
 @web.route('/opinion/reportar', methods=['POST'])
 @cliente_required
 def reportar_opinion():
-    return uc.reportar_opinion()
+    from app.controllers import resenas_controller
+    return resenas_controller.reportar_opinion()
 
 # ================================================================
 # 6. ADMIN - USUARIOS
@@ -627,14 +631,9 @@ def mis_cupones():
     return cupon_controller.clientes_mis_cupones()
 
 @web.route('/api/cupon/aplicar', methods=['POST'])
-@cliente_required
-def aplicar_cupon():
-    return cupon_controller.cliente_aplicar_cupon()
-
-@web.route('/api/cupon/quitar', methods=['POST'])
-@cliente_required
-def quitar_cupon():
-    return cupon_controller.cliente_quitar_cupon()
+def api_cupon_aplicar():
+    from app.controllers.carrito_controller import aplicar_cupon
+    return aplicar_cupon()   # ← controlador NUEVO con debug
 
 @web.route('/api/cupon/validar', methods=['GET'])
 @cliente_required
@@ -646,12 +645,133 @@ def validar_cupon():
 def cupon_info():
     return cupon_controller.cliente_cupon_info()
 
+
+# ================================================================
+# ⭐ API JSON DE CUPONES (para React Native / SPA)
+# ================================================================
+
+@web.route('/api/v1/admin/cupones', methods=['GET'])
+@admin_required
+def api_v1_admin_cupones_listar():
+    try:
+        filtro = {}
+        if request.args.get("q"):
+            import re
+            rx = re.compile(request.args["q"], re.I)
+            filtro = {"$or": [{"codigo": rx}, {"nombre": rx}, {"descripcion": rx}]}
+        if request.args.get("activo") is not None:
+            filtro["activo"] = request.args["activo"].lower() in ("true", "1")
+
+        items = list(
+            cupon_controller.Cupon.get_collection().find(filtro).sort("created_at", -1)
+        )
+        return jsonify({
+            "ok": True,
+            "data": [cupon_controller.serializar_cupon(c) for c in items]
+        })
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@web.route('/api/v1/admin/cupones/<cupon_id>', methods=['GET'])
+@admin_required
+def api_v1_admin_cupon_detalle(cupon_id):
+    try:
+        c = cupon_controller.Cupon.obtener_por_id(cupon_id)
+        if not c:
+            return jsonify({"ok": False, "error": "Cupón no encontrado"}), 404
+        return jsonify({"ok": True, "data": cupon_controller.serializar_cupon(c)})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@web.route('/api/v1/admin/cupones', methods=['POST'])
+@admin_required
+def api_v1_admin_cupon_crear():
+    data = request.get_json(force=True, silent=True) or {}
+    ok, payload, status = cupon_controller.api_crear_cupon(data)
+    return jsonify(payload), status
+
+
+@web.route('/api/v1/admin/cupones/<cupon_id>', methods=['PUT'])
+@admin_required
+def api_v1_admin_cupon_editar(cupon_id):
+    data = request.get_json(force=True, silent=True) or {}
+    ok, payload, status = cupon_controller.api_actualizar_cupon(cupon_id, data)
+    return jsonify(payload), status
+
+
+@web.route('/api/v1/admin/cupones/<cupon_id>', methods=['DELETE'])
+@admin_required
+def api_v1_admin_cupon_eliminar(cupon_id):
+    ok, payload, status = cupon_controller.api_eliminar_cupon(cupon_id)
+    return jsonify(payload), status
+
+
+@web.route('/api/v1/admin/cupones/<cupon_id>/toggle', methods=['POST'])
+@admin_required
+def api_v1_admin_cupon_toggle(cupon_id):
+    ok, payload, status = cupon_controller.api_toggle_cupon(cupon_id)
+    return jsonify(payload), status
+
+
+@web.route('/api/v1/admin/segmentos', methods=['GET'])
+@admin_required
+def api_v1_admin_segmentos():
+    try:
+        data = cupon_controller.listar_segmentos_disponibles()
+        return jsonify({"ok": True, "data": data})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@web.route('/api/v1/admin/segmentos/<segmento_id>/preview', methods=['POST'])
+@admin_required
+def api_v1_admin_segmento_preview(segmento_id):
+    try:
+        data = cupon_controller.previsualizar_segmento(segmento_id)
+        return jsonify({"ok": True, "data": data})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@web.route('/api/v1/admin/cupones/generar-automatico', methods=['POST'])
+@admin_required
+def api_v1_admin_generar_cupones_automaticos():
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+        solo = data.get("segmentos") or None
+        resultados = cupon_controller.generar_cupones_automaticos_por_segmento(solo)
+        return jsonify({"ok": True, "data": resultados})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@web.route('/api/v1/admin/cupones-generados', methods=['GET'])
+@admin_required
+def api_v1_admin_cupones_generados():
+    try:
+        items = list(
+            cupon_controller.Cupon.get_collection()
+            .find({"creado_automaticamente": True})
+            .sort("created_at", -1)
+            .limit(200)
+        )
+        return jsonify({
+            "ok": True,
+            "data": [cupon_controller.serializar_cupon(c) for c in items]
+        })
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
 # ================================================================
 # 16. PROMOCIONES - ADMIN
 # ================================================================
 @web.route('/admin/promociones')
 @admin_required
 def admin_listar_promociones():
+    # CORREGIDO: Ahora llama al controlador que renderiza la LISTA general (tabla)
     return promo_c.admin_listar_promociones()
 
 @web.route('/admin/promociones/crear', methods=['GET', 'POST'])
@@ -672,6 +792,7 @@ def admin_eliminar_promocion(promocion_id):
 @web.route('/admin/promociones/estadisticas/<promocion_id>')
 @admin_required
 def admin_promocion_estadisticas(promocion_id):
+    # CORREGIDO: Esta ruta llama al controlador que renderiza la vista de estadísticas
     return promo_c.admin_promocion_estadisticas(promocion_id)
 
 @web.route('/admin/promociones/toggle/<promocion_id>', methods=['POST'])
@@ -2213,3 +2334,137 @@ def api_admin_monedero_grafico():
 def admin_monedero_exportar_csv():
     return monedero_admin_c.admin_monedero_exportar_csv()
 
+# ================================================================
+# MARKETPLACE — Secciones del vendedor
+# ================================================================
+
+@web.route('/marketplace/mis-ventas', methods=['GET'])
+@vendedor_required
+def marketplace_mis_ventas():
+    return vendedor_c.vendedor_mis_ventas()
+
+
+@web.route('/marketplace/mis-clientes', methods=['GET'])
+@vendedor_required
+def marketplace_mis_clientes():
+    return vendedor_c.vendedor_mis_clientes()
+
+
+@web.route('/marketplace/resenas', methods=['GET'])
+@vendedor_required
+def marketplace_resenas():
+    return vendedor_c.vendedor_resenas()
+
+
+@web.route('/marketplace/resenas/responder/<resena_id>', methods=['POST'])
+@vendedor_required
+def marketplace_responder_resena(resena_id):
+    return vendedor_c.vendedor_responder_resena(resena_id)
+
+
+@web.route('/marketplace/envios', methods=['GET'])
+@vendedor_required
+def marketplace_envios():
+    return vendedor_c.vendedor_envios()
+
+
+@web.route('/marketplace/envios/<pedido_id>/marcar', methods=['POST'])
+@vendedor_required
+def marketplace_marcar_enviado(pedido_id):
+    return vendedor_c.vendedor_marcar_enviado(pedido_id)
+
+
+@web.route('/marketplace/mi-tienda', methods=['GET', 'POST'])
+@vendedor_required
+def marketplace_mi_tienda():
+    return vendedor_c.vendedor_mi_tienda()
+
+
+# ⭐ NUEVA: Perfil propio del vendedor (cuenta de usuario)
+@web.route('/marketplace/perfil', methods=['GET', 'POST'])
+@vendedor_required
+def marketplace_perfil():
+    return vendedor_c.perfil()
+
+
+@web.route('/vendedor/ventas', methods=['GET'])
+@vendedor_required
+def vendedor_ventas():
+    return vendedor_c.lista_ventas()
+
+
+@web.route('/vendedor/clientes', methods=['GET'])
+@vendedor_required
+def vendedor_clientes():
+    return vendedor_c.lista_clientes()
+
+
+@web.route('/vendedor/envios', methods=['GET'])
+@vendedor_required
+def vendedor_envios():
+    return vendedor_c.lista_envios()
+
+
+@web.route('/vendedor/mi-tienda', methods=['GET', 'POST'])
+@vendedor_required
+def vendedor_mi_tienda():
+    return vendedor_c.mi_tienda()
+
+# ================================================================
+# ⭐ MONEDERO — Rutas faltantes
+# ================================================================
+
+@web.route('/api/monedero/pagar', methods=['POST'])
+@cliente_required
+def api_monedero_pagar():
+    return monedero_c.api_pagar_con_monedero()
+
+# ================================================================
+# ⭐ CUPONES EN CARRITO
+# ================================================================
+@web.route('/carrito/confirmar-pago/<id>', methods=['POST'])
+@cliente_required
+def confirmar_pago(id):
+    return pedido_c.confirmar_pago(id)
+
+
+@web.route('/api/cupon/quitar', methods=['POST'])
+def api_cupon_quitar():
+    from app.controllers.carrito_controller import quitar_cupon_carrito
+    return quitar_cupon_carrito()
+
+
+@web.route('/api/cupon/mis-cupones', methods=['GET'])
+def api_cupon_mis_cupones():
+    from app.controllers.carrito_controller import api_mis_cupones
+    return api_mis_cupones()
+
+@web.route('/api/cupon/diagnostico', methods=['GET'])
+def api_cupon_diagnostico():
+    from app.controllers.carrito_controller import api_diagnostico_cupones
+    return api_diagnostico_cupones()
+
+@web.route('/api/v1/admin/cupones/<cupon_id>/detalle-usos', methods=['GET'])
+@admin_required
+def api_v1_admin_cupon_detalle_usos(cupon_id):
+    try:
+        data = cupon_controller._detalle_usos(cupon_id)
+        if not data:
+            return jsonify({"ok": False, "error": "Cupón no encontrado"}), 404
+        return jsonify({"ok": True, "data": data})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+@web.route('/api/v1/auth/2fa/verificar', methods=['POST'])
+def api_v1_verify_2fa():
+    from app.controllers.auth_controller import api_verify_2fa_jwt
+    return api_verify_2fa_jwt()
+
+
+@web.route('/ayuda')
+def ayuda():
+    return render_template('tienda/ayuda.html')
+
+@web.route('/admin/perfil', methods=['GET', 'POST'])
+def admin_perfil():
+    return ac.admin_perfil()

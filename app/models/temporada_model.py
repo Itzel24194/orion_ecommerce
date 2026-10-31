@@ -1,70 +1,120 @@
-from app.config.database_config import db
+# ================================================================
+# app/models/temporada_model.py
+# Modelo de Temporadas - MongoDB
+# Usa current_app.db (igual que el resto de tus modelos)
+# ================================================================
+from flask import current_app
 from bson import ObjectId
 from datetime import datetime
 
+
 class Temporada:
-    """Modelo para gestionar temporadas (ej. Verano, Navidad, Rebajas)"""
+    COLLECTION = 'temporadas'
 
     @staticmethod
-    def obtener_todas():
-        """Obtener todas las temporadas"""
-        return list(db.temporadas.find().sort("fecha_inicio", -1))
+    def _col():
+        return current_app.db[Temporada.COLLECTION]
+
+    # ============================================================
+    # LECTURA
+    # ============================================================
 
     @staticmethod
-    def obtener_activas():
-        """Obtener temporadas activas (activa=True)"""
-        return list(db.temporadas.find({"activa": True}))
+    def obtener_todas(filtros=None):
+        filtros = filtros or {}
+        q = {}
+        if 'activa' in filtros:
+            q['activa'] = bool(filtros['activa'])
+        if 'destacada' in filtros:
+            q['destacada'] = bool(filtros['destacada'])
+
+        cursor = Temporada._col().find(q).sort([('fecha_inicio', -1), ('nombre', 1)])
+        return [Temporada._serialize(t) for t in cursor]
 
     @staticmethod
-    def obtener_por_id(id):
-        """Obtener una temporada por ID"""
+    def obtener_por_id(temp_id):
         try:
-            return db.temporadas.find_one({"_id": ObjectId(id)})
-        except:
+            doc = Temporada._col().find_one({'_id': ObjectId(temp_id)})
+        except Exception:
             return None
+        return Temporada._serialize(doc) if doc else None
+
+    @staticmethod
+    def obtener_activa():
+        """Devuelve la temporada vigente hoy (activa y dentro de fechas)."""
+        hoy = datetime.utcnow()
+        doc = Temporada._col().find_one({
+            'activa': True,
+            'fecha_inicio': {'$lte': hoy},
+            'fecha_fin': {'$gte': hoy},
+        })
+        return Temporada._serialize(doc) if doc else None
+
+    # ============================================================
+    # ESCRITURA
+    # ============================================================
 
     @staticmethod
     def crear(data):
-        """Crear una nueva temporada"""
-        data['created_at'] = datetime.now()
-        data['updated_at'] = datetime.now()
-        if 'activa' not in data:
-            data['activa'] = True
-        return db.temporadas.insert_one(data)
+        data.setdefault('descripcion', '')
+        data.setdefault('imagen', '')
+        data.setdefault('color', '#7C3AED')
+        data.setdefault('destacada', False)
+        data.setdefault('activa', True)
+        data['created_at'] = datetime.utcnow()
+        data['updated_at'] = datetime.utcnow()
+        res = Temporada._col().insert_one(data)
+        return str(res.inserted_id)
 
     @staticmethod
-    def actualizar(id, data):
-        """Actualizar una temporada existente"""
-        data['updated_at'] = datetime.now()
+    def actualizar(temp_id, data):
         try:
-            return db.temporadas.update_one(
-                {"_id": ObjectId(id)},
-                {"$set": data}
+            data['updated_at'] = datetime.utcnow()
+            Temporada._col().update_one(
+                {'_id': ObjectId(temp_id)},
+                {'$set': data}
             )
-        except:
-            return None
-
-    @staticmethod
-    def eliminar(id):
-        """Eliminar una temporada por ID"""
-        try:
-            result = db.temporadas.delete_one({"_id": ObjectId(id)})
-            return result.deleted_count > 0
-        except:
+            return True
+        except Exception:
             return False
 
     @staticmethod
-    def obtener_por_fecha(fecha=None):
-        """Obtener temporadas vigentes en una fecha (por defecto hoy)"""
-        if fecha is None:
-            fecha = datetime.now().date()
-        if isinstance(fecha, datetime):
-            fecha_dt = fecha
-        else:
-            fecha_dt = datetime.combine(fecha, datetime.min.time())
-        
-        return list(db.temporadas.find({
-            "fecha_inicio": {"$lte": fecha_dt},
-            "fecha_fin": {"$gte": fecha_dt},
-            "activa": True
-        }))
+    def eliminar(temp_id):
+        try:
+            res = Temporada._col().delete_one({'_id': ObjectId(temp_id)})
+            return res.deleted_count > 0
+        except Exception:
+            return False
+
+    # ============================================================
+    # UTILIDADES
+    # ============================================================
+
+    @staticmethod
+    def buscar_por_nombre(nombre):
+        return Temporada._col().find_one({
+            'nombre': {'$regex': f'^{nombre}$', '$options': 'i'}
+        })
+
+    @staticmethod
+    def estadisticas():
+        col = Temporada._col()
+        return {
+            'total': col.count_documents({}),
+            'activas': col.count_documents({'activa': True}),
+            'inactivas': col.count_documents({'activa': False}),
+            'destacadas': col.count_documents({'destacada': True}),
+        }
+
+    @staticmethod
+    def _serialize(doc):
+        if not doc:
+            return None
+        out = dict(doc)
+        out['_id'] = str(out['_id'])
+        out['descripcion'] = out.get('descripcion', '') or ''
+        out['imagen'] = out.get('imagen', '') or ''
+        out['color'] = out.get('color', '#7C3AED') or '#7C3AED'
+        out['destacada'] = bool(out.get('destacada', False))
+        out['activa'] = out.get('activa', True) is not False
+        return out

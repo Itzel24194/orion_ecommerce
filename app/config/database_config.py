@@ -421,7 +421,10 @@ def crear_indices():
 
         # --------------------------------------------------------
         # MESAS DE REGALOS
+        # ⭐ Búsqueda por 'owner_id' (así se guardan en el modelo).
+        # También se mantiene 'usuario_id' por compatibilidad.
         # --------------------------------------------------------
+        (mesas_regalos_col, [("owner_id", ASCENDING)], {}),
         (mesas_regalos_col, [("usuario_id", ASCENDING)], {}),
         (mesas_regalos_col, [("created_at", DESCENDING)], {}),
 

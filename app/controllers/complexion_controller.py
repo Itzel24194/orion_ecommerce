@@ -263,7 +263,7 @@ def api_obtener_complexion():
     return jsonify({
         'success': True,
         'complexion': datos,
-        'genero': (usuario.get('genero') or usuario.get('sexo') or '').lower(),
+        '': (usuario.get('') or usuario.get('sexo') or '').lower(),
         'opciones': {
             'complexion':       OPCIONES_COMPLEXION,
             'tallas_camisa':    TALLAS_CAMISA,

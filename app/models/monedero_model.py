@@ -1,30 +1,32 @@
 # app/models/monedero_model.py
 # ================================================================
-# MONEDERO DIGITAL ORION - Réplica del monedero de Liverpool
+# MONEDERO DIGITAL ORION — CLIENTE
+# Fuente única de verdad: colección `monedero`
 # ================================================================
 
-from app.config.database_config import db
 from bson import ObjectId
 from datetime import datetime, timezone
 import random
 import string
 
+from app.models.monedero_utils import (
+    COL_MONEDERO, uid_filtro, buscar_usuario,
+    leer_config, sincronizar_cache,
+    nuevo_movimiento, serializar_fechas,
+    ahora_utc, safe_oid,
+)
 
-def _to_utc(dt):
-    if dt is None:
-        return None
-    if isinstance(dt, str):
-        try:
-            dt = datetime.fromisoformat(dt)
-        except ValueError:
-            return None
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt.astimezone(timezone.utc)
+try:
+    from flask import current_app
+except Exception:
+    current_app = None
+
+
+def _col():
+    return current_app.db[COL_MONEDERO]
 
 
 def _generar_numero_tarjeta():
-    """Genera un número tipo '8 7902 2814 3307' (16 dígitos agrupados)."""
     digitos = ''.join(random.choices(string.digits, k=16))
     return f"{digitos[0]} {digitos[1:5]} {digitos[5:9]} {digitos[9:13]}"
 
@@ -33,133 +35,221 @@ def _generar_cvv():
     return ''.join(random.choices(string.digits, k=3))
 
 
-class Monedero:
-    collection = db.monedero
+def _serializar_fechas(obj):
+    return serializar_fechas(obj)
 
-    # ============================================================
-    # CREAR / OBTENER
-    # ============================================================
+
+class Monedero:
 
     @staticmethod
     def obtener_o_crear(usuario_id):
         if not usuario_id:
             return None
 
-        uid = str(usuario_id)
-        monedero = Monedero.collection.find_one({'usuario_id': uid})
+        uid_str = str(usuario_id)
+        col = _col()
 
-        if monedero:
-            return monedero
+        doc = col.find_one(uid_filtro(uid_str))
+        if doc:
+            return doc
 
-        ahora = datetime.now(timezone.utc)
+        usuario = buscar_usuario(uid_str)
+        if usuario:
+            doc = col.find_one({'usuario_id': usuario['_id']})
+            if doc:
+                return doc
+
+        ahora = ahora_utc()
         nuevo = {
-            'usuario_id': uid,
+            'usuario_id': uid_str,
             'saldo': 0.0,
-            'numero_tarjeta': _generar_numero_tarjeta(),  # "8 7902 2814 3307"
+            'numero_tarjeta': _generar_numero_tarjeta(),
             'cvv': _generar_cvv(),
-            'saldo_pendiente_transferir': 0.0,            # saldo externo disponible
+            'saldo_pendiente_transferir': 0.0,
+            'bloqueado': False,
+            'motivo_bloqueo': None,
             'movimientos': [],
             'created_at': ahora,
             'updated_at': ahora,
         }
-
-        result = Monedero.collection.insert_one(nuevo)
-        nuevo['_id'] = result.inserted_id
-        return nuevo
+        try:
+            result = col.insert_one(nuevo)
+            nuevo['_id'] = result.inserted_id
+            sincronizar_cache(uid_str, 0.0)
+            return nuevo
+        except Exception:
+            return None
 
     @staticmethod
     def obtener_por_usuario(usuario_id):
         if not usuario_id:
             return None
-        return Monedero.collection.find_one({'usuario_id': str(usuario_id)})
-
-    # ============================================================
-    # MOVIMIENTOS
-    # ============================================================
+        return _col().find_one(uid_filtro(str(usuario_id)))
 
     @staticmethod
-    def _registrar_movimiento(usuario_id, tipo, monto, descripcion, referencia=None):
-        movimiento = {
-            'tipo': tipo,
-            'monto': round(monto, 2),
-            'descripcion': descripcion,
-            'referencia': referencia or '',
-            'fecha': datetime.now(timezone.utc),
-        }
-        Monedero.collection.update_one(
-            {'usuario_id': str(usuario_id)},
+    def _push_movimiento(doc, movimiento, saldo_nuevo):
+        _col().update_one(
+            {'_id': doc['_id']},
             {
-                '$push': {'movimientos': {'$each': [movimiento], '$position': 0, '$slice': 100}},
-                '$set': {'updated_at': datetime.now(timezone.utc)}
+                '$set': {
+                    'saldo': round(float(saldo_nuevo), 2),
+                    'updated_at': ahora_utc(),
+                },
+                '$push': {
+                    'movimientos': {'$each': [movimiento], '$position': 0}
+                },
             }
         )
-
-    # ============================================================
-    # TRANSFERIR SALDO (formulario del drawer)
-    # ============================================================
 
     @staticmethod
     def transferir_saldo(usuario_id, monto, numero_serie, cvv):
-        """
-        Simula la transferencia de un monedero electrónico externo al monedero digital.
-        Valida el número de serie (últimos 4 dígitos de la tarjeta) y el CVV.
-        """
-        if monto <= 0:
+        try:
+            monto = float(monto)
+        except (TypeError, ValueError):
             return {'success': False, 'message': 'Monto inválido'}
 
-        monedero = Monedero.obtener_o_crear(usuario_id)
-        if not monedero:
-            return {'success': False, 'message': 'Monedero no encontrado'}
+        if monto <= 0:
+            return {'success': False, 'message': 'El monto debe ser mayor a 0'}
 
-        # Validar últimos 4 dígitos de la tarjeta
-        numero_tarjeta = monedero.get('numero_tarjeta', '').replace(' ', '')
-        ultimos_4 = numero_tarjeta[-4:] if len(numero_tarjeta) >= 4 else ''
+        numero_serie = str(numero_serie or '').strip()
+        cvv = str(cvv or '').strip()
 
-        if str(numero_serie).strip() != ultimos_4:
-            return {'success': False, 'message': 'Número de serie incorrecto'}
+        if len(numero_serie) != 4 or not numero_serie.isdigit():
+            return {'success': False, 'message': 'Número de serie debe tener 4 dígitos'}
+        if len(cvv) != 3 or not cvv.isdigit():
+            return {'success': False, 'message': 'CVV debe tener 3 dígitos'}
 
-        if str(cvv).strip() != str(monedero.get('cvv', '')).strip():
-            return {'success': False, 'message': 'CVV incorrecto'}
+        doc = Monedero.obtener_o_crear(usuario_id)
+        if not doc:
+            return {'success': False, 'message': 'No se pudo crear el monedero'}
 
-        # Acreditar
-        Monedero.collection.update_one(
-            {'usuario_id': str(usuario_id)},
-            {
-                '$inc': {'saldo': round(monto, 2)},
-                '$set': {'updated_at': datetime.now(timezone.utc)}
-            }
+        if doc.get('bloqueado'):
+            return {'success': False, 'message': 'Tu monedero está bloqueado. Contacta a soporte.'}
+
+        cfg = leer_config()
+
+        if not cfg['permitir_transferencias']:
+            return {'success': False, 'message': 'Las transferencias están deshabilitadas.'}
+
+        # ⭐ NO se valida numero_serie ni cvv contra la tarjeta virtual.
+        # Son datos de la tarjeta externa del banco.
+
+        saldo_actual = float(doc.get('saldo') or 0)
+
+        if monto < cfg['saldo_minimo_recarga']:
+            return {'success': False, 'message': f'La recarga mínima es ${cfg["saldo_minimo_recarga"]:.2f}'}
+        if monto > cfg['recarga_maxima']:
+            return {'success': False, 'message': f'La recarga máxima por operación es ${cfg["recarga_maxima"]:.2f}'}
+        if saldo_actual + monto > cfg['saldo_maximo']:
+            return {'success': False, 'message': f'El saldo máximo permitido es ${cfg["saldo_maximo"]:.2f}'}
+
+        comision = monto * (cfg['comision_transferencia'] / 100.0)
+        saldo_nuevo = saldo_actual + monto - comision
+
+        mov = nuevo_movimiento(
+            tipo='transferencia',
+            monto=monto,
+            saldo_anterior=saldo_actual,
+            saldo_nuevo=saldo_nuevo,
+            descripcion=f'Recarga desde tarjeta externa ••{numero_serie}',
         )
-        Monedero._registrar_movimiento(
-            usuario_id, 'transferencia', monto,
-            'Transferencia de saldo a mi monedero digital'
-        )
+        Monedero._push_movimiento(doc, mov, saldo_nuevo)
 
-        return {'success': True, 'message': f'Se transfirieron ${monto:.2f} a tu monedero'}
+        if comision > 0:
+            mov_c = nuevo_movimiento(
+                tipo='comision_transferencia',
+                monto=-comision,
+                saldo_anterior=saldo_nuevo,
+                saldo_nuevo=saldo_nuevo,
+                descripcion=f'Comisión {cfg["comision_transferencia"]}% por transferencia',
+            )
+            Monedero._push_movimiento(doc, mov_c, saldo_nuevo)
 
-    # ============================================================
-    # RECARGAR (para demo rápido)
-    # ============================================================
+        sincronizar_cache(usuario_id, saldo_nuevo)
+
+        msg = f'Se transfirieron ${monto:.2f} a tu monedero'
+        if comision > 0:
+            msg += f' (comisión: ${comision:.2f})'
+
+        return {'success': True, 'message': msg, 'saldo': saldo_nuevo, 'comision': comision}
 
     @staticmethod
     def recargar(usuario_id, monto, descripcion='Recarga de saldo'):
+        try:
+            monto = float(monto)
+        except (TypeError, ValueError):
+            return {'success': False, 'message': 'Monto inválido'}
+
+        if monto <= 0:
+            return {'success': False, 'message': 'El monto debe ser mayor a 0'}
+
+        doc = Monedero.obtener_o_crear(usuario_id)
+        if not doc:
+            return {'success': False, 'message': 'No se pudo crear el monedero'}
+
+        if doc.get('bloqueado'):
+            return {'success': False, 'message': 'Tu monedero está bloqueado. Contacta a soporte.'}
+
+        cfg = leer_config()
+
+        if monto < cfg['saldo_minimo_recarga']:
+            return {'success': False, 'message': f'La recarga mínima es ${cfg["saldo_minimo_recarga"]:.2f}'}
+        if monto > cfg['recarga_maxima']:
+            return {'success': False, 'message': f'La recarga máxima por operación es ${cfg["recarga_maxima"]:.2f}'}
+
+        saldo_actual = float(doc.get('saldo') or 0)
+        saldo_nuevo = saldo_actual + monto
+
+        if saldo_nuevo > cfg['saldo_maximo']:
+            return {'success': False, 'message': f'El saldo máximo permitido es ${cfg["saldo_maximo"]:.2f}'}
+
+        mov = nuevo_movimiento(
+            tipo='recarga',
+            monto=monto,
+            saldo_anterior=saldo_actual,
+            saldo_nuevo=saldo_nuevo,
+            descripcion=descripcion,
+        )
+        Monedero._push_movimiento(doc, mov, saldo_nuevo)
+        sincronizar_cache(usuario_id, saldo_nuevo)
+
+        return {'success': True, 'message': f'Se agregaron ${monto:.2f}', 'saldo': saldo_nuevo}
+
+    @staticmethod
+    def pagar(usuario_id, monto, descripcion='Pago con monedero', referencia=''):
+        try:
+            monto = float(monto)
+        except (TypeError, ValueError):
+            return {'success': False, 'message': 'Monto inválido'}
+
         if monto <= 0:
             return {'success': False, 'message': 'Monto inválido'}
 
-        Monedero.obtener_o_crear(usuario_id)
-        Monedero.collection.update_one(
-            {'usuario_id': str(usuario_id)},
-            {
-                '$inc': {'saldo': round(monto, 2)},
-                '$set': {'updated_at': datetime.now(timezone.utc)}
-            }
+        doc = Monedero.obtener_o_crear(usuario_id)
+        if not doc:
+            return {'success': False, 'message': 'No se pudo crear el monedero'}
+
+        if doc.get('bloqueado'):
+            return {'success': False, 'message': 'Tu monedero está bloqueado. Contacta a soporte.'}
+
+        saldo_actual = float(doc.get('saldo') or 0)
+        if saldo_actual < monto:
+            return {'success': False, 'message': 'Saldo insuficiente en el monedero', 'saldo': saldo_actual}
+
+        saldo_nuevo = saldo_actual - monto
+
+        mov = nuevo_movimiento(
+            tipo='compra',
+            monto=-monto,
+            saldo_anterior=saldo_actual,
+            saldo_nuevo=saldo_nuevo,
+            descripcion=descripcion,
+            referencia=referencia,
         )
-        Monedero._registrar_movimiento(usuario_id, 'recarga', monto, descripcion)
+        Monedero._push_movimiento(doc, mov, saldo_nuevo)
+        sincronizar_cache(usuario_id, saldo_nuevo)
 
-        return {'success': True, 'message': f'Se agregaron ${monto:.2f}'}
-
-    # ============================================================
-    # CASHBACK (opcional: integrado con checkout)
-    # ============================================================
+        return {'success': True, 'message': f'Pago realizado por ${monto:.2f}', 'saldo': saldo_nuevo}
 
     CASHBACK_POR_NIVEL = {
         'Bronce':   0.01,
@@ -170,40 +260,67 @@ class Monedero:
 
     @staticmethod
     def aplicar_cashback(usuario_id, monto_compra, nivel_cliente, pedido_id=None):
+        try:
+            monto_compra = float(monto_compra)
+        except (TypeError, ValueError):
+            return 0.0
+
         if monto_compra <= 0:
-            return 0
+            return 0.0
 
         porcentaje = Monedero.CASHBACK_POR_NIVEL.get(nivel_cliente, 0.01)
         cashback = round(monto_compra * porcentaje, 2)
+        if cashback <= 0:
+            return 0.0
 
-        Monedero.obtener_o_crear(usuario_id)
-        Monedero.collection.update_one(
-            {'usuario_id': str(usuario_id)},
-            {
-                '$inc': {'saldo': cashback},
-                '$set': {'updated_at': datetime.now(timezone.utc)}
-            }
+        doc = Monedero.obtener_o_crear(usuario_id)
+        if not doc or doc.get('bloqueado'):
+            return 0.0
+
+        cfg = leer_config()
+        saldo_actual = float(doc.get('saldo') or 0)
+
+        if saldo_actual + cashback > cfg['saldo_maximo']:
+            cashback = max(0.0, cfg['saldo_maximo'] - saldo_actual)
+            if cashback <= 0:
+                return 0.0
+
+        saldo_nuevo = saldo_actual + cashback
+
+        mov = nuevo_movimiento(
+            tipo='cashback',
+            monto=cashback,
+            saldo_anterior=saldo_actual,
+            saldo_nuevo=saldo_nuevo,
+            descripcion=f'Cashback {int(porcentaje * 100)}% por compra',
+            referencia=pedido_id,
         )
-        Monedero._registrar_movimiento(
-            usuario_id, 'cashback', cashback,
-            f'Cashback {int(porcentaje * 100)}% por compra',
-            referencia=pedido_id
-        )
+        Monedero._push_movimiento(doc, mov, saldo_nuevo)
+        sincronizar_cache(usuario_id, saldo_nuevo)
+
         return cashback
-
-    # ============================================================
-    # RESUMEN
-    # ============================================================
 
     @staticmethod
     def obtener_resumen(usuario_id):
-        monedero = Monedero.obtener_o_crear(usuario_id)
-        if not monedero:
+        doc = Monedero.obtener_o_crear(usuario_id)
+        if not doc:
             return None
 
+        movs = doc.get('movimientos') or []
+        try:
+            movs = sorted(
+                movs,
+                key=lambda x: x.get('fecha') if isinstance(x.get('fecha'), datetime) else datetime.min.replace(tzinfo=timezone.utc),
+                reverse=True,
+            )
+        except Exception:
+            pass
+
         return {
-            'saldo': round(monedero.get('saldo', 0), 2),
-            'numero_tarjeta': monedero.get('numero_tarjeta', ''),
-            'cvv': monedero.get('cvv', ''),
-            'movimientos': monedero.get('movimientos', [])[:30],
+            'saldo': round(float(doc.get('saldo') or 0), 2),
+            'numero_tarjeta': doc.get('numero_tarjeta') or '',
+            'cvv': doc.get('cvv') or '',
+            'bloqueado': bool(doc.get('bloqueado', False)),
+            'motivo_bloqueo': doc.get('motivo_bloqueo'),
+            'movimientos': serializar_fechas(movs[:50]),
         }

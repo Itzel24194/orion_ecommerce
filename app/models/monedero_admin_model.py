@@ -1,32 +1,27 @@
 # app/models/monedero_admin_model.py
 # ================================================================
 # MODELO ADMIN — MONEDERO DIGITAL ORION
+# Misma colección `monedero` que el cliente, misma estructura.
+# UTC aware, respeta config, sincroniza caché usuarios.monedero_saldo.
 # ================================================================
 
 from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 from flask import current_app
 
-
-def _ahora():
-    return datetime.now(timezone.utc).replace(tzinfo=None)
-
-
-def _serializar_fechas(obj):
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-    if isinstance(obj, dict):
-        return {k: _serializar_fechas(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [_serializar_fechas(v) for v in obj]
-    return obj
+from app.models.monedero_utils import (
+    COL_MONEDERO, COL_CONFIG, uid_filtro, buscar_usuario,
+    leer_config, sincronizar_cache,
+    nuevo_movimiento, serializar_fechas, ahora_utc, safe_oid,
+)
 
 
 class MonederoAdmin:
-    COLECCION = 'monedero'
-    COLECCION_CONFIG = 'monedero_config'
+    COLECCION = COL_MONEDERO
+    COLECCION_CONFIG = COL_CONFIG
 
     # ---------- Helpers ----------
+
     @staticmethod
     def _col():
         return current_app.db[MonederoAdmin.COLECCION]
@@ -37,24 +32,14 @@ class MonederoAdmin:
 
     @staticmethod
     def _uid_filtro(usuario_id):
-        try:
-            uid_obj = ObjectId(str(usuario_id))
-        except Exception:
-            uid_obj = None
-        opciones = [{'usuario_id': str(usuario_id)}]
-        if uid_obj:
-            opciones.append({'usuario_id': uid_obj})
-        return {'$or': opciones}
+        return uid_filtro(usuario_id)
 
     @staticmethod
     def _buscar_usuario(db, usuario_id):
-        try:
-            return db.usuarios.find_one({'_id': ObjectId(str(usuario_id))})
-        except Exception:
-            return None
+        return buscar_usuario(usuario_id)
 
     # ============================================================
-    # ESTADÍSTICAS GLOBALES (coincide con el template)
+    # ESTADÍSTICAS GLOBALES
     # ============================================================
     @staticmethod
     def estadisticas_globales():
@@ -74,8 +59,7 @@ class MonederoAdmin:
         saldo_maximo = float(agg[0].get('maximo') or 0) if agg else 0.0
         saldo_promedio = (saldo_total / total_monederos) if total_monederos else 0.0
 
-        # Movimientos hoy
-        hoy_ini = _ahora().replace(hour=0, minute=0, second=0, microsecond=0)
+        hoy_ini = ahora_utc().replace(hour=0, minute=0, second=0, microsecond=0)
         agg_hoy = list(col.aggregate([
             {'$unwind': '$movimientos'},
             {'$match': {'movimientos.fecha': {'$gte': hoy_ini}}},
@@ -93,12 +77,12 @@ class MonederoAdmin:
         }
 
     # ============================================================
-    # GRÁFICO (claves: etiquetas, abonos, cargos, saldo_acumulado)
+    # GRÁFICO
     # ============================================================
     @staticmethod
     def datos_grafico_movimientos(dias=30):
         col = MonederoAdmin._col()
-        desde = _ahora() - timedelta(days=dias)
+        desde = ahora_utc() - timedelta(days=dias)
 
         pipeline = [
             {'$unwind': '$movimientos'},
@@ -122,7 +106,6 @@ class MonederoAdmin:
             abonos.append(round(float(r.get('abonos') or 0), 2))
             cargos.append(round(float(r.get('cargos') or 0), 2))
 
-        # Saldo acumulado simple: abonos - cargos acumulados
         saldo_acumulado = []
         acumulado = 0.0
         for a, c in zip(abonos, cargos):
@@ -148,6 +131,7 @@ class MonederoAdmin:
         salida = []
         for m in docs:
             u = MonederoAdmin._buscar_usuario(db, m.get('usuario_id'))
+            movs = m.get('movimientos') or []
             salida.append({
                 '_id': str(m.get('_id')),
                 'usuario_id': str(m.get('usuario_id') or ''),
@@ -157,8 +141,8 @@ class MonederoAdmin:
                 'numero_tarjeta': m.get('numero_tarjeta', ''),
                 'bloqueado': bool(m.get('bloqueado', False)),
                 'motivo_bloqueo': m.get('motivo_bloqueo'),
-                'total_movimientos': len(m.get('movimientos') or []),
-                'updated_at': _serializar_fechas(m.get('updated_at')),
+                'total_movimientos': len(movs),
+                'updated_at': serializar_fechas(m.get('updated_at')),
             })
         return salida
 
@@ -178,6 +162,7 @@ class MonederoAdmin:
             m = col.find_one(MonederoAdmin._uid_filtro(u['_id']))
             if not m:
                 continue
+            movs = m.get('movimientos') or []
             resultados.append({
                 '_id': str(m.get('_id')),
                 'usuario_id': str(m.get('usuario_id') or ''),
@@ -187,8 +172,8 @@ class MonederoAdmin:
                 'numero_tarjeta': m.get('numero_tarjeta', ''),
                 'bloqueado': bool(m.get('bloqueado', False)),
                 'motivo_bloqueo': m.get('motivo_bloqueo'),
-                'total_movimientos': len(m.get('movimientos') or []),
-                'updated_at': _serializar_fechas(m.get('updated_at')),
+                'total_movimientos': len(movs),
+                'updated_at': serializar_fechas(m.get('updated_at')),
             })
         return resultados
 
@@ -205,7 +190,14 @@ class MonederoAdmin:
         u = MonederoAdmin._buscar_usuario(db, m.get('usuario_id'))
 
         movimientos = m.get('movimientos') or []
-        movimientos = sorted(movimientos, key=lambda x: x.get('fecha') or datetime.min, reverse=True)[:100]
+        try:
+            movimientos = sorted(
+                movimientos,
+                key=lambda x: x.get('fecha') if isinstance(x.get('fecha'), datetime) else datetime.min.replace(tzinfo=timezone.utc),
+                reverse=True,
+            )[:100]
+        except Exception:
+            pass
 
         return {
             'monedero_id': str(m.get('_id')),
@@ -220,10 +212,10 @@ class MonederoAdmin:
             'cvv': m.get('cvv', ''),
             'bloqueado': bool(m.get('bloqueado', False)),
             'motivo_bloqueo': m.get('motivo_bloqueo'),
-            'movimientos': _serializar_fechas(movimientos),
+            'movimientos': serializar_fechas(movimientos),
             'total_movimientos': len(m.get('movimientos') or []),
-            'created_at': _serializar_fechas(m.get('created_at')),
-            'updated_at': _serializar_fechas(m.get('updated_at')),
+            'created_at': serializar_fechas(m.get('created_at')),
+            'updated_at': serializar_fechas(m.get('updated_at')),
         }
 
     # ============================================================
@@ -236,35 +228,63 @@ class MonederoAdmin:
         if not m:
             return {'success': False, 'error': 'Monedero no encontrado'}
 
+        try:
+            monto = float(monto)
+        except (TypeError, ValueError):
+            return {'success': False, 'error': 'Monto inválido'}
+
+        if monto == 0:
+            return {'success': False, 'error': 'El monto no puede ser cero'}
+
+        motivo = (motivo or '').strip()
+        if not motivo:
+            return {'success': False, 'error': 'El motivo es obligatorio'}
+
         saldo_anterior = float(m.get('saldo') or 0)
-        saldo_nuevo = saldo_anterior + float(monto)
+        saldo_nuevo = saldo_anterior + monto
+
         if saldo_nuevo < 0:
             return {'success': False, 'error': 'El saldo no puede quedar negativo'}
 
-        ahora = _ahora()
-        movimiento = {
-            'tipo': 'ajuste_admin',
-            'monto': float(monto),
-            'descripcion': f'Ajuste admin: {motivo}',
-            'fecha': ahora,
-            'saldo_anterior': saldo_anterior,
-            'saldo_nuevo': saldo_nuevo,
-            'admin_id': str(admin_id),
-            'motivo': motivo,
-        }
+        cfg = leer_config()
+        if saldo_nuevo > cfg['saldo_maximo']:
+            return {
+                'success': False,
+                'error': f'El saldo máximo permitido es ${cfg["saldo_maximo"]:.2f}',
+            }
+
+        mov = nuevo_movimiento(
+            tipo='ajuste_admin',
+            monto=monto,
+            saldo_anterior=saldo_anterior,
+            saldo_nuevo=saldo_nuevo,
+            descripcion=f'Ajuste admin: {motivo}',
+            admin_id=admin_id,
+            motivo=motivo,
+        )
+
         col.update_one(
             {'_id': m['_id']},
-            {'$set': {'saldo': saldo_nuevo, 'updated_at': ahora},
-             '$push': {'movimientos': {'$each': [movimiento], '$position': 0}}},
+            {
+                '$set': {'saldo': round(saldo_nuevo, 2), 'updated_at': ahora_utc()},
+                '$push': {'movimientos': {'$each': [mov], '$position': 0}},
+            },
         )
-        return {'success': True, 'saldo_nuevo': saldo_nuevo, 'mensaje': f'Ajuste aplicado: ${monto:+.2f}'}
+
+        sincronizar_cache(usuario_id, saldo_nuevo)
+
+        return {
+            'success': True,
+            'saldo_nuevo': saldo_nuevo,
+            'mensaje': f'Ajuste aplicado: ${monto:+.2f}',
+        }
 
     # ============================================================
     # BLOQUEAR / DESBLOQUEAR
     # ============================================================
     @staticmethod
     def bloquear(usuario_id, motivo):
-        ahora = _ahora()
+        ahora = ahora_utc()
         res = MonederoAdmin._col().update_one(
             MonederoAdmin._uid_filtro(usuario_id),
             {'$set': {'bloqueado': True, 'motivo_bloqueo': motivo, 'updated_at': ahora}},
@@ -275,7 +295,7 @@ class MonederoAdmin:
 
     @staticmethod
     def desbloquear(usuario_id):
-        ahora = _ahora()
+        ahora = ahora_utc()
         res = MonederoAdmin._col().update_one(
             MonederoAdmin._uid_filtro(usuario_id),
             {'$set': {'bloqueado': False, 'motivo_bloqueo': None, 'updated_at': ahora}},
@@ -289,23 +309,13 @@ class MonederoAdmin:
     # ============================================================
     @staticmethod
     def obtener_config():
-        default = {
-            'saldo_maximo': 50000.0,
-            'saldo_minimo_recarga': 50.0,
-            'recarga_maxima': 20000.0,
-            'permitir_transferencias': True,
-            'comision_transferencia': 0.0,
-            'cashback_porcentaje': 0.0,
-        }
-        doc = MonederoAdmin._col_config().find_one({'_id': 'global'})
-        if doc:
-            doc.pop('_id', None)
-            default.update(doc)
-        return default
+        return leer_config()
 
     @staticmethod
     def guardar_config(config):
-        MonederoAdmin._col_config().update_one({'_id': 'global'}, {'$set': config}, upsert=True)
+        MonederoAdmin._col_config().update_one(
+            {'_id': 'global'}, {'$set': config}, upsert=True
+        )
         return True
 
     # ============================================================
@@ -326,7 +336,7 @@ class MonederoAdmin:
                 'bloqueado': 'Sí' if m.get('bloqueado') else 'No',
                 'motivo_bloqueo': m.get('motivo_bloqueo') or '',
                 'total_movimientos': len(m.get('movimientos') or []),
-                'creado': _serializar_fechas(m.get('created_at')) or '',
-                'actualizado': _serializar_fechas(m.get('updated_at')) or '',
+                'creado': serializar_fechas(m.get('created_at')) or '',
+                'actualizado': serializar_fechas(m.get('updated_at')) or '',
             })
         return filas
