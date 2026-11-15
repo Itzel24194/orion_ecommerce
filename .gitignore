@@ -42,3 +42,12 @@ desktop.ini
 app/static/debug_impi/
 .history/
 app/static/uploads/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+terraform.tfvars
+terraform.tfvars.json
+crash.log

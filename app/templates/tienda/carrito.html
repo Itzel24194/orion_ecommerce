@@ -404,78 +404,79 @@
                 {% endif %}
             </div>
 
-            {% if carrito_items|length == 0 %}
-            <div class="text-center py-4 mt-3 bg-white rounded-4 shadow-sm">
-                <i class="bi bi-cart-x display-4 text-secondary"></i>
-                <h5 class="mt-2 fw-bold">Tu carrito está vacío</h5>
-                <p class="text-muted small">Agrega productos para comenzar tu compra.</p>
-                <a href="{{ url_for('web.raiz_tienda') }}" class="btn btn-dark rounded-pill px-4 py-1" style="font-size:0.85rem;">
-                    <i class="bi bi-arrow-left me-2"></i> Seguir comprando
-                </a>
-            </div>
-            {% else %}
-
+            <!-- ⭐ FIX: Se asegura que el bloque siempre se muestre -->
             <div class="row g-3 mt-1">
                 <div class="col-lg-8">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted small" style="font-size:0.7rem;">{{ carrito_items|length }} productos</span>
-                    </div>
+                    {% if carrito_items|length == 0 %}
+                        <div class="text-center py-5 mt-3 bg-white rounded-4 shadow-sm">
+                            <i class="bi bi-cart-x display-4 text-secondary"></i>
+                            <h5 class="mt-2 fw-bold">Tu carrito está vacío</h5>
+                            <p class="text-muted small">Agrega productos para comenzar tu compra.</p>
+                            <a href="{{ url_for('web.raiz_tienda') }}" class="btn btn-dark rounded-pill px-4 py-1" style="font-size:0.85rem;">
+                                <i class="bi bi-arrow-left me-2"></i> Seguir comprando
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small" style="font-size:0.7rem;">{{ carrito_items|length }} productos</span>
+                        </div>
 
-                    {% for item in carrito_items %}
-                    <div class="cart-product d-flex align-items-center">
-                        <img src="{{ url_for('static', filename='uploads/productos/' + (item.imagen or 'default.jpg')) }}"
-                             class="cart-product-img me-2" alt="{{ item.nombre }}">
-                        <div class="flex-grow-1">
-                            <div class="cart-product-title">{{ item.nombre }}</div>
-                            {% if item.atributos %}
-                                <div class="cart-product-attr">
-                                    {% if item.atributos.color %}Color: {{ item.atributos.color }}{% endif %}
-                                    {% if item.atributos.tamano %} | Talla: {{ item.atributos.tamano }}{% endif %}
-                                </div>
-                            {% endif %}
-                            <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
-                                <div class="qty-control">
-                                    <button type="button" class="qty-btn" onclick="cambiarCantidad('{{ item.id }}', -1)">−</button>
-                                    <input type="number" id="qty-{{ item.id }}" class="qty-input" value="{{ item.cantidad }}" min="1" max="{{ item.stock_disponible or 999999 }}">
-                                    <button type="button" class="qty-btn" onclick="cambiarCantidad('{{ item.id }}', 1)">+</button>
-                                </div>
-                                <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1" onclick="eliminarProducto('{{ item.id }}')" style="font-size:0.7rem;">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                            <div class="mt-1">
-                                <span class="stock-indicator small" style="font-size:0.6rem;">
-                                    <span class="text-muted">Stock:</span>
-                                    {% if item.stock_disponible is defined %}
-                                        <span class="fw-bold 
-                                            {% if item.stock_disponible <= 10 %}stock-bajo
-                                            {% elif item.stock_disponible <= 50 %}stock-medio
-                                            {% else %}stock-alto{% endif %}">
-                                            {{ item.stock_disponible }}
-                                        </span>
-                                    {% else %}
-                                        <span class="text-muted">Sin límite</span>
-                                    {% endif %}
-                                </span>
-                                {% if item.cantidad >= 50 %}
-                                    <span class="badge-mayorista ms-1"><i class="bi bi-truck"></i> Mayorista</span>
-                                {% elif item.cantidad >= 10 %}
-                                    <span class="badge-volumen ms-1"><i class="bi bi-box-seam"></i> Volumen</span>
+                        {% for item in carrito_items %}
+                        <div class="cart-product d-flex align-items-center">
+                            <img src="{{ url_for('static', filename='uploads/productos/' + (item.imagen or 'default.jpg')) }}"
+                                 class="cart-product-img me-2" alt="{{ item.nombre }}">
+                            <div class="flex-grow-1">
+                                <div class="cart-product-title">{{ item.nombre }}</div>
+                                {% if item.atributos %}
+                                    <div class="cart-product-attr">
+                                        {% if item.atributos.color %}Color: {{ item.atributos.color }}{% endif %}
+                                        {% if item.atributos.tamano %} | Talla: {{ item.atributos.tamano }}{% endif %}
+                                    </div>
                                 {% endif %}
+                                <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
+                                    <div class="qty-control">
+                                        <button type="button" class="qty-btn" onclick="cambiarCantidad('{{ item.id }}', -1)">−</button>
+                                        <input type="number" id="qty-{{ item.id }}" class="qty-input" value="{{ item.cantidad }}" min="1" max="{{ item.stock_disponible or 999999 }}">
+                                        <button type="button" class="qty-btn" onclick="cambiarCantidad('{{ item.id }}', 1)">+</button>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-danger btn-sm py-0 px-1" onclick="eliminarProducto('{{ item.id }}')" style="font-size:0.7rem;">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-1">
+                                    <span class="stock-indicator small" style="font-size:0.6rem;">
+                                        <span class="text-muted">Stock:</span>
+                                        {% if item.stock_disponible is defined %}
+                                            <span class="fw-bold 
+                                                {% if item.stock_disponible <= 10 %}stock-bajo
+                                                {% elif item.stock_disponible <= 50 %}stock-medio
+                                                {% else %}stock-alto{% endif %}">
+                                                {{ item.stock_disponible }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">Sin límite</span>
+                                        {% endif %}
+                                    </span>
+                                    {% if item.cantidad >= 50 %}
+                                        <span class="badge-mayorista ms-1"><i class="bi bi-truck"></i> Mayorista</span>
+                                    {% elif item.cantidad >= 10 %}
+                                        <span class="badge-volumen ms-1"><i class="bi bi-box-seam"></i> Volumen</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="cart-product-price">${{ "%.2f"|format(item.precio|float * item.cantidad|int) }}</div>
+                                <div class="small text-muted" style="font-size:0.6rem;">${{ "%.2f"|format(item.precio|float) }} c/u</div>
                             </div>
                         </div>
-                        <div class="text-end">
-                            <div class="cart-product-price">${{ "%.2f"|format(item.precio|float * item.cantidad|int) }}</div>
-                            <div class="small text-muted" style="font-size:0.6rem;">${{ "%.2f"|format(item.precio|float) }} c/u</div>
-                        </div>
-                    </div>
-                    {% endfor %}
+                        {% endfor %}
 
-                    <div class="mt-2">
-                        <a href="{{ url_for('web.raiz_tienda') }}" class="btn btn-outline-secondary btn-sm rounded-pill" style="font-size:0.75rem; padding:4px 14px;">
-                            <i class="bi bi-arrow-left me-1"></i> Seguir comprando
-                        </a>
-                    </div>
+                        <div class="mt-2">
+                            <a href="{{ url_for('web.raiz_tienda') }}" class="btn btn-outline-secondary btn-sm rounded-pill" style="font-size:0.75rem; padding:4px 14px;">
+                                <i class="bi bi-arrow-left me-1"></i> Seguir comprando
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="col-lg-4">
@@ -484,7 +485,7 @@
                             <i class="bi bi-receipt me-2"></i> Resumen
                         </div>
 
-                        <!-- ===== ⭐ WIDGET DE CUPÓN (ÚNICO, el que funciona) ===== -->
+                        <!-- ===== ⭐ WIDGET DE CUPÓN ===== -->
                         <div class="cupon-widget">
                             <div class="cupon-widget-header">
                                 <div class="cupon-widget-title">
@@ -519,7 +520,7 @@
                         </div>
                         <!-- ===== /WIDGET DE CUPÓN ===== -->
 
-                        <!-- ⭐ PROMOCIÓN (solo lectura, sin url_for viejo) -->
+                        <!-- ⭐ PROMOCIÓN -->
                         {% if promocion_aplicada %}
                         <div class="promocion-aplicado-box">
                             <div class="promocion-info">
@@ -630,7 +631,7 @@
                         </div>
                         {% endif %}
 
-                        <button class="btn-pagar mt-2" data-bs-toggle="modal" data-bs-target="#checkoutModal" style="padding:8px;">
+                        <button class="btn-pagar mt-2" data-bs-toggle="modal" data-bs-target="#checkoutModal" style="padding:8px;" {% if carrito_items|length == 0 %}disabled{% endif %}>
                             <i class="bi bi-credit-card"></i> Pagar ${{ "%.2f"|format(total_carrito) }}
                         </button>
 
@@ -652,7 +653,6 @@
                 </div>
             </div>
 
-            {% endif %}
         </div>
     </div>
 
@@ -853,7 +853,6 @@
                                 <span id="tarjetaSectionTitle">Datos de la tarjeta</span>
                             </div>
 
-                            <!-- VISTA A: Tarjeta guardada seleccionada (sin CVC) -->
                             <div id="tarjetaGuardadaVista" style="display:none;">
                                 <div class="tarjeta-guardada-compacta">
                                     <div>
@@ -880,7 +879,6 @@
                                 <input type="hidden" id="tarjetaCustomerId" value="">
                             </div>
 
-                            <!-- VISTA B: Nueva tarjeta -->
                             <div id="tarjetaCompleta">
                                 <div class="row g-2">
                                     <div class="col-12">

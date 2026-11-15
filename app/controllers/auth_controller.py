@@ -183,8 +183,8 @@ def login():
         usuario = UsuarioModel.obtener_por_email(email)
 
         if not usuario:
-            flash("Correo o contraseña incorrectos.", "danger")
-            return redirect(url_for('web.login'))
+            # ⭐ AVISO AL HTML PARA QUE CUENTE EL INTENTO FALLIDO
+            return render_template('auth/login.html', login_error=True)
 
         # ⭐ ELIMINADO: ya no se bloquea por correo sin confirmar.
         # if not _esta_confirmado(usuario):
@@ -198,12 +198,12 @@ def login():
         try:
             password_hash = usuario.get('password', '')
             if not password_hash:
-                flash("Correo o contraseña incorrectos.", "danger")
-                return redirect(url_for('web.login'))
+                # ⭐ AVISO AL HTML PARA QUE CUENTE EL INTENTO FALLIDO
+                return render_template('auth/login.html', login_error=True)
 
             if not bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8')):
-                flash("Correo o contraseña incorrectos.", "danger")
-                return redirect(url_for('web.login'))
+                # ⭐ AVISO AL HTML PARA QUE CUENTE EL INTENTO FALLIDO
+                return render_template('auth/login.html', login_error=True)
 
         except Exception as e:
             print(f"❌ Error bcrypt login: {e}", file=sys.stderr)
@@ -268,6 +268,7 @@ def login():
         flash(f"¡Bienvenido {session['nombre']}!", "success")
         return redirect(url_for('web.raiz_tienda'))
 
+    # Si es GET, solo muestra el formulario
     return render_template('auth/login.html')
 
 

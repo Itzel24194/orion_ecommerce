@@ -1,6 +1,7 @@
 # ================================================================
 # app/controllers/pedido_controller.py
 # COMPLETO — MSI en modo SANDBOX + flujo Liverpool (cupón al pagar)
+# + espejo estado↔status y pago_estado↔paymentStatus (móvil/web)
 # ================================================================
 
 from flask import (
@@ -34,6 +35,44 @@ except ImportError:
 
 CONEKTA_MSI_PLAZOS = [3, 6, 9, 12, 18, 24]
 SANDBOX_MODE = True
+
+
+# ================================================================
+# ⭐ ESPEJO DE ESTADO — para que móvil (Express/RN) y web (Flask) lean igual
+# ================================================================
+
+def _campos_estado_espejo(estado=None, pago_estado=None, pagado=None):
+    """
+    Devuelve un dict con TODOS los alias de estado que la app móvil
+    y la web pueden necesitar. Escribe siempre ambos idiomas para que
+    nunca se desincronicen.
+
+    Uso:
+        db.pedidos.update_one(
+            {'_id': oid},
+            {'$set': _campos_estado_espejo('confirmado', 'pagado', True)}
+        )
+    """
+    campos = {}
+
+    if estado is not None:
+        estado_lc = str(estado).lower().strip()
+        campos['estado'] = estado_lc
+        campos['status'] = estado_lc   # ⭐ espejo para móvil
+
+    if pago_estado is not None:
+        pago_lc = str(pago_estado).lower().strip()
+        campos['pago_estado'] = pago_lc
+        campos['paymentStatus'] = pago_lc   # ⭐ espejo para móvil
+
+        # booleano explícito (el móvil lo detecta como fallback)
+        if pagado is None:
+            pagado = pago_lc in ('pagado', 'aprobado', 'completado', 'paid', 'approved', 'succeeded')
+
+    if pagado is not None:
+        campos['pagado'] = bool(pagado)
+
+    return campos
 
 
 # ================================================================
@@ -589,9 +628,11 @@ def carrito_checkout():
         return redirect(url_for('web.login'))
 
     carrito_items = session.get('carrito', [])
-    if not carrito_items:
-        flash('Tu carrito está vacío', 'warning')
-        return redirect(url_for('web.catalogo'))
+
+    # ⭐ SE COMENTÓ ESTA LÍNEA PARA QUE NO TE EXPULSE AL CATÁLOGO SI ESTÁ VACÍO
+    # if not carrito_items:
+    #     flash('Tu carrito está vacío', 'warning')
+    #     return redirect(url_for('web.catalogo'))
 
     items_enriquecidos = []
     for item in carrito_items:
@@ -676,6 +717,8 @@ def procesar_checkout():
     """
     Crea el pedido en estado 'pendiente' y SIN tocar el cupón.
     ⭐ El cupón se marca como usado hasta confirmar_pago() (estilo Liverpool).
+    ⭐ AHORA escribe TODOS los alias de estado (estado+status, pago_estado+paymentStatus+pagado)
+       para que el móvil y la web lean igual.
     """
     if 'user_id' not in session:
         flash('Inicia sesión para procesar tu pedido', 'warning')
@@ -751,8 +794,10 @@ def procesar_checkout():
             'descuento_lealtad': round(descuento_lealtad, 2), 'nivel_lealtad': nivel_cliente,
             'descuento_total': round(descuento_total, 2), 'total': round(total, 2),
             'metodo_pago': metodo_pago, 'tipo_envio': tipo_envio,
+            # ── ⭐ Estado original (español) + espejo (inglés + booleano) ──
             'estado': 'pendiente', 'pago_estado': 'pendiente',
             'pago_confirmado': False,
+            'status': 'pendiente', 'paymentStatus': 'pendiente', 'pagado': False,
             'notas': notas, 'total_unidades': total_unidades,
             'es_mayorista': total_unidades >= 50,
             'fecha_entrega_estimada': fecha_entrega,
@@ -853,6 +898,7 @@ def confirmar_pago(pedido_id):
     """
     Confirma el pago de un pedido Pendiente.
     AQUÍ y solo aquí se quema el cupón.
+    ⭐ AHORA escribe TODOS los alias de estado (estado+status, pago_estado+paymentStatus+pagado).
     """
     if 'user_id' not in session:
         flash('Inicia sesión para confirmar tu pago', 'warning')
@@ -887,11 +933,16 @@ def confirmar_pago(pedido_id):
         db.pedidos.update_one(
             {'_id': ObjectId(pedido_id)},
             {'$set': {
+                # ── Campos originales en español ──
                 'estado': 'confirmado',
                 'pago_estado': 'pagado',
                 'pago_confirmado': True,
                 'fecha_pago': datetime.utcnow(),
                 'updated_at': datetime.utcnow(),
+                # ── ⭐ Espejo para el móvil (Express/React Native) ──
+                'status': 'confirmado',
+                'paymentStatus': 'pagado',
+                'pagado': True,
             }}
         )
     except Exception as e:
@@ -1018,8 +1069,11 @@ def cancelar_pedido(id):
             _revertir_cashback_pedido(session['user_id'], cashback,
                 f"Cancelación {pedido.get('numero_pedido')}")
         db.pedidos.update_one({'_id': ObjectId(id)},
-            {'$set': {'estado': 'cancelado', 'fecha_cancelacion': datetime.utcnow(),
-                      'puntos_revertidos': puntos, 'cashback_revertido': cashback}})
+            {'$set': {
+                'estado': 'cancelado', 'status': 'cancelado',
+                'fecha_cancelacion': datetime.utcnow(),
+                'puntos_revertidos': puntos, 'cashback_revertido': cashback
+            }})
         return jsonify({'success': True, 'message': 'Pedido cancelado'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -1039,8 +1093,11 @@ def generar_codigo_recogida_api(id):
             return jsonify({'success': False, 'message': 'Aún no está listo'}), 400
         codigo = generar_codigo_recogida()
         db.pedidos.update_one({'_id': ObjectId(id)},
-            {'$set': {'codigo_recogida': codigo, 'estado': 'preparando',
-                      'fecha_preparacion': datetime.utcnow()}})
+            {'$set': {
+                'codigo_recogida': codigo,
+                'estado': 'preparando', 'status': 'preparando',
+                'fecha_preparacion': datetime.utcnow()
+            }})
         return jsonify({'success': True, 'codigo': codigo, 'tienda': pedido.get('tienda_recogida')})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -1057,7 +1114,10 @@ def confirmar_pedido(id):
         if pedido.get('estado') != 'enviado':
             return jsonify({'success': False, 'message': 'No enviado'}), 400
         db.pedidos.update_one({'_id': ObjectId(id)},
-            {'$set': {'estado': 'entregado', 'fecha_entrega_real': datetime.utcnow()}})
+            {'$set': {
+                'estado': 'entregado', 'status': 'entregado',
+                'fecha_entrega_real': datetime.utcnow()
+            }})
         return jsonify({'success': True, 'message': 'Confirmado'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -1183,8 +1243,13 @@ def admin_actualizar_estado_pedido(id):
                     _revertir_cashback_pedido(pedido.get('usuario_id'),
                         pedido.get('cashback_ganado', 0),
                         f"Cancelación admin {pedido.get('numero_pedido')}")
+        # ⭐ Espejo: escribir también 'status' para que el móvil lo vea
         db.pedidos.update_one({'_id': ObjectId(id)},
-            {'$set': {'estado': nuevo_estado, 'updated_at': datetime.utcnow()}})
+            {'$set': {
+                'estado': nuevo_estado,
+                'status': nuevo_estado,
+                'updated_at': datetime.utcnow()
+            }})
         return jsonify({'success': True, 'message': f'Actualizado a {nuevo_estado}'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -1570,7 +1635,7 @@ def cliente_generar_factura_pdf(id):
         flash('No autorizado', 'danger')
         return redirect(url_for('web.mis_pedidos_clientes'))
     usuario_factura = usuario_actual if es_mio else _obtener_usuario_de_pedido(pedido)
-    return _generar_factura_pdf_interno(pedido, usuario_factura)
+    return _generar_factura_pdf_interno(pedido, factura_usuario if False else usuario_factura)
 
 
 # ================================================================
@@ -1611,6 +1676,7 @@ def procesar_checkout_msi():
     Flujo MSI en SANDBOX. A diferencia de procesar_checkout(), aquí SÍ
     se confirma el pago inmediatamente (es el flujo de pago con tarjeta),
     pero se respeta el cupón de sesión y se quema en el mismo paso.
+    ⭐ AHORA escribe TODOS los alias de estado (estado+status, pago_estado+paymentStatus+pagado).
     """
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Debes iniciar sesión'}), 401
@@ -1718,9 +1784,13 @@ def procesar_checkout_msi():
             'tipo_envio':        tipo_envio_final,
             'sandbox_order_id':  order_id,
             'sandbox_status':    'paid',
+            # ── Estado original (español) + ⭐ espejo (inglés + booleano) ──
             'estado':            'confirmado',
             'pago_estado':       'pagado',
             'pago_confirmado':   True,
+            'status':            'confirmado',
+            'paymentStatus':     'pagado',
+            'pagado':            True,
             'fecha_pago':        datetime.now(timezone.utc),
             'notas':             data.get('notas', ''),
             'direccion':         data.get('direccion', {}) or {},

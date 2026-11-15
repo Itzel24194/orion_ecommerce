@@ -14,18 +14,19 @@
 
         body {
             margin: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--bg-deep);
             font-family: 'Outfit', sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            padding: 20px 0;
         }
 
         /* FONDO ANIMADO */
         .ultra-bg {
-            position: absolute;
+            position: fixed;
             width: 100vw; height: 100vh;
             background: radial-gradient(circle at 50% 50%, #1a001a, #000);
             z-index: 0;
@@ -65,6 +66,8 @@
         .card-wrapper {
             position: relative; z-index: 10;
             transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 80px;
+            max-width: 90%;
         }
 
         .card-wrapper:hover {
@@ -72,7 +75,9 @@
         }
 
         .register-card {
-            width: 400px; padding: 4rem;
+            width: 400px; 
+            max-width: 100%;
+            padding: 4rem;
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(50px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -80,6 +85,7 @@
             color: white;
             text-align: center;
             transition: 0.5s;
+            box-sizing: border-box;
         }
 
         .card-wrapper:hover .register-card {
@@ -95,6 +101,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 20px; color: white;
             transition: 0.4s;
+            box-sizing: border-box;
         }
 
         .input-box:focus {
@@ -119,6 +126,70 @@
             display: block; color: rgba(255,255,255,0.4);
             text-decoration: none; font-size: 0.75rem; margin-top: 20px;
         }
+
+        /* ⭐ NUEVO: ESTILO PARA EL MENSAJE DE ÉXITO */
+        .mensaje-exito {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+
+        /* =========================================
+           REGLAS RESPONSIVAS (Ajustes para móviles y tablets)
+           ========================================= */
+        @media (max-width: 600px) {
+            .top-bar {
+                font-size: 1.2rem;
+                letter-spacing: 10px;
+            }
+            .top-bar:hover {
+                letter-spacing: 12px;
+            }
+            .card-wrapper {
+                max-width: 95%;
+                margin-top: 80px;
+            }
+            .register-card {
+                padding: 2.5rem 1.5rem;
+                border-radius: 40px;
+            }
+            h4 {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .input-box {
+                padding: 15px;
+                margin-bottom: 1rem;
+            }
+            .btn-register {
+                padding: 15px;
+                letter-spacing: 2px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            /* Para celulares acostados o pantallas con poca altura */
+            .register-card {
+                padding: 1.5rem;
+            }
+            h4 {
+                margin-bottom: 1rem;
+                font-size: 1.3rem;
+            }
+            .input-box {
+                padding: 12px;
+                margin-bottom: 0.8rem;
+            }
+            .btn-register {
+                padding: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -129,6 +200,15 @@
     <div class="card-wrapper">
         <div class="register-card">
             <h4>CREA TU CUENTA</h4>
+            
+            <!-- ⭐ MENSAJE DE ÉXITO: Aparece si el backend envía 'registro_exitoso' como True -->
+            {% if registro_exitoso %}
+                <div class="mensaje-exito">
+                    <i class="bi bi-check-circle"></i> ¡Registro exitoso!<br>
+                    Se ha enviado un correo a <strong>{{ email_registrado }}</strong> para confirmar tu cuenta. Por favor, revisa tu bandeja de entrada.
+                </div>
+            {% endif %}
+
             <form action="{{ url_for('web.register') }}" method="POST">
                 <input type="email" name="email" class="input-box" placeholder="CORREO" required>
                 <input type="password" name="password" class="input-box" placeholder="CONTRASEÑA" required>

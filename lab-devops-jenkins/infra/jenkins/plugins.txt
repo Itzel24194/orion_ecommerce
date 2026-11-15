@@ -1,0 +1,14 @@
+workflow-aggregator
+git
+ssh-slaves
+credentials-binding
+pipeline-stage-view
+pipeline-graph-view
+junit
+coverage
+warnings-ng
+htmlpublisher
+timestamper
+ws-cleanup
+multibranch-scan-webhook-trigger
+pipeline-utility-steps

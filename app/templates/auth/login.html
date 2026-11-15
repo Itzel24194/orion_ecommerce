@@ -59,12 +59,13 @@
 
         .top-bar:hover { letter-spacing: 25px; border-bottom-color: var(--neon-blue); }
 
-        /* NUEVO: CONTENEDOR CON ELEVACIÓN SIN COLORES DE BORDE */
+        /* CONTENEDOR CON ELEVACIÓN SIN COLORES DE BORDE */
         .card-wrapper {
             position: relative; z-index: 10;
             padding: 1px;
             border-radius: 71px;
             transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 90%; 
         }
 
         .card-wrapper:hover {
@@ -73,7 +74,9 @@
 
         /* TARJETA DE CRISTAL OSCURO */
         .login-card {
-            width: 400px; padding: 4rem;
+            width: 400px; 
+            max-width: 100%;
+            padding: 4rem;
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(50px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -81,9 +84,9 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             text-align: center;
             transition: 0.5s;
+            box-sizing: border-box;
         }
 
-        /* Iluminación sutil al hacer hover en el contenedor */
         .card-wrapper:hover .login-card {
             border-color: rgba(255, 255, 255, 0.3);
             box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.05);
@@ -97,6 +100,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 20px; color: white;
             transition: 0.4s;
+            box-sizing: border-box;
         }
 
         .input-box:focus {
@@ -124,6 +128,72 @@
             transition: 0.3s;
         }
         .links a:hover { color: var(--neon-blue); }
+
+        /* ⭐ ESTILO PARA EL MENSAJE DE ERROR */
+        .alert-error {
+            background: rgba(255, 0, 127, 0.1);
+            border: 1px solid var(--neon-pink);
+            color: #ff4d94;
+            padding: 12px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+            display: none;
+        }
+
+        /* =========================================
+           REGLAS RESPONSIVAS
+           ========================================= */
+        @media (max-width: 600px) {
+            .top-bar {
+                font-size: 1.2rem;
+                letter-spacing: 10px;
+            }
+            .top-bar:hover {
+                letter-spacing: 12px;
+            }
+            .login-card {
+                padding: 2.5rem 1.5rem;
+                border-radius: 40px;
+            }
+            .card-wrapper {
+                border-radius: 41px;
+            }
+            h2 {
+                margin-bottom: 1.5rem;
+                font-size: 1.8rem;
+            }
+            .input-box {
+                padding: 15px;
+                margin-bottom: 1rem;
+            }
+            .btn-entry {
+                padding: 15px;
+                letter-spacing: 2px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .login-card {
+                padding: 1.5rem;
+            }
+            h2 {
+                margin-bottom: 1rem;
+                font-size: 1.5rem;
+            }
+            .input-box {
+                padding: 12px;
+                margin-bottom: 0.8rem;
+            }
+            .btn-entry {
+                padding: 12px;
+            }
+            .links a {
+                margin-top: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -134,10 +204,17 @@
     <div class="card-wrapper">
         <div class="login-card">
             <h2>ENTRAR</h2>
-            <form action="{{ url_for('web.login') }}" method="POST">
-                <input type="email" name="email" class="input-box" placeholder="USUARIO" required>
-                <input type="password" name="password" class="input-box" placeholder="CONTRASEÑA" required>
-                <button type="submit" class="btn-entry">ACCEDER</button>
+            
+            <!-- ⭐ Mensaje de Error -->
+            <div id="mensajeError" class="alert-error">
+                Credenciales incorrectas. Intento <span id="contadorIntentos">1</span> de 3.
+            </div>
+
+            <form id="loginForm" action="{{ url_for('web.login') }}" method="POST" novalidate>
+                <input type="email" name="email" id="email" class="input-box" placeholder="USUARIO" required>
+                <input type="password" name="password" id="password" class="input-box" placeholder="CONTRASEÑA" required>
+                <!-- ⭐ CAMBIO IMPORTANTE: type="button" para que no envíe de golpe -->
+                <button type="button" id="btnAcceder" class="btn-entry">ACCEDER</button>
             </form>
             <div class="links">
                 <a href="{{ url_for('web.register') }}">¿AÚN NO TIENES CUENTA? REGÍSTRATE</a>
@@ -145,6 +222,107 @@
             </div>
         </div>
     </div>
+
+    <!-- ⭐ SCRIPT DE CONTROL DE INTENTOS Y BLOQUEO + VALIDACIONES EN ESPAÑOL -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const btnSubmit = document.getElementById('btnAcceder');
+            const alertError = document.getElementById('mensajeError');
+            const spanIntentos = document.getElementById('contadorIntentos');
+
+            // Claves para guardar en el navegador
+            const LLAVE_INTENTOS = 'orion_login_intentos';
+            const LLAVE_BLOQUEO = 'orion_login_bloqueo';
+
+            // Función para verificar si el usuario ya está bloqueado
+            function verificarBloqueo() {
+                const bloqueoHasta = localStorage.getItem(LLAVE_BLOQUEO);
+                if (bloqueoHasta) {
+                    const ahora = new Date().getTime();
+                    if (ahora < parseInt(bloqueoHasta)) {
+                        // Sigue bloqueado
+                        const minutosRestantes = Math.ceil((parseInt(bloqueoHasta) - ahora) / 60000);
+                        alertError.style.display = 'block';
+                        alertError.innerHTML = `🚫 Demasiados intentos fallidos. Por seguridad, espera <strong>${minutosRestantes} minutos</strong> para intentar de nuevo.`;
+                        emailInput.disabled = true;
+                        passwordInput.disabled = true;
+                        btnSubmit.disabled = true;
+                        btnSubmit.style.opacity = '0.5';
+                        btnSubmit.style.cursor = 'not-allowed';
+                        return true; // Está bloqueado
+                    } else {
+                        // Ya pasó el tiempo, limpiamos el bloqueo y los intentos
+                        localStorage.removeItem(LLAVE_BLOQUEO);
+                        localStorage.removeItem(LLAVE_INTENTOS);
+                    }
+                }
+                return false; // No está bloqueado
+            }
+
+            // Verificar bloqueo al cargar la página
+            verificarBloqueo();
+
+            // ⭐ FUNCIÓN QUE SE EJECUTA AL DAR CLIC EN "ACCEDER"
+            btnSubmit.addEventListener('click', function(e) {
+                // Si ya está bloqueado, no hacemos nada más
+                if (verificarBloqueo()) return;
+
+                // Limpiar estilos de error previos
+                emailInput.style.borderColor = '';
+                passwordInput.style.borderColor = '';
+                alertError.style.display = 'none';
+
+                // Validar Correo (No vacío y formato válido)
+                if (!emailInput.value.trim()) {
+                    alertError.style.display = 'block';
+                    alertError.innerHTML = '⚠️ Por favor, ingresa tu correo electrónico.';
+                    emailInput.style.borderColor = 'var(--neon-pink)';
+                    emailInput.focus();
+                    return;
+                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
+                    alertError.style.display = 'block';
+                    alertError.innerHTML = '⚠️ El formato del correo no es válido. Ejemplo: usuario@correo.com';
+                    emailInput.style.borderColor = 'var(--neon-pink)';
+                    emailInput.focus();
+                    return;
+                }
+
+                // Validar Contraseña (No vacía)
+                if (!passwordInput.value.trim()) {
+                    alertError.style.display = 'block';
+                    alertError.innerHTML = '⚠️ Por favor, ingresa tu contraseña.';
+                    passwordInput.style.borderColor = 'var(--neon-pink)';
+                    passwordInput.focus();
+                    return;
+                }
+
+                // ⭐ SI TODO ESTÁ BIEN, ENVIAMOS EL FORMULARIO AL SERVIDOR MANUALMENTE
+                form.submit();
+            });
+
+            // ⭐ ESCUCHA DEL BACKEND (Si Flask envía un mensaje de error)
+            {% if login_error %}
+                let intentosActuales = parseInt(localStorage.getItem(LLAVE_INTENTOS) || '0');
+                intentosActuales++;
+                localStorage.setItem(LLAVE_INTENTOS, intentosActuales);
+
+                if (intentosActuales >= 3) {
+                    // Bloquear por 30 minutos
+                    const ahora = new Date().getTime();
+                    const treintaMinutos = 30 * 60 * 1000;
+                    localStorage.setItem(LLAVE_BLOQUEO, ahora + treintaMinutos);
+                    verificarBloqueo();
+                } else {
+                    alertError.style.display = 'block';
+                    spanIntentos.textContent = intentosActuales;
+                    alertError.innerHTML = `Credenciales incorrectas. Intento <span id="contadorIntentos">${intentosActuales}</span> de 3.`;
+                }
+            {% endif %}
+        });
+    </script>
 
 </body>
 </html>

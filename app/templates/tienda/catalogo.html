@@ -455,6 +455,36 @@
         .toast-orion.success i { color: #22c55e; }
         .toast-orion.error i { color: #ef4444; }
     </style>
+
+    <!-- ⭐ ESTILOS EXTRA PARA RESPONSIVIDAD (Móvil y Tablet) -->
+    <style>
+        @media (max-width: 768px) {
+            /* Navbar: apilar el buscador debajo del logo y los iconos */
+            .main-navbar .main-container {
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+            }
+            .search-wrapper {
+                order: 3;
+                width: 100%;
+                margin: 5px 0 0 0 !important;
+                flex: none;
+            }
+            .main-navbar .d-flex.align-items-center.gap-3 {
+                width: 100%;
+                justify-content: space-between;
+                padding: 0 10px;
+            }
+            .main-container > nav.breadcrumb-orion { margin-top: 10px !important; }
+            /* Ajustar layout del catálogo */
+            .row.g-3 { flex-direction: column; }
+            .col-lg-3.col-md-4, .col-lg-9.col-md-8 { width: 100%; }
+            /* Ocultar textos largos en pantallas muy pequeñas */
+            .btn-fav-card i { font-size: 0.9rem; }
+            .badge-vendedor-card { max-width: 80px; }
+        }
+    </style>
 </head>
 
 <body
