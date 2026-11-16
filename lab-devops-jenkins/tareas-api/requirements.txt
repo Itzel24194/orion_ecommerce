@@ -1,4 +1,0 @@
-# REEMPLAZA este archivo por el requirements.txt de tu API de ORION
-fastapi
-uvicorn[standard]
-pymongo
