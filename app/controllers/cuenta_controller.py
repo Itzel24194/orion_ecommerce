@@ -8,12 +8,16 @@ from datetime import datetime, timezone
 from flask import (jsonify, request, session, current_app,
                    render_template, redirect, url_for, send_file)
 from bson import ObjectId
+from werkzeug.security import check_password_hash, generate_password_hash
+import hashlib
+import hmac
 import secrets
 import uuid
 import math
 import re
 import io
 import base64
+import binascii
 import os
 
 # --- Dependencias opcionales ---
@@ -79,47 +83,96 @@ def _to_oid(val):
     return _safe_oid(val)
 
 
+# ================================================================
+# 🔐 CONTRASEÑAS (hashes fuertes + migración de hashes heredados)
+# ================================================================
+
+_CAMPOS_PASSWORD = ('password', 'password_hash', 'contraseña',
+                    'contrasena', 'hash', 'clave')
+_PREFIJOS_WERKZEUG = ('pbkdf2:', 'scrypt:')
+_PREFIJOS_BCRYPT = ('$2a$', '$2b$', '$2y$')
+
+
+def _iguales(a, b):
+    """Comparación en tiempo constante entre dos str."""
+    return hmac.compare_digest(str(a).encode('utf-8'), str(b).encode('utf-8'))
+
+
+def _es_hash_fuerte(stored_str):
+    return stored_str.startswith(_PREFIJOS_WERKZEUG + _PREFIJOS_BCRYPT)
+
+
+def _hash_guardado(usuario):
+    """Devuelve (campo, valor) del primer campo de contraseña con datos."""
+    for campo in _CAMPOS_PASSWORD:
+        if usuario.get(campo):
+            return campo, str(usuario[campo])
+    return None, ''
+
+
+def _coincide_legacy(plain, stored_str):
+    """
+    Solo para verificar hashes heredados SIN sal (MD5/SHA1/SHA256).
+    El usuario se re-hashea con un algoritmo fuerte al iniciar sesión
+    (ver _migrar_password_si_legacy).
+    """
+    data = plain.encode('utf-8')
+    n = len(stored_str)
+    if n == 32:
+        digest = hashlib.md5(data, usedforsecurity=False).hexdigest()  # nosec B324
+    elif n == 40:
+        digest = hashlib.sha1(data, usedforsecurity=False).hexdigest()  # nosec B324
+    elif n == 64:
+        digest = hashlib.sha256(data).hexdigest()
+    else:
+        return False
+    return _iguales(digest, stored_str.lower())
+
+
 def _verificar_password(stored, plain):
     if not stored or not plain:
         return False
     stored_str = str(stored)
 
-    if stored_str == plain:
-        return True
-
-    if stored_str.startswith(('pbkdf2:', 'scrypt:')):
+    # Hashes fuertes: el resultado es definitivo (nunca se compara como texto plano,
+    # así no se puede entrar usando el propio hash como contraseña).
+    if stored_str.startswith(_PREFIJOS_WERKZEUG):
         try:
-            from werkzeug.security import check_password_hash
-            if check_password_hash(stored_str, plain):
-                return True
+            return check_password_hash(stored_str, plain)
         except Exception:
-            pass
+            return False
 
-    if stored_str.startswith(('$2a$', '$2b$', '$2y$')):
+    if stored_str.startswith(_PREFIJOS_BCRYPT):
         try:
             import bcrypt
-            if bcrypt.checkpw(plain.encode('utf-8'), stored_str.encode('utf-8')):
-                return True
+            return bcrypt.checkpw(plain.encode('utf-8'), stored_str.encode('utf-8'))
         except Exception:
-            pass
+            return False
 
-    if len(stored_str) in (32, 40, 64):
-        try:
-            import hashlib
-            if hashlib.md5(plain.encode()).hexdigest() == stored_str:
-                return True
-            if hashlib.sha1(plain.encode()).hexdigest() == stored_str:
-                return True
-            if hashlib.sha256(plain.encode()).hexdigest() == stored_str:
-                return True
-        except Exception:
-            pass
+    # Contraseña en texto plano (heredada)
+    if _iguales(stored_str, plain):
+        return True
 
+    # Hashes heredados sin sal
+    return _coincide_legacy(plain, stored_str)
+
+
+def _migrar_password_si_legacy(usuario, plain):
+    """
+    Llamar SOLO después de que _verificar_password devolvió True.
+    Si la contraseña estaba en texto plano o con MD5/SHA1/SHA256 sin sal,
+    la guarda de nuevo con el hash fuerte de werkzeug.
+    """
+    campo, valor = _hash_guardado(usuario)
+    if not campo or _es_hash_fuerte(valor):
+        return
     try:
-        from werkzeug.security import check_password_hash
-        return check_password_hash(stored_str, plain)
+        current_app.db.usuarios.update_one(
+            {'_id': usuario['_id']},
+            {'$set': {campo: generate_password_hash(plain)}}
+        )
     except Exception:
-        return False
+        current_app.logger.error('[password] no se pudo migrar el hash heredado')
 
 
 def _normalizar_pedido(p):
@@ -166,8 +219,6 @@ def _monedero_doc(usuario, crear_si_falta=True):
         doc = db[_COLECCION_MONEDERO].find_one({'usuario_id': uid_str})
         if doc: return doc
         doc = db[_COLECCION_MONEDERO].find_one({'usuario_id': uid})
-        if doc: return doc
-        doc = db[_COLECCION_MONEDERO].find_one({'usuario_id': uid_str})
         if doc: return doc
     except Exception:
         return None
@@ -563,8 +614,7 @@ def agregar_metodo_pago():
         db.metodos_pago.insert_one(nuevo)
         return _json_no_cache({'success': True, 'message': 'Método guardado (modo sandbox)', 'metodo': _serializar_metodo(nuevo)})
     except Exception as e:
-        current_app.logger.error(f'[agregar_metodo_pago] {e}')
-        import traceback; traceback.print_exc()
+        current_app.logger.exception(f'[agregar_metodo_pago] {e}')
         return _json_no_cache({'success': False, 'message': str(e)}, 500)
 
 
@@ -662,8 +712,7 @@ def obtener_lealtad_mi_info():
         except Exception: pass
         return _json_no_cache({'success': True, 'nivel': nivel, 'emoji_nivel': emoji, 'color_nivel': _COLOR_NIVEL.get(nivel, '#CD7F32'), 'multiplicador': mult, 'puntos_disponibles': puntos, 'valor_puntos': round(puntos * 0.01, 2), 'gasto_total': gasto_total, 'compras_realizadas': compras, 'progreso': progreso, 'cupones': cupones, 'total_cupones': len(cupones), 'beneficios_actuales': beneficios, 'historial_puntos': historial, 'puntos_historicos': puntos})
     except Exception as e:
-        current_app.logger.error(f'[obtener_lealtad_mi_info] {e}')
-        import traceback; traceback.print_exc()
+        current_app.logger.exception(f'[obtener_lealtad_mi_info] {e}')
         return _json_no_cache({'success': False, 'error': str(e)}, 500)
 
 
@@ -702,6 +751,7 @@ def iniciar_2fa():
 def confirmar_2fa():
     usuario = _get_usuario_actual()
     if not usuario: return _error('No autenticado', 401)
+    if not _PYOTP_OK: return _error('pyotp no instalado en el servidor', 500)
     data = request.get_json(silent=True) or {}
     codigo = (data.get('codigo') or '').strip()
     secreto = usuario.get('two_factor_pendiente')
@@ -717,10 +767,9 @@ def desactivar_2fa():
     if not usuario: return _error('No autenticado', 401)
     data = request.get_json(silent=True) or {}
     password = (data.get('password') or '').strip()
-    stored = ''
-    for campo in ('password', 'password_hash', 'contraseña', 'contrasena', 'hash', 'clave'):
-        if usuario.get(campo): stored = str(usuario[campo]); break
+    _, stored = _hash_guardado(usuario)
     if not stored or not _verificar_password(stored, password): return _error('Contraseña incorrecta')
+    _migrar_password_si_legacy(usuario, password)
     current_app.db.usuarios.update_one({'_id': usuario['_id']}, {'$unset': {'two_factor': ''}})
     return _json_no_cache({'success': True, 'message': '2FA desactivado'})
 
@@ -730,10 +779,9 @@ def regenerar_codigos_2fa():
     if not usuario: return _error('No autenticado', 401)
     data = request.get_json(silent=True) or {}
     password = (data.get('password') or '').strip()
-    stored = ''
-    for campo in ('password', 'password_hash', 'contraseña', 'contrasena', 'hash', 'clave'):
-        if usuario.get(campo): stored = str(usuario[campo]); break
+    _, stored = _hash_guardado(usuario)
     if not stored or not _verificar_password(stored, password): return _error('Contraseña incorrecta')
+    _migrar_password_si_legacy(usuario, password)
     codigos = [{'codigo': secrets.token_hex(4).upper(), 'usado': False} for _ in range(8)]
     current_app.db.usuarios.update_one({'_id': usuario['_id']}, {'$set': {'two_factor.codigos_respaldo': codigos}})
     return _json_no_cache({'success': True, 'codigos_respaldo': [c['codigo'] for c in codigos]})
@@ -870,17 +918,27 @@ def monedero_transferir():
         monto = float(data.get('monto') or 0)
     except (ValueError, TypeError):
         monto = 0
+    # Rechaza NaN / infinito
+    if not math.isfinite(monto):
+        monto = 0
     serie = (data.get('numero_serie') or '').strip()
     cvv = (data.get('cvv') or '').strip()
     if monto <= 0: return _error('Monto inválido')
-    if len(serie) != 4 or not serie.isdigit(): return _error('Número de serie debe tener 4 dígitos')
-    if len(cvv) != 3 or not cvv.isdigit(): return _error('CVV debe tener 3 dígitos')
+    if len(serie) != 4 or not serie.isascii() or not serie.isdigit(): return _error('Número de serie debe tener 4 dígitos')
+    if len(cvv) != 3 or not cvv.isascii() or not cvv.isdigit(): return _error('CVV debe tener 3 dígitos')
     db = current_app.db
     uid = usuario['_id']
     uid_str = str(uid)
     doc = _monedero_doc(usuario, crear_si_falta=True)
     if not doc: return _error('No se pudo acceder al monedero', 500)
     if doc.get('bloqueado'): return _error('Tu monedero está bloqueado. Contacta a soporte.', 403)
+
+    # Valida serie (últimos 4 de la tarjeta) y CVV contra los datos del monedero
+    serie_ok = _iguales(serie, str(doc.get('numero_tarjeta') or '')[-4:])
+    cvv_ok = _iguales(cvv, str(doc.get('cvv') or ''))
+    if not (serie_ok and cvv_ok):
+        return _error('Datos de la tarjeta incorrectos', 403)
+
     config = {}
     try:
         from app.models.monedero_admin_model import MonederoAdmin
@@ -915,11 +973,8 @@ def cambiar_password():
     if not actual or not nuevo or not confirmar: return _error('Todos los campos son obligatorios')
     if nuevo != confirmar: return _error('Las contraseñas no coinciden')
     if len(nuevo) < 8: return _error('La contraseña debe tener al menos 8 caracteres')
-    stored = ''
-    for campo in ('password', 'password_hash', 'contraseña', 'contrasena', 'hash', 'clave'):
-        if usuario.get(campo): stored = str(usuario[campo]); break
+    _, stored = _hash_guardado(usuario)
     if not stored or not _verificar_password(stored, actual): return _error('Contraseña actual incorrecta')
-    from werkzeug.security import generate_password_hash
     nuevo_hash = generate_password_hash(nuevo)
     current_app.db.usuarios.update_one({'_id': usuario['_id']}, {'$set': {'password': nuevo_hash, 'password_hash': nuevo_hash, 'updated_at': datetime.now(timezone.utc)}})
     return _json_no_cache({'success': True, 'message': 'Contraseña actualizada'})
@@ -1050,73 +1105,80 @@ def actualizar_perfil():
 
 
 # ================================================================
-# ⭐ API MÓVIL: SUBIR FOTO (BASE64) — CON DIAGNÓSTICO
+# ⭐ API MÓVIL: SUBIR FOTO (BASE64)
 # ================================================================
 
+_MAX_FOTO_BYTES = 5 * 1024 * 1024          # 5 MB de imagen real
+_MAX_FOTO_BASE64 = int(_MAX_FOTO_BYTES * 1.4)  # ~ tamaño máximo del texto base64
+
+
+def _detectar_ext_imagen(img_bytes):
+    """Devuelve la extensión según los bytes reales del archivo, o None si no es imagen."""
+    if img_bytes.startswith(b'\xff\xd8\xff'):
+        return 'jpg'
+    if img_bytes.startswith(b'\x89PNG\r\n\x1a\n'):
+        return 'png'
+    if img_bytes.startswith((b'GIF87a', b'GIF89a')):
+        return 'gif'
+    if img_bytes[:4] == b'RIFF' and img_bytes[8:12] == b'WEBP':
+        return 'webp'
+    return None
+
+
 def api_subir_foto():
-    print("=" * 60)
-    print("📥 [api_subir_foto] ¡Petición recibida desde la app móvil!")
-    
+    log = current_app.logger
     usuario = _get_usuario_actual()
     if not usuario:
-        print("❌ [api_subir_foto] Usuario no autenticado (no hay sesión)")
+        log.warning('[api_subir_foto] usuario no autenticado')
         return _json_no_cache({'success': False, 'error': 'No autenticado'}, 401)
 
     data = request.get_json(silent=True) or {}
     foto_base64 = data.get('foto_base64') or ''
-    
-    print(f"📥 [api_subir_foto] Tamaño de la cadena base64: {len(foto_base64)} caracteres")
-    
-    if not foto_base64.startswith('data:image/'):
-        print("❌ [api_subir_foto] El string no empieza con 'data:image/'")
+
+    if not isinstance(foto_base64, str) or not foto_base64.startswith('data:image/'):
         return _json_no_cache({'success': False, 'error': 'Formato inválido'}, 400)
 
-    try:
-        header, b64data = foto_base64.split(',', 1)
-        ext = 'jpg'
-        if 'image/png' in header: ext = 'png'
-        elif 'image/webp' in header: ext = 'webp'
-        elif 'image/gif' in header: ext = 'gif'
+    if len(foto_base64) > _MAX_FOTO_BASE64:
+        return _json_no_cache({'success': False, 'error': 'La imagen supera el tamaño máximo (5 MB)'}, 413)
 
-        img_bytes = base64.b64decode(b64data)
+    try:
+        _, b64data = foto_base64.split(',', 1)
+        try:
+            img_bytes = base64.b64decode(b64data, validate=True)
+        except (binascii.Error, ValueError):
+            return _json_no_cache({'success': False, 'error': 'Imagen corrupta'}, 400)
+
+        if len(img_bytes) > _MAX_FOTO_BYTES:
+            return _json_no_cache({'success': False, 'error': 'La imagen supera el tamaño máximo (5 MB)'}, 413)
+
+        ext = _detectar_ext_imagen(img_bytes)
+        if not ext:
+            return _json_no_cache({'success': False, 'error': 'El archivo no es una imagen válida'}, 400)
+
         uid_str = str(usuario['_id'])
         fname = f'u{uid_str}_{int(datetime.now().timestamp() * 1000)}_{secrets.token_hex(4)}.{ext}'
-        
         upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
-        
-        print(f"📁 [api_subir_foto] Carpeta destino: {upload_dir}")
-        print(f"📁 [api_subir_foto] Nombre del archivo: {fname}")
-        print(f"📁 [api_subir_foto] ¿La carpeta existe? {os.path.exists(upload_dir)}")
-
         os.makedirs(upload_dir, exist_ok=True)
         ruta = os.path.join(upload_dir, fname)
 
         with open(ruta, 'wb') as f:
             f.write(img_bytes)
 
-        if os.path.exists(ruta):
-            print(f"✅ [api_subir_foto] Archivo guardado con éxito: {ruta}")
-        else:
-            print(f"❌ [api_subir_foto] ¡ERROR FATAL! El archivo no se creó en: {ruta}")
+        if not os.path.exists(ruta):
+            log.error(f'[api_subir_foto] el archivo no se creó: {ruta}')
             return _json_no_cache({'success': False, 'error': 'No se pudo guardar en disco'}, 500)
 
         current_app.db.usuarios.update_one({'_id': usuario['_id']}, {'$set': {'foto': fname}})
-        
-        print("✅ [api_subir_foto] Base de datos actualizada")
-        print("=" * 60)
+        log.info(f'[api_subir_foto] foto guardada: {fname} ({len(img_bytes)} bytes)')
 
-        url = f'/static/uploads/{fname}'
         return _json_no_cache({
             'success': True,
-            'fotoUrl': url,
+            'fotoUrl': f'/static/uploads/{fname}',
             'message': 'Foto actualizada correctamente'
         })
     except Exception as e:
-        print(f"❌ [api_subir_foto] Excepción capturada: {e}")
-        import traceback
-        traceback.print_exc()
-        print("=" * 60)
-        return _json_no_cache({'success': False, 'error': str(e)}, 500)
+        log.exception(f'[api_subir_foto] {e}')
+        return _json_no_cache({'success': False, 'error': 'No se pudo procesar la imagen'}, 500)
 
 
 # ================================================================
@@ -1277,9 +1339,7 @@ def eliminar_mi_cuenta():
     data = request.get_json(silent=True) or {}
     password = (data.get('password') or '').strip()
     if not password: return _error('Debes ingresar tu contraseña para confirmar')
-    stored = ''
-    for campo in ('password', 'password_hash', 'contraseña', 'contrasena', 'hash', 'clave'):
-        if usuario.get(campo): stored = str(usuario[campo]); break
+    _, stored = _hash_guardado(usuario)
     if not stored: return _error('No se encontró la contraseña en tu cuenta.')
     if not _verificar_password(stored, password): return _error('Contraseña incorrecta')
     db = current_app.db
