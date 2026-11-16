@@ -154,6 +154,16 @@ pipeline {
         stage('Desplegar a staging') {
             when { anyOf { branch 'main'; branch 'develop' } }
             steps {
+                sh 'DOCKER_HOST=tcp://dind:2375 docker network create orion-staging 2>/dev/null || true'
+                sh 'DOCKER_HOST=tcp://dind:2375 docker rm -f orion-mongo-staging 2>/dev/null || true'
+                sh 'DOCKER_HOST=tcp://dind:2375 docker run -d --name orion-mongo-staging --network orion-staging mongo:7'
+                sh '''
+                    for i in $(seq 1 30); do
+                        DOCKER_HOST=tcp://dind:2375 docker exec orion-mongo-staging mongosh --quiet --eval 'db.runCommand({ping:1}).ok' >/dev/null 2>&1 && exit 0
+                        sleep 2
+                    done
+                    echo "MongoDB de staging no arrancó"; exit 1
+                '''
                 desplegarContenedor(
                     nombre: 'orion-api-staging',
                     imagen: "${env.REGISTRY}/${env.IMAGE_NAME}:${env.IMAGE_TAG}",
@@ -206,17 +216,17 @@ pipeline {
             steps {
                 script {
                     String previa = sh(
-                        script: "docker inspect --format '{{.Config.Image}}' orion-api-prod 2>/dev/null || echo ninguna",
+                        script: "DOCKER_HOST=tcp://dind:2375 docker inspect --format '{{.Config.Image}}' orion-api-prod 2>/dev/null || echo ninguna",
                         returnStdout: true
                     ).trim()
                     writeFile file: 'reports/prod-imagen-previa.txt', text: previa + '\n'
                 }
                 withCredentials([string(credentialsId: 'orion-jwt-prod', variable: 'JWT_SECRET')]) {
                     sh '''
-                        docker network create orion-prod 2>/dev/null || true
-                        if ! docker ps --format '{{.Names}}' | grep -qx orion-mongo-prod; then
-                            docker rm -f orion-mongo-prod 2>/dev/null || true
-                            docker run -d --name orion-mongo-prod --network orion-prod --restart unless-stopped \\
+                        DOCKER_HOST=tcp://dind:2375 docker network create orion-prod 2>/dev/null || true
+                        if ! DOCKER_HOST=tcp://dind:2375 docker ps --format '{{.Names}}' | grep -qx orion-mongo-prod; then
+                            DOCKER_HOST=tcp://dind:2375 docker rm -f orion-mongo-prod 2>/dev/null || true
+                            DOCKER_HOST=tcp://dind:2375 docker run -d --name orion-mongo-prod --network orion-prod --restart unless-stopped \\
                                 -v orion_mongo_prod_data:/data/db mongo:7
                         fi
                     '''
@@ -274,8 +284,8 @@ pipeline {
 
     post {
         always {
-            sh 'docker rm -f "${TEST_MONGO:-ninguno}" 2>/dev/null || true'
-            sh 'docker image prune -f >/dev/null 2>&1 || true'
+            sh 'DOCKER_HOST=tcp://dind:2375 docker rm -f "${TEST_MONGO:-ninguno}" 2>/dev/null || true'
+            sh 'DOCKER_HOST=tcp://dind:2375 docker image prune -f >/dev/null 2>&1 || true'
             notificarResultado()
         }
         cleanup {
