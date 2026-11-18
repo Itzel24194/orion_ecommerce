@@ -17,18 +17,19 @@ from pymongo import MongoClient, ASCENDING, DESCENDING
 # ================================================================
 
 RUTA_ENV = Path(__file__).resolve().parents[2] / ".env"
-load_dotenv(dotenv_path=RUTA_ENV)
+load_dotenv(dotenv_path=RUTA_ENV, override=False)
 
 # ================================================================
 # 2. CONEXIÓN A MONGODB ATLAS
 # ================================================================
 
-MONGO_URI = os.getenv("MONGO_URI")
-MONGO_DBNAME = os.getenv("MONGO_DBNAME", "orioon")
+# Prioriza variables de entorno (Jenkins/Docker) y usa .env solo como respaldo
+MONGO_URI = os.getenv("MONGO_URI") or os.getenv("MONGO_URL")
+MONGO_DBNAME = os.getenv("MONGO_DBNAME") or os.getenv("DB_NAME") or "orioon"
 
 if not MONGO_URI:
     raise RuntimeError(
-        f"No se encontró MONGO_URI en el archivo: {RUTA_ENV}"
+        f"No se encontró MONGO_URI/MONGO_URL en el entorno ni en el archivo: {RUTA_ENV}"
     )
 
 client = MongoClient(

@@ -1,3 +1,4 @@
+
 @Library('ci-lib') _
 
 pipeline {
@@ -168,10 +169,10 @@ pipeline {
                     nombre: 'orion-api-staging',
                     imagen: "${env.REGISTRY}/${env.IMAGE_NAME}:${env.IMAGE_TAG}",
                     puerto: 8081,
-                    puertoInterno: 5000,
+                    puertoInterno: 8000,
                     red: 'orion-staging',
                     envVars: [
-                        MONGO_URL : 'mongodb://orion-mongo-staging:27017',
+                        MONGO_URI : 'mongodb://orion-mongo-staging:27017',
                         DB_NAME   : 'orion_staging',
                         JWT_SECRET: 'secreto-solo-para-staging',
                         APP_ENV   : 'staging'
@@ -234,10 +235,10 @@ pipeline {
                         nombre: 'orion-api-prod',
                         imagen: "${env.REGISTRY}/${env.IMAGE_NAME}:${env.IMAGE_TAG}",
                         puerto: 8082,
-                        puertoInterno: 5000,
+                        puertoInterno: 8000,
                         red: 'orion-prod',
                         envVars: [
-                            MONGO_URL: 'mongodb://orion-mongo-prod:27017',
+                            MONGO_URI: 'mongodb://orion-mongo-prod:27017',
                             DB_NAME  : 'orion',
                             APP_ENV  : 'production'
                         ],
@@ -263,10 +264,10 @@ pipeline {
                                     nombre: 'orion-api-prod',
                                     imagen: previa,
                                     puerto: 8082,
-                                    puertoInterno: 5000,
+                                    puertoInterno: 8000,
                                     red: 'orion-prod',
                                     envVars: [
-                                        MONGO_URL: 'mongodb://orion-mongo-prod:27017',
+                                        MONGO_URI: 'mongodb://orion-mongo-prod:27017',
                                         DB_NAME  : 'orion',
                                         APP_ENV  : 'production'
                                     ],

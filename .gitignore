@@ -42,3 +42,5 @@ desktop.ini
 app/static/debug_impi/
 .history/
 app/static/uploads/
+
+lab-devops-jenkins/infra/jenkins_agent_key*
