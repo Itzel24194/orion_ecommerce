@@ -1,4 +1,3 @@
-
 @Library('ci-lib') _
 
 pipeline {
@@ -114,7 +113,6 @@ pipeline {
                 }
 
                 stage('Pruebas y cobertura') {
-                    when { expression { return false } }
                     steps {
                         sh '''
                             . .venv/bin/activate
