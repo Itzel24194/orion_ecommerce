@@ -60,6 +60,7 @@ pipeline {
                     . .venv/bin/activate
                     pip install --quiet --upgrade pip
                     pip install --quiet -r requirements-dev.txt
+                    pip install --quiet pytest-cov
                 '''
             }
         }
@@ -117,12 +118,13 @@ pipeline {
                         sh '''
                             . .venv/bin/activate
                             mkdir -p reports
-                            pytest --junitxml=reports/junit.xml || true
+                            pytest --junitxml=reports/junit.xml --cov=app --cov-report=xml:reports/coverage.xml --cov-fail-under=${COBERTURA_MINIMA} || true
                         '''
                     }
                     post {
                         always {
                             junit allowEmptyResults: true, testResults: 'reports/junit.xml'
+                            recordCoverage(tools: [[parser: 'COBERTURA', pattern: 'reports/coverage.xml']])
                         }
                     }
                 }
@@ -147,6 +149,9 @@ pipeline {
                     docker tag ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} ${REGISTRY}/${IMAGE_NAME}:latest || true
                     docker push ${REGISTRY}/${IMAGE_NAME}:latest || true
                 '''
+                // NUEVO: guardar y archivar el nombre de la imagen
+                sh 'mkdir -p reports && echo "${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}" > reports/imagen.txt'
+                archiveArtifacts artifacts: 'reports/imagen.txt', allowEmptyArchive: true
             }
         }
 
