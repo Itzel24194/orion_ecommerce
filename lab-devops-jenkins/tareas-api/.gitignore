@@ -1,8 +1,0 @@
-.venv/
-__pycache__/
-reports/
-.coverage
-.env
-infra/.env
-infra/jenkins_agent_key
-infra/jenkins_agent_key.pub
