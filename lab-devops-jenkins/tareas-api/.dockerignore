@@ -1,7 +1,0 @@
-.git
-.venv
-tests
-reports
-Jenkinsfile
-Dockerfile
-.env
